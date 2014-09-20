@@ -1,0 +1,197 @@
+/*jslint white: true */
+/*global Y, YAX, $, Self */
+
+Y.DOM(document).ready(function () {
+	'use strict';
+
+	var ButtonOne = Y.DOM('#ButtonOne');
+	var TestOneImage = Y.DOM('#TestOneImage');
+	var Wrapper = Y.DOM('body');
+
+	// var Temp1 = new Y.Store('LocalStorage');
+
+	// Temp1.Set('YAX.SVG.LOGO', YAX.LOGo.SVG);
+
+	TestOneImage.attr('src', 'http://0.0.0.0:8000/Media/yax_js_logo_01-o.svg');
+
+	TestOneImage.width(115);
+
+	TestOneImage.css({
+		marginTop: -13
+	});
+
+	ButtonOne.Tooltip({
+		Content: 'Testing Tooltips!',
+		Gravity: 'north',
+		Theme: 'dark',
+		Animation: 'flipIn'
+	});
+
+	Wrapper.WaitForMe({
+		Effect: 'rotation'
+	});
+
+	Wrapper.trigger('WaitForMeCloseEvent');
+
+//	TestOneImage.css({
+//		width: 50,
+//		height: 30,
+//		backgroundColor: 'red'
+//	});
+
+	TestOneImage.Tooltip({
+		Content: 'YAX.js Test!',
+		Gravity: 'west',
+		Theme: 'dark',
+		Animation: 'fadeIn'
+	});
+
+//	var csvData = '"year","age","name","sex","country"\t\n1988,26,Xeriab Nabil,Male,Yemen\t\n1990,24,Radhda Jamal,Female,Yemen\t\n';
+//
+//	var csvParser = new Y.Parser('CSV');
+//
+//	var csvResult = csvParser.dataSource(csvData).parse();
+//
+//	var LocalStorage = new Y.Store('LocalStorage');
+//
+//	var Cookies = new Y.Store('Cookies');
+
+	// Y.Define('YAXJS', function (require, exports, module) {
+	//
+	// 	var YAXJS = {
+	// 		VERSION: '0.1.9',
+	// 	};
+	//
+	// 	module.exports = YAXJS;
+	// });
+	//
+	// console.LOG(Y.Require('YAXJS'));
+
+
+	// console.LOG(csvResult);
+
+	// console.LOG(LocalStorage);
+
+	// Cookies.Set('T1', 'Hey!!');
+
+	// LocalStorage.Set('T1', 'Hey!!');
+
+	// console.LOG(Cookies.Get('T1'));
+	// console.LOG(Cookies.Set('T1', 'Hey!!'));
+
+	// console.LOG(LocalStorage.Get('T1'));
+
+	//Y.SetConfig('test.one', 1);
+	//Y.SetConfig('test.two', 2);
+
+	//console.LOG(Y.GetConfig('test.two'));
+	//Y.LOG('YAX.JS: ', Y);
+
+//	var compiledTemplate = Y.Template('Hello <%= text %>');
+//
+//	Y.LOG(compiledTemplate({
+//			text: 'World!'
+//		})
+//	);
+
+
+
+//	Y.Define('YAXJS', function (require, exports, module) {
+//
+//		var YAXJS = {
+//			VERSION: '0.1.9'
+//		};
+//
+//		module.exports = YAXJS;
+//
+//		// Y.Extend(window, YAXJS);
+//	});
+
+//	this += Y.Require('YAXJS');
+
+//	Y.Require('YAXJS');
+
+	// Y.LOG(VERSION);
+//	Y.LOG(window);
+
+
+	//Y.LOG(Y);
+
+	// Y.UserAgent.Extend({});
+
+	// function Test (e) {
+	// 	Y.LOG(e);
+	// }
+
+	// Y.Mixin.Events.addEventListener('LOAD', Test, Y);
+
+	// Y.LOG('%c[LOG]', 'color:gray', Y);
+	// Y.LOG(Y);
+
+	// Y.Mixin.Events.fire('LOAD');
+
+	// var CLE = new Y.CLE();
+	//
+	// Y.LOG(CLE);
+	// Y.LOG(CLE.applyColors('#red{msg}'));
+
+	// Y.DEBUG('#red{msg}');
+
+	// Y.LOG('This is _BOLD_');
+	// Y.LOG('This is *ITALIC*');
+	// Y.LOG('This is `CODE`');
+	// Y.DEBUG('#red{msg}');
+	// Y.LOG('#red{msg}');
+	// Y.LOG('%c[LOG]', 'color: magenta', 'testing');
+
+	// Y.LOG($('head'));
+
+	var TT1 = {
+		values: {
+			'Yes': 'Yes',
+			'No': 'No',
+			'%n comments': [
+				[0, 0, '%n comments'],
+				[1, 1, '%n comment'],
+				[2, null, '%n comments']
+			]
+		},
+
+		contexts: [
+			{
+				'matches': {
+					'gender': 'male'
+				},
+				'values': {
+					'%{name} updated their profile': '%{name} updated his profile'
+				}
+			},
+
+			{
+				'matches': {
+					'gender': 'female'
+				},
+				'values': {
+					'%{name} updated their profile': '%{name} updated her profile'
+				}
+			}
+		]
+	};
+
+//	Y.I18N.add(TT1, 'en');
+
+//	Y._T = new Y.Locale()._;
+
+//	Y.LOG(Y.Keys(Y));
+//	Y.LOG(Y);
+	Y.LOG('');
+//	Y.LOG(Y.DOM.Function.ready);
+	Y.LOG(Y.Keys(Y.DOM));
+	Y.LOG('');
+	Y.LOG(Y.Keys(jQuery));
+	Y.LOG('');
+	Y.LOG(Y.G);
+//	Y.LOG(ButtonOne);
+//	Y.LOG(ButtonOne.button('toggle').addClass('fat'));
+
+});

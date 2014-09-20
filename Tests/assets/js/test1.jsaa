@@ -1,0 +1,178 @@
+/*global Y, YAX*/
+
+Y.DOM(function () {
+	'use strict';
+
+	var Wrapper = YAX.Node('.jumbotron');
+	var ButtonOne = YAX.Node('#ButtonOne');
+	var TestOneImage = YAX.Node('#TestOneImage');
+	var Temp1, Temp2;
+
+//	var URL2 = 'http://localhost/dev/minerva/api/search.action';
+//
+//	Y.DOM.Ajax({
+//		type: 'GET',
+//		url: URL2,
+//		data: {
+//			v: 0.10,
+//			format: 'json',
+//			country: 'ye',
+//			locale: 'en'
+//		},
+//		dataType: 'json',
+//		timeout: 300,
+//		cache: true,
+//		global: true,
+//		crossDomain: true,
+//		contentType: 'text/plain',
+//		xhrFields: {
+//			withCredentials: false
+//		},
+//		success: function () {
+//			var args = Array.prototype.slice.call(arguments, 0);
+//
+//			args = args[0].result;
+//
+//			YAX.Log(args);
+//		}
+//	});
+
+//	Y.DOM.AjaxJSONP(URL2, {
+//		v: 0.10,
+//		format: 'jsonp',
+//		country: 'ye',
+//		locale: 'en'
+//	}, function (data) {
+//		Y.Log(data);
+//	});
+
+
+	Temp1 = new YAX.Store('LocalStorage');
+
+	Temp2 = new YAX.Parser('CSV');
+
+	Temp1.Set('YAX.SVG.LOGO', YAX.Logo.SVG);
+
+	TestOneImage.attr('src', Temp1.Get('YAX.SVG.LOGO'));
+	TestOneImage.width(115);
+	TestOneImage.css({
+		marginTop: -13
+	});
+
+	ButtonOne.Tooltip({
+		Content: 'Testing Tooltips!',
+		Gravity: 'north',
+		Theme: 'dark',
+		Animation: 'flipIn'
+	});
+
+//	Wrapper.WaitForMe({
+//		Content: '<div class="TextContent">Please Wait</div>',
+//		Effect: 'rotation',
+//		Color: 'rgba(10, 20, 30, .75)',
+//		Width: 64,
+//		Height: 64
+//	});
+
+//	var TT1 = Object.create(null);
+//	var TT2 = Object.create(null);
+
+	var TT1 = {
+		values: {
+			'Yes': 'Yes',
+			'No': 'No',
+			'%n comments': [
+				[0, 0, '%n comments'],
+				[1, 1, '%n comment'],
+				[2, null, '%n comments']
+			]
+		},
+
+		contexts: [
+			{
+				'matches': {
+					'gender': 'male'
+				},
+				'values': {
+					'%{name} updated their profile': '%{name} updated his profile'
+				}
+			},
+
+			{
+				'matches': {
+					'gender': 'female'
+				},
+				'values': {
+					'%{name} updated their profile': '%{name} updated her profile'
+				}
+			}
+		]
+	};
+
+	var TT2 = {
+		values: {
+			'Yes': 'نعم',
+			'No': 'لا',
+			'%n comments': [
+				[0, 0, '%n تعليقات'],
+				[1, 1, '%n تعليق'],
+				[2, null, '%n تعليقات']
+			]
+		},
+
+		contexts: [
+			{
+				'matches': {
+					'gender': 'male'
+				},
+				'values': {
+					'%{name} updated their profile': '%{name} حدث ملفه الشخصي'
+				}
+			},
+
+			{
+				'matches': {
+					'gender': 'female'
+				},
+				'values': {
+					'%{name} updated their profile': '%{name} حدثت ملفها الشخصي'
+				}
+			}
+		]
+	};
+
+	Y.I18N.add(TT1, 'en');
+	Y.I18N.add(TT2, 'ar');
+
+//	console.log(Y.I18N._('%{name} updated their profile', 'ar',
+//		{
+//			name: 'Xavier'
+//		},
+//		{
+//			gender: 'male'
+//		})
+//	);
+//
+//	console.log(Y.I18N._('%{name} updated their profile',
+//		{
+//			name: 'Julia'
+//		},
+//		{
+//			gender: 'female'
+//		})
+//	);
+
+//	console.log(Y.I18N._('%n comments', 1));
+//	console.log(Y.I18N._('%n comments', 2));
+//	console.log(Y.I18N._('Yes'));
+
+	var CSVDATA = '"year","age","marst","sex","people"\n1850,0,0,1,1483789\n1850,0,0,2,1450376\n1850,5,0,1,1411067\n1850,5,0,2,1359668\n1850,10,0,1,1260099\n';
+
+	//Temp2 = new Temp2.CSV(CSVDATA, {header: true}).Parse();
+//	Temp2 = new Temp2.Initialise(CSVDATA, {header: true});
+
+
+	console.log(Temp2);
+
+
+});

@@ -1,0 +1,29 @@
+{
+	"name": "YAX.JS",
+	"version": "0.19.0",
+	"description": "Yet another extensible Javascript library.",
+	
+	"devDependencies": {
+		"jake": "~0.7.6",
+		"jshint": "~2.3.0",
+		"uglify-js": "~2.4.8"
+	},
+	
+	"main": "Dist/yax.src.js",
+	
+	"scripts": {
+		"test": "jake test",
+		"prepublish": "jake build"
+	},
+	
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/KodeBurner/YAX.JS"
+	},
+	
+	"keywords": [
+		"js",
+		"html5",
+		"javascript"
+	]
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage">
+<head>
+	<title>YAX.JS Builder</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="dependencies.js"></script>
+</head>
+<body>
+	<!-- .wrapper -->
+	<div class="wrapper">
+		<!-- wrapper -->
+		<div id="wrapper" class="">
+			<header>
+				<div class="header container">
+					<h1>YAX.JS Build Helper</h1>
+				</div>
+			</header>	
+			<div class="body">
+				<div class="container">
+					<div class="content">
+						<ul id="dependencies-list"></ul>
+						<ul id="toolbar-list">
+							<li>
+								<a id="select-all" href="#all">Select All</a>
+							</li>
+							<li id="toolbar-list-sep"></li>
+							<li>
+								<a id="deselect-all" href="#none">Deselect All</a>
+							</li>
+						</ul>
+
+						<h2 id="build-info">Building YAX.JS using Node and UglifyJS</h2>
+
+						<ol id="build-list">
+							<li>
+								<a href="http://nodejs.org/#download">Download and install Node</a>
+							</li>
+							<li>
+								<span>Run this in the command line: </span>
+								<br />
+								<input class="code" value="npm install -g jake">
+								</br>
+								<input class="code" value="npm install">
+							</li>
+							<li>
+								<span>Run this command inside the YAX.js directory: </span>
+								<br />
+								<input class="code" id="command">
+							</li>
+						</ol>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /wrapper -->
+	</div>
+	<!-- /.wrapper -->
+
+	<footer>
+		<div class="footer container">
+			<p>&copy; 2014</p>
+		</div>
+	</footer>
+
+	<script src="assets.js"></script>
+</body>
+</html>
