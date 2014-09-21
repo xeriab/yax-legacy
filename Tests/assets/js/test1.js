@@ -16,7 +16,7 @@ Y.DOM(document).ready(function () {
 		marginTop: -13
 	});
 
-	ButtonOne.button('');
+//	ButtonOne.button();
 
 	ButtonOne.Tooltip({
 		Content: 'Testing Tooltips!',
@@ -25,11 +25,11 @@ Y.DOM(document).ready(function () {
 		Animation: 'flipIn'
 	});
 
-	Wrapper.WaitForMe({
+	/*Wrapper.WaitForMe({
 		Effect: 'rotation'
 	});
 
-	Wrapper.trigger('WaitForMeCloseEvent');
+	Wrapper.trigger('WaitForMeCloseEvent');*/
 
 
 	TestOneImage.Tooltip({
@@ -45,9 +45,21 @@ Y.DOM(document).ready(function () {
 
 //	TestOneImage.trigger('bsTransitionEnd');
 
+//	Y.setConfig('Extension', 'Use.Console');
+//	Y.setConfig('Use.Console', 'Off');
+//	Y.setConfig('Use.Console', 'On');
+
+//	Y.DOM(Y.Document).on('click.bs.collapse.data-api', '[data-toggle="collapse"]', function (e) {
+//		Y.LOG(Y.DOM(this).data());
+//	});
 
 	Y.LOG('');
 	Y.LOG(Y);
+//	Y.LOG(Y.DOM.fx);
+//	Y.LOG(Y.DOM.support);
+//	Y.LOG(Y.DOM.Function);
+//	Y.LOG(Y.DOM.Event.special);
+//	Y.LOG(ButtonOne.data());
 //	Y.LOG(Y.DOM.support);
 	//Y.LOG('');
 	//Y.LOG(Y.Lang.Keys(jQuery));

@@ -23,7 +23,7 @@
 	// ============================================================
 
 	function transitionEnd() {
-		var el = Y.Document.createElement('yaxbootstrap');
+		var el = Y.Document.createElement('yaxbs');
 		var name;
 
 		var transEndEventNames = {
@@ -37,11 +37,18 @@
 			if (Y.HasOwnProperty.call(transEndEventNames, name)) {
 				if (!Y.Lang.isDefined(el.style[name])) {
 					return {
-						end: transEndEventNames[name]
+						// end: transEndEventNames[name]
+						end: Y.DOM.fx.transitionEnd
 					};
 				}
 			}
 		}
+
+		/*if (Y.DOM.fx) {
+			return {
+				end: Y.DOM.fx.transitionEnd
+			};
+		}*/
 
 		return false; // explicit for ie8 (	._.)
 	}
@@ -51,14 +58,13 @@
 		var called = false;
 		var $el = this;
 
-		Y.DOM(this).one('bsTransitionEnd', function () {
+		Y.DOM(this).bind('bsTransitionEnd', function () {
 			called = true;
 		});
 
 		var callback = function () {
 			if (!called) {
 				Y.DOM($el).trigger(Y.DOM.support.transition.end);
-				Y.DOM($el).trigger('bsTransitionEnd');
 			}
 		};
 
@@ -74,7 +80,44 @@
 			return;
 		}
 
-		Y.DOM.Event.special.bsTransitionEnd = {
+		Y.DOM.each({
+			bsTransitionEnd: Y.DOM.fx.transitionEnd,
+			yaxbs: Y.DOM.fx.transitionEnd
+		}, function (orig, fix) {
+			var attaches = 0;
+
+			var handler = function (event) {
+				Y.DOM.event.simulate(fix, event.target, Y.DOM.extend({}, event), true);
+			};
+
+			Y.DOM.event.special[orig] = {
+				bindType: Y.DOM.support.transition.end,
+
+				delegateType: Y.DOM.support.transition.end,
+
+				handle: function (e) {
+					if (Y.DOM(e.target).is(this)) {
+						Y.LOG(e);
+						return e.handleObj.handler.apply(this, arguments);
+					}
+				},
+
+				setup: function () {
+					if (attaches++ === 0) {
+						Y.Document.addEventListener(orig, handler, true);
+						Y.Document.addEventListener(fix, handler, true);
+					}
+				},
+
+				teardown: function () {
+					if (--attaches === 0) {
+						Y.Document.removeEventListener(orig, handler, true);
+					}
+				}
+			};
+		});
+
+		/*Y.DOM.Event.special.bsTransitionEnd = {
 			bindType: Y.DOM.support.transition.end,
 			delegateType: Y.DOM.support.transition.end,
 			handle: function (e) {
@@ -83,7 +126,7 @@
 					return e.handleObj.handler.apply(this, arguments);
 				}
 			}
-		};
+		};*/
 	});
 
 	//---

@@ -52,7 +52,10 @@
 
 		specialEvents = Object.create({});
 
-	specialEvents.click = specialEvents.mousedown = specialEvents.mouseup = specialEvents.mousemove = 'MouseEvents';
+	specialEvents.click =
+		specialEvents.mousedown =
+			specialEvents.mouseup =
+				specialEvents.mousemove = 'MouseEvents';
 
 	//---
 
@@ -112,7 +115,7 @@
 	}
 
 	function eventCapture(handler, captureSetting) {
-		return !(!handler.del || !(!focusinSupported && Y.ObjectHasProperty(focus, handler.e))) || Y.Lang.isSet(captureSetting);
+		return !(!handler.del || !(!focusinSupported && Y.Lang.hasProperty(focus, handler.e))) || Y.Lang.isSet(captureSetting);
 	}
 
 	function realEvent(type) {
@@ -122,7 +125,7 @@
 	function compatible(event, source) {
 		if (source || !event.isDefaultPrevented) {
 			// source || (source = event);
-			source = event;
+			source = source || event;
 
 			Y.Each(eventMethods, function (name, predicate) {
 				var sourceMethod = source[name];
@@ -140,7 +143,7 @@
 					event.isDefaultPrevented = returnTrue;
 				}
 			} else {
-				if (Y.ObjectHasProperty(source, 'returnValue')) {
+				if (Y.Lang.hasProperty(source, 'returnValue')) {
 					if (source.returnValue === false) {
 						event.isDefaultPrevented = returnTrue;
 					}
@@ -151,6 +154,12 @@
 					}
 				}
 			}
+
+			/*if (source.defaultPrevented !== undefined ? source.defaultPrevented :
+					'returnValue' in source ? source.returnValue === false :
+				source.getPreventDefault && source.getPreventDefault()) {
+				event.isDefaultPrevented = returnTrue;
+			}*/
 		}
 
 		return event;
@@ -291,7 +300,7 @@
 				this.addDoubleTapListener(object, handler, id);
 			}
 
-			if (Y.ObjectHasProperty(object, 'addEventListener')) {
+			if (Y.Lang.hasProperty(object, 'addEventListener')) {
 				if (type === 'mousewheel') {
 					object.addEventListener('DOMMouseScroll', handler, false);
 					object.addEventListener(type, handler, false);
@@ -314,7 +323,7 @@
 
 					object.addEventListener(type, handler, false);
 				}
-			} else if (Y.ObjectHasProperty(object, 'attachEvent')) {
+			} else if (Y.Lang.hasProperty(object, 'attachEvent')) {
 				object.attachEvent('on' + type, handler);
 			}
 
@@ -359,7 +368,7 @@
 				this.removePointerListener(object, type, id);
 			} else if (Y.UserAgent.Features.Touch && (type === 'dblclick') && this.removeDoubleTapListener) {
 				this.removeDoubleTapListener(object, id);
-			} else if (Y.ObjectHasProperty(object, 'removeEventListener')) {
+			} else if (Y.Lang.hasProperty(object, 'removeEventListener')) {
 				if (type === 'mousewheel') {
 					object.removeEventListener('DOMMouseScroll', handler, false);
 					object.removeEventListener(type, handler, false);
@@ -368,7 +377,7 @@
 							type === 'mouseenter' ? 'mouseover' :
 								type === 'mouseleave' ? 'mouseout' : type, handler, false);
 				}
-			} else if (Y.ObjectHasProperty(object, 'detachEvent')) {
+			} else if (Y.Lang.hasProperty(object, 'detachEvent')) {
 				object.detachEvent('on' + type, handler);
 			}
 
@@ -557,7 +566,7 @@
 
 				set.push(handler);
 
-				if (Y.ObjectHasProperty(element, 'addEventListener')) {
+				if (Y.Lang.hasProperty(element, 'addEventListener')) {
 					Y.DOM.Event.addListener(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
 				}
 			});
@@ -568,7 +577,7 @@
 				findHandlers(element, event, func, selector).forEach(function (handler) {
 					delete eventHandlers(element)[handler.i];
 
-					if (Y.ObjectHasProperty(element, 'removeEventListener')) {
+					if (Y.Lang.hasProperty(element, 'removeEventListener')) {
 						Y.DOM.Event.removeListener(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
 					}
 				});
@@ -583,15 +592,17 @@
 	Y.DOM.proxy = Y.DOM.Proxy = function (callback, context) {
 		var result, proxyFn, args;
 
-		// args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
-		args = Y.G.Slice.call(arguments, 2);
+		args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
 
 		if (Y.Lang.isFunction(callback)) {
+
 			proxyFn = function () {
 				return callback.apply(context, args ? args.concat(Y.G.Slice.call(arguments)) : arguments);
 			};
 
 			proxyFn.YID = yID(callback);
+
+			proxyFn.GUID = callback.GUID = callback.GUID || proxyFn.GUID || Y.DOM.GUID++;
 
 			result = proxyFn;
 		} else if (Y.Lang.isString(context)) {
@@ -738,7 +749,9 @@
 
 		return this.each(function () {
 			// items in the collection might not be Node elements
-			if (Y.ObjectHasProperty(this, 'dispatchEvent')) {
+			// if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
+			if (Y.HasOwnProperty.call(this, 'dispatchEvent')) {
+			// if ('dispatchEvent' in this) {
 				this.dispatchEvent(event);
 			} else {
 				Y.DOM(this).triggerHandler(event, args);
@@ -846,6 +859,12 @@
 			return origFn.call(this);
 		};
 	});
+
+	//---
+
+	Y.DOM.Event.prototype.isDefaultPrevented = function () {
+		return this.defaultPrevented;
+	};
 
 	//---
 

@@ -145,7 +145,7 @@
 	/**
 	 * The ready event handler and self cleanup method
 	 */
-	function completed () {
+	function completed() {
 		Y.Document.removeEventListener('DOMContentLoaded', completed, false);
 		Y.Window.removeEventListener('load', completed, false);
 		Y.DOM.ready();
@@ -182,6 +182,61 @@
 		Y.DOM.isXMLDoc = Y.Window.Sizzle.isXML;
 		Y.DOM.text = Y.DOM.Text = Y.Window.Sizzle.getText;
 	}
+
+	//---
+
+	Y.DOM.event.simulate = function (type, elem, event, bubble) {
+		var e = Y.Extend(new Y.DOM.Event(type), event, {
+			type: type,
+			isSimulated: true,
+			originalEvent: {},
+			bubbles: true
+		});
+
+		Y.DOM(elem).trigger(e);
+
+		if (e.isDefaultPrevented()) {
+			event.preventDefault();
+		}
+	};
+
+	Y.DOM.each({
+		focus: 'focusin',
+		blur: 'focusout'
+	}, function (orig, fix) {
+		var attaches = 0;
+
+		var handler = function (event) {
+			Y.DOM.event.simulate(fix, event.target, Y.DOM.extend({}, event), true);
+		};
+
+		Y.DOM.event.special[fix] = {
+			setup: function () {
+				if (attaches++ === 0) {
+					Y.Document.addEventListener(orig, handler, true);
+				}
+			},
+
+			teardown: function () {
+				if (--attaches === 0) {
+					Y.Document.removeEventListener(orig, handler, true);
+				}
+			}
+		};
+	});
+
+	//---
+
+	Y.Window.cordova = document.URL.indexOf('http://') === -1 && Y.Document.URL.indexOf('https://') === -1;
+
+	if (Y.Window.cordova === false) {
+		Y.DOM(function () {
+			Y.DOM(Y.Document).trigger('deviceready');
+		});
+	}
+
+
+	//---
 
 }());
 

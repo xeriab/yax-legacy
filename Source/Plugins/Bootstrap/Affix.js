@@ -23,13 +23,13 @@
 	// ======================
 
 	var Affix = function (element, options) {
-		this.options = Y.DOM.extend({}, Affix.DEFAULTS, options);
+		this.options = Y.Extend({}, Affix.DEFAULTS, options);
 
 		this.$target = Y.DOM(this.options.target)
 			.on('scroll.bs.affix.data-api', Y.DOM.proxy(this.checkPosition, this))
 			.on('click.bs.affix.data-api', Y.DOM.proxy(this.checkPositionWithEventLoop, this));
 
-		this.$element = Y.DOM(element);
+		this.element = Y.DOM(element);
 		this.affixed =
 			this.unpin =
 				this.pinnedOffset = null;
@@ -51,10 +51,10 @@
 			return this.pinnedOffset;
 		}
 
-		this.$element.removeClass(Affix.RESET).addClass('affix');
+		this.element.removeClass(Affix.RESET).addClass('affix');
 
 		var scrollTop = this.$target.scrollTop();
-		var position = this.$element.offset();
+		var position = this.element.offset();
 
 		//return (this.pinnedOffset = position.top - scrollTop);
 
@@ -68,13 +68,13 @@
 	};
 
 	Affix.prototype.checkPosition = function () {
-		if (!this.$element.is(':visible')) {
+		if (!this.element.is(':visible')) {
 			return;
 		}
 
-		var scrollHeight = Y.DOM(document).height();
+		var scrollHeight = Y.DOM(Y.Document).height();
 		var scrollTop = this.$target.scrollTop();
-		var position = this.$element.offset();
+		var position = this.element.offset();
 		var offset = this.options.offset;
 		var offsetTop = offset.top;
 		var offsetBottom = offset.bottom;
@@ -84,15 +84,15 @@
 		}
 
 		if (typeof offsetTop === 'function') {
-			offsetTop = offset.top(this.$element);
+			offsetTop = offset.top(this.element);
 		}
 
 		if (typeof offsetBottom === 'function') {
-			offsetBottom = offset.bottom(this.$element);
+			offsetBottom = offset.bottom(this.element);
 		}
 
 		var affix = this.unpin !== null && (scrollTop + this.unpin <= position.top) ? false :
-				offsetBottom !== null && (position.top + this.$element.height() >= scrollHeight - offsetBottom) ? 'bottom' :
+				offsetBottom !== null && (position.top + this.element.height() >= scrollHeight - offsetBottom) ? 'bottom' :
 				offsetTop !== null && (scrollTop <= offsetTop) ? 'top' : false;
 
 		if (this.affixed === affix) {
@@ -100,13 +100,13 @@
 		}
 
 		if (this.unpin !== null) {
-			this.$element.css('top', '');
+			this.element.css('top', '');
 		}
 
 		var affixType = 'affix' + (affix ? '-' + affix : '');
 		var e = Y.DOM.Event(affixType + '.bs.affix');
 
-		this.$element.trigger(e);
+		this.element.trigger(e);
 
 		if (e.isDefaultPrevented()) {
 			return;
@@ -115,14 +115,14 @@
 		this.affixed = affix;
 		this.unpin = affix === 'bottom' ? this.getPinnedOffset() : null;
 
-		this.$element
+		this.element
 			.removeClass(Affix.RESET)
 			.addClass(affixType)
 			.trigger(Y.DOM.Event(affixType.replace('affix', 'affixed')));
 
 		if (affix === 'bottom') {
-			this.$element.offset({
-				top: scrollHeight - this.$element.height() - offsetBottom
+			this.element.offset({
+				top: scrollHeight - this.element.height() - offsetBottom
 			});
 		}
 	};

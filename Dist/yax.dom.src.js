@@ -28,20 +28,20 @@
 		gecko3d = Y.Document.documentElement.style.hasOwnProperty('MozPerspective'),
 		opera3d = Y.Document.documentElement.style.hasOwnProperty('OTransition');
 
-	retina = (Y.ObjectHasProperty(Y.Window, 'devicePixelRatio') && Y.CallProperty(Y.Window, 'devicePixelRatio') > 1);
+	retina = (Y.HasOwnProperty.call(Y.Window, 'devicePixelRatio') && Y.CallProperty(Y.Window, 'devicePixelRatio') > 1);
 
-	if (!retina && Y.ObjectHasProperty(Y.Window, 'matchMedia')) {
+	if (!retina && Y.HasOwnProperty.call(Y.Window, 'matchMedia')) {
 		matches = Y.CallProperty(Y.Window, 'matchMedia');
 		retina = (Y.Lang.isSet(matches) && Y.CallProperty(matches, 'matches'));
 	}
 
-	msPointer = (Y.ObjectHasProperty(navigator, 'msPointerEnabled') &&
-		Y.ObjectHasProperty(navigator, 'msMaxTouchPoints') &&
-		!Y.ObjectHasProperty(Y.Window, 'PointerEvent'));
+	msPointer = (Y.HasOwnProperty.call(navigator, 'msPointerEnabled') &&
+		Y.HasOwnProperty.call(navigator, 'msMaxTouchPoints') &&
+		!Y.HasOwnProperty.call(Y.Window, 'PointerEvent'));
 
-	pointer = (Y.ObjectHasProperty(Y.Window, 'PointerEvent') &&
-		Y.ObjectHasProperty(navigator, 'pointerEnabled') &&
-		!Y.ObjectHasProperty(navigator, 'maxTouchPoints')) || msPointer;
+	pointer = (Y.HasOwnProperty.call(Y.Window, 'PointerEvent') &&
+		Y.HasOwnProperty.call(navigator, 'pointerEnabled') &&
+		!Y.HasOwnProperty.call(navigator, 'maxTouchPoints')) || msPointer;
 
 	//---
 
@@ -445,12 +445,14 @@
 
 		ReadyReplacement = /complete|loaded|interactive/,
 
-		//SimpleSelectorReplacement = /^[\w-]*$/,
+	//SimpleSelectorReplacement = /^[\w-]*$/,
 		SimpleSelectorReplacement = /^[\w\-]*$/,
 
 		RootNodeReplacement = /^(?:body|html)$/i,
 
-		// Special attributes that should be get/set via method calls
+		SelectorGroupReplacement = /(([\w#:.~>+()\s-]+|\*|\[.*?\])+)\s*(,|$)/g,
+
+	// Special attributes that should be get/set via method calls
 		MethodAttributes = [
 			'title',
 			'value',
@@ -487,6 +489,8 @@
 
 		temporaryParent = Y.Document.createElement('div'),
 
+		ClassTag = 'YAX' + (+new Date()),
+
 		properitiesMap = {
 			'tabindex': 'tabIndex',
 			'readonly': 'readOnly',
@@ -507,25 +511,25 @@
 
 		CCSS,
 
-		// Matching numbers
-		//pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
+	// Matching numbers
+	//pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
 		pnum = /[+\-]?(?:\d*\.|)\d+(?:[eE][+\-]?\d+|)/.source,
-		//		pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
-		//pnum = /[+\-]?\d*\.?\d+(?:e[+\-]?\d+)?/i.source,
+	//		pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
+	//pnum = /[+\-]?\d*\.?\d+(?:e[+\-]?\d+)?/i.source,
 
-		// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
-		// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
+	// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
+	// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
 		rdisplayswap = /^(none|table(?!-c[ea]).+)/,
 
 		rmargin = /^margin/,
 
-		//rnumsplit = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(.*)$', 'i'),
+	//rnumsplit = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(.*)$', 'i'),
 		rnumsplit = new RegExp('^(' + pnum + ')(.*)$', 'i'),
 
-		//rnumnonpx = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(?!px)[a-z%]+$', 'i'),
+	//rnumnonpx = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(?!px)[a-z%]+$', 'i'),
 		rnumnonpx = new RegExp('^(' + pnum + ')(?!px)[a-z%]+$', 'i'),
 
-		//rrelNum = new RegExp('^([+-])=(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')', 'i'),
+	//rrelNum = new RegExp('^([+-])=(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')', 'i'),
 		rrelNum = new RegExp('^([+-])=(' + pnum + ')', 'i'),
 
 		cssShow = {
@@ -565,7 +569,7 @@
 	function classReplacement(name) {
 		var result;
 
-		if (Y.ObjectHasProperty(ClassCache, name)) {
+		if (Y.HasOwnProperty.call(ClassCache, name)) {
 			result = ClassCache[name];
 		} else {
 			ClassCache[name] = new RegExp('(^|\\s)' + name + '(\\s|)');
@@ -578,7 +582,7 @@
 	function idReplacement(name) {
 		var result;
 
-		if (Y.ObjectHasProperty(IDsCache, name)) {
+		if (Y.HasOwnProperty.call(IDsCache, name)) {
 			result = IDsCache[name];
 		} else {
 			IDsCache[name] = new RegExp('(^|\\s)' + name + '(\\s|)');
@@ -594,7 +598,8 @@
 		func(node);
 
 		for (key in node.childNodes) {
-			if (Y.HasOwnProperty.call(node.childNodes, key)) {
+			// if (Y.HasOwnProperty.call(node.childNodes, key)) {
+			if (node.childNodes.hasOwnProperty(key)) {
 				traverseNode(node.childNodes[key], func);
 			}
 		}
@@ -627,10 +632,21 @@
 	// NOTE: I have included the "window" in window.getComputedStyle
 	// because jsdom on node.js will be bitch and break without it.
 
-	function getStyles(element) {
-		if (!Y.Lang.isUndefined(element)) {
+	function getStyles() {
+		var args = Y.G.Slice.call(arguments);
+
+		if (!Y.Lang.isUndefined(args[0])) {
 			// return window.getComputedStyle(element, null);
-			return Y.Window.getComputedStyle(element, null);
+			return Y.Window.getComputedStyle(args[0], null);
+		}
+	}
+
+	function getDocStyles() {
+		var args = Y.G.Slice.call(arguments);
+
+		if (!Y.Lang.isUndefined(args[0])) {
+			// return window.getComputedStyle(element, null);
+			return Y.Document.defaultView.getComputedStyle(args[0], null);
 		}
 	}
 
@@ -702,7 +718,7 @@
 		// svg = svg ? (Class.baseVal = value) : (node.className = value);
 
 		if (svg) {
-			result = Y.Inject(Class, 'baseVal', value);
+			result = Y.Lang.inject(Class, 'baseVal', value);
 		} else {
 			node.className = value;
 
@@ -726,7 +742,7 @@
 		}
 
 		if (svg) {
-			result = Y.Inject(ID, 'baseVal', value);
+			result = Y.Lang.inject(ID, 'baseVal', value);
 		} else {
 			node.ID = value;
 
@@ -783,8 +799,8 @@
 	CCSS = function (element, name, csssComputed) {
 		var width, minWidth, maxWidth,
 			computed = csssComputed || getStyles(element),
-			// Support: IE9
-			// getPropertyValue is only needed for .css('filter') in IE9, see #12537
+		// Support: IE9
+		// getPropertyValue is only needed for .css('filter') in IE9, see #12537
 			ret = computed ? computed.getPropertyValue(name) || computed[name] : undef,
 			style = element.style;
 
@@ -819,21 +835,19 @@
 	};
 
 	function setPositiveNumber(element, value, subtract) {
-		//		Y.Log(element);
-
 		var matches = rnumsplit.exec(value);
 		return matches ?
-		// Guard against undefinedined "subtract", e.g., when used as in CSS_Hooks
-		Math.max(0, matches[1] - (subtract || 0)) + (matches[2] || 'px') :
+			// Guard against undefined "subtract", e.g., when used as in CSS_Hooks
+			Math.max(0, matches[1] - (subtract || 0)) + (matches[2] || 'px') :
 			value;
 	}
 
 	function argumentWidthOrHeight(element, name, extra, isBorderBox, styles) {
 		var i = extra === (isBorderBox ? 'border' : 'content') ?
-		// If we already have the right measurement, avoid augmentation
-		4 :
-		// Otherwise initialise for horizontal or vertical properties
-		name === 'width' ? 1 : 0,
+				// If we already have the right measurement, avoid augmentation
+				4 :
+				// Otherwise initialise for horizontal or vertical properties
+					name === 'width' ? 1 : 0,
 			val = 0;
 
 		for (null; i < 4; i += 2) {
@@ -908,11 +922,11 @@
 			argumentWidthOrHeight(
 				element,
 				name,
-				extra || (isBorderBox ? 'border' : 'content'),
+					extra || (isBorderBox ? 'border' : 'content'),
 				valueIsBorderBox,
 				styles
 			)
-		) + 'px';
+			) + 'px';
 	}
 
 	function globalEval(code) {
@@ -931,16 +945,46 @@
 		}
 	}
 
+	// Given a selector, splits it into groups. Necessary because naively
+	// splitting on commas will do the wrong thing.
+	//
+	// Examples:
+	// "div.foo" -> ["div.foo"]
+	// "div, p" -> ["div", "p"]
+	// "div[title='foo, bar'], p" -> ["div[title='foo, bar']", "p"]
+	function splitSelector(selector) {
+		var results = [];
+		selector.replace(SelectorGroupReplacement, function (m, unit) {
+			results.push(unit.trim());
+		});
+		return results;
+	}
+
+	// Checks whether the selector has a combinator in it. If not, it's a
+	// "simple selector" and can be optimized in some cases.
+	// This logic isn't exhaustive, but it doesn't have to be. False
+	// positives are OK.
+	function hasCombinator(selector) {
+		return selector.match(/[\s>~+]/);
+	}
+
 	// END OF [Private Functions]
 
 	//---
 
 	YAXDOM = {
+		/**
+		 *
+		 * @param element
+		 * @param selector
+		 * @returns {*}
+		 * @constructor
+		 */
 		Matches: function (element, selector) {
 			var result, matchesSelector, temp, parent;
 
 			if (!element || element.nodeType !== 1) {
-				return;
+				return false;
 			}
 
 			matchesSelector = Y.CallProperty(element, 'webkitMatchesSelector') ||
@@ -954,20 +998,20 @@
 
 			// Fall back to performing a selector:
 			parent = element.parentNode;
-			temp = !Y.Lang.isSet(parent);
+			//temp = !Y.Lang.isSet(parent);
+			temp = !parent;
 
 			if (temp) {
-				parent = temporaryParent;
-				parent.appendChild(element);
-				// (parent = temporaryParent).appendChild(element);
+				// parent = temporaryParent;
+				// parent.appendChild(element);
+				(parent = temporaryParent).appendChild(element);
 			}
 
 			// result = ~YAXDOM.QSA(parent, selector).indexOf(element);
+			/* jshint -W052 */
 			result = ~YAXDOM.QSA(parent, selector).indexOf(element);
 
-			if (temp) {
-				temporaryParent.appendChild(element);
-			}
+			temp && temporaryParent.appendChild(element);
 
 			return result;
 		},
@@ -1081,9 +1125,7 @@
 					// nodes from there
 				} else if (Y.Lang.isDefined(context)) {
 					// return Y.Node(context).find(selector);
-
-					//					console.log(context);
-
+					// console.log(context);
 					//result = Y.Node(context).find(selector);
 					// And last but no least, if it's a CSS selector, use it to select nodes.
 				} else {
@@ -1132,14 +1174,14 @@
 				result = (!Y.Lang.isUndefined(element) && element.nodeType !== 1 &&
 					element.nodeType !== 9) ? {} :
 					Y.G.Slice.call(
-						isSimple && !maybeID ?
-						// If it's simple, it could be a class
-						maybeClass ? element.getElementsByClassName(nameOnly) :
-						// Or a tag
-						element.getElementsByTagName(selector) :
-						// Or it's not simple, and we need to query all
-						element.querySelectorAll(selector)
-				);
+							isSimple && !maybeID ?
+							// If it's simple, it could be a class
+							maybeClass ? element.getElementsByClassName(nameOnly) :
+								// Or a tag
+								element.getElementsByTagName(selector) :
+							// Or it's not simple, and we need to query all
+							element.querySelectorAll(selector)
+					);
 			}
 
 			return result;
@@ -1152,18 +1194,10 @@
 		Y: function (dom, selector) {
 			var result;
 
-			// result = dom || Object.create([]);
 			result = dom || [];
 
+			/* jshint -W103 */
 			result.__proto__ = Y.Node.Function;
-
-			// result.prototype = Object.create(null);
-
-			// Y.Extend(result.__proto__, Y.Node.Function);
-
-			// result.prototype = Y.Node.Function;
-			// result.prototype = Object.create(null);
-			// Y.Inject(result, '__proto__', Y.Node.Function);
 
 			result.selector = selector || Y.Lang.empty();
 
@@ -1269,10 +1303,10 @@
 				// return num === undef ? Slice.call(this) : this[num >= 0 ? num : num + this.length];
 
 				return num === null ?
-				// Return a 'Clean' array
-				this.toArray() :
-				// Return just the object
-				(num < 0 ? this[this.length + num] : this[num]);
+					// Return a 'Clean' array
+					this.toArray() :
+					// Return just the object
+					(num < 0 ? this[this.length + num] : this[num]);
 			},
 			toArray: function () {
 				// return this.get();
@@ -1326,7 +1360,7 @@
 				} else {
 					excludes = Y.Lang.isString(selector) ? this.filter(selector) :
 						(Y.Lang.likeArray(selector) && Y.Lang.isFunction(selector.item)) ? Y.G.Slice
-						.call(selector) : Y.Node(selector);
+							.call(selector) : Y.Node(selector);
 
 					this.forEach(function (el) {
 						if (excludes.indexOf(el) < 0) {
@@ -1357,9 +1391,10 @@
 			},
 			find: function (selector) {
 				var result, $this = this,
+					error = false,
 					node;
 
-				if (Y.Lang.isObject(selector)) {
+				/*if (Y.Lang.isObject(selector)) {
 					result = Y.Node(selector).filter(function () {
 						node = this;
 						return Y.G.ArrayProto.some.call($this, function (parent) {
@@ -1372,6 +1407,74 @@
 					result = this.map(function () {
 						return YAXDOM.QSA(this, selector);
 					});
+				}*/
+
+				if (Y.Lang.isObject(selector)) {
+					result = Y.Node(selector).filter(function () {
+						node = this;
+						return Y.G.ArrayProto.some.call($this, function (parent) {
+							return contains(parent, node);
+						});
+					});
+				} else {
+					var slow = false;
+
+					selector = splitSelector(selector).map(function (unit) {
+						if (hasCombinator(selector)) {
+							slow = true;
+							return '.' + ClassTag + ' ' + unit;
+						}
+
+						return unit;
+					}).join(', ');
+
+					var findBySelector = function findBySelector(elem, selector, slow) {
+						if (elem.length == 1) {
+							if (slow) {
+								elem.addClass(ClassTag);
+							}
+
+							result = Y.Node(YAXDOM.QSA(elem[0], selector));
+
+							if (slow) {
+								elem.removeClass(ClassTag);
+							}
+						} else {
+							result = elem.map(function () {
+								if (slow) {
+									Y.Node(this).addClass(ClassTag);
+								}
+
+								var result = YAXDOM.QSA(this, selector);
+
+								if (slow) {
+									Y.Node(this).removeClass(ClassTag);
+								}
+
+								return result;
+							});
+						}
+
+						return result;
+					};
+
+					if (slow) {
+						try {
+							result = findBySelector(this, selector, slow);
+						} catch (e) {
+							Y.ERROR('error performing selector: %o', selector);
+							error = true;
+							throw e;
+						} finally {
+							// If an error was thrown, we should assume that the class name
+							// cleanup didn't happen, and do it ourselves.
+							if (error) {
+								Y.Node('.' + ClassTag).removeClass(ClassTag);
+							}
+						}
+					} else {
+						result = findBySelector(this, selector, slow);
+					}
 				}
 
 				return result;
@@ -1480,7 +1583,7 @@
 				return this.each(function (index) {
 					Y.Node(this).wrapAll(
 						func ? structure.call(this, index) :
-						clone ? dom.cloneNode(true) : dom
+							clone ? dom.cloneNode(true) : dom
 					);
 				});
 			},
@@ -1541,17 +1644,12 @@
 					var el = Y.Node(this),
 						val;
 
-					// setting = undef ? el.css('display') === 'none' : setting;
-
 					val = el.css('display') === 'none';
 
 					if (Y.Lang.isUndefined(setting)) {
 						if (val) {
 							setting = val;
 						}
-						/*else {
-						res = setting;
-						}*/
 					}
 
 					if (setting) {
@@ -1559,8 +1657,6 @@
 					} else {
 						el.hide();
 					}
-
-					// (setting === undef ? el.css('display') === 'none' : setting) ? el.show() : el.hide();
 				});
 			},
 			prev: function (selector) {
@@ -1600,10 +1696,10 @@
 
 				return (Y.Lang.isString(name) && value === undef) ?
 					(this.length === 0 || this[0].nodeType !== 1 ? undef :
-					(name === 'value' && this[0].nodeName === 'INPUT') ? this.val() :
-					(Y.Lang.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
-						name)) ? this[0][name] : result
-				) :
+						(name === 'value' && this[0].nodeName === 'INPUT') ? this.val() :
+							(Y.Lang.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
+								name)) ? this[0][name] : result
+						) :
 					this.each(function (index) {
 						if (this.nodeType !== 1) {
 							return;
@@ -1660,10 +1756,10 @@
 			val: function (value) {
 				return arguments.length === 0 ?
 					(this[0] && (this[0].multiple ?
-					Y.Node(this[0]).find('option').filter(function () {
-						return this.selected;
-					}).pluck('value') :
-					this[0].value)) :
+						Y.Node(this[0]).find('option').filter(function () {
+							return this.selected;
+						}).pluck('value') :
+						this[0].value)) :
 					this.each(function (index) {
 						this.value = functionArgument(this, value, index, this.value);
 					});
@@ -1671,10 +1767,10 @@
 			value: function (value) {
 				return arguments.length === 0 ?
 					(this[0] && (this[0].multiple ?
-					Y.Node(this[0]).find('option').filter(function () {
-						return this.selected;
-					}).pluck('value') :
-					this[0].value)) :
+						Y.Node(this[0]).find('option').filter(function () {
+							return this.selected;
+						}).pluck('value') :
+						this[0].value)) :
 					this.each(function (index) {
 						this.value = functionArgument(this, value, index, this.value);
 					});
@@ -2050,9 +2146,9 @@
 				}
 
 				var element = this[0],
-					// Get *real* offsetParent
+				// Get *real* offsetParent
 					offsetParent = this.offsetParent(),
-					// Get correct offsets
+				// Get correct offsets
 					offset = this.offset(),
 					parentOffset = RootNodeReplacement.test(offsetParent[0].nodeName) ? {
 						top: 0,
@@ -2145,8 +2241,8 @@
 			}
 
 			return chainable ? elems :
-			// Gets
-			bulk ? callback.call(elems) : length ? callback(elems[0], key) : emptyGet;
+				// Gets
+				bulk ? callback.call(elems) : length ? callback(elems[0], key) : emptyGet;
 		},
 		// A method for quickly swapping in/out CSS properties to get correct calculations.
 		// Note: this method belongs to the css module but it's needed here for the support module.
@@ -2339,7 +2435,7 @@
 		offset: {
 			setOffset: function (element, options, i) {
 				var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft,
-						calculatePosition,
+					calculatePosition,
 					position = Y.Node.CSS(element, "position"),
 					curElem = Y.Node(element),
 					props = {};
@@ -2441,6 +2537,8 @@
 
 		UUID: 0,
 
+		GUID: 0,
+
 		Expando: DomNode.Expando,
 
 		Timers: [],
@@ -2509,14 +2607,14 @@
 			set: function (element, value, extra) {
 				var styles = extra && getStyles(element);
 				return setPositiveNumber(element, value, extra ?
-					argumentWidthOrHeight(
-						element,
-						name,
-						extra,
-						Y.Node.Support.boxSizing && Y.Node.CSS(element, 'boxSizing', false,
-							styles) === 'border-box',
-						styles
-					) : 0
+						argumentWidthOrHeight(
+							element,
+							name,
+							extra,
+								Y.Node.Support.boxSizing && Y.Node.CSS(element, 'boxSizing', false,
+								styles) === 'border-box',
+							styles
+						) : 0
 				);
 			}
 		};
@@ -2536,7 +2634,7 @@
 			// margin is only for outerHeight, outerWidth
 			Y.Node.Function[funcName] = function (margin, value) {
 				var chainable = arguments.length && (defaultExtra || typeof margin !==
-					'boolean'),
+						'boolean'),
 					extra = defaultExtra || (margin === true || value === true ? 'margin' :
 						'border');
 
@@ -2564,10 +2662,10 @@
 					}
 
 					return value === undef ?
-					// Get width or height on the element, requesting but not forcing parseFloat
-					Y.Node.CSS(element, type, extra) :
-					// Set width or height on the element
-					Y.Node.Style(element, type, value, extra);
+						// Get width or height on the element, requesting but not forcing parseFloat
+						Y.Node.CSS(element, type, extra) :
+						// Set width or height on the element
+						Y.Node.Style(element, type, value, extra);
 				}, type, chainable ? margin : undef, chainable, null);
 			};
 		});
@@ -2587,11 +2685,11 @@
 		Y.Node.Function[operator] = function () {
 			// Arguments can be nodes, arrays of nodes, YAX objects and HTML strings
 			var nodes = map(arguments, function (arg) {
-				return Y.Lang.isObject(arg) ||
-					Y.Lang.isArray(arg) ||
-					Y.Lang.isNull(arg) ?
-					arg : YAXDOM.Fragment(arg);
-			}),
+					return Y.Lang.isObject(arg) ||
+						Y.Lang.isArray(arg) ||
+						Y.Lang.isNull(arg) ?
+						arg : YAXDOM.Fragment(arg);
+				}),
 				parent,
 				copyByClone = this.length > 1,
 				parentInDocument;
@@ -2605,8 +2703,8 @@
 
 				// Convert all methods to a "before" operation
 				target = operatorIndex === 0 ? target.nextSibling :
-					operatorIndex === 1 ? target.firstChild :
-					operatorIndex === 2 ? target :
+						operatorIndex === 1 ? target.firstChild :
+						operatorIndex === 2 ? target :
 					null;
 
 				parentInDocument = docElement.contains(parent);
@@ -2658,11 +2756,14 @@
 
 	Y.Node.YAXDOM = YAXDOM;
 	Y.Node.globalEval = globalEval;
+	Y.Node.getStyles = getStyles;
+	Y.Node.getDocStyles = getDocStyles;
 
 	//---
 
-	if (Y.Lang.isUndefined(Y.Window.$)) {
-		Y.Window.$ = Y.DOM = Y.Node;
+	if (typeof window.$ === 'undefined') {
+		Y.DOM = Y.Node;
+		window.$ = Y.DOM;
 	}
 
 	//---
@@ -3424,7 +3525,10 @@
 
 		specialEvents = Object.create({});
 
-	specialEvents.click = specialEvents.mousedown = specialEvents.mouseup = specialEvents.mousemove = 'MouseEvents';
+	specialEvents.click =
+		specialEvents.mousedown =
+			specialEvents.mouseup =
+				specialEvents.mousemove = 'MouseEvents';
 
 	//---
 
@@ -3484,7 +3588,7 @@
 	}
 
 	function eventCapture(handler, captureSetting) {
-		return !(!handler.del || !(!focusinSupported && Y.ObjectHasProperty(focus, handler.e))) || Y.Lang.isSet(captureSetting);
+		return !(!handler.del || !(!focusinSupported && Y.Lang.hasProperty(focus, handler.e))) || Y.Lang.isSet(captureSetting);
 	}
 
 	function realEvent(type) {
@@ -3494,7 +3598,7 @@
 	function compatible(event, source) {
 		if (source || !event.isDefaultPrevented) {
 			// source || (source = event);
-			source = event;
+			source = source || event;
 
 			Y.Each(eventMethods, function (name, predicate) {
 				var sourceMethod = source[name];
@@ -3512,7 +3616,7 @@
 					event.isDefaultPrevented = returnTrue;
 				}
 			} else {
-				if (Y.ObjectHasProperty(source, 'returnValue')) {
+				if (Y.Lang.hasProperty(source, 'returnValue')) {
 					if (source.returnValue === false) {
 						event.isDefaultPrevented = returnTrue;
 					}
@@ -3523,6 +3627,12 @@
 					}
 				}
 			}
+
+			/*if (source.defaultPrevented !== undefined ? source.defaultPrevented :
+					'returnValue' in source ? source.returnValue === false :
+				source.getPreventDefault && source.getPreventDefault()) {
+				event.isDefaultPrevented = returnTrue;
+			}*/
 		}
 
 		return event;
@@ -3663,7 +3773,7 @@
 				this.addDoubleTapListener(object, handler, id);
 			}
 
-			if (Y.ObjectHasProperty(object, 'addEventListener')) {
+			if (Y.Lang.hasProperty(object, 'addEventListener')) {
 				if (type === 'mousewheel') {
 					object.addEventListener('DOMMouseScroll', handler, false);
 					object.addEventListener(type, handler, false);
@@ -3686,7 +3796,7 @@
 
 					object.addEventListener(type, handler, false);
 				}
-			} else if (Y.ObjectHasProperty(object, 'attachEvent')) {
+			} else if (Y.Lang.hasProperty(object, 'attachEvent')) {
 				object.attachEvent('on' + type, handler);
 			}
 
@@ -3731,7 +3841,7 @@
 				this.removePointerListener(object, type, id);
 			} else if (Y.UserAgent.Features.Touch && (type === 'dblclick') && this.removeDoubleTapListener) {
 				this.removeDoubleTapListener(object, id);
-			} else if (Y.ObjectHasProperty(object, 'removeEventListener')) {
+			} else if (Y.Lang.hasProperty(object, 'removeEventListener')) {
 				if (type === 'mousewheel') {
 					object.removeEventListener('DOMMouseScroll', handler, false);
 					object.removeEventListener(type, handler, false);
@@ -3740,7 +3850,7 @@
 							type === 'mouseenter' ? 'mouseover' :
 								type === 'mouseleave' ? 'mouseout' : type, handler, false);
 				}
-			} else if (Y.ObjectHasProperty(object, 'detachEvent')) {
+			} else if (Y.Lang.hasProperty(object, 'detachEvent')) {
 				object.detachEvent('on' + type, handler);
 			}
 
@@ -3929,7 +4039,7 @@
 
 				set.push(handler);
 
-				if (Y.ObjectHasProperty(element, 'addEventListener')) {
+				if (Y.Lang.hasProperty(element, 'addEventListener')) {
 					Y.DOM.Event.addListener(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
 				}
 			});
@@ -3940,7 +4050,7 @@
 				findHandlers(element, event, func, selector).forEach(function (handler) {
 					delete eventHandlers(element)[handler.i];
 
-					if (Y.ObjectHasProperty(element, 'removeEventListener')) {
+					if (Y.Lang.hasProperty(element, 'removeEventListener')) {
 						Y.DOM.Event.removeListener(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
 					}
 				});
@@ -3955,15 +4065,17 @@
 	Y.DOM.proxy = Y.DOM.Proxy = function (callback, context) {
 		var result, proxyFn, args;
 
-		// args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
-		args = Y.G.Slice.call(arguments, 2);
+		args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
 
 		if (Y.Lang.isFunction(callback)) {
+
 			proxyFn = function () {
 				return callback.apply(context, args ? args.concat(Y.G.Slice.call(arguments)) : arguments);
 			};
 
 			proxyFn.YID = yID(callback);
+
+			proxyFn.GUID = callback.GUID = callback.GUID || proxyFn.GUID || Y.DOM.GUID++;
 
 			result = proxyFn;
 		} else if (Y.Lang.isString(context)) {
@@ -4110,7 +4222,9 @@
 
 		return this.each(function () {
 			// items in the collection might not be Node elements
-			if (Y.ObjectHasProperty(this, 'dispatchEvent')) {
+			// if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
+			if (Y.HasOwnProperty.call(this, 'dispatchEvent')) {
+			// if ('dispatchEvent' in this) {
 				this.dispatchEvent(event);
 			} else {
 				Y.DOM(this).triggerHandler(event, args);
@@ -4218,6 +4332,12 @@
 			return origFn.call(this);
 		};
 	});
+
+	//---
+
+	Y.DOM.Event.prototype.isDefaultPrevented = function () {
+		return this.defaultPrevented;
+	};
 
 	//---
 
@@ -5605,7 +5725,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global YAX, Y */
+/*global YAX, Y, transitionProperty, transitionDuration, transitionTiming*/
 
 //---
 
@@ -5778,7 +5898,9 @@
 		}
 	});
 
-	var prefix = Y.DOM.fx.cssPrefix, transitionEnd = Y.DOM.fx.transitionEnd, cssReset = {};
+	var prefix = Y.DOM.fx.cssPrefix;
+	var transitionEnd = Y.DOM.fx.transitionEnd;
+	var cssReset = Object.create({});
 
 	var transitionProperty;
 	var transitionDuration;
@@ -5789,7 +5911,10 @@
 			cssReset[transitionTiming = prefix + 'transition-timing-function'] = '';
 
 	Y.DOM.Function.stopTranAnim = function (jumpToEnd, cancelCallback) {
-		var props, style, cssValues = {}, i;
+		var props;
+		var style;
+		// var cssValues = {};
+		var x;
 
 		props = this.css(prefix + 'transition-property').split(', ');
 
@@ -5798,10 +5923,11 @@
 		}
 
 		if (!jumpToEnd) {
-			style = Y.Document.defaultView.getComputedStyle(this.get(0), '');
+			// style = Y.Document.defaultView.getComputedStyle(this.get(0), '');
+			style = Y.DOM.getDocStyles(this.get(0));
 
-			for (i = 0; i < props.length; i++) {
-				this.css(props[i], style.getPropertyValue(props[i]));
+			for (x = 0; x < props.length; x++) {
+				this.css(props[x], style.getPropertyValue(props[x]));
 			}
 		}
 
@@ -5812,6 +5938,116 @@
 		}
 
 		return this;
+	};
+
+	//---
+
+	Y.Extend(Y.DOM.Function, {
+		cycleNext: function () {
+			if (this.next().length > 0) {
+				return this.next();
+			}
+
+			return this.siblings().first();
+		},
+
+		cyclePrev: function () {
+			if (this.prev().length > 0) {
+				return this.prev();
+			}
+
+			return this.siblings().last();
+		}
+	});
+
+	//---
+
+}());
+
+//---
+
+
+/**
+ * YAX Node | Event Logger
+ *
+ *
+ * @version     0.15
+ * @depends:    Core, Node, Events
+ * @license     Dual licensed under the MIT and GPL licenses.
+ */
+
+//---
+
+/*jslint indent: 4 */
+/*jslint browser: true */
+/*jslint white: true */
+/*jshint -W084 */
+/*jshint -W040 */
+/*jslint node: false */
+/*global YAX, Y */
+
+//---
+
+(function () {
+
+	'use strict';
+
+	//---
+	function consoleOutput(e) {
+		if (e.data.color) {
+			var style = 'color:' + e.data.color;
+			Y.LOG('%c' + e.type + ' on ' + this.tagName, style);
+		} else {
+			Y.LOG(e.type + ' on ' + this.tagName);
+		}
+	}
+
+	function getCollectionObj(selector) {
+		var obj = {};
+		switch (typeof selector) {
+			case 'string':
+				obj = Y.DOM(selector);
+				break;
+			case 'object':
+				obj = selector;
+				break;
+		}
+		return obj;
+	}
+
+	Y.DOM.Function.EventLoggerStart = function (event, color) {
+		var fontColor = Y.Lang.isString(color) ? color : '';
+
+		this.on(event, {color: fontColor}, consoleOutput);
+
+		return this;
+	};
+
+	Y.DOM.Function.EventLoggerEnd = function (event) {
+		this.off(event, consoleOutput);
+
+		return this;
+	};
+
+	Y.Window.EventLogger = {
+		start: function (selector, event, color) {
+			var fontColor = Y.Lang.isString(color) ? color : '';
+
+			var obj = getCollectionObj(selector);
+
+			obj.on(event, {
+				color: fontColor
+			}, consoleOutput);
+
+			return obj;
+		},
+		end: function (selector, event) {
+			var obj = getCollectionObj(selector);
+
+			obj.off(event, consoleOutput);
+
+			return obj;
+		}
 	};
 
 	//---
@@ -5968,7 +6204,7 @@
 	/**
 	 * The ready event handler and self cleanup method
 	 */
-	function completed () {
+	function completed() {
 		Y.Document.removeEventListener('DOMContentLoaded', completed, false);
 		Y.Window.removeEventListener('load', completed, false);
 		Y.DOM.ready();
@@ -6005,6 +6241,165 @@
 		Y.DOM.isXMLDoc = Y.Window.Sizzle.isXML;
 		Y.DOM.text = Y.DOM.Text = Y.Window.Sizzle.getText;
 	}
+
+	//---
+
+	Y.DOM.event.simulate = function (type, elem, event, bubble) {
+		var e = Y.Extend(new Y.DOM.Event(type), event, {
+			type: type,
+			isSimulated: true,
+			originalEvent: {},
+			bubbles: true
+		});
+
+		Y.DOM(elem).trigger(e);
+
+		if (e.isDefaultPrevented()) {
+			event.preventDefault();
+		}
+	};
+
+	Y.DOM.each({
+		focus: 'focusin',
+		blur: 'focusout'
+	}, function (orig, fix) {
+		var attaches = 0;
+
+		var handler = function (event) {
+			Y.DOM.event.simulate(fix, event.target, Y.DOM.extend({}, event), true);
+		};
+
+		Y.DOM.event.special[fix] = {
+			setup: function () {
+				if (attaches++ === 0) {
+					Y.Document.addEventListener(orig, handler, true);
+				}
+			},
+
+			teardown: function () {
+				if (--attaches === 0) {
+					Y.Document.removeEventListener(orig, handler, true);
+				}
+			}
+		};
+	});
+
+	//---
+
+	Y.Window.cordova = document.URL.indexOf('http://') === -1 && Y.Document.URL.indexOf('https://') === -1;
+
+	if (Y.Window.cordova === false) {
+		Y.DOM(function () {
+			Y.DOM(Y.Document).trigger('deviceready');
+		});
+	}
+
+
+	//---
+
+}());
+
+//---
+
+
+/**
+ * YAX Node | Special Event
+ *
+ * Cross browser special event implementation using YAX's API [Node]
+ *
+ * @version     0.15
+ * @depends:    Core, Node, Events
+ * @license     Dual licensed under the MIT and GPL licenses.
+ */
+
+//---
+
+/*jslint indent: 4 */
+/*jslint browser: true */
+/*jslint white: true */
+/*jshint -W084 */
+/*jslint node: false */
+/*global YAX, Y */
+
+//---
+
+(function () {
+
+	'use strict';
+
+	//---
+
+	Y.DOM.Function.bind = function (eventName, data, callback) {
+		var el = this;
+		// var $this = Y.DOM(el);
+		var specialEvent;
+
+		if (!Y.Lang.isSet(callback)) {
+			callback = data;
+			data = null;
+		}
+
+		if (Y.DOM.YAXDOM) {
+			Y.DOM.each(eventName.split(/\s/), function (i, eventName) {
+				eventName = eventName.split(/\./)[0];
+
+				var tmp = Y.HasOwnProperty.call(Y.DOM.Event.special, eventName);
+
+				if (tmp) {
+					specialEvent = Y.DOM.event.special[eventName];
+
+					/// init enable special events on Y.DOM
+					if (!specialEvent._init) {
+						specialEvent._init = true;
+
+						/// intercept and replace the special event handler to add functionality
+						specialEvent.originalHandler = specialEvent.handler;
+						specialEvent.handler = function () {
+
+							/// make event argument writable, like on jQuery
+							var args = Y.G.Slice.call(arguments);
+
+							args[0] = Y.Extend({}, args[0]);
+
+							/// define the event handle, Y.DOM.event.dispatch is only for newer versions of jQuery
+							Y.DOM.event.handle = function () {
+								/// make context of trigger the event element
+								var args_ = Y.G.Slice.call(arguments);
+								var event = args_[0];
+								var $target = Y.DOM(event.target);
+
+								$target.trigger.apply($target, arguments);
+
+							};
+
+//							Y.LOG(specialEvent);
+							specialEvent.originalHandler.apply(this, args);
+
+						};
+					}
+
+					//Y.LOG(el);
+					//Y.LOG(data);
+					// Y.LOG(specialEvent);
+					//Y.LOG(eventName);
+
+					/// setup special events on Y.DOM
+					// specialEvent.setup.apply(el, [data]);
+					specialEvent.setup.apply(el, [data]);
+				}
+			});
+		}
+
+		// Y.LOG(bindBeforeSpecialEvents);
+//		Y.LOG(callback);
+
+		// return bindBeforeSpecialEvents.apply(this, [eventName, callback]);
+		// return Y.Window.bindBeforeSpecialEvents.apply(this, [eventName, callback]);
+		// return Y.DOM.Function.bindEvent.apply(this, [eventName, callback]);
+		return Y.DOM.Function.bindEvent.apply(this, [eventName, callback]);
+	};
+
+	//---
 
 }());
 

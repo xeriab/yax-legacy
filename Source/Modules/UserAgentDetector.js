@@ -28,20 +28,20 @@
 		gecko3d = Y.Document.documentElement.style.hasOwnProperty('MozPerspective'),
 		opera3d = Y.Document.documentElement.style.hasOwnProperty('OTransition');
 
-	retina = (Y.ObjectHasProperty(Y.Window, 'devicePixelRatio') && Y.CallProperty(Y.Window, 'devicePixelRatio') > 1);
+	retina = (Y.HasOwnProperty.call(Y.Window, 'devicePixelRatio') && Y.CallProperty(Y.Window, 'devicePixelRatio') > 1);
 
-	if (!retina && Y.ObjectHasProperty(Y.Window, 'matchMedia')) {
+	if (!retina && Y.HasOwnProperty.call(Y.Window, 'matchMedia')) {
 		matches = Y.CallProperty(Y.Window, 'matchMedia');
 		retina = (Y.Lang.isSet(matches) && Y.CallProperty(matches, 'matches'));
 	}
 
-	msPointer = (Y.ObjectHasProperty(navigator, 'msPointerEnabled') &&
-		Y.ObjectHasProperty(navigator, 'msMaxTouchPoints') &&
-		!Y.ObjectHasProperty(Y.Window, 'PointerEvent'));
+	msPointer = (Y.HasOwnProperty.call(navigator, 'msPointerEnabled') &&
+		Y.HasOwnProperty.call(navigator, 'msMaxTouchPoints') &&
+		!Y.HasOwnProperty.call(Y.Window, 'PointerEvent'));
 
-	pointer = (Y.ObjectHasProperty(Y.Window, 'PointerEvent') &&
-		Y.ObjectHasProperty(navigator, 'pointerEnabled') &&
-		!Y.ObjectHasProperty(navigator, 'maxTouchPoints')) || msPointer;
+	pointer = (Y.HasOwnProperty.call(Y.Window, 'PointerEvent') &&
+		Y.HasOwnProperty.call(navigator, 'pointerEnabled') &&
+		!Y.HasOwnProperty.call(navigator, 'maxTouchPoints')) || msPointer;
 
 	//---
 

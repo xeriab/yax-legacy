@@ -15,7 +15,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global YAX, Y */
+/*global YAX, Y, transitionProperty, transitionDuration, transitionTiming*/
 
 //---
 
@@ -188,7 +188,9 @@
 		}
 	});
 
-	var prefix = Y.DOM.fx.cssPrefix, transitionEnd = Y.DOM.fx.transitionEnd, cssReset = {};
+	var prefix = Y.DOM.fx.cssPrefix;
+	var transitionEnd = Y.DOM.fx.transitionEnd;
+	var cssReset = Object.create({});
 
 	var transitionProperty;
 	var transitionDuration;
@@ -199,7 +201,10 @@
 			cssReset[transitionTiming = prefix + 'transition-timing-function'] = '';
 
 	Y.DOM.Function.stopTranAnim = function (jumpToEnd, cancelCallback) {
-		var props, style, cssValues = {}, i;
+		var props;
+		var style;
+		// var cssValues = {};
+		var x;
 
 		props = this.css(prefix + 'transition-property').split(', ');
 
@@ -208,10 +213,11 @@
 		}
 
 		if (!jumpToEnd) {
-			style = Y.Document.defaultView.getComputedStyle(this.get(0), '');
+			// style = Y.Document.defaultView.getComputedStyle(this.get(0), '');
+			style = Y.DOM.getDocStyles(this.get(0));
 
-			for (i = 0; i < props.length; i++) {
-				this.css(props[i], style.getPropertyValue(props[i]));
+			for (x = 0; x < props.length; x++) {
+				this.css(props[x], style.getPropertyValue(props[x]));
 			}
 		}
 
@@ -223,6 +229,26 @@
 
 		return this;
 	};
+
+	//---
+
+	Y.Extend(Y.DOM.Function, {
+		cycleNext: function () {
+			if (this.next().length > 0) {
+				return this.next();
+			}
+
+			return this.siblings().first();
+		},
+
+		cyclePrev: function () {
+			if (this.prev().length > 0) {
+				return this.prev();
+			}
+
+			return this.siblings().last();
+		}
+	});
 
 	//---
 

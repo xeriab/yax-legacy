@@ -23,8 +23,8 @@
 	// ============================
 
 	var ProgressBar = function(element, options) {
-		this.$element = Y.DOM(element);
-		this.options = Y.DOM.extend({}, ProgressBar.defaults, options);
+		this.element = Y.DOM(element);
+		this.options = Y.Extend({}, ProgressBar.defaults, options);
 	};
 
 	ProgressBar.defaults = {
@@ -45,7 +45,7 @@
 	};
 
 	ProgressBar.prototype.transition = function() {
-		var $this = this.$element;
+		var $this = this.element;
 		var $parent = $this.parent();
 		var $back_text = this.$back_text;
 		var $front_text = this.$front_text;

@@ -13,13 +13,16 @@
 /*jslint indent: 4 */
 /*jslint white: true */
 /*jshint eqeqeq: false */
-/*jshint strict: false */
 /*jshint undef: true */
 /*jshint unused: true */
 /*global exports, define, module */
 
 (function () {
+	// 'use strict';
+
 	var Y = Object.create({});
+
+	// var Y;
 
 	var isNode = false;
 
@@ -51,16 +54,16 @@
 	//---
 
 	// Create a safe reference to the YAX object for use below.
-	/*Y = function (obj) {
-		if (obj instanceof Y) {
-			return obj;
+	/*Y = function (object) {
+		if (object instanceof Y) {
+			return object;
 		}
 
 		if (!(this instanceof Y)) {
-			return new Y(obj);
+			return new Y(object);
 		}
 
-		this._wrapped = obj;
+		this._WRAPPED = object;
 	};*/
 
 	//---
@@ -211,8 +214,14 @@
 	Y.G.ArrayProto = ArrayProto;
 	Y.G.ObjProto = ObjProto;
 
+	/** @namespace root.R */
+	/** @namespace root.D */
 	Y.Require = root.R || require || null;
 	Y.Define = root.D || define || null;
+
+	//---
+
+
 
 	//---
 
@@ -230,6 +239,11 @@
 	} else {
 		expose();
 	}
+
+	//---
+
+	delete root.R;
+	delete root.D;
 
 	//---
 

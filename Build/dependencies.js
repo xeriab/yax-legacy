@@ -17,12 +17,16 @@ var Dependencies = {
 			'Core/Class.js',
 			'Core/Tools.js',
 			'Core/Events.js',
+
+//			'Core/OO.js',
+
 			'Core/Callbacks.js',
 			'Core/Deferred.js',
 			'Core/Store.js',
 			'Core/Parser.js',
 			'Core/I18N.js'
-			// 'Core/Console.js'
+
+//			'Core/Console.js'
 		],
 
 		desc: 'YAX.JS Core Library.',
@@ -55,11 +59,12 @@ var Dependencies = {
 //			'Modules/Node/EventGesture.js',
 //			'Modules/Node/Assets.js',
 //			'Modules/Node/Stack.js',
+
 			'Modules/Node/Extra.js',
+			'Modules/Node/EventLogger.js',
+			'Support/Compatibility.js',
+			'Modules/Node/EventSpecial.js'
 
-//			'Modules/Node/EventSpecial.js',
-
-			'Support/Compatibility.js'
 		],
 
 		desc: 'YAX.JS Node/DOM Module.',

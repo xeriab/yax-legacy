@@ -92,7 +92,7 @@
 						return value;
 					}
 
-					var domParser = (Y.ObjectHasProperty(global, 'DOMParser') && (new DOMParser()).parseFromString);
+					var domParser = (Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser()).parseFromString);
 
 					/** @namespace global.ActiveX */
 					if (!domParser && global.ActiveX) {
@@ -111,7 +111,7 @@
 					}
 
 					value.value = domParser.call(
-						(Y.ObjectHasProperty(global, 'DOMParser') && (new DOMParser())) || Y.Window,
+						(Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser())) || Y.Window,
 						value.value,
 						'text/xml'
 					);

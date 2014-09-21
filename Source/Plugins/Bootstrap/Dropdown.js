@@ -83,7 +83,7 @@
 		clearMenus();
 
 		if (!isActive) {
-			if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
+			if ('ontouchstart' in Y.Document.documentElement && !$parent.closest('.navbar-nav').length) {
 				// if mobile we use a backdrop because click events don't delegate
 				Y.DOM('<div class="dropdown-backdrop"/>').insertAfter(Y.DOM(this)).on('click', clearMenus);
 			}
@@ -193,7 +193,7 @@
 	// APPLY TO STANDARD DROPDOWN ELEMENTS
 	// ===================================
 
-	Y.DOM(document)
+	Y.DOM(Y.Document)
 		.on('click.bs.dropdown.data-api', clearMenus)
 		.on('click.bs.dropdown.data-api', '.dropdown form', function (e) {
 			e.stopPropagation();

@@ -118,13 +118,16 @@
 /*jslint indent: 4 */
 /*jslint white: true */
 /*jshint eqeqeq: false */
-/*jshint strict: false */
 /*jshint undef: true */
 /*jshint unused: true */
 /*global exports, define, module */
 
 (function () {
+	// 'use strict';
+
 	var Y = Object.create({});
+
+	// var Y;
 
 	var isNode = false;
 
@@ -156,16 +159,16 @@
 	//---
 
 	// Create a safe reference to the YAX object for use below.
-	/*Y = function (obj) {
-		if (obj instanceof Y) {
-			return obj;
+	/*Y = function (object) {
+		if (object instanceof Y) {
+			return object;
 		}
 
 		if (!(this instanceof Y)) {
-			return new Y(obj);
+			return new Y(object);
 		}
 
-		this._wrapped = obj;
+		this._WRAPPED = object;
 	};*/
 
 	//---
@@ -316,8 +319,14 @@
 	Y.G.ArrayProto = ArrayProto;
 	Y.G.ObjProto = ObjProto;
 
+	/** @namespace root.R */
+	/** @namespace root.D */
 	Y.Require = root.R || require || null;
 	Y.Define = root.D || define || null;
+
+	//---
+
+
 
 	//---
 
@@ -335,6 +344,11 @@
 	} else {
 		expose();
 	}
+
+	//---
+
+	delete root.R;
+	delete root.D;
 
 	//---
 
@@ -973,13 +987,15 @@
 
 		if (type && isNumber(type) && type === 1) {
 			for (x in object) {
-				if (Y.HasOwnProperty.call(object, x)) {
+				// if (Y.HasOwnProperty.call(object, x)) {
+				if (object.hasOwnProperty(x)) {
 					tmp.push([x, object[x]]);
 				}
 			}
 		} else {
 			for (n in object) {
-				if (Y.HasOwnProperty.call(object, n)) {
+				// if (Y.HasOwnProperty.call(object, n)) {
+				if (object.hasOwnProperty(n)) {
 					tmp.push(object[n]);
 				}
 			}
@@ -1070,7 +1086,7 @@
 			item,
 			j,
 			value,
-			// The padding given at the beginning of the line.
+		// The padding given at the beginning of the line.
 			levelPadding = '';
 
 		if (!level) {
@@ -1096,7 +1112,7 @@
 					}
 				}
 			}
-		// Stings/Chars/Numbers etc.
+			// Stings/Chars/Numbers etc.
 		} else {
 			dumpedText = '===>' + object + '<===(' + type(object) + ')';
 			// dumpedText = '==>' + object + '<==(' + type(object) + ')';
@@ -1196,11 +1212,12 @@
 
 		var source, prop, x, length = arguments.length;
 
-		for (x = 0; x < length; x++) {
+		for (x = 1; x < length; x++) {
 			source = arguments[x];
 
 			for (prop in source) {
-				if (Y.HasOwnProperty.call(source, prop)) {
+				//if (Y.HasOwnProperty.call(source, prop)) {
+				if (source.hasOwnProperty(prop)) {
 					object[prop] = source[prop];
 				}
 			}
@@ -1209,50 +1226,58 @@
 		return object;
 	}
 
-	function configSet(varname, newvalue) {
-		var oldval;
+	function configSet() {
+		var args = Y.G.Slice.call(arguments);
+
+		var varName = args[0];
+		var newValue = args[1];
+		var oldValue;
 		var self = Y;
-		var setArr;
+		var setArray;
 
-		Y._CONFIG_STORAGE[varname] = Y._CONFIG_STORAGE[varname] || Object.create({});
+		Y._CONFIG_STORAGE[varName] = Y._CONFIG_STORAGE[varName] || Object.create({});
 
-		oldval = Y._CONFIG_STORAGE[varname].LOCAL_VALUE;
+		oldValue = Y._CONFIG_STORAGE[varName].LOCAL_VALUE;
 
-		setArr = function (oldval) {
+		setArray = function (_oldValue, _newValue) {
 			// Although these are set individually, they are all accumulated
-			if (isUndefined(oldval)) {
-				self._CONFIG_STORAGE[varname].LOCAL_VALUE = [];
+			if (isUndefined(_oldValue)) {
+				self._CONFIG_STORAGE[varName].LOCAL_VALUE = [];
 			}
 
-			self._CONFIG_STORAGE[varname].LOCAL_VALUE.push(newvalue);
+			self._CONFIG_STORAGE[varName].LOCAL_VALUE.push(_newValue);
 		};
 
-		switch (varname) {
+		switch (varName) {
 			case 'extension':
-				setArr(oldval, newvalue);
+				setArray(oldValue, newValue);
 				break;
 
 			case 'Extension':
-				setArr(oldval, newvalue);
+				setArray(oldValue, newValue);
 				break;
 
 			default:
-				Y._CONFIG_STORAGE[varname].LOCAL_VALUE = newvalue;
+				Y._CONFIG_STORAGE[varName].LOCAL_VALUE = newValue;
 				break;
 		}
 
-		return oldval;
+		return oldValue;
 	}
 
-	function configGet(varname) {
-		if (Y._CONFIG_STORAGE &&
-			Y._CONFIG_STORAGE[varname] && !isUndefined(Y._CONFIG_STORAGE[varname].LOCAL_VALUE)) {
+	function configGet() {
+		var args = Y.G.Slice.call(arguments);
 
-			if (isNull(Y._CONFIG_STORAGE[varname].LOCAL_VALUE)) {
+		var varName = args[0];
+
+		if (Y._CONFIG_STORAGE &&
+			Y._CONFIG_STORAGE[varName] && !isUndefined(Y._CONFIG_STORAGE[varName].LOCAL_VALUE)) {
+
+			if (isNull(Y._CONFIG_STORAGE[varName].LOCAL_VALUE)) {
 				return '';
 			}
 
-			return Y._CONFIG_STORAGE[varname].LOCAL_VALUE;
+			return Y._CONFIG_STORAGE[varName].LOCAL_VALUE;
 		}
 
 		return '';
@@ -1309,7 +1334,7 @@
 
 			// Extend Y itself if only one argument is passed
 			if (length === x) {
-				object = this || Y;
+				object = this;
 				// i = i - 1;
 				--x;
 			}
@@ -1319,6 +1344,7 @@
 
 				for (prop in source) {
 					if (Y.HasOwnProperty.call(source, prop)) {
+						// if (source.hasOwnProperty(prop)) {
 						object[prop] = source[prop];
 					}
 				}
@@ -1327,13 +1353,96 @@
 			return object;
 		},
 
-		ObjectHasProperty: hasProperty,
+		Extend_: function (target, source, deepp) {
+			var options,
+				name,
+				copy,
+				copyIsArray,
+				clone,
+				i = 1,
+				length = arguments.length,
+				sourceObject,
+				targetObject,
+			// deep = false;
+				deep = deepp;
 
-		HasProperty: hasProp,
+			// targetObject = arguments[0] || {};
+			targetObject = target || {};
 
-		CallProperty: getOwn,
+			// Handle a deep copy situation
+			if (isBool(targetObject)) {
+				deep = targetObject;
+				// targetObject = arguments[1] || {};
+				targetObject = source || {};
+				// Skip the boolean and the target
+				i = 2;
+			}
 
-		Inject: inject
+			// Handle case when target is a string or something (possible in deep copy)
+			if (!isObject(targetObject) && !isFunction(targetObject)) {
+				targetObject = {};
+			}
+
+			// Extend Y itself if only one argument is passed
+			if (length === i) {
+				targetObject = this;
+				// i = i - 1;
+				--i;
+			}
+
+			// for (null; i < length; i++) {
+			for (i; i < length; i++) {
+				options = arguments[i];
+
+				// Only deal with non-null/undef values
+				// if ((options = arguments[i]) !== null) {
+				if (!isNull(options)) {
+					// Extend the base object
+					for (name in options) {
+						if (options.hasOwnProperty(name)) {
+							sourceObject = targetObject[name];
+							copy = options[name];
+
+							// Prevent never-ending loop
+							/* jslint continue: true */
+							if (targetObject === copy) {
+								continue;
+							}
+
+							// Recurse if we're merging plain objects or arrays
+							// if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+							copyIsArray = isArray(copy);
+
+							// if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+							if (deep && copy && (isPlainObject(copy) || copyIsArray)) {
+								if (copyIsArray) {
+									copyIsArray = false;
+									clone = sourceObject && isArray(sourceObject) ? sourceObject : [];
+								} else {
+									clone = sourceObject && isPlainObject(sourceObject) ? sourceObject : {};
+								}
+
+								// Never move original objects, clone them
+								targetObject[name] = Y.extend(deep, clone, copy);
+
+								// Don't bring in undefined values
+							} else if (!isUndefined(copy)) {
+								targetObject[name] = copy;
+							}
+						}
+					}
+				}
+			}
+
+			// Return the modified object
+			return targetObject;
+		},
+
+		// ObjectHasProperty: hasProperty,
+
+		// HasProperty: hasProp,
+
+		CallProperty: getOwn
 	});
 
 	//---
@@ -1431,7 +1540,11 @@
 
 		makeArray: function (arrayLikeThing) {
 			return Y.G.Slice.call(arrayLikeThing);
-		}
+		},
+
+		inject: inject,
+
+		hasProperty: hasProperty
 	});
 
 	//---
@@ -1485,13 +1598,14 @@
 
 	// Shortcut function for checking if an object has a given property directly
 	// on itself (in other words, not on a prototype).
-	Y.Lang.Has = function(obj, key) {
+	Y.Lang.Has = function (obj, key) {
 		return obj !== null && Y.HasOwnProperty.call(obj, key);
+		// return obj !== null && obj.hasOwnProperty(key);
 	};
 
 	// Retrieve the names of an object's properties.
 	// Delegates to **ECMAScript 5**'s native `.keys`
-	Y.Lang.Keys = function(obj) {
+	Y.Lang.Keys = function (obj) {
 		var key;
 
 		if (!isObject(obj) && !isFunction(obj)) {
@@ -1505,8 +1619,10 @@
 		var keys = [];
 
 		for (key in obj) {
-			if (Y.Lang.Has(obj, key)) {
-				keys.push(key);
+			if (obj.hasOwnProperty(key)) {
+				if (Y.Lang.Has(obj, key)) {
+					keys.push(key);
+				}
 			}
 		}
 
@@ -1517,7 +1633,7 @@
 	};
 
 	// Retrieve the values of an object's properties.
-	Y.Lang.Values = function(obj) {
+	Y.Lang.Values = function (obj) {
 		var keys = Y.Lang.Keys(obj);
 		var length = keys.length;
 		var values = new Array(length);
@@ -1531,7 +1647,7 @@
 	};
 
 	// Convert an object into a list of `[key, value]` pairs.
-	Y.Lang.Pairs = function(obj) {
+	Y.Lang.Pairs = function (obj) {
 		var keys = Y.Lang.Keys(obj);
 		var length = keys.length;
 		var pairs = new Array(length);
@@ -1545,7 +1661,7 @@
 	};
 
 	// Invert the keys and values of an object. The values must be serializable.
-	Y.Lang.Invert = function(obj) {
+	Y.Lang.Invert = function (obj) {
 		var result = {};
 		var keys = Y.Lang.Keys(obj);
 		var x;
@@ -1560,13 +1676,15 @@
 
 	// Return a sorted list of the function names available on the object.
 	// Aliased as `methods`
-	Y.Lang.Functions = Y.Lang.Methods = function(obj) {
+	Y.Lang.Functions = Y.Lang.Methods = function (obj) {
 		var names = [];
 		var key;
 
 		for (key in obj) {
-			if (isFunction(obj[key])) {
-				names.push(key);
+			if (obj.hasOwnProperty(key)) {
+				if (isFunction(obj[key])) {
+					names.push(key);
+				}
 			}
 		}
 
@@ -1622,9 +1740,12 @@
 			source = arguments[x];
 
 			for (prop in source) {
-				// if (obj[prop] === eval('void 0')) {
-				if (obj[prop] === void 0) {
-					obj[prop] = source[prop];
+				if (source.hasOwnProperty(prop)) {
+					// if (obj[prop] === eval('void 0')) {
+					// if (obj[prop] === void 0) {
+					if (obj[prop] === undefined) {
+						obj[prop] = source[prop];
+					}
 				}
 			}
 		}
@@ -1714,7 +1835,7 @@
 		var render;
 
 		try {
-			// jslint eval: false
+			/*jshint -W054 */
 			render = new Function(settings.variable || 'obj', 'Y', source);
 		} catch (e) {
 			e.source = source;
@@ -1737,6 +1858,13 @@
 	};
 
 	//---
+
+
+	Y.setConfig('Use.Console', 'Off');
+	Y.setConfig('Extension', 'Use.Console');
+
+	//---
+
 
 }());
 
@@ -3216,7 +3344,7 @@
 						return value;
 					}
 
-					var domParser = (Y.ObjectHasProperty(global, 'DOMParser') && (new DOMParser()).parseFromString);
+					var domParser = (Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser()).parseFromString);
 
 					/** @namespace global.ActiveX */
 					if (!domParser && global.ActiveX) {
@@ -3235,7 +3363,7 @@
 					}
 
 					value.value = domParser.call(
-						(Y.ObjectHasProperty(global, 'DOMParser') && (new DOMParser())) || Y.Window,
+						(Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser())) || Y.Window,
 						value.value,
 						'text/xml'
 					);
@@ -3453,7 +3581,7 @@
 						return value;
 					}
 
-					var domParser = (Y.ObjectHasProperty(global, 'DOMParser') && (new DOMParser()).parseFromString);
+					var domParser = (Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser()).parseFromString);
 
 					/** @namespace global.ActiveX */
 					if (!domParser && global.ActiveX) {
@@ -3472,7 +3600,7 @@
 					}
 
 					value.value = domParser.call(
-							(Y.ObjectHasProperty(global, 'DOMParser') && (new DOMParser())) || Y.Window,
+							(Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser())) || Y.Window,
 						value.value,
 						'text/xml'
 					);

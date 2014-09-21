@@ -1475,7 +1475,7 @@
 		History: {
 			Cache: false,
 			// Support: ('history' in global)
-			Support: Y.ObjectHasProperty(global, 'history')
+			Support: Y.HasOwnProperty.call(global, 'history')
 		},
 
 		Array: function (args) {

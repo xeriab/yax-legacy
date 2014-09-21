@@ -23,7 +23,7 @@
 	// ============================================================
 
 	function transitionEnd() {
-		var el = Y.Document.createElement('yaxbootstrap');
+		var el = Y.Document.createElement('yaxbs');
 		var name;
 
 		var transEndEventNames = {
@@ -37,11 +37,18 @@
 			if (Y.HasOwnProperty.call(transEndEventNames, name)) {
 				if (!Y.Lang.isDefined(el.style[name])) {
 					return {
-						end: transEndEventNames[name]
+						// end: transEndEventNames[name]
+						end: Y.DOM.fx.transitionEnd
 					};
 				}
 			}
 		}
+
+		/*if (Y.DOM.fx) {
+			return {
+				end: Y.DOM.fx.transitionEnd
+			};
+		}*/
 
 		return false; // explicit for ie8 (	._.)
 	}
@@ -51,14 +58,13 @@
 		var called = false;
 		var $el = this;
 
-		Y.DOM(this).one('bsTransitionEnd', function () {
+		Y.DOM(this).bind('bsTransitionEnd', function () {
 			called = true;
 		});
 
 		var callback = function () {
 			if (!called) {
 				Y.DOM($el).trigger(Y.DOM.support.transition.end);
-				Y.DOM($el).trigger('bsTransitionEnd');
 			}
 		};
 
@@ -74,7 +80,44 @@
 			return;
 		}
 
-		Y.DOM.Event.special.bsTransitionEnd = {
+		Y.DOM.each({
+			bsTransitionEnd: Y.DOM.fx.transitionEnd,
+			yaxbs: Y.DOM.fx.transitionEnd
+		}, function (orig, fix) {
+			var attaches = 0;
+
+			var handler = function (event) {
+				Y.DOM.event.simulate(fix, event.target, Y.DOM.extend({}, event), true);
+			};
+
+			Y.DOM.event.special[orig] = {
+				bindType: Y.DOM.support.transition.end,
+
+				delegateType: Y.DOM.support.transition.end,
+
+				handle: function (e) {
+					if (Y.DOM(e.target).is(this)) {
+						Y.LOG(e);
+						return e.handleObj.handler.apply(this, arguments);
+					}
+				},
+
+				setup: function () {
+					if (attaches++ === 0) {
+						Y.Document.addEventListener(orig, handler, true);
+						Y.Document.addEventListener(fix, handler, true);
+					}
+				},
+
+				teardown: function () {
+					if (--attaches === 0) {
+						Y.Document.removeEventListener(orig, handler, true);
+					}
+				}
+			};
+		});
+
+		/*Y.DOM.Event.special.bsTransitionEnd = {
 			bindType: Y.DOM.support.transition.end,
 			delegateType: Y.DOM.support.transition.end,
 			handle: function (e) {
@@ -83,7 +126,7 @@
 					return e.handleObj.handler.apply(this, arguments);
 				}
 			}
-		};
+		};*/
 	});
 
 	//---
@@ -118,13 +161,13 @@
 	// ======================
 
 	var Affix = function (element, options) {
-		this.options = Y.DOM.extend({}, Affix.DEFAULTS, options);
+		this.options = Y.Extend({}, Affix.DEFAULTS, options);
 
 		this.$target = Y.DOM(this.options.target)
 			.on('scroll.bs.affix.data-api', Y.DOM.proxy(this.checkPosition, this))
 			.on('click.bs.affix.data-api', Y.DOM.proxy(this.checkPositionWithEventLoop, this));
 
-		this.$element = Y.DOM(element);
+		this.element = Y.DOM(element);
 		this.affixed =
 			this.unpin =
 				this.pinnedOffset = null;
@@ -146,10 +189,10 @@
 			return this.pinnedOffset;
 		}
 
-		this.$element.removeClass(Affix.RESET).addClass('affix');
+		this.element.removeClass(Affix.RESET).addClass('affix');
 
 		var scrollTop = this.$target.scrollTop();
-		var position = this.$element.offset();
+		var position = this.element.offset();
 
 		//return (this.pinnedOffset = position.top - scrollTop);
 
@@ -163,13 +206,13 @@
 	};
 
 	Affix.prototype.checkPosition = function () {
-		if (!this.$element.is(':visible')) {
+		if (!this.element.is(':visible')) {
 			return;
 		}
 
-		var scrollHeight = Y.DOM(document).height();
+		var scrollHeight = Y.DOM(Y.Document).height();
 		var scrollTop = this.$target.scrollTop();
-		var position = this.$element.offset();
+		var position = this.element.offset();
 		var offset = this.options.offset;
 		var offsetTop = offset.top;
 		var offsetBottom = offset.bottom;
@@ -179,15 +222,15 @@
 		}
 
 		if (typeof offsetTop === 'function') {
-			offsetTop = offset.top(this.$element);
+			offsetTop = offset.top(this.element);
 		}
 
 		if (typeof offsetBottom === 'function') {
-			offsetBottom = offset.bottom(this.$element);
+			offsetBottom = offset.bottom(this.element);
 		}
 
 		var affix = this.unpin !== null && (scrollTop + this.unpin <= position.top) ? false :
-				offsetBottom !== null && (position.top + this.$element.height() >= scrollHeight - offsetBottom) ? 'bottom' :
+				offsetBottom !== null && (position.top + this.element.height() >= scrollHeight - offsetBottom) ? 'bottom' :
 				offsetTop !== null && (scrollTop <= offsetTop) ? 'top' : false;
 
 		if (this.affixed === affix) {
@@ -195,13 +238,13 @@
 		}
 
 		if (this.unpin !== null) {
-			this.$element.css('top', '');
+			this.element.css('top', '');
 		}
 
 		var affixType = 'affix' + (affix ? '-' + affix : '');
 		var e = Y.DOM.Event(affixType + '.bs.affix');
 
-		this.$element.trigger(e);
+		this.element.trigger(e);
 
 		if (e.isDefaultPrevented()) {
 			return;
@@ -210,14 +253,14 @@
 		this.affixed = affix;
 		this.unpin = affix === 'bottom' ? this.getPinnedOffset() : null;
 
-		this.$element
+		this.element
 			.removeClass(Affix.RESET)
 			.addClass(affixType)
 			.trigger(Y.DOM.Event(affixType.replace('affix', 'affixed')));
 
 		if (affix === 'bottom') {
-			this.$element.offset({
-				top: scrollHeight - this.$element.height() - offsetBottom
+			this.element.offset({
+				top: scrollHeight - this.element.height() - offsetBottom
 			});
 		}
 	};
@@ -312,8 +355,8 @@
 	// ==============================
 
 	var Button = function (element, options) {
-		this.$element = Y.DOM(element);
-		this.options = Y.DOM.extend({}, Button.DEFAULTS, options);
+		this.element = Y.DOM(element);
+		this.options = Y.Extend({}, Button.DEFAULTS, options);
 		this.isLoading = false;
 	};
 
@@ -325,12 +368,13 @@
 
 	Button.prototype.setState = function (state) {
 		var d = 'disabled';
-		var $el = this.$element;
+		var $el = this.element;
 		var val = $el.is('input') ? 'val' : 'html';
 		var data = $el.data();
 
 		state = state + 'Text';
 
+		/** @namespace data.resetText */
 		if (data.resetText === null) {
 			$el.data('resetText', $el[val]());
 		}
@@ -351,13 +395,13 @@
 
 	Button.prototype.toggle = function () {
 		var changed = true;
-		var $parent = this.$element.closest('[data-toggle="buttons"]');
+		var $parent = this.element.closest('[data-toggle="buttons"]');
 
 		if ($parent.length) {
-			var $input = this.$element.find('input');
+			var $input = this.element.find('input');
 
 			if ($input.prop('type') === 'radio') {
-				if ($input.prop('checked') && this.$element.hasClass('active')) {
+				if ($input.prop('checked') && this.element.hasClass('active')) {
 					changed = false;
 				} else {
 					$parent.find('.active').removeClass('active');
@@ -365,12 +409,12 @@
 			}
 
 			if (changed) {
-				$input.prop('checked', !this.$element.hasClass('active')).trigger('change');
+				$input.prop('checked', !this.element.hasClass('active')).trigger('change');
 			}
 		}
 
 		if (changed) {
-			this.$element.toggleClass('active');
+			this.element.toggleClass('active');
 		}
 	};
 
@@ -387,7 +431,11 @@
 			if (!data) {
 				data = new Button(this, options);
 				$this.data('bs.button', data);
+
+				// Y.LOG($this);
 			}
+
+			// Y.LOG(option);
 
 			if (option === 'toggle') {
 				data.toggle();
@@ -415,7 +463,9 @@
 	// BUTTON DATA-API
 	// ===============
 
-	Y.DOM(document).on('click.bs.button.data-api', '[data-toggle^="button"]', function (e) {
+	Y.DOM(Y.Document).on('click.bs.button.data-api', '[data-toggle^="button"]', function (e) {
+		// Y.LOG(e);
+
 		var $btn = Y.DOM(e.target);
 
 		if (!$btn.hasClass('btn')) {
@@ -459,8 +509,8 @@
 	// ============================
 
 	var ProgressBar = function(element, options) {
-		this.$element = Y.DOM(element);
-		this.options = Y.DOM.extend({}, ProgressBar.defaults, options);
+		this.element = Y.DOM(element);
+		this.options = Y.Extend({}, ProgressBar.defaults, options);
 	};
 
 	ProgressBar.defaults = {
@@ -481,7 +531,7 @@
 	};
 
 	ProgressBar.prototype.transition = function() {
-		var $this = this.$element;
+		var $this = this.element;
 		var $parent = $this.parent();
 		var $back_text = this.$back_text;
 		var $front_text = this.$front_text;
@@ -704,7 +754,7 @@
 		clearMenus();
 
 		if (!isActive) {
-			if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
+			if ('ontouchstart' in Y.Document.documentElement && !$parent.closest('.navbar-nav').length) {
 				// if mobile we use a backdrop because click events don't delegate
 				Y.DOM('<div class="dropdown-backdrop"/>').insertAfter(Y.DOM(this)).on('click', clearMenus);
 			}
@@ -814,7 +864,7 @@
 	// APPLY TO STANDARD DROPDOWN ELEMENTS
 	// ===================================
 
-	Y.DOM(document)
+	Y.DOM(Y.Document)
 		.on('click.bs.dropdown.data-api', clearMenus)
 		.on('click.bs.dropdown.data-api', '.dropdown form', function (e) {
 			e.stopPropagation();
@@ -854,12 +904,12 @@
 	// ================================
 
 	var Collapse = function (element, options) {
-		this.$element = Y.DOM(element);
-		this.options = Y.DOM.extend({}, Collapse.DEFAULTS, options);
+		this.element = Y.DOM(element);
+		this.options = Y.Extend({}, Collapse.DEFAULTS, options);
 		this.transitioning = null;
 
 		if (this.options.parent) {
-			this.$parent = Y.DOM(this.options.parent);
+			this.parent = Y.DOM(this.options.parent);
 		}
 
 		if (this.options.toggle) {
@@ -874,7 +924,7 @@
 	};
 
 	Collapse.prototype.dimension = function () {
-		var hasWidth = this.$element.hasClass('width');
+		var hasWidth = this.element.hasClass('width');
 
 		return hasWidth ? 'width' : 'height';
 	};
@@ -882,19 +932,19 @@
 	Collapse.prototype.show = function () {
 		var self = this;
 
-		if (this.transitioning || this.$element.hasClass('in')) {
+		/*if (this.showed || this.transitioning || this.element.hasClass('in')) {
 			return;
-		}
+		}*/
 
 		var startEvent = Y.DOM.Event('show.bs.collapse');
 
-		this.$element.trigger(startEvent);
+		this.element.trigger(startEvent);
 
 		if (startEvent.isDefaultPrevented()) {
 			return;
 		}
 
-		var actives = this.$parent && this.$parent.find('> .panel > .in');
+		var actives = this.parent && this.parent.find('> .panel > .in');
 
 		if (actives && actives.length) {
 			var hasData = actives.data('bs.collapse');
@@ -905,30 +955,25 @@
 
 			Plugin.call(actives, 'hide');
 
-//			if (hasData) {
-//				actives.data('bs.collapse', null);
-//			}
-
-			hasData || actives.data('bs.collapse', null);
+			if (hasData) {
+				actives.data('bs.collapse', null);
+			}
 		}
-
-		// Y.LOG(self);
 
 		var dimension = this.dimension();
 
-		this.$element
-			.removeClass('collapse')
+		this.element.removeClass('collapse')
 			.addClass('collapsing')[dimension](0);
 
 		this.transitioning = 1;
 
 		var complete = function () {
-			this.$element.removeClass('collapsing')
-				.addClass('collapse in')[dimension]('');
+			self.element.removeClass('collapsing')
+				.addClass('collapse in')[dimension]('auto');
 
-			this.transitioning = 0;
+			self.transitioning = 0;
 
-			this.$element.trigger('shown.bs.collapse');
+			self.element.trigger('shown.bs.collapse');
 		};
 
 		if (!Y.DOM.support.transition) {
@@ -937,27 +982,27 @@
 
 		var scrollSize = Y.Lang.camelise(['scroll', dimension].join('-'));
 
-		// Y.LOG(Y.DOM.proxy(complete, this));
+		/*this.element
+			.one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
+			.emulateTransitionEnd(350)[dimension](this.element[0][scrollSize]);*/
 
-		/*this.$element
-			.one('bsTransitionEnd', Y.DOM.proxy(complete, this))
-			.emulateTransitionEnd(350)[dimension](this.$element[0][scrollSize]).stop();*/
+		this.element.one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
+			.emulateTransitionEnd(350)[dimension](this.element[0][scrollSize]);
 
-		this.$element
-			.one('bsTransitionEnd', Y.DOM.proxy(complete, this))
-			.stopTranAnim()[dimension](this.$element[0][scrollSize]).stop();
+		this.showed = true;
+		this.element.hasClass('in')
 	};
 
 	Collapse.prototype.hide = function () {
 		var self = this;
 
-		if (this.transitioning || !this.$element.hasClass('in')) {
+		/*if (!this.showed || this.transitioning || !this.element.hasClass('in')) {
 			return;
-		}
+		}*/
 
 		var startEvent = Y.DOM.Event('hide.bs.collapse');
 
-		this.$element.trigger(startEvent);
+		this.element.trigger(startEvent);
 
 		if (startEvent.isDefaultPrevented()) {
 			return;
@@ -965,23 +1010,18 @@
 
 		var dimension = this.dimension();
 
-		// self.$element[dimension](self.$element[dimension]())[0].offsetHeight;
+		this.element[dimension](this.element[dimension]())[0].offsetHeight;
 
-		// self.$element[dimension](self.$element[dimension]())[0].offsetHeight;
-
-		this.$element[dimension](this.$element[dimension]())[0].offsetHeight;
-
-		this.$element
-			.addClass('collapsing')
+		this.element.addClass('collapsing')
 			.removeClass('collapse')
 			.removeClass('in');
 
 		this.transitioning = 1;
 
 		var complete = function () {
-			this.transitioning = 0;
+			self.transitioning = 0;
 
-			this.$element
+			self.element
 				.trigger('hidden.bs.collapse')
 				.removeClass('collapsing')
 				.addClass('collapse');
@@ -991,21 +1031,32 @@
 			return complete.call(this);
 		}
 
-		/*this.$element[dimension](0).one('bsTransitionEnd', Y.DOM.proxy(complete, this))
-			.emulateTransitionEnd(350).stop();*/
+		this.element[dimension](0).one('bsTransitionEnd', Y.DOM.proxy(complete, this))
+			.emulateTransitionEnd(350);
 
-		this.$element[dimension](0).one('bsTransitionEnd', Y.DOM.proxy(complete, this))
-			.stopTranAnim().stop();
+		/*var scrollSize = Y.Lang.camelise(['scroll', dimension].join('-'));
+		var tmp = this.element[0][scrollSize];
+
+		this.element.one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
+			.emulateTransitionEnd(350)[dimension](-tmp);*/
+
+		this.showed = false;
 	};
 
 	Collapse.prototype.toggle = function () {
-		if (this.$element.hasClass('in')) {
+		if (this.showed) {
 			this.hide();
 		} else {
 			this.show();
 		}
 
-		// this[this.$element.hasClass('in') ? 'hide' : 'show']();
+		/*if (this.element.hasClass('in')) {
+			this.hide();
+		} else {
+			this.show();
+		}*/
+
+		//this[this.element.hasClass('in') ? 'hide' : 'show']();
 	};
 
 
@@ -1016,7 +1067,7 @@
 		return this.each(function () {
 			var $this = Y.DOM(this);
 			var data = $this.data('bs.collapse');
-			var options = Y.DOM.extend({}, Collapse.DEFAULTS, $this.data(), typeof option === 'object' && option);
+			var options = Y.Extend({}, Collapse.DEFAULTS, $this.data(), typeof option === 'object' && option);
 
 			if (!data && options.toggle && option === 'show') {
 				option = !option;
@@ -1051,7 +1102,7 @@
 	// COLLAPSE DATA-API
 	// =================
 
-	Y.DOM(document).on('click.bs.collapse.data-api', '[data-toggle="collapse"]', function (e) {
+	Y.DOM(Y.Document).on('click.bs.collapse.data-api', '[data-toggle="collapse"]', function (e) {
 		var href;
 
 		var $this = Y.DOM(this);
@@ -1062,20 +1113,15 @@
 			e.preventDefault() ||
 			(href && href.replace(/.*(?=#[^\s]+$)/, '')); // strip for ie7
 
-		// Y.LOG(target);
-
 		var $target = Y.DOM(target);
 		var data = $target.data('bs.collapse');
 		var option = data ? 'toggle' : $this.data();
 		var parent = $this.attr('data-parent');
-		var $parent = parent && Y.DOM(parent);
-
-		// Y.LOG(data);
+		parent = parent && Y.DOM(parent);
 
 		if (!data || !data.transitioning) {
-			if ($parent) {
-				$parent.find('[data-toggle="collapse"][data-parent="' + parent + '"]').not($this).addClass('collapsed');
-//				Y.LOG($parent.find('[data-toggle="collapse"][data-parent="' + parent + '"]').not($this).addClass('collapsed'));
+			if (parent) {
+				parent.find('[data-toggle="collapse"][data-parent="' + parent + '"]').not($this).addClass('collapsed');
 			}
 
 			$this[$target.hasClass('in') ? 'addClass' : 'removeClass']('collapsed');

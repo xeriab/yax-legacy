@@ -77,7 +77,7 @@
 					//Y.LOG(el);
 					//Y.LOG(data);
 					// Y.LOG(specialEvent);
-					Y.LOG(eventName);
+					//Y.LOG(eventName);
 
 					/// setup special events on Y.DOM
 					// specialEvent.setup.apply(el, [data]);
