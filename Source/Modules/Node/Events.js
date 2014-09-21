@@ -749,9 +749,7 @@
 
 		return this.each(function () {
 			// items in the collection might not be Node elements
-			// if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
-			if (Y.HasOwnProperty.call(this, 'dispatchEvent')) {
-			// if ('dispatchEvent' in this) {
+			if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
 				this.dispatchEvent(event);
 			} else {
 				Y.DOM(this).triggerHandler(event, args);
@@ -765,7 +763,6 @@
 		var e, result = null;
 
 		this.each(function (i, element) {
-			// e = createProxy(Y.Lang.isString(event) ? Y.Event.Create(event) : event);
 			e = createProxy(Y.Lang.isString(event) ? Y.DOM.Event(event) : event);
 			e._args = args;
 			e.target = element;

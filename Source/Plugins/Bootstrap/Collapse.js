@@ -109,7 +109,6 @@
 			.emulateTransitionEnd(350)[dimension](this.element[0][scrollSize]);
 
 		this.showed = true;
-		this.element.hasClass('in')
 	};
 
 	Collapse.prototype.hide = function () {

@@ -207,7 +207,7 @@
 		var attaches = 0;
 
 		var handler = function (event) {
-			Y.DOM.event.simulate(fix, event.target, Y.DOM.extend({}, event), true);
+			Y.DOM.event.simulate(fix, event.target, Y.Extend({}, event), true);
 		};
 
 		Y.DOM.event.special[fix] = {

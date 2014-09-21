@@ -58,7 +58,7 @@
 		var called = false;
 		var $el = this;
 
-		Y.DOM(this).bind('bsTransitionEnd', function () {
+		Y.DOM(this).one('bsTransitionEnd', function () {
 			called = true;
 		});
 
@@ -81,13 +81,12 @@
 		}
 
 		Y.DOM.each({
-			bsTransitionEnd: Y.DOM.fx.transitionEnd,
-			yaxbs: Y.DOM.fx.transitionEnd
+			bsTransitionEnd: Y.DOM.fx.transitionEnd
 		}, function (orig, fix) {
 			var attaches = 0;
 
 			var handler = function (event) {
-				Y.DOM.event.simulate(fix, event.target, Y.DOM.extend({}, event), true);
+				Y.DOM.event.simulate(fix, event.target, Y.Extend({}, event), true);
 			};
 
 			Y.DOM.event.special[orig] = {
