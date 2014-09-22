@@ -39,8 +39,8 @@
 					// Firefox won't allow localStorage if cookies are disabled
 					if (Y.UserAgent.Features.LocalStorage) {
 						// Safari's "Private" mode throws a QUOTA_EXCEEDED_ERR on setItem
-						Y.Window.window.localStorage.setItem('Y.Store.LocalStorage Availability test', true);
-						Y.Window.window.localStorage.removeItem('Y.Store.LocalStorage Availability test');
+						Y.Window.localStorage.setItem('Y.Store.LocalStorage Availability test', true);
+						Y.Window.localStorage.removeItem('Y.Store.LocalStorage Availability test');
 
 						return true;
 					}
@@ -59,7 +59,7 @@
 			 */
 			Set: function (key, value) {
 				if (this.Available()) {
-					Y.Window.window.localStorage.setItem(key, value);
+					Y.Window.localStorage.setItem(key, value);
 				} else {
 					var name;
 
@@ -86,7 +86,7 @@
 
 			Get: function (key) {
 				if (this.Available()) {
-					return Y.Window.window.localStorage.getItem(key);
+					return Y.Window.localStorage.getItem(key);
 				}
 
 				return Y.Window.LocalStorage[key];
@@ -94,7 +94,7 @@
 
 			Delete: function (key) {
 				if (this.Available()) {
-					Y.Window.window.localStorage.removeItem(key);
+					Y.Window.localStorage.removeItem(key);
 				} else {
 					delete Y.Window.LocalStorage[key];
 				}
@@ -102,7 +102,7 @@
 
 			Flush: function () {
 				if (this.Available()) {
-					Y.Window.window.localStorage.clear();
+					Y.Window.localStorage.clear();
 				} else {
 					Y.Window.LocalStorage = {};
 				}

@@ -108,6 +108,7 @@
 			// Y.Node('div.exen-YAX-Tooltip').remove();
 			window.clearTimeout(this.Delay);
 			this.Tooltip.css('display', 'block');
+			// this.Tooltip.fadeToggle().emulateTransitionEnd(350);
 		},
 
 		Hide: function () {

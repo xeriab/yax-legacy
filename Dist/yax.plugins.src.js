@@ -39,8 +39,8 @@
 					// Firefox won't allow localStorage if cookies are disabled
 					if (Y.UserAgent.Features.LocalStorage) {
 						// Safari's "Private" mode throws a QUOTA_EXCEEDED_ERR on setItem
-						Y.Window.window.localStorage.setItem('Y.Store.LocalStorage Availability test', true);
-						Y.Window.window.localStorage.removeItem('Y.Store.LocalStorage Availability test');
+						Y.Window.localStorage.setItem('Y.Store.LocalStorage Availability test', true);
+						Y.Window.localStorage.removeItem('Y.Store.LocalStorage Availability test');
 
 						return true;
 					}
@@ -59,7 +59,7 @@
 			 */
 			Set: function (key, value) {
 				if (this.Available()) {
-					Y.Window.window.localStorage.setItem(key, value);
+					Y.Window.localStorage.setItem(key, value);
 				} else {
 					var name;
 
@@ -86,7 +86,7 @@
 
 			Get: function (key) {
 				if (this.Available()) {
-					return Y.Window.window.localStorage.getItem(key);
+					return Y.Window.localStorage.getItem(key);
 				}
 
 				return Y.Window.LocalStorage[key];
@@ -94,7 +94,7 @@
 
 			Delete: function (key) {
 				if (this.Available()) {
-					Y.Window.window.localStorage.removeItem(key);
+					Y.Window.localStorage.removeItem(key);
 				} else {
 					delete Y.Window.LocalStorage[key];
 				}
@@ -102,7 +102,7 @@
 
 			Flush: function () {
 				if (this.Available()) {
-					Y.Window.window.localStorage.clear();
+					Y.Window.localStorage.clear();
 				} else {
 					Y.Window.LocalStorage = {};
 				}
@@ -663,6 +663,7 @@
 			// Y.Node('div.exen-YAX-Tooltip').remove();
 			window.clearTimeout(this.Delay);
 			this.Tooltip.css('display', 'block');
+			// this.Tooltip.fadeToggle().emulateTransitionEnd(350);
 		},
 
 		Hide: function () {
@@ -1672,6 +1673,7 @@
 					if (path.toLowerCase() === hash.toLowerCase().slice(1)) {
 						DefaultOptions.Before.call(Router, path);
 						// route['Function'].call(Router);
+						/** @namespace route.Function.call */
 						route.Function.call(Router);
 						DefaultOptions.On.call(Router, path);
 						found = true;
@@ -1698,7 +1700,8 @@
 	}; // END OF Router CLASS
 
 	// Assign the Router class to YAX's and Window global
-	Y.Node.Router = global.Router = Router;
+	// Y.Node.Router = global.Router = Router;
+	Y.DOM.Router = Router;
 
 	//---
 

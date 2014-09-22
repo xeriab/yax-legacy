@@ -18,11 +18,13 @@ Y.DOM(document).ready(function () {
 
 //	ButtonOne.button();
 
+	// Y.Lang.delay(3000);
+
 	ButtonOne.Tooltip({
 		Content: 'Testing Tooltips!',
 		Gravity: 'north',
 		Theme: 'dark',
-		Animation: 'flipIn'
+		Animation: 'fadeIn'
 	});
 
 	/*Wrapper.WaitForMe({
@@ -53,8 +55,14 @@ Y.DOM(document).ready(function () {
 //		Y.LOG(Y.DOM(this).data());
 //	});
 
+//	Y.DOM.getJSON('//0.0.0.0:8000/Tests/assets/test1.json', function (data) {
+//		Y.LOG(data);
+//	});
+
+	Y.setConfig('Console.Timed', true);
 	Y.LOG('');
 	Y.LOG(Y);
+//	Y.LOG(Y.DOM('[data-toggle^="button"]'));
 //	Y.LOG(Y.DOM.fx);
 //	Y.LOG(Y.DOM.support);
 //	Y.LOG(Y.DOM.Function);

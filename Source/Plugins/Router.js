@@ -265,6 +265,7 @@
 					if (path.toLowerCase() === hash.toLowerCase().slice(1)) {
 						DefaultOptions.Before.call(Router, path);
 						// route['Function'].call(Router);
+						/** @namespace route.Function.call */
 						route.Function.call(Router);
 						DefaultOptions.On.call(Router, path);
 						found = true;
@@ -291,7 +292,8 @@
 	}; // END OF Router CLASS
 
 	// Assign the Router class to YAX's and Window global
-	Y.Node.Router = global.Router = Router;
+	// Y.Node.Router = global.Router = Router;
+	Y.DOM.Router = Router;
 
 	//---
 
