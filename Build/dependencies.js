@@ -34,12 +34,6 @@ var Dependencies = {
 		extended_desc: ''
 	},
 
-	/*Console: {
-		src: ['Core/Console.js'],
-		desc: 'YAX.JS Console Plugin.',
-		extended_desc: ''
-	},*/
-
 	Node: {
 		src: [
 			'Modules/UserAgentDetector.js',
@@ -53,6 +47,8 @@ var Dependencies = {
 			'Modules/Node/FxMethods.js',
 			'Modules/Node/Form.js',
 
+			// These file are not part of Node but you can
+			// add them to empower YAX.Node with some useful stuff :)
  //			'Modules/Node/EventPress.js',
  //			'Modules/Node/EventTouch.js',
  //			'Modules/Node/EventShake.js',

@@ -49,10 +49,6 @@
 
 	//---
 
-
-
-	//---
-
 	// Create a safe reference to the YAX object for use below.
 	/*Y = function (object) {
 		if (object instanceof Y) {

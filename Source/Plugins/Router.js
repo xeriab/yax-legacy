@@ -126,13 +126,17 @@
 				}
 			} else {
 				if (Y.Lang.isString(path)) {
-					path = path.replace(this.HashRegex.Escape, '\\$&').replace(this.HashRegex.NamedArgument, '([^\/]*)').replace(this.HashRegex.ArgumentSplat, '(.*?)');
+					path = path.replace(this.HashRegex.Escape, '\\$&').replace(this.HashRegex
+						.NamedArgument, '([^\/]*)').replace(this.HashRegex.ArgumentSplat,
+						'(.*?)');
 					temp = new RegExp('^' + path + '$');
 				}
 
 				this.Routes.push({
 					'Route': temp,
-					'Function': callback || function () {return false;}
+					'Function': callback || function () {
+						return false;
+					}
 				});
 			}
 		},
@@ -219,7 +223,8 @@
 		},
 
 		getHost: function () {
-			return ((document.location + Y.Lang.empty()).replace(this.getPath() + this.getHash(), ''));
+			return ((document.location + Y.Lang.empty()).replace(this.getPath() + this.getHash(),
+				''));
 		},
 
 		getFragment: function () {
@@ -292,7 +297,6 @@
 	}; // END OF Router CLASS
 
 	// Assign the Router class to YAX's and Window global
-	// Y.Node.Router = global.Router = Router;
 	Y.DOM.Router = Router;
 
 	//---

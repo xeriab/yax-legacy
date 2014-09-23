@@ -17,8 +17,6 @@
 /*jslint node: false */
 /*global YAX, Y, transitionProperty, transitionDuration, transitionTiming*/
 
-//---
-
 (function () {
 
 	'use strict';
@@ -125,7 +123,8 @@
 				handler.$timerID = fn.$timerID;
 
 				if (!element.$timers[label][fn.$timerID]) {
-					element.$timers[label][fn.$timerID] = window.setInterval(handler, interval);
+					element.$timers[label][fn.$timerID] = window.setInterval(handler,
+						interval);
 				}
 
 				if (!this.global[label]) {
@@ -198,7 +197,7 @@
 
 	cssReset[transitionProperty = prefix + 'transition-property'] =
 		cssReset[transitionDuration = prefix + 'transition-duration'] =
-			cssReset[transitionTiming = prefix + 'transition-timing-function'] = '';
+		cssReset[transitionTiming = prefix + 'transition-timing-function'] = '';
 
 	Y.DOM.Function.stopTranAnim = function (jumpToEnd, cancelCallback) {
 		var props;

@@ -34,7 +34,8 @@
 
 		document = Y.Document,
 		testEl = document.createElement('div'),
-		supportedTransforms = /^((translate|rotate|scale)(X|Y|Z|3d)?|matrix(3d)?|perspective|skew(X|Y)?)$/i,
+		supportedTransforms =
+		/^((translate|rotate|scale)(X|Y|Z|3d)?|matrix(3d)?|perspective|skew(X|Y)?)$/i,
 		transform,
 		transitionProperty,
 		transitionDuration,
@@ -68,12 +69,12 @@
 
 	cssReset[transitionProperty = prefix + 'transition-property'] =
 		cssReset[transitionDuration = prefix + 'transition-duration'] =
-			cssReset[transitionDelay = prefix + 'transition-delay'] =
-				cssReset[transitionTiming = prefix + 'transition-timing-function'] =
-					cssReset[animationName = prefix + 'animation-name'] =
-						cssReset[animationDuration = prefix + 'animation-duration'] =
-							cssReset[animationDelay = prefix + 'animation-delay'] =
-								cssReset[animationTiming = prefix + 'animation-timing-function'] = '';
+		cssReset[transitionDelay = prefix + 'transition-delay'] =
+		cssReset[transitionTiming = prefix + 'transition-timing-function'] =
+		cssReset[animationName = prefix + 'animation-name'] =
+		cssReset[animationDuration = prefix + 'animation-duration'] =
+		cssReset[animationDelay = prefix + 'animation-delay'] =
+		cssReset[animationTiming = prefix + 'animation-timing-function'] = '';
 
 	/** @namespace testEl.style.transitionProperty */
 	Y.DOM.fx = {
@@ -88,7 +89,8 @@
 		animationEnd: normalizeEvent('AnimationEnd')
 	};
 
-	Y.DOM.Function.animate = function (properties, duration, ease, callback, delay) {
+	Y.DOM.Function.animate = function (properties, duration, ease, callback,
+		delay) {
 		if (Y.Lang.isFunction(duration)) {
 			callback = duration;
 			ease = undef;
@@ -121,7 +123,8 @@
 	};
 
 	Y.DOM.Function.anim = function (properties, duration, ease, callback, delay) {
-		var key, cssValues = {}, cssProperties, transforms = '',
+		var key, cssValues = {},
+			cssProperties, transforms = '',
 			that = this,
 			wrappedCallback, endEvent = Y.DOM.fx.transitionEnd,
 			fired = false;
@@ -295,11 +298,12 @@
 		// not intended for public consumption - generates a queueHooks object, or returns the current one
 		_queueHooks: function (elem, type) {
 			var key = type + 'queueHooks';
-			return Y.DOM.dataPrivative.get(elem, key) || Y.DOM.dataPrivative.access(elem, key, {
-				empty: Y.G.Callbacks('once memory').add(function () {
-					Y.DOM.dataPrivative.remove(elem, [type + 'queue', key]);
-				})
-			});
+			return Y.DOM.dataPrivative.get(elem, key) || Y.DOM.dataPrivative.access(
+				elem, key, {
+					empty: Y.G.Callbacks('once memory').add(function () {
+						Y.DOM.dataPrivative.remove(elem, [type + 'queue', key]);
+					})
+				});
 		}
 	});
 
@@ -394,8 +398,7 @@
 			return defer.promise(obj);
 		}
 	});
-	
-	
+
 	//---
 
 }());

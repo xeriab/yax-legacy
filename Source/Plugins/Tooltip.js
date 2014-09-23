@@ -24,25 +24,25 @@
 	// Plugin information
 
 	// Default options for the Plugin
-//	Y.Settings.Node = {
-//		Tooltip: {
-//			Opacity: 0.75,
-//			Content: '',
-//			Size: 'small',
-//			Gravity: 'north',
-//			Theme: 'dark',
-//			Trigger: 'hover',
-//			Animation: 'flipIn',
-//			Confirm: false,
-//			Yes: 'Yes',
-//			No: 'No',
-//			FinalMessage: '',
-//			FinalMessageDuration: 500,
-//			OnYes: Y.Lang.Noop,
-//			OnNo: Y.Lang.Noop,
-//			Container: 'body'
-//		}
-//	};
+	//	Y.Settings.Node = {
+	//		Tooltip: {
+	//			Opacity: 0.75,
+	//			Content: '',
+	//			Size: 'small',
+	//			Gravity: 'north',
+	//			Theme: 'dark',
+	//			Trigger: 'hover',
+	//			Animation: 'flipIn',
+	//			Confirm: false,
+	//			Yes: 'Yes',
+	//			No: 'No',
+	//			FinalMessage: '',
+	//			FinalMessageDuration: 500,
+	//			OnYes: Y.Lang.Noop,
+	//			OnNo: Y.Lang.Noop,
+	//			Container: 'body'
+	//		}
+	//	};
 
 	Y.Extend(Y.Settings.DOM, {
 		Tooltip: {
@@ -63,24 +63,6 @@
 			Container: 'body'
 		}
 	});
-
-//	Y.Settings.Node.Tooltip = {
-//		Opacity: 0.75,
-//		Content: '',
-//		Size: 'small',
-//		Gravity: 'north',
-//		Theme: 'dark',
-//		Trigger: 'hover',
-//		Animation: 'flipIn',
-//		Confirm: false,
-//		Yes: 'Yes',
-//		No: 'No',
-//		FinalMessage: '',
-//		FinalMessageDuration: 500,
-//		OnYes: Y.Lang.Noop,
-//		OnNo: Y.Lang.Noop,
-//		Container: 'body'
-//	};
 
 	var PluginOptions = Y.Settings.DOM.Tooltip;
 
@@ -128,18 +110,18 @@
 
 		addAnimation: function () {
 			switch (this.Options.Animation) {
-				case 'none':
-					break;
+			case 'none':
+				break;
 
-				case 'fadeIn':
-					this.Tooltip.addClass('animated');
-					this.Tooltip.addClass('fadeIn');
-					break;
+			case 'fadeIn':
+				this.Tooltip.addClass('animated');
+				this.Tooltip.addClass('fadeIn');
+				break;
 
-				case 'flipIn':
-					this.Tooltip.addClass('animated');
-					this.Tooltip.addClass('flipIn');
-					break;
+			case 'flipIn':
+				this.Tooltip.addClass('animated');
+				this.Tooltip.addClass('flipIn');
+				break;
 			}
 		},
 
@@ -215,7 +197,8 @@
 
 		getPosition: function () {
 			var Element = this.Element[0];
-			return Y.Node.Extend({}, (typeof Element.getBoundingClientRect === 'function') ? Element.getBoundingClientRect() : {
+			return Y.Node.Extend({}, (typeof Element.getBoundingClientRect ===
+				'function') ? Element.getBoundingClientRect() : {
 				width: Element.offsetWidth,
 				height: Element.offsetHeight
 			}, this.Element.offset());
@@ -228,36 +211,47 @@
 				ElementTop = this.Element.offset().top,
 				ElementLeft = this.Element.offset().left;
 
-			if (this.Element.css('position') === 'fixed' || this.Element.css('position') === 'absolute') {
+			if (this.Element.css('position') === 'fixed' || this.Element.css('position') ===
+				'absolute') {
 				ElementTop = 0;
 				ElementLeft = 0;
 			}
 
 			switch (this.Options.Gravity) {
-				case 'south':
-					leftPos = ElementLeft + this.Element.outerWidth() / 2 - this.Tooltip.outerWidth() / 2;
-					topPos = ElementTop - this.Tooltip.outerHeight() - this.Tip.outerHeight() / 2;
-					break;
+			case 'south':
+				leftPos = ElementLeft + this.Element.outerWidth() / 2 - this.Tooltip.outerWidth() /
+					2;
+				topPos = ElementTop - this.Tooltip.outerHeight() - this.Tip.outerHeight() /
+					2;
+				break;
 
-				case 'west':
-					leftPos = ElementLeft + this.Element.outerWidth() + this.Tip.outerWidth() / 2;
-					topPos = ElementTop + this.Element.outerHeight() / 2 - (this.Tooltip.outerHeight() / 2);
-					break;
+			case 'west':
+				leftPos = ElementLeft + this.Element.outerWidth() + this.Tip.outerWidth() /
+					2;
+				topPos = ElementTop + this.Element.outerHeight() / 2 - (this.Tooltip.outerHeight() /
+					2);
+				break;
 
-				case 'north':
-					leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() / 2);
-					topPos = ElementTop + this.Element.outerHeight() + this.Tip.outerHeight() / 2;
-					break;
+			case 'north':
+				leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
+					2);
+				topPos = ElementTop + this.Element.outerHeight() + this.Tip.outerHeight() /
+					2;
+				break;
 
-				case 'east':
-					leftPos = ElementLeft - this.Tooltip.outerWidth() - this.Tip.outerWidth() / 2;
-					topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tooltip.outerHeight() / 2;
-					break;
+			case 'east':
+				leftPos = ElementLeft - this.Tooltip.outerWidth() - this.Tip.outerWidth() /
+					2;
+				topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tooltip.outerHeight() /
+					2;
+				break;
 
-				case 'center':
-					leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() / 2);
-					topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tip.outerHeight() / 2;
-					break;
+			case 'center':
+				leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
+					2);
+				topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tip.outerHeight() /
+					2;
+				break;
 			}
 
 			this.Tooltip.css('left', leftPos);
@@ -267,14 +261,16 @@
 		setEvents: function () {
 			var self = this;
 
-			if (this.Options.Trigger === 'hover' || this.Options.Trigger === 'mouseover' || this.Options.Trigger === 'onmouseover') {
+			if (this.Options.Trigger === 'hover' || this.Options.Trigger ===
+				'mouseover' || this.Options.Trigger === 'onmouseover') {
 				this.Element.mouseover(function () {
 					self.setPositions();
 					self.Show();
 				}).mouseout(function () {
 					self.Hide();
 				});
-			} else if (this.Options.Trigger === 'click' || this.Options.Trigger === 'onclick') {
+			} else if (this.Options.Trigger === 'click' || this.Options.Trigger ===
+				'onclick') {
 				this.Tooltip.click(function (event) {
 					event.stopPropagation();
 				});
@@ -302,7 +298,8 @@
 
 		addConfirm: function () {
 			this.Tooltip.append('<ul class="confirm"><li class="exen-YAX-Tooltip-yes">' +
-				this.Options.Yes + '</li><li class="exen-YAX-Tooltip-no">' + this.Options.No + '</li></ul>');
+				this.Options.Yes + '</li><li class="exen-YAX-Tooltip-no">' + this.Options.No +
+				'</li></ul>');
 			this.setConfirmEvents();
 		},
 

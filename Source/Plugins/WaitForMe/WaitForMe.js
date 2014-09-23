@@ -23,20 +23,20 @@
 	//---
 
 	// Default options for the Plugin
-//	Y.Settings.Node = {
-//		WaitForMe: {
-//			Opacity: 1.0,
-//			Effect: 'bounce',
-//			Content: '',
-//			// Background: 'rgba(210, 220, 230, .6)',
-//			Background: 'rgba(245, 245, 245, .75)',
-//			Color: 'rgba(10, 20, 30, .9)',
-//			Width: null,
-//			Height: null,
-//			Container: 'body',
-//			Trigger: 'WaitForMeCloseEvent'
-//		}
-//	};
+	//	Y.Settings.Node = {
+	//		WaitForMe: {
+	//			Opacity: 1.0,
+	//			Effect: 'bounce',
+	//			Content: '',
+	//			// Background: 'rgba(210, 220, 230, .6)',
+	//			Background: 'rgba(245, 245, 245, .75)',
+	//			Color: 'rgba(10, 20, 30, .9)',
+	//			Width: null,
+	//			Height: null,
+	//			Container: 'body',
+	//			Trigger: 'WaitForMeCloseEvent'
+	//		}
+	//	};
 
 	// Default options for the Plugin
 	Y.Extend(Y.Settings.DOM, {
@@ -60,7 +60,7 @@
 		this.Options = option;
 		this.CSS_Class = 'exen-YAX-WaitForMe';
 		this.Effects = null;
-		this.EffectElementCount= null;
+		this.EffectElementCount = null;
 		this.CreateSubElement = false;
 		this.SpecificAttr = 'background-color';
 		this.EffectElementHTML = '';
@@ -78,9 +78,9 @@
 
 			this._init_();
 
-//			if (this.Content) {
-//				this.setEvents();
-//			}
+			//			if (this.Content) {
+			//				this.setEvents();
+			//			}
 
 			this.setEvents();
 		},
@@ -110,152 +110,155 @@
 			var x;
 
 			switch (this.Options.Effect) {
-				case 'none':
-					this.EffectElementCount = 0;
-					break;
+			case 'none':
+				this.EffectElementCount = 0;
+				break;
 
-				case 'bounce':
-					this.EffectElementCount = 3;
-					this.ContainerSize = '';
+			case 'bounce':
+				this.EffectElementCount = 3;
+				this.ContainerSize = '';
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 
-				case 'rotateplane':
-					this.EffectElementCount = 1;
-					this.ContainerSize = '';
+			case 'rotateplane':
+				this.EffectElementCount = 1;
+				this.ContainerSize = '';
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 
-				case 'stretch':
-					this.EffectElementCount = 5;
-					this.ContainerSize = '';
+			case 'stretch':
+				this.EffectElementCount = 5;
+				this.ContainerSize = '';
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 
-				case 'orbit':
-					this.EffectElementCount = 2;
+			case 'orbit':
+				this.EffectElementCount = 2;
 
-					this.ContainerSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ContainerSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					this.ElementSize = '';
+				this.ElementSize = '';
 
-					break;
+				break;
 
-				case 'roundBounce':
-					this.EffectElementCount = 12;
+			case 'roundBounce':
+				this.EffectElementCount = 12;
 
-					this.ContainerSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ContainerSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					this.ElementSize = '';
+				this.ElementSize = '';
 
-					break;
+				break;
 
-				case 'win8':
-					this.EffectElementCount = 5;
-					this.CreateSubElement = true;
+			case 'win8':
+				this.EffectElementCount = 5;
+				this.CreateSubElement = true;
 
-					// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
-					// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
 
-					this.ContainerSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ContainerSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 
-				case 'win8_linear':
-					this.EffectElementCount = 5;
-					this.CreateSubElement = true;
+			case 'win8_linear':
+				this.EffectElementCount = 5;
+				this.CreateSubElement = true;
 
-					// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
 
-					this.ContainerSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ContainerSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					this.ElementSize = '';
+				this.ElementSize = '';
 
-					break;
+				break;
 
-				case 'ios':
-					this.EffectElementCount = 12;
+			case 'ios':
+				this.EffectElementCount = 12;
 
-					// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
 
-					this.ContainerSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ContainerSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					this.ElementSize = '';
+				this.ElementSize = '';
 
-					break;
+				break;
 
-				case 'facebook':
-					this.EffectElementCount = 3;
-					this.ContainerSize = '';
+			case 'facebook':
+				this.EffectElementCount = 3;
+				this.ContainerSize = '';
 
-					// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 
-				case 'rotation':
-					this.EffectElementCount = 1;
-					this.SpecificAttr = 'border-color';
-					this.ContainerSize = '';
+			case 'rotation':
+				this.EffectElementCount = 1;
+				this.SpecificAttr = 'border-color';
+				this.ContainerSize = '';
 
-					// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 			}
 
-			this.ElementSize = 'width: ' + this.ElementSize.width + '; height: ' + this.ElementSize.height;
-			this.ContainerSize = 'width: ' + this.ContainerSize.width + '; height: ' + this.ContainerSize.height;
+			this.ElementSize = 'width: ' + this.ElementSize.width + '; height: ' + this
+				.ElementSize.height;
+			this.ContainerSize = 'width: ' + this.ContainerSize.width + '; height: ' +
+				this.ContainerSize.height;
 
 			if (Y.Lang.isEmpty(this.Options.Width) && Y.Lang.isEmpty(this.Options.Height)) {
 				this.ElementSize = Y.Lang.empty();
 				this.ContainerSize = Y.Lang.empty();
 			}
 
-			this.Effects = Y.Node('<div class="' + this.CSS_Class + '-progress ' + this.Options.Effect + '"></div>');
+			this.Effects = Y.Node('<div class="' + this.CSS_Class + '-progress ' + this
+				.Options.Effect + '"></div>');
 
 			if (this.EffectElementCount > 0) {
 
@@ -274,14 +277,18 @@
 
 				}
 
-				this.Effects = Y.Node('<div class="' + this.CSS_Class + '-progress ' + this.Options.Effect + '" style="' + this.ContainerSize + '">' + this.EffectElementHTML + '</div>');
+				this.Effects = Y.Node('<div class="' + this.CSS_Class + '-progress ' +
+					this.Options.Effect + '" style="' + this.ContainerSize + '">' + this.EffectElementHTML +
+					'</div>');
 
-//				this.Effects = Y.Node('<div></div>').addClass(this.CSS_Class + '-progress ' + this.Options.Effect).css(this.ContainerSize);
-//				this.Effects.append(this.EffectElementHTML);
+				//				this.Effects = Y.Node('<div></div>').addClass(this.CSS_Class + '-progress ' + this.Options.Effect).css(this.ContainerSize);
+				//				this.Effects.append(this.EffectElementHTML);
 			}
 
 			if (this.Options.Content) {
-				this.Content = Y.Node('<div class="' + this.CSS_Class + '-text" style="color: ' + this.Options.Color + ';">' + this.Options.Content + '</div>');
+				this.Content = Y.Node('<div class="' + this.CSS_Class +
+					'-text" style="color: ' + this.Options.Color + ';">' + this.Options.Content +
+					'</div>');
 			}
 
 			if (this.Element.find('> .' + this.CSS_Class)) {
@@ -305,7 +312,8 @@
 			});
 
 			this.Element.find('.' + this.CSS_Class + '-content').css({
-				marginTop: -this.Element.find('.' + this.CSS_Class + '-content').outerHeight() / 2 + 'px'
+				marginTop: -this.Element.find('.' + this.CSS_Class + '-content').outerHeight() /
+					2 + 'px'
 			});
 		},
 
@@ -338,7 +346,7 @@
 			}
 
 			// Create WaitForMe container
-			this.WaitForMe = Y.Node('<div></div>').addClass(this.CSS_Class);
+			this.WaitForMe = Y.DOM('<div></div>').addClass(this.CSS_Class);
 
 			if (this.Options.Container) {
 				this.WaitForMe.prependTo(this.Options.Container);
