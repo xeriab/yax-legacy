@@ -18,7 +18,7 @@ var Dependencies = {
 			'Core/Tools.js',
 			'Core/Events.js',
 
-//			'Core/OO.js',
+			'Core/OO.js',
 
 			'Core/Callbacks.js',
 			'Core/Deferred.js',
@@ -26,7 +26,7 @@ var Dependencies = {
 			'Core/Parser.js',
 			'Core/I18N.js'
 
-//			'Core/Console.js'
+ //			'Core/Console.js'
 		],
 
 		desc: 'YAX.JS Core Library.',
@@ -53,12 +53,12 @@ var Dependencies = {
 			'Modules/Node/FxMethods.js',
 			'Modules/Node/Form.js',
 
-//			'Modules/Node/EventPress.js',
-//			'Modules/Node/EventTouch.js',
-//			'Modules/Node/EventShake.js',
-//			'Modules/Node/EventGesture.js',
-//			'Modules/Node/Assets.js',
-//			'Modules/Node/Stack.js',
+ //			'Modules/Node/EventPress.js',
+ //			'Modules/Node/EventTouch.js',
+ //			'Modules/Node/EventShake.js',
+ //			'Modules/Node/EventGesture.js',
+ //			'Modules/Node/Assets.js',
+ //			'Modules/Node/Stack.js',
 
 			'Modules/Node/Extra.js',
 			'Modules/Node/EventLogger.js',

@@ -37,16 +37,6 @@
 
 	//---
 
-	// Check dependence files
-	/*if (typeof Y !== 'function' || !window.Y) {
-		throw 'Y.OO: not found YAX. Please ensure `Core.js` is referenced before the `OO.js` file.';
-	}*/
-
-	//---
-
-	Y.akimana = Y.akimana || Object.create({});
-	Y.akimana.app = Y.akimana.app || Object.create({});
-
 	/**
 	 * set accessor like a ES5
 	 * @param object{Object} required,
@@ -71,14 +61,14 @@
 	 * createOOClass, Class builder for OOP
 	 * implemented `new` operator checker : throw error message when not use `new`.
 	 *
-	 * @usage Y.OO.create( 'className', classMembers );
+	 * @usage Y.OO.create('className', classMembers);
 	 * @param className{string} required, Named oo-class.
 	 * @param classMembers{object} required,
 	 */
 
 	/**
 	 * inherit class, overloaded createOOClass.
-	 * @usage Y.OO.create( className, BaseClass, classMembers );
+	 * @usage Y.OO.create(className, BaseClass, classMembers);
 	 * @param className{string} required, Named oo-subclass.
 	 * @param BaseClass{function} required, superclass created with createOOClass method.
 	 * @param classMembers{string} required, oo-subclass members.
@@ -152,9 +142,7 @@
 	}
 
 	Y.OO = {
-		Accessor: setAccessor,
 		accessor: setAccessor,
-		Create: createOOClass,
 		create: createOOClass,
 		isA: isA
 	};
