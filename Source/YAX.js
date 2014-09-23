@@ -216,8 +216,8 @@
 
 	/** @namespace root.R */
 	/** @namespace root.D */
-	Y.Require = root.R || require || null;
-	Y.Define = root.D || define || null;
+	Y.Require = root.R || null;
+	Y.Define = root.D || null;
 
 	//---
 
@@ -233,7 +233,7 @@
 	// an AMD load request. Those cases could generate an error when an
 	// anonymous define() is called outside of a loader request.
 	if (typeof define === 'function' && define.amd) {
-		define('YAX', [], function() {
+		define('YAX', [], function () {
 			return Y;
 		});
 	} else {

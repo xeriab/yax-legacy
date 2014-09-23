@@ -78,27 +78,30 @@
 
 	/**
 	 * inherit class, overloaded createOOClass.
-	 * @usage Y.OO.create( className, baseClass, classMembers );
+	 * @usage Y.OO.create( className, BaseClass, classMembers );
 	 * @param className{string} required, Named oo-subclass.
-	 * @param baseClass{function} required, superclass created with createOOClass method.
+	 * @param BaseClass{function} required, superclass created with createOOClass method.
 	 * @param classMembers{string} required, oo-subclass members.
 	 */
 	function createOOClass() {
-		var len, ooClassName, baseClass, members, klass = null, args;
+		var len, ooClassName, BaseClass, members, klass = null,
+			args;
 
 		args = Y.G.Slice(arguments);
 
 		len = arguments.length;
 		ooClassName = args[0];
-		baseClass = args[1];
+		BaseClass = args[1];
 		members = args[len - 1];
 
 		// check arguments type
 		if (!Y.Lang.isString(ooClassName) && Y.Lang.trim(ooClassName) !== '') {
-			throw new TypeError('not defined Y.OO ClassName in 1st argument, must be {string}.');
+			throw new TypeError(
+				'not defined Y.OO ClassName in 1st argument, must be {string}.');
 		}
 
-		if (!(len === 2 && Y.Lang.isObject(members)) && !(len === 3 && Y.Lang.isFunction(baseClass) && Y.Lang.isObject(members))) {
+		if (!(len === 2 && Y.Lang.isObject(members)) && !(len === 3 && Y.Lang.isFunction(
+			BaseClass) && Y.Lang.isObject(members))) {
 			throw new TypeError('wrong arguments.');
 		}
 
@@ -109,11 +112,13 @@
 
 		/* jshint evil: true */
 		// implement `new` operator error check.
-		eval('klass=function ' + ooClassName + '(){try {this.initialise.apply(this, arguments)}catch(e){console.log(e.stack);throw "required `new` operator in `' + ooClassName + '`."}}');
+		eval('klass=function ' + ooClassName +
+			'(){try {this.initialise.apply(this, arguments)}catch(e){console.log(e.stack);throw "required `new` operator in `' +
+			ooClassName + '`."}}');
 
 		// inherit
 		if (len === 3) {
-			klass.prototype = new baseClass();
+			klass.prototype = new BaseClass();
 			klass.prototype.constructor = klass;
 		}
 
@@ -127,8 +132,8 @@
 	 * @param a{OOClass} subClass
 	 * @param b{OOClass} superClass
 	 */
-	function isA(a, b) {
-		var tmp = (Y.Lang.isFunction(a)) ? new a() : a;
+	function isA(A, b) {
+		var tmp = (Y.Lang.isFunction(a)) ? new A() : A;
 
 		var result = false;
 
@@ -139,8 +144,8 @@
 				break;
 			}
 
-			/** @namespace tmp.__proto__ */
-			tmp = tmp.__proto__;
+			// tmp = tmp.__proto__;
+			tmp = tmp.prototype;
 		}
 
 		return result;

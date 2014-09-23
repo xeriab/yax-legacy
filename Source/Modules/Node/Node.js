@@ -40,18 +40,18 @@
 		SingleTagReplacement = /^<(\w+)\s*\/?>(?:<\/\1>|)$/,
 
 		TagExpanderReplacement =
-			/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
+		/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
 
 		ReadyReplacement = /complete|loaded|interactive/,
 
-	//SimpleSelectorReplacement = /^[\w-]*$/,
+		//SimpleSelectorReplacement = /^[\w-]*$/,
 		SimpleSelectorReplacement = /^[\w\-]*$/,
 
 		RootNodeReplacement = /^(?:body|html)$/i,
 
 		SelectorGroupReplacement = /(([\w#:.~>+()\s-]+|\*|\[.*?\])+)\s*(,|$)/g,
 
-	// Special attributes that should be get/set via method calls
+		// Special attributes that should be get/set via method calls
 		MethodAttributes = [
 			'title',
 			'value',
@@ -110,25 +110,25 @@
 
 		CCSS,
 
-	// Matching numbers
-	//pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
+		// Matching numbers
+		//pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
 		pnum = /[+\-]?(?:\d*\.|)\d+(?:[eE][+\-]?\d+|)/.source,
-	//		pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
-	//pnum = /[+\-]?\d*\.?\d+(?:e[+\-]?\d+)?/i.source,
+		//		pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
+		//pnum = /[+\-]?\d*\.?\d+(?:e[+\-]?\d+)?/i.source,
 
-	// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
-	// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
+		// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
+		// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
 		rdisplayswap = /^(none|table(?!-c[ea]).+)/,
 
 		rmargin = /^margin/,
 
-	//rnumsplit = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(.*)$', 'i'),
+		//rnumsplit = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(.*)$', 'i'),
 		rnumsplit = new RegExp('^(' + pnum + ')(.*)$', 'i'),
 
-	//rnumnonpx = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(?!px)[a-z%]+$', 'i'),
+		//rnumnonpx = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(?!px)[a-z%]+$', 'i'),
 		rnumnonpx = new RegExp('^(' + pnum + ')(?!px)[a-z%]+$', 'i'),
 
-	//rrelNum = new RegExp('^([+-])=(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')', 'i'),
+		//rrelNum = new RegExp('^([+-])=(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')', 'i'),
 		rrelNum = new RegExp('^([+-])=(' + pnum + ')', 'i'),
 
 		cssShow = {
@@ -398,8 +398,8 @@
 	CCSS = function (element, name, csssComputed) {
 		var width, minWidth, maxWidth,
 			computed = csssComputed || getStyles(element),
-		// Support: IE9
-		// getPropertyValue is only needed for .css('filter') in IE9, see #12537
+			// Support: IE9
+			// getPropertyValue is only needed for .css('filter') in IE9, see #12537
 			ret = computed ? computed.getPropertyValue(name) || computed[name] : undef,
 			style = element.style;
 
@@ -443,10 +443,10 @@
 
 	function argumentWidthOrHeight(element, name, extra, isBorderBox, styles) {
 		var i = extra === (isBorderBox ? 'border' : 'content') ?
-				// If we already have the right measurement, avoid augmentation
-				4 :
-				// Otherwise initialise for horizontal or vertical properties
-					name === 'width' ? 1 : 0,
+			// If we already have the right measurement, avoid augmentation
+			4 :
+			// Otherwise initialise for horizontal or vertical properties
+			name === 'width' ? 1 : 0,
 			val = 0;
 
 		for (null; i < 4; i += 2) {
@@ -521,11 +521,11 @@
 			argumentWidthOrHeight(
 				element,
 				name,
-					extra || (isBorderBox ? 'border' : 'content'),
+				extra || (isBorderBox ? 'border' : 'content'),
 				valueIsBorderBox,
 				styles
 			)
-			) + 'px';
+		) + 'px';
 	}
 
 	function globalEval(code) {
@@ -773,14 +773,14 @@
 				result = (!Y.Lang.isUndefined(element) && element.nodeType !== 1 &&
 					element.nodeType !== 9) ? {} :
 					Y.G.Slice.call(
-							isSimple && !maybeID ?
-							// If it's simple, it could be a class
-							maybeClass ? element.getElementsByClassName(nameOnly) :
-								// Or a tag
-								element.getElementsByTagName(selector) :
-							// Or it's not simple, and we need to query all
-							element.querySelectorAll(selector)
-					);
+						isSimple && !maybeID ?
+						// If it's simple, it could be a class
+						maybeClass ? element.getElementsByClassName(nameOnly) :
+						// Or a tag
+						element.getElementsByTagName(selector) :
+						// Or it's not simple, and we need to query all
+						element.querySelectorAll(selector)
+				);
 			}
 
 			return result;
@@ -959,7 +959,7 @@
 				} else {
 					excludes = Y.Lang.isString(selector) ? this.filter(selector) :
 						(Y.Lang.likeArray(selector) && Y.Lang.isFunction(selector.item)) ? Y.G.Slice
-							.call(selector) : Y.Node(selector);
+						.call(selector) : Y.Node(selector);
 
 					this.forEach(function (el) {
 						if (excludes.indexOf(el) < 0) {
@@ -1182,7 +1182,7 @@
 				return this.each(function (index) {
 					Y.Node(this).wrapAll(
 						func ? structure.call(this, index) :
-							clone ? dom.cloneNode(true) : dom
+						clone ? dom.cloneNode(true) : dom
 					);
 				});
 			},
@@ -1296,9 +1296,9 @@
 				return (Y.Lang.isString(name) && value === undef) ?
 					(this.length === 0 || this[0].nodeType !== 1 ? undef :
 						(name === 'value' && this[0].nodeName === 'INPUT') ? this.val() :
-							(Y.Lang.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
-								name)) ? this[0][name] : result
-						) :
+						(Y.Lang.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
+							name)) ? this[0][name] : result
+					) :
 					this.each(function (index) {
 						if (this.nodeType !== 1) {
 							return;
@@ -1492,7 +1492,8 @@
 				}
 
 				return Y.Node.Access(this, function (element, name, value) {
-					var styles, len, mapo = {}, i = 0;
+					var styles, len, mapo = {},
+						i = 0;
 
 					if (Y.Lang.isArray(name)) {
 						styles = getStyles(element);
@@ -1745,9 +1746,9 @@
 				}
 
 				var element = this[0],
-				// Get *real* offsetParent
+					// Get *real* offsetParent
 					offsetParent = this.offsetParent(),
-				// Get correct offsets
+					// Get correct offsets
 					offset = this.offset(),
 					parentOffset = RootNodeReplacement.test(offsetParent[0].nodeName) ? {
 						top: 0,
@@ -2122,8 +2123,6 @@
 
 		Function: DomNode.Function,
 
-		Func: DomNode.Function,
-
 		expr: {},
 
 		Expr: {},
@@ -2196,7 +2195,7 @@
 					// certain elements can have dimension info if we invisibly show them
 					// however, it must have a current display style that would benefit from this
 					return element.offsetWidth === 0 && rdisplayswap.test(Y.Node.CSS(element,
-						'display')) ?
+							'display')) ?
 						Y.Node.Swap(element, cssShow, function () {
 							return getWidthOrHeight(element, name, extra);
 						}) :
@@ -2206,14 +2205,14 @@
 			set: function (element, value, extra) {
 				var styles = extra && getStyles(element);
 				return setPositiveNumber(element, value, extra ?
-						argumentWidthOrHeight(
-							element,
-							name,
-							extra,
-								Y.Node.Support.boxSizing && Y.Node.CSS(element, 'boxSizing', false,
-								styles) === 'border-box',
-							styles
-						) : 0
+					argumentWidthOrHeight(
+						element,
+						name,
+						extra,
+						Y.Node.Support.boxSizing && Y.Node.CSS(element, 'boxSizing', false,
+							styles) === 'border-box',
+						styles
+					) : 0
 				);
 			}
 		};
@@ -2302,8 +2301,8 @@
 
 				// Convert all methods to a "before" operation
 				target = operatorIndex === 0 ? target.nextSibling :
-						operatorIndex === 1 ? target.firstChild :
-						operatorIndex === 2 ? target :
+					operatorIndex === 1 ? target.firstChild :
+					operatorIndex === 2 ? target :
 					null;
 
 				parentInDocument = docElement.contains(parent);

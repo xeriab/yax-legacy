@@ -302,6 +302,7 @@
 			code = code.slice(0, -1) + "]";
 		}
 
+		/** jshint evil: true */
 		return new Function("values", code);
 	};
 
@@ -380,7 +381,8 @@
 							return null;
 						}
 
-						return (typeof value !== 'string') ? value : '"' + value.replace(/\"/g, '""') + '"';
+						return (typeof value !== 'string') ? value : '"' + value.replace(/\"/g,
+							'""') + '"';
 					},
 
 					sendLine = stream ? function (line) {
@@ -441,7 +443,8 @@
 			 * @return {Array}
 			 */
 			forEach: function (stream) {
-				return this.Data instanceof Array ? this.encode(stream) : this.parse(stream);
+				return this.Data instanceof Array ? this.encode(stream) : this.parse(
+					stream);
 			},
 
 			parse: function (stream) {
@@ -459,8 +462,15 @@
 					_line = this.Options.line,
 					_fieldsLength = fields.length,
 
-					current = { row: [], cell: "" },
-					flag = { escaped: false, quote: false, cell: true },
+					current = {
+						row: [],
+						cell: ""
+					},
+					flag = {
+						escaped: false,
+						quote: false,
+						cell: true
+					},
 
 					Record,
 					saveCell = function (cell) {
@@ -468,7 +478,11 @@
 							(flag.escaped ? cell.slice(1, -1).replace(/""/g, '"') : cell).trim()
 						);
 						current.cell = "";
-						flag = { escaped: false, quote: false, cell: true };
+						flag = {
+							escaped: false,
+							quote: false,
+							cell: true
+						};
 					},
 					saveLastCell = _line.length === 1 ? saveCell : function (cell) {
 						saveCell(cell.slice(0, 1 - _line.length));
@@ -551,7 +565,6 @@
 }());
 
 //---
-
 
 /**
  * YAX Plugins | Tooltip
