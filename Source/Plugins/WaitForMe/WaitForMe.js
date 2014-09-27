@@ -1,9 +1,9 @@
 /**
- * YAX Node | WiatForMe Plugin
+ * YAX DOM | WiatForMe Plugin
  *
  *
  * @version     0.15
- * @depends:    Core, Node, Events
+ * @depends:    Core, DOM, Events
  * @license     Dual licensed under the MIT and GPL licenses.
  */
 
@@ -22,23 +22,6 @@
 
 	//---
 
-	// Default options for the Plugin
-	//	Y.Settings.Node = {
-	//		WaitForMe: {
-	//			Opacity: 1.0,
-	//			Effect: 'bounce',
-	//			Content: '',
-	//			// Background: 'rgba(210, 220, 230, .6)',
-	//			Background: 'rgba(245, 245, 245, .75)',
-	//			Color: 'rgba(10, 20, 30, .9)',
-	//			Width: null,
-	//			Height: null,
-	//			Container: 'body',
-	//			Trigger: 'WaitForMeCloseEvent'
-	//		}
-	//	};
-
-	// Default options for the Plugin
 	Y.Extend(Y.Settings.DOM, {
 		WaitForMe: {
 			Opacity: 1.0,
@@ -86,10 +69,10 @@
 		},
 
 		Show: function () {
-			// Y.Node(this.Element).css('cursor', 'none');
+			// Y.DOM(this.Element).css('cursor', 'none');
 
 			// Close all other WaitForMe
-			Y.Node('div.yax-waitforme').hide();
+			Y.DOM('div.yax-waitforme').hide();
 			this.WaitForMe.css('display', 'block');
 		},
 
@@ -257,7 +240,7 @@
 				this.ContainerSize = Y.Lang.empty();
 			}
 
-			this.Effects = Y.Node('<div class="' + this.CSS_Class + '-progress ' + this
+			this.Effects = Y.DOM('<div class="' + this.CSS_Class + '-progress ' + this
 				.Options.Effect + '"></div>');
 
 			if (this.EffectElementCount > 0) {
@@ -277,16 +260,16 @@
 
 				}
 
-				this.Effects = Y.Node('<div class="' + this.CSS_Class + '-progress ' +
+				this.Effects = Y.DOM('<div class="' + this.CSS_Class + '-progress ' +
 					this.Options.Effect + '" style="' + this.ContainerSize + '">' + this.EffectElementHTML +
 					'</div>');
 
-				//				this.Effects = Y.Node('<div></div>').addClass(this.CSS_Class + '-progress ' + this.Options.Effect).css(this.ContainerSize);
+				//				this.Effects = Y.DOM('<div></div>').addClass(this.CSS_Class + '-progress ' + this.Options.Effect).css(this.ContainerSize);
 				//				this.Effects.append(this.EffectElementHTML);
 			}
 
 			if (this.Options.Content) {
-				this.Content = Y.Node('<div class="' + this.CSS_Class +
+				this.Content = Y.DOM('<div class="' + this.CSS_Class +
 					'-text" style="color: ' + this.Options.Color + ';">' + this.Options.Content +
 					'</div>');
 			}
@@ -295,14 +278,14 @@
 				this.Element.find('> .' + this.CSS_Class).remove();
 			}
 
-			this.Div = Y.Node('<div class="' + this.CSS_Class + '-content"></div>');
+			this.Div = Y.DOM('<div class="' + this.CSS_Class + '-content"></div>');
 
 			this.Div.append(this.Effects, this.Content);
 
 			this.Div.appendTo(this.WaitForMe);
 
 			if (this.Element[0].tagName === 'HTML') {
-				this.Element = Y.Node('body');
+				this.Element = Y.DOM('body');
 			}
 
 			this.Element.addClass(this.CSS_Class + '-container').append(this.WaitForMe);
@@ -338,8 +321,8 @@
 			}
 
 			if (this.Content.charAt(0) === '#') {
-				Y.Node(this.Content).hide();
-				this.Content = Y.Node(this.Content).html();
+				Y.DOM(this.Content).hide();
+				this.Content = Y.DOM(this.Content).html();
 				this.contentType = 'html';
 			} else {
 				this.contentType = 'text';
@@ -379,6 +362,10 @@
 
 	Y.DOM.Function.WaitForMe = function (option) {
 		var options = Y.Extend({}, PluginOptions, option);
+
+		if (option === 'close') {
+			return new WaitForMe(Y.DOM(this), options).Close();
+		}
 
 		return this.each(function () {
 			return new WaitForMe(Y.DOM(this), options);
