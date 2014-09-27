@@ -102,9 +102,27 @@ exports.build = function (callback, compsBase32, buildName) {
 
 	var newSrc = copy + combineFiles(files);
 
-	var pathPart = 'Dist/yax' + (buildName ? '.' + buildName : '');
+	var pathPart;
 
-	var srcPath = pathPart + '.src.js';
+	if (buildName === 'css') {
+		pathPart = 'Dist/yax' + '';
+	} else {
+		pathPart = 'Dist/yax' + (buildName ? '.' + buildName : '');
+	}
+
+//	var pathPart = 'Dist/yax' + (buildName ? '.' + buildName : '');
+
+//	console.log(newSrc);
+
+	var srcPath;
+
+	if (buildName === 'css') {
+		srcPath = pathPart + '.src.css';
+	} else {
+		srcPath = pathPart + '.src.js';
+	}
+
+//	var srcPath = pathPart + '.src.js';
 
 	var oldSrc = loadSilently(srcPath);
 
@@ -117,7 +135,15 @@ exports.build = function (callback, compsBase32, buildName) {
 		console.log('   Saved to ' + srcPath);
 	}
 
-	var path = pathPart + '.js';
+	var path;
+
+	if (buildName === 'css') {
+		path = pathPart + '.css';
+	} else {
+		path = pathPart + '.js';
+	}
+
+//	var path = pathPart + '.js';
 
 	var oldCompressed = loadSilently(path);
 

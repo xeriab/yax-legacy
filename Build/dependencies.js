@@ -130,6 +130,19 @@ var Dependencies = {
 
 		extended_desc: ''
 	}
+
+	/*'Stylesheets': {
+		src: [
+			'Plugins/yax.js.css',
+			'Plugins/Tooltip/Tooltip.css',
+			'Plugins/WaitForMe/WaitForMe.css',
+			'Plugins/AutoFix/AutoFix.css'
+		],
+
+		desc: 'YAX.JS Plugins stylesheets.',
+
+		extended_desc: ''
+	},*/
 };
 
 if (typeof exports !== 'undefined') {
