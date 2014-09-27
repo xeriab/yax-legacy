@@ -977,7 +977,7 @@
 			this.transitioning = 0;
 			this.element.trigger('shown.bs.collapse');
 
-			Y.LOG('SHOW: ', this);
+			//Y.LOG('SHOW: ', this);
 		};
 
 		if (!Y.DOM.support.transition) {
@@ -1028,7 +1028,7 @@
 			this.element.trigger('hidden.bs.collapse');
 			this.element.removeClass('collapsing').addClass('collapse');
 
-			Y.LOG('HIDE: ', this);
+			//Y.LOG('HIDE: ', this);
 		};
 
 		if (!Y.DOM.support.transition) {

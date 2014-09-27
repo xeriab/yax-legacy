@@ -251,6 +251,23 @@
 
 	//---
 
+	Y.Extend(Y.DOM.Function, {
+		role: function () {
+			var args = Y.G.Slice.call(arguments);
+			var data;
+
+			if (args[0] === undefined || args[0] === null) {
+				data = this.attr('role');
+			} else {
+				data = this.attr('role', args[0]);
+			}
+
+			return data;
+		}
+	});
+
+	//---
+
 }());
 
 //---

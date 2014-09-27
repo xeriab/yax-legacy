@@ -24,30 +24,29 @@ Y.DOM(document).ready(function () {
 		Content: 'Testing Tooltips!',
 		Gravity: 'north',
 		Theme: 'dark',
-		Animation: 'fadeIn'
+		Animation: 'flipIn'
 	});
 
 	Y.DOM('body').toggle();
 //	Y.DOM('body').css('display', 'block');
 //
-	Y.DOM('body').addClass('north');
-	Y.DOM('body').addClass('animated');
-	Y.DOM('body').addClass('flipIn');
+//	Y.DOM('body').addClass('north');
+//	Y.DOM('body').addClass('animated');
+//	Y.DOM('body').addClass('flipIn');
 
 
-	Wrapper.WaitForMe({
-		Effect: 'rotation'
-	});
+//	Wrapper.WaitForMe({
+//		Effect: 'rotation'
+//	});
 
-	Wrapper.trigger('WaitForMeCloseEvent');
+//	Wrapper.trigger('WaitForMeCloseEvent');
 
-
-	TestOneImage.Tooltip({
-		Content: 'YAX.js Test!',
-		Gravity: 'west',
-		Theme: 'dark',
-		Animation: 'flipIn'
-	});
+//	TestOneImage.Tooltip({
+//		Content: 'YAX.js Test!',
+//		Gravity: 'west',
+//		Theme: 'dark',
+//		Animation: 'flipIn'
+//	});
 
 //	TestOneImage.fadeToggle(350);
 
@@ -69,7 +68,8 @@ Y.DOM(document).ready(function () {
 
 //	Y.setConfig('Console.Timed', true);
 	Y.LOG('');
-	Y.LOG(Y.DOM.Function);
+
+//	Y.LOG($('body').role());
 //	Y.DOM('body').emulateTransitionEnd(500).one('bsTransitionEnd', Y.LOG('a'));
 //	Y.LOG(Y.DOM('[data-toggle^="button"]'));
 //	Y.LOG(Y.DOM.fx);

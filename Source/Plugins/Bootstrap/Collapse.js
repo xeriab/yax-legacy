@@ -38,6 +38,8 @@
 
 	var Plugin;
 
+	var old;
+
 	Collapse.VERSION = '3.2.0';
 
 	Collapse.DEFAULTS = {
@@ -190,9 +192,9 @@
 				data[option]();
 			}
 		});
-	}
+	};
 
-	var old = Y.DOM.fn.collapse;
+	old = Y.DOM.fn.collapse;
 
 	Y.DOM.fn.collapse = Plugin;
 	Y.DOM.fn.collapse.Constructor = Collapse;
