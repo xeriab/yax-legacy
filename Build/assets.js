@@ -42,23 +42,27 @@
 		console.log(compsStr);
 
 		switch (compsStr) {
-			case '0000':
+			case '00000':
 				type = 'core';
 				break;
 
-			case '0001':
+			case '00001':
 				type = 'core';
 				break;
 
-			case '0010':
+			case '00010':
 				type = 'dom';
 				break;
 
-			case '0100':
+			case '00100':
+				type = 'dom_full';
+				break;
+
+			case '01000':
 				type = 'bootstrap';
 				break;
 
-			case '1000':
+			case '10000':
 				type = 'plugins';
 				break;
 		}
