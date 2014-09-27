@@ -1,5 +1,4 @@
 /*global Dependencies */
-/*jshint strict: false */
 
 (function (global) {
 
@@ -20,12 +19,17 @@
 		var checkBoxes = dependenciesList.getElementsByTagName('input');
 		var compsStr = '';
 		var type = '';
+		var i = 0;
+		var len;
+		var srcs;
+		var j = 0;
+		var len2;
 
-		for (var i = 0, len = checkBoxes.length; i < len; i++) {
+		for (i, len = checkBoxes.length; i < len; i++) {
 			if (checkBoxes[i].checked) {
-				var srcs = Dependencies[checkBoxes[i].id].src;
+				srcs = Dependencies[checkBoxes[i].id].src;
 
-				for (var j = 0, len2 = srcs.length; j < len2; j++) {
+				for (j, len2 = srcs.length; j < len2; j++) {
 					files[srcs[j]] = true;
 				}
 
@@ -35,26 +39,7 @@
 			}
 		}
 
-//		alert(compsStr)
-		console.log(compsStr)
-
-		// Stupid but will fix it later
-		// TODO: Fix me :D
-//		if (compsStr === '001') {
-//			type = 'core';
-//		} else if (compsStr === '011') {
-//			type = 'node_dom';
-//		} else if (compsStr === '101') {
-//			type = 'extra_core';
-//		} else if (compsStr === '100') {
-//			type = 'plugins';
-//		} else if (compsStr === '010') {
-//			type = 'node_dom';
-//		} else if (compsStr === '111') {
-//			type = 'all';
-//		} else {
-//			type = 'library';
-//		}
+		console.log(compsStr);
 
 		switch (compsStr) {
 			case '0000':
@@ -78,19 +63,13 @@
 				break;
 		}
 
-
-		// console.log(compsStr);
-		// console.log(parseInt(compsStr, 2).toString(32));
-
 		commandInput.value = 'jake \'build[' + parseInt(compsStr, 2).toString(32) + ',' + type + ']\'';
 	}
 
 	function inputSelect () {
-		// console.log(this);
 		this.focus();
 		this.select();
-	};
-
+	}
 
 	$('select-all').onclick = function () {
 		var checkBoxes = dependenciesList.getElementsByTagName('input'),
@@ -123,10 +102,12 @@
 	function onCheckboxChange () {
 		if (this.checked) {
 			var depDeps = Dependencies[this.id].Dependencies;
+			var i = 0;
+			var check;
 
 			if (depDeps) {
-				for (var i = 0; i < depDeps.length; i++) {
-					var check = document.getElementById(depDeps[i]);
+				for (i; i < depDeps.length; i++) {
+					check = document.getElementById(depDeps[i]);
 					if (!check.checked) {
 						check.checked = true;
 						check.onchange();
@@ -135,19 +116,22 @@
 			}
 		} else {
 			var checkBoxes = dependenciesList.getElementsByTagName('input');
+			var x = 0;
+			var j = 0;
+			var dep;
 
-			for (var i = 0; i < checkBoxes.length; i++) {
-				var dep = Dependencies[checkBoxes[i].id];
+			for (x; x < checkBoxes.length; x++) {
+				dep = Dependencies[checkBoxes[x].id];
 
 				if (!dep.Dependencies) {
 					continue;
 				}
 
-				for (var j = 0; j < dep.Dependencies.length; j++) {
+				for (j; j < dep.Dependencies.length; j++) {
 					if (dep.Dependencies[j] === this.id) {
-						if (checkBoxes[i].checked) {
-							checkBoxes[i].checked = false;
-							checkBoxes[i].onchange();
+						if (checkBoxes[x].checked) {
+							checkBoxes[x].checked = false;
+							checkBoxes[x].onchange();
 						}
 					}
 				}
@@ -159,21 +143,33 @@
 
 	commandInput.onclick = inputSelect;
 
-	for (var name in Dependencies) {
-		var li = document.createElement('li');
+	var name;
+	var li;
+	var heading;
+	var div;
+	var label;
+	var check;
+	var desc;
+	var xdesc;
+	var depText;
+	var depspan;
+
+	/* jshint -W089 */
+	for (name in Dependencies) {
+		li = document.createElement('li');
 
 		if (Dependencies[name].heading) {
-			var heading = document.createElement('li');
+			heading = document.createElement('li');
 			heading.className = 'heading';
 			heading.appendChild(document.createTextNode(Dependencies[name].heading));
 			dependenciesList.appendChild(heading);
 		}
 
-		var div = document.createElement('div');
+		div = document.createElement('div');
 
-		var label = document.createElement('label');
+		label = document.createElement('label');
 
-		var check = document.createElement('input');
+		check = document.createElement('input');
 
 		check.type = 'checkbox';
 		check.id = name;
@@ -190,9 +186,9 @@
 
 		li.appendChild(label);
 
-		var desc = document.createElement('span');
+		desc = document.createElement('span');
 
-		var xdesc = document.createElement('span');
+		xdesc = document.createElement('span');
 
 		desc.className = 'desc';
 
@@ -207,10 +203,10 @@
 
 		xdesc.appendChild(document.createTextNode(Dependencies[name].extended_desc));
 
-		var depText = Dependencies[name].Dependencies && Dependencies[name].Dependencies.join(', ');
+		depText = Dependencies[name].Dependencies && Dependencies[name].Dependencies.join(', ');
 
 		if (depText) {
-			var depspan = document.createElement('span');
+			depspan = document.createElement('span');
 			depspan.className = 'Dependencies';
 			depspan.appendChild(document.createTextNode('Deps: ' + depText));
 		}
@@ -231,4 +227,4 @@
 
 	updateCommand();
 
-})(this);
+}(this));
