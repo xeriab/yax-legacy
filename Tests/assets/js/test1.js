@@ -1,7 +1,7 @@
 /*jslint white: true */
 /*global Y, YAX, $, Self */
 
-Y.DOM(document).ready(function () {
+Y.DOM(Y.Document).ready(function () {
 	'use strict';
 
 	var ButtonOne = Y.DOM('#ButtonOne');
@@ -25,9 +25,7 @@ Y.DOM(document).ready(function () {
 		Animation: 'flipIn'
 	});
 
-//	Wrapper.WaitForMe({
-//		Effect: 'orbit'
-//	});
+	// Wrapper.WaitForMe({Effect: 'orbit'});
 
 	Y.LOG('');
 	Y.LOG(Y);

@@ -3,7 +3,7 @@ var jshint = require('jshint');
 var UglifyJS = require('uglify-js');
 var zlib = require('zlib');
 
-Dependencies = require('./dependencies.js').Dependencies;
+var Dependencies = require('./dependencies.js').Dependencies;
 
 function getFiles(compsBase32) {
 	var memo = {};
@@ -102,12 +102,8 @@ exports.build = function (callback, compsBase32, buildName) {
 
 	var newSrc = copy + combineFiles(files);
 
-//	var newSrc = combineFiles(files);
-
-	// var pathPart = 'Dist/yax' + (buildName ? '_' + buildName : '');
 	var pathPart = 'Dist/yax' + (buildName ? '.' + buildName : '');
 
-	//var srcPath = pathPart + '_src.js';
 	var srcPath = pathPart + '.src.js';
 
 	var oldSrc = loadSilently(srcPath);
@@ -125,8 +121,7 @@ exports.build = function (callback, compsBase32, buildName) {
 
 	var oldCompressed = loadSilently(path);
 
-//	var newCompressed = copy + UglifyJS.minify(newSrc, {
-	var newCompressed = UglifyJS.minify(newSrc, {
+	var newCompressed = copy + UglifyJS.minify(newSrc, {
 		warnings: true,
 		fromString: true
 	}).code;
