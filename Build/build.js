@@ -77,7 +77,7 @@ function combineFiles(files) {
 	var content = '';
 
 	for (var i = 0, len = files.length; i < len; i++) {
-		content += fs.readFileSync(files[i], 'utf8') + '\n\n\t';
+		content += fs.readFileSync(files[i], 'utf8') + '\n\n';
 	}
 
 	return content;
@@ -94,9 +94,9 @@ exports.build = function (callback, compsBase32, buildName) {
 
 	var copy = fs.readFileSync('Source/Copyright.js', 'utf8');
 
-	var intro = '\n\n(function () {\n\n';
+	var intro = '\n\n(function (global) {\n\n';
 
-	var outro = '\n}());\n\n// END\n';
+	var outro = '\n}(this));\n\n// END\n';
 
 	var newSrc = copy + intro + combineFiles(files) + outro;
 
