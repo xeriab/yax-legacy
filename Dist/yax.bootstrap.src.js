@@ -473,11 +473,13 @@
 		// Y.LOG(e);
 		var $btn = Y.DOM(e.target);
 
+		// Y.LOG($btn);
+
 		if (!$btn.hasClass('btn')) {
 			$btn = $btn.closest('.btn');
 		}
 
-		Plugin.call($btn, '');
+		// Plugin.call($btn, 'toggle');
 
 		e.preventDefault();
 	});
