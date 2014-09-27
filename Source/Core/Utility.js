@@ -122,8 +122,8 @@
 		Noop: function () {},
 
 		// Trim whitespace from both sides of a string
-		Trim: function (string) {
-			return string.trim ? string.trim() : string.replace(/^\s+|\s+$/g, '');
+		Trim: function (str) {
+			return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
 		},
 
 		// Standard string replace functionality

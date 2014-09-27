@@ -18,8 +18,6 @@ var Dependencies = {
 			'Core/Tools.js',
 			'Core/Events.js',
 
-			'Core/OO.js',
-
 			'Core/Callbacks.js',
 			'Core/Deferred.js',
 			'Core/Store.js',
