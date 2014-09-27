@@ -25,7 +25,9 @@
 	/**
 	 * Y.Class powers the OOP facilities of the library.
 	 */
-	Y.Class = function () {};
+	Y.Class = function () {
+
+	};
 	// END OF Y.Class OBJECT
 
 	//---
@@ -39,6 +41,7 @@
 			}
 
 			// Call the construct constructor
+			/** @namespace this.construct */
 			if (this.construct) {
 				// this.construct.apply(this, arguments);
 				return this.construct.apply(this, arguments);
@@ -88,6 +91,7 @@
 		}
 
 		// Mix includes into the prototype
+		/** @namespace properties.INCLUDES */
 		if (properties.INCLUDES) {
 			Y.Extend.apply(null, [proto].concat(properties.INCLUDES));
 			/** @namespace properties.Includes */

@@ -65,8 +65,6 @@
 		var callback = function () {
 			if (!called) {
 				Y.DOM($el).trigger(Y.DOM.support.transition.end);
-			} else {
-				Y.DOM($el).unbind(Y.DOM.support.transition.end);
 			}
 		};
 
@@ -76,13 +74,13 @@
 
 		//Y.LOG(this);
 
-		return this;
+		return $el;
 	};
 
 	Y.DOM(function () {
 		Y.DOM.support.transition = transitionEnd();
 
-		if (!Y.DOM.support.transition) {
+		/*if (!Y.DOM.support.transition) {
 			return;
 		}
 
@@ -110,18 +108,18 @@
 				setup: function () {
 					if (attaches++ === 0) {
 						Y.Document.addEventListener(orig, handler, true);
-						Y.Document.addEventListener(fix, handler, true);
+						// Y.Document.addEventListener(fix, handler, true);
 					}
 				},
 
 				teardown: function () {
 					if (--attaches === 0) {
 						Y.Document.removeEventListener(orig, handler, true);
-						Y.Document.removeEventListener(fix, handler, true);
+						// Y.Document.removeEventListener(fix, handler, true);
 					}
 				}
 			};
-		});
+		});*/
 
 		/*Y.DOM.Event.special.bsTransitionEnd = {
 			bindType: Y.DOM.support.transition.end,
@@ -922,8 +920,6 @@
 		}
 	};
 
-	var Plugin;
-
 	Collapse.VERSION = '3.2.0';
 
 	Collapse.DEFAULTS = {
@@ -943,7 +939,7 @@
 
 		var startEvent = Y.DOM.Event('show.bs.collapse');
 
-		this.element.trigger(startEvent);
+		this.element.triggerHandler(startEvent);
 
 		if (startEvent.isDefaultPrevented()) {
 			return;
@@ -975,7 +971,7 @@
 		var complete = function () {
 			this.element.removeClass('collapsing').addClass('collapse in')[dimension]('');
 			this.transitioning = 0;
-			this.element.trigger('shown.bs.collapse');
+			this.element.triggerHandler('shown.bs.collapse');
 
 			Y.LOG('SHOW: ', this);
 		};
@@ -993,10 +989,7 @@
 		/*this.element.one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
 			.emulateTransitionEnd(350)[dimension](this.element[0][scrollSize]);*/
 
-		this.element.bind(Y.DOM.support.transition.end, Y.DOM.Proxy(complete, this))
-			.emulateTransitionEnd(350)[dimension](this.element[0][scrollSize]);
-
-		this.element.one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
+		this.element.one(Y.DOM.support.transition.end, Y.DOM.Proxy(complete, this))
 			.emulateTransitionEnd(350)[dimension](this.element[0][scrollSize]);
 	};
 
@@ -1007,7 +1000,7 @@
 
 		var startEvent = Y.DOM.Event('hide.bs.collapse');
 
-		this.element.trigger(startEvent);
+		this.element.triggerHandler(startEvent);
 
 		if (startEvent.isDefaultPrevented()) {
 			return;
@@ -1025,7 +1018,7 @@
 
 		var complete = function () {
 			this.transitioning = 0;
-			this.element.trigger('hidden.bs.collapse');
+			this.element.triggerHandler('hidden.bs.collapse');
 			this.element.removeClass('collapsing').addClass('collapse');
 
 			Y.LOG('HIDE: ', this);
@@ -1038,10 +1031,7 @@
 		/*this.element[dimension](0).one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
 			.emulateTransitionEnd(350);*/
 
-		this.element[dimension](0).bind(Y.DOM.support.transition.end, Y.DOM.Proxy(complete, this))
-			.emulateTransitionEnd(350);
-
-		this.element[dimension](0).one('bsTransitionEnd', Y.DOM.proxy(complete, this))
+		this.element[dimension](0).one(Y.DOM.support.transition.end, Y.DOM.Proxy(complete, this))
 			.emulateTransitionEnd(350);
 	};
 
@@ -1057,7 +1047,7 @@
 	// COLLAPSE PLUGIN DEFINITION
 	// ==========================
 
-	Plugin = function Plugin(option) {
+	function Plugin(option) {
 		return this.each(function () {
 			var $this = Y.DOM(this);
 			var data = $this.data('bs.collapse');

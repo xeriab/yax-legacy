@@ -39,6 +39,8 @@
 
 		var state = 'pending';
 
+		var deferred = Object.create({});
+
 		var promise = {
 			state: function () {
 				return state;
@@ -80,8 +82,6 @@
 			}
 		};
 
-		var deferred = Object.create({});
-
 		// Keep pipe for back-compat
 		promise.pipe = promise.then;
 
@@ -94,6 +94,7 @@
 			if (stateString) {
 				list.add(function () {
 					state = stateString;
+					/* jshint -W016 */
 				}, tuples[x ^ 1][2].disable, tuples[2][2].lock);
 			}
 
@@ -129,9 +130,11 @@
 
 					val[x] = arguments.length > 1 ? Y.G.Slice.call(arguments) : value;
 
+					var tmp = --remain;
+
 					if (val === progressValues) {
 						deferred.notifyWith(ctx, val);
-					} else if (!(--remain)) {
+					} else if (!tmp) {
 						deferred.resolveWith(ctx, val);
 					}
 				};

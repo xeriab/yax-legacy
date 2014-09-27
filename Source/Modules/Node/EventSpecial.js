@@ -50,15 +50,15 @@
 
 						/// intercept and replace the special event handler to add functionality
 						specialEvent.originalHandler = specialEvent.handler;
-						specialEvent.handler = function () {
 
+						specialEvent.handler = function () {
 							/// make event argument writable, like on jQuery
 							var args = Y.G.Slice.call(arguments);
 
 							args[0] = Y.Extend({}, args[0]);
 
 							/// define the event handle, Y.DOM.event.dispatch is only for newer versions of jQuery
-							Y.DOM.event.handle = function () {
+							Y.DOM.Event.handle = function () {
 								/// make context of trigger the event element
 								var args_ = Y.G.Slice.call(arguments);
 								var event = args_[0];
@@ -68,15 +68,14 @@
 
 							};
 
-//							Y.LOG(specialEvent);
 							specialEvent.originalHandler.apply(this, args);
-
 						};
 					}
 
 					//Y.LOG(el);
 					//Y.LOG(data);
-					// Y.LOG(specialEvent);
+					//Y.LOG(specialEvent);
+					//Y.LOG(eventName);
 					//Y.LOG(eventName);
 
 					/// setup special events on Y.DOM

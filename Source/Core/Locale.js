@@ -1,7 +1,7 @@
 /**
- * Y Core | Store
+ * Y Core | Locale
  *
- * Powers Y's with store capability [CORE]
+ * Powers Y's with Localisation capability [CORE]
  *
  * @version     0.15
  * @depends:    Core, Global, Utility

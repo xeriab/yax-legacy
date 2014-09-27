@@ -18,8 +18,7 @@
 /*global exports, define, module */
 
 (function () {
-	// 'use strict';
-
+	/*jshint globalstrict: false */
 	var Y = Object.create({});
 
 	// var Y;

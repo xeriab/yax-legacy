@@ -27,21 +27,29 @@ Y.DOM(document).ready(function () {
 		Animation: 'fadeIn'
 	});
 
-	/*Wrapper.WaitForMe({
+	Y.DOM('body').toggle();
+//	Y.DOM('body').css('display', 'block');
+//
+	Y.DOM('body').addClass('north');
+	Y.DOM('body').addClass('animated');
+	Y.DOM('body').addClass('flipIn');
+
+
+	Wrapper.WaitForMe({
 		Effect: 'rotation'
 	});
 
-	Wrapper.trigger('WaitForMeCloseEvent');*/
+	Wrapper.trigger('WaitForMeCloseEvent');
 
 
 	TestOneImage.Tooltip({
 		Content: 'YAX.js Test!',
 		Gravity: 'west',
 		Theme: 'dark',
-		Animation: 'fadeIn'
+		Animation: 'flipIn'
 	});
 
-	TestOneImage.fadeToggle(350);
+//	TestOneImage.fadeToggle(350);
 
 //	TestOneImage.bind('bsTransitionEnd', Y.DOM.Proxy(Com, TestOneImage)).emulateTransitionEnd(350);
 
@@ -59,9 +67,10 @@ Y.DOM(document).ready(function () {
 //		Y.LOG(data);
 //	});
 
-	Y.setConfig('Console.Timed', true);
+//	Y.setConfig('Console.Timed', true);
 	Y.LOG('');
-	Y.LOG(Y);
+	Y.LOG(Y.DOM.Function);
+//	Y.DOM('body').emulateTransitionEnd(500).one('bsTransitionEnd', Y.LOG('a'));
 //	Y.LOG(Y.DOM('[data-toggle^="button"]'));
 //	Y.LOG(Y.DOM.fx);
 //	Y.LOG(Y.DOM.support);
@@ -76,4 +85,10 @@ Y.DOM(document).ready(function () {
 	//Y.LOG(Y.Lang.Keys(Y.DOM));
 	//Y.LOG(Y.DOM.Function);
 
+
+//	var obj = {name: 'YAX'},
+//	handler = function(){ console.log("hello from + ", this.name); };
+
+	// ensures that the handler will be executed in the context of `obj`:
+//	$(document).one('click', $.proxy(handler, obj));
 });

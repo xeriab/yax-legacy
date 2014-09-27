@@ -618,6 +618,8 @@
 			throw new TypeError('expected function');
 		}
 
+		// Y.LOG(result);
+
 		return result;
 	};
 
@@ -808,12 +810,12 @@
 		'mousewheel',
 		'wheel'
 	].forEach(function (event) {
-			Y.DOM.Function[event] = function (callback) {
-				return callback ?
-					this.bind(event, callback) :
-					this.trigger(event);
-			};
-		});
+		Y.DOM.Function[event] = function (callback) {
+			return callback ?
+				this.bind(event, callback) :
+				this.trigger(event);
+		};
+	});
 
 	Y.DOM.Function.hashchange = function (callback) {
 		return callback ? this.bind('hashchange', callback) : this.trigger('hashchange', callback);

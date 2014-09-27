@@ -2524,8 +2524,6 @@
 
 		Function: DomNode.Function,
 
-		Func: DomNode.Function,
-
 		expr: {},
 
 		Expr: {},
@@ -4091,6 +4089,8 @@
 			throw new TypeError('expected function');
 		}
 
+		// Y.LOG(result);
+
 		return result;
 	};
 
@@ -4281,12 +4281,12 @@
 		'mousewheel',
 		'wheel'
 	].forEach(function (event) {
-			Y.DOM.Function[event] = function (callback) {
-				return callback ?
-					this.bind(event, callback) :
-					this.trigger(event);
-			};
-		});
+		Y.DOM.Function[event] = function (callback) {
+			return callback ?
+				this.bind(event, callback) :
+				this.trigger(event);
+		};
+	});
 
 	Y.DOM.Function.hashchange = function (callback) {
 		return callback ? this.bind('hashchange', callback) : this.trigger('hashchange', callback);
@@ -5079,7 +5079,8 @@
 
 		document = Y.Document,
 		testEl = document.createElement('div'),
-		supportedTransforms = /^((translate|rotate|scale)(X|Y|Z|3d)?|matrix(3d)?|perspective|skew(X|Y)?)$/i,
+		supportedTransforms =
+		/^((translate|rotate|scale)(X|Y|Z|3d)?|matrix(3d)?|perspective|skew(X|Y)?)$/i,
 		transform,
 		transitionProperty,
 		transitionDuration,
@@ -5113,12 +5114,12 @@
 
 	cssReset[transitionProperty = prefix + 'transition-property'] =
 		cssReset[transitionDuration = prefix + 'transition-duration'] =
-			cssReset[transitionDelay = prefix + 'transition-delay'] =
-				cssReset[transitionTiming = prefix + 'transition-timing-function'] =
-					cssReset[animationName = prefix + 'animation-name'] =
-						cssReset[animationDuration = prefix + 'animation-duration'] =
-							cssReset[animationDelay = prefix + 'animation-delay'] =
-								cssReset[animationTiming = prefix + 'animation-timing-function'] = '';
+		cssReset[transitionDelay = prefix + 'transition-delay'] =
+		cssReset[transitionTiming = prefix + 'transition-timing-function'] =
+		cssReset[animationName = prefix + 'animation-name'] =
+		cssReset[animationDuration = prefix + 'animation-duration'] =
+		cssReset[animationDelay = prefix + 'animation-delay'] =
+		cssReset[animationTiming = prefix + 'animation-timing-function'] = '';
 
 	/** @namespace testEl.style.transitionProperty */
 	Y.DOM.fx = {
@@ -5133,7 +5134,8 @@
 		animationEnd: normalizeEvent('AnimationEnd')
 	};
 
-	Y.DOM.Function.animate = function (properties, duration, ease, callback, delay) {
+	Y.DOM.Function.animate = function (properties, duration, ease, callback,
+		delay) {
 		if (Y.Lang.isFunction(duration)) {
 			callback = duration;
 			ease = undef;
@@ -5166,7 +5168,8 @@
 	};
 
 	Y.DOM.Function.anim = function (properties, duration, ease, callback, delay) {
-		var key, cssValues = {}, cssProperties, transforms = '',
+		var key, cssValues = {},
+			cssProperties, transforms = '',
 			that = this,
 			wrappedCallback, endEvent = Y.DOM.fx.transitionEnd,
 			fired = false;
@@ -5340,11 +5343,12 @@
 		// not intended for public consumption - generates a queueHooks object, or returns the current one
 		_queueHooks: function (elem, type) {
 			var key = type + 'queueHooks';
-			return Y.DOM.dataPrivative.get(elem, key) || Y.DOM.dataPrivative.access(elem, key, {
-				empty: Y.G.Callbacks('once memory').add(function () {
-					Y.DOM.dataPrivative.remove(elem, [type + 'queue', key]);
-				})
-			});
+			return Y.DOM.dataPrivative.get(elem, key) || Y.DOM.dataPrivative.access(
+				elem, key, {
+					empty: Y.G.Callbacks('once memory').add(function () {
+						Y.DOM.dataPrivative.remove(elem, [type + 'queue', key]);
+					})
+				});
 		}
 	});
 
@@ -5439,8 +5443,7 @@
 			return defer.promise(obj);
 		}
 	});
-	
-	
+
 	//---
 
 }());
@@ -5724,8 +5727,6 @@
 /*jslint node: false */
 /*global YAX, Y, transitionProperty, transitionDuration, transitionTiming*/
 
-//---
-
 (function () {
 
 	'use strict';
@@ -5832,7 +5833,8 @@
 				handler.$timerID = fn.$timerID;
 
 				if (!element.$timers[label][fn.$timerID]) {
-					element.$timers[label][fn.$timerID] = window.setInterval(handler, interval);
+					element.$timers[label][fn.$timerID] = window.setInterval(handler,
+						interval);
 				}
 
 				if (!this.global[label]) {
@@ -5905,7 +5907,7 @@
 
 	cssReset[transitionProperty = prefix + 'transition-property'] =
 		cssReset[transitionDuration = prefix + 'transition-duration'] =
-			cssReset[transitionTiming = prefix + 'transition-timing-function'] = '';
+		cssReset[transitionTiming = prefix + 'transition-timing-function'] = '';
 
 	Y.DOM.Function.stopTranAnim = function (jumpToEnd, cancelCallback) {
 		var props;
@@ -5962,7 +5964,6 @@
 }());
 
 //---
-
 
 /**
  * YAX Node | Event Logger
@@ -6351,15 +6352,15 @@
 
 						/// intercept and replace the special event handler to add functionality
 						specialEvent.originalHandler = specialEvent.handler;
-						specialEvent.handler = function () {
 
+						specialEvent.handler = function () {
 							/// make event argument writable, like on jQuery
 							var args = Y.G.Slice.call(arguments);
 
 							args[0] = Y.Extend({}, args[0]);
 
 							/// define the event handle, Y.DOM.event.dispatch is only for newer versions of jQuery
-							Y.DOM.event.handle = function () {
+							Y.DOM.Event.handle = function () {
 								/// make context of trigger the event element
 								var args_ = Y.G.Slice.call(arguments);
 								var event = args_[0];
@@ -6369,15 +6370,14 @@
 
 							};
 
-//							Y.LOG(specialEvent);
 							specialEvent.originalHandler.apply(this, args);
-
 						};
 					}
 
 					//Y.LOG(el);
 					//Y.LOG(data);
-					// Y.LOG(specialEvent);
+					//Y.LOG(specialEvent);
+					//Y.LOG(eventName);
 					//Y.LOG(eventName);
 
 					/// setup special events on Y.DOM

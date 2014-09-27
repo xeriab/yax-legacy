@@ -58,17 +58,23 @@
 		var called = false;
 		var $el = this;
 
-		Y.DOM(this).one('bsTransitionEnd', function () {
+		Y.DOM(this).one(Y.DOM.support.transition.end, function () {
 			called = true;
 		});
 
 		var callback = function () {
 			if (!called) {
 				Y.DOM($el).trigger(Y.DOM.support.transition.end);
+			} else {
+				Y.DOM($el).unbind(Y.DOM.support.transition.end);
 			}
 		};
 
+		//Y.DOM($el).stopTranAnim(callback);
+
 		setTimeout(callback, duration);
+
+		//Y.LOG(this);
 
 		return this;
 	};
@@ -81,7 +87,7 @@
 		}
 
 		Y.DOM.each({
-			bsTransitionEnd: Y.DOM.fx.transitionEnd
+			'bsTransitionEnd': Y.DOM.fx.transitionEnd
 		}, function (orig, fix) {
 			var attaches = 0;
 
@@ -111,6 +117,7 @@
 				teardown: function () {
 					if (--attaches === 0) {
 						Y.Document.removeEventListener(orig, handler, true);
+						Y.Document.removeEventListener(fix, handler, true);
 					}
 				}
 			};

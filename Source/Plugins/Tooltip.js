@@ -1,10 +1,10 @@
 /**
  * YAX Plugins | Tooltip
  *
- * Cross browser Tooltip implementation using YAX's API [Node]
+ * Cross browser Tooltip implementation using YAX's API [DOM]
  *
  * @version     0.15
- * @depends:    Core, Node
+ * @depends:    Core, DOM
  * @license     Dual licensed under the MIT and GPL licenses.
  */
 
@@ -21,32 +21,9 @@
 
 	'use strict';
 
-	// Plugin information
-
-	// Default options for the Plugin
-	//	Y.Settings.Node = {
-	//		Tooltip: {
-	//			Opacity: 0.75,
-	//			Content: '',
-	//			Size: 'small',
-	//			Gravity: 'north',
-	//			Theme: 'dark',
-	//			Trigger: 'hover',
-	//			Animation: 'flipIn',
-	//			Confirm: false,
-	//			Yes: 'Yes',
-	//			No: 'No',
-	//			FinalMessage: '',
-	//			FinalMessageDuration: 500,
-	//			OnYes: Y.Lang.Noop,
-	//			OnNo: Y.Lang.Noop,
-	//			Container: 'body'
-	//		}
-	//	};
-
 	Y.Extend(Y.Settings.DOM, {
 		Tooltip: {
-			Opacity: 0.75,
+			Opacity: 1,
 			Content: '',
 			Size: 'small',
 			Gravity: 'north',
@@ -83,18 +60,21 @@
 		},
 
 		Show: function () {
-			Y.Node(this.Element).css('cursor', 'pointer');
+			Y.DOM(this.Element).css('cursor', 'pointer');
 
 			// Close all other Tooltips
-			Y.Node('div.exen-YAX-Tooltip').hide();
-			// Y.Node('div.exen-YAX-Tooltip').remove();
-			window.clearTimeout(this.Delay);
+			// Y.DOM('yaxtooltip.yax-tooltip').hide();
+			Y.DOM('yaxtooltip.yax-tooltip').remove();
+			Y.Window.clearTimeout(this.Delay);
+			this.setContent();
+			this.setPositions();
+
 			this.Tooltip.css('display', 'block');
-			// this.Tooltip.fadeToggle().emulateTransitionEnd(350);
 		},
 
 		Hide: function () {
-			this.Tooltip.hide();
+			// this.Tooltip.hide();
+			this.Tooltip.remove();
 			window.clearTimeout(this.Delay);
 			// this.Tooltip.css('display', 'none');
 			this.Tooltip.css('display', 'none');
@@ -140,21 +120,21 @@
 			}
 
 			if (this.Content.charAt(0) === '#') {
-				Y.Node(this.Content).hide();
-				this.Content = Y.Node(this.Content).html();
+				Y.DOM(this.Content).hide();
+				this.Content = Y.DOM(this.Content).html();
 				this.contentType = 'html';
 			} else {
 				this.contentType = 'text';
 			}
 
 			// Create Tooltip container
-			this.Tooltip = Y.Node('<div class="exen-YAX-Tooltip ' +
+			this.Tooltip = Y.DOM('<yaxtooltip class="yax-tooltip ' +
 				this.Options.Theme + ' ' +
 				this.Options.Size + ' ' +
 				this.Options.Gravity +
-				'"><div class="TooltipText">' +
+				'"><yaxtooltip class="tooltiptext">' +
 				this.Content +
-				'</div><div class="tip"></div></div>'
+				'</yaxtooltip><yaxtooltip class="tip"></yaxtooltip></yaxtooltip>'
 			);
 
 			this.Tip = this.Tooltip.find('.tip');
@@ -168,15 +148,14 @@
 				// this.Tooltip.appendTo(this.Options.Container);
 			} else {
 				// this.Tooltip.insertAfter(this.Element.parent());
+				// this.Tooltip.insertBefore(this.Element.parent());
 				this.Tooltip.insertBefore(this.Element.parent());
-				// this.Tooltip.insertAfter(this.Element.parent());
-				// this.Element.append(this.Tooltip);
 			}
 
 
-			// this.Tooltip.insertBefore(Y.Node(this.Element));
+			// this.Tooltip.insertBefore(Y.DOM(this.Element));
 
-			// Y.Node(this.Element).parent().append(this.Tooltip);
+			// Y.DOM(this.Element).parent().append(this.Tooltip);
 
 			// this.Element.append(this.Tooltip);
 
@@ -197,15 +176,15 @@
 
 		getPosition: function () {
 			var Element = this.Element[0];
-			return Y.Node.Extend({}, (typeof Element.getBoundingClientRect ===
-				'function') ? Element.getBoundingClientRect() : {
+			return Y.Extend({}, (Y.Lang.isFunction(Element.getBoundingClientRect)) ? Element.getBoundingClientRect() : {
 				width: Element.offsetWidth,
 				height: Element.offsetHeight
 			}, this.Element.offset());
 		},
 
 		setPositions: function () {
-			// var pos = this.getPosition(),
+			// var pos = this.getPosition();
+
 			var leftPos = 0,
 				topPos = 0,
 				ElementTop = this.Element.offset().top,
@@ -218,40 +197,40 @@
 			}
 
 			switch (this.Options.Gravity) {
-			case 'south':
-				leftPos = ElementLeft + this.Element.outerWidth() / 2 - this.Tooltip.outerWidth() /
-					2;
-				topPos = ElementTop - this.Tooltip.outerHeight() - this.Tip.outerHeight() /
-					2;
-				break;
+				case 'south':
+					leftPos = ElementLeft + this.Element.outerWidth() / 2 - this.Tooltip.outerWidth() /
+						2;
+					topPos = ElementTop - this.Tooltip.outerHeight() - this.Tip.outerHeight() /
+						2;
+					break;
 
-			case 'west':
-				leftPos = ElementLeft + this.Element.outerWidth() + this.Tip.outerWidth() /
-					2;
-				topPos = ElementTop + this.Element.outerHeight() / 2 - (this.Tooltip.outerHeight() /
-					2);
-				break;
+				case 'west':
+					leftPos = ElementLeft + this.Element.outerWidth() + this.Tip.outerWidth() /
+						2;
+					topPos = ElementTop + this.Element.outerHeight() / 2 - (this.Tooltip.outerHeight() /
+						2);
+					break;
 
-			case 'north':
-				leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
-					2);
-				topPos = ElementTop + this.Element.outerHeight() + this.Tip.outerHeight() /
-					2;
-				break;
+				case 'north':
+					leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
+						2);
+					topPos = ElementTop + this.Element.outerHeight() + this.Tip.outerHeight() /
+						2;
+					break;
 
-			case 'east':
-				leftPos = ElementLeft - this.Tooltip.outerWidth() - this.Tip.outerWidth() /
-					2;
-				topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tooltip.outerHeight() /
-					2;
-				break;
+				case 'east':
+					leftPos = ElementLeft - this.Tooltip.outerWidth() - this.Tip.outerWidth() /
+						2;
+					topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tooltip.outerHeight() /
+						2;
+					break;
 
-			case 'center':
-				leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
-					2);
-				topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tip.outerHeight() /
-					2;
-				break;
+				case 'center':
+					leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
+						2);
+					topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tip.outerHeight() /
+						2;
+					break;
 			}
 
 			this.Tooltip.css('left', leftPos);
@@ -282,7 +261,7 @@
 					event.stopPropagation();
 				});
 
-				Y.Node('html').click(function () {
+				Y.DOM('html').click(function () {
 					self.Hide();
 				});
 			}
@@ -297,8 +276,8 @@
 		},
 
 		addConfirm: function () {
-			this.Tooltip.append('<ul class="confirm"><li class="exen-YAX-Tooltip-yes">' +
-				this.Options.Yes + '</li><li class="exen-YAX-Tooltip-no">' + this.Options.No +
+			this.Tooltip.append('<ul class="confirm"><li class="yax-tooltip-yes">' +
+				this.Options.Yes + '</li><li class="yax-tooltip-no">' + this.Options.No +
 				'</li></ul>');
 			this.setConfirmEvents();
 		},
@@ -306,11 +285,11 @@
 		setConfirmEvents: function () {
 			var self = this;
 
-			this.Tooltip.find('li.exen-YAX-Tooltip-yes').click(function (event) {
+			this.Tooltip.find('li.yax-tooltip-yes').click(function (event) {
 				self.onYes();
 				event.stopPropagation();
 			});
-			this.Tooltip.find('li.exen-YAX-Tooltip-no').click(function (event) {
+			this.Tooltip.find('li.yax-tooltip-no').click(function (event) {
 				self.onNo();
 				event.stopPropagation();
 			});
@@ -319,7 +298,7 @@
 		finalMessage: function () {
 			if (this.Options.FinalMessage) {
 				var self = this;
-				self.Tooltip.find('div:first').html(this.Options.FinalMessage);
+				self.Tooltip.find('yaxtooltip:first').html(this.Options.FinalMessage);
 				self.Tooltip.find('ul').remove();
 				self.setPositions();
 				setTimeout(function () {
@@ -344,7 +323,6 @@
 
 	Y.DOM.Function.Tooltip = function (options) {
 		options = Y.Extend({}, PluginOptions, options);
-		// options = Y.Extend(PluginOptions, options);
 
 		return this.each(function () {
 			return new Tooltip(Y.DOM(this), options);

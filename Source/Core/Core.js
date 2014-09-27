@@ -984,7 +984,7 @@
 				source = arguments[x];
 
 				for (prop in source) {
-					if (Y.HasOwnProperty.call(source, prop)) {
+					if (source.hasOwnProperty(prop)) {
 						// if (source.hasOwnProperty(prop)) {
 						object[prop] = source[prop];
 					}

@@ -36,6 +36,8 @@
 		}
 	};
 
+	var Plugin;
+
 	Collapse.VERSION = '3.2.0';
 
 	Collapse.DEFAULTS = {
@@ -49,11 +51,9 @@
 	};
 
 	Collapse.prototype.show = function () {
-		var self = this;
-
-		/*if (this.showed || this.transitioning || this.element.hasClass('in')) {
+		if (this.transitioning || this.element.hasClass('in')) {
 			return;
-		}*/
+		}
 
 		var startEvent = Y.DOM.Event('show.bs.collapse');
 
@@ -87,12 +87,11 @@
 		this.transitioning = 1;
 
 		var complete = function () {
-			self.element.removeClass('collapsing')
-				.addClass('collapse in')[dimension]('auto');
+			this.element.removeClass('collapsing').addClass('collapse in')[dimension]('');
+			this.transitioning = 0;
+			this.element.trigger('shown.bs.collapse');
 
-			self.transitioning = 0;
-
-			self.element.trigger('shown.bs.collapse');
+			Y.LOG('SHOW: ', this);
 		};
 
 		if (!Y.DOM.support.transition) {
@@ -105,18 +104,20 @@
 			.one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
 			.emulateTransitionEnd(350)[dimension](this.element[0][scrollSize]);*/
 
-		this.element.one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
+		/*this.element.one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
+			.emulateTransitionEnd(350)[dimension](this.element[0][scrollSize]);*/
+
+		this.element.bind(Y.DOM.support.transition.end, Y.DOM.Proxy(complete, this))
 			.emulateTransitionEnd(350)[dimension](this.element[0][scrollSize]);
 
-		this.showed = true;
+		this.element.one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
+			.emulateTransitionEnd(350)[dimension](this.element[0][scrollSize]);
 	};
 
 	Collapse.prototype.hide = function () {
-		var self = this;
-
-		/*if (!this.showed || this.transitioning || !this.element.hasClass('in')) {
+		if (this.transitioning || !this.element.hasClass('in')) {
 			return;
-		}*/
+		}
 
 		var startEvent = Y.DOM.Event('hide.bs.collapse');
 
@@ -137,51 +138,40 @@
 		this.transitioning = 1;
 
 		var complete = function () {
-			self.transitioning = 0;
+			this.transitioning = 0;
+			this.element.trigger('hidden.bs.collapse');
+			this.element.removeClass('collapsing').addClass('collapse');
 
-			self.element
-				.trigger('hidden.bs.collapse')
-				.removeClass('collapsing')
-				.addClass('collapse');
+			Y.LOG('HIDE: ', this);
 		};
 
 		if (!Y.DOM.support.transition) {
 			return complete.call(this);
 		}
 
-		this.element[dimension](0).one('bsTransitionEnd', Y.DOM.proxy(complete, this))
+		/*this.element[dimension](0).one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
+			.emulateTransitionEnd(350);*/
+
+		this.element[dimension](0).bind(Y.DOM.support.transition.end, Y.DOM.Proxy(complete, this))
 			.emulateTransitionEnd(350);
 
-		/*var scrollSize = Y.Lang.camelise(['scroll', dimension].join('-'));
-		var tmp = this.element[0][scrollSize];
-
-		this.element.one('bsTransitionEnd', Y.DOM.Proxy(complete, this))
-			.emulateTransitionEnd(350)[dimension](-tmp);*/
-
-		this.showed = false;
+		this.element[dimension](0).one('bsTransitionEnd', Y.DOM.proxy(complete, this))
+			.emulateTransitionEnd(350);
 	};
 
 	Collapse.prototype.toggle = function () {
-		if (this.showed) {
+		if (this.element.hasClass('in')) {
 			this.hide();
 		} else {
 			this.show();
 		}
-
-		/*if (this.element.hasClass('in')) {
-			this.hide();
-		} else {
-			this.show();
-		}*/
-
-		//this[this.element.hasClass('in') ? 'hide' : 'show']();
 	};
 
 
 	// COLLAPSE PLUGIN DEFINITION
 	// ==========================
 
-	function Plugin(option) {
+	Plugin = function Plugin(option) {
 		return this.each(function () {
 			var $this = Y.DOM(this);
 			var data = $this.data('bs.collapse');

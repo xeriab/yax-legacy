@@ -569,10 +569,10 @@
 /**
  * YAX Plugins | Tooltip
  *
- * Cross browser Tooltip implementation using YAX's API [Node]
+ * Cross browser Tooltip implementation using YAX's API [DOM]
  *
  * @version     0.15
- * @depends:    Core, Node
+ * @depends:    Core, DOM
  * @license     Dual licensed under the MIT and GPL licenses.
  */
 
@@ -589,32 +589,9 @@
 
 	'use strict';
 
-	// Plugin information
-
-	// Default options for the Plugin
-//	Y.Settings.Node = {
-//		Tooltip: {
-//			Opacity: 0.75,
-//			Content: '',
-//			Size: 'small',
-//			Gravity: 'north',
-//			Theme: 'dark',
-//			Trigger: 'hover',
-//			Animation: 'flipIn',
-//			Confirm: false,
-//			Yes: 'Yes',
-//			No: 'No',
-//			FinalMessage: '',
-//			FinalMessageDuration: 500,
-//			OnYes: Y.Lang.Noop,
-//			OnNo: Y.Lang.Noop,
-//			Container: 'body'
-//		}
-//	};
-
 	Y.Extend(Y.Settings.DOM, {
 		Tooltip: {
-			Opacity: 0.75,
+			Opacity: 1,
 			Content: '',
 			Size: 'small',
 			Gravity: 'north',
@@ -631,24 +608,6 @@
 			Container: 'body'
 		}
 	});
-
-//	Y.Settings.Node.Tooltip = {
-//		Opacity: 0.75,
-//		Content: '',
-//		Size: 'small',
-//		Gravity: 'north',
-//		Theme: 'dark',
-//		Trigger: 'hover',
-//		Animation: 'flipIn',
-//		Confirm: false,
-//		Yes: 'Yes',
-//		No: 'No',
-//		FinalMessage: '',
-//		FinalMessageDuration: 500,
-//		OnYes: Y.Lang.Noop,
-//		OnNo: Y.Lang.Noop,
-//		Container: 'body'
-//	};
 
 	var PluginOptions = Y.Settings.DOM.Tooltip;
 
@@ -669,18 +628,21 @@
 		},
 
 		Show: function () {
-			Y.Node(this.Element).css('cursor', 'pointer');
+			Y.DOM(this.Element).css('cursor', 'pointer');
 
 			// Close all other Tooltips
-			Y.Node('div.exen-YAX-Tooltip').hide();
-			// Y.Node('div.exen-YAX-Tooltip').remove();
-			window.clearTimeout(this.Delay);
+			// Y.DOM('yaxtooltip.yax-tooltip').hide();
+			Y.DOM('yaxtooltip.yax-tooltip').remove();
+			Y.Window.clearTimeout(this.Delay);
+			this.setContent();
+			this.setPositions();
+
 			this.Tooltip.css('display', 'block');
-			// this.Tooltip.fadeToggle().emulateTransitionEnd(350);
 		},
 
 		Hide: function () {
-			this.Tooltip.hide();
+			// this.Tooltip.hide();
+			this.Tooltip.remove();
 			window.clearTimeout(this.Delay);
 			// this.Tooltip.css('display', 'none');
 			this.Tooltip.css('display', 'none');
@@ -696,18 +658,18 @@
 
 		addAnimation: function () {
 			switch (this.Options.Animation) {
-				case 'none':
-					break;
+			case 'none':
+				break;
 
-				case 'fadeIn':
-					this.Tooltip.addClass('animated');
-					this.Tooltip.addClass('fadeIn');
-					break;
+			case 'fadeIn':
+				this.Tooltip.addClass('animated');
+				this.Tooltip.addClass('fadeIn');
+				break;
 
-				case 'flipIn':
-					this.Tooltip.addClass('animated');
-					this.Tooltip.addClass('flipIn');
-					break;
+			case 'flipIn':
+				this.Tooltip.addClass('animated');
+				this.Tooltip.addClass('flipIn');
+				break;
 			}
 		},
 
@@ -726,21 +688,21 @@
 			}
 
 			if (this.Content.charAt(0) === '#') {
-				Y.Node(this.Content).hide();
-				this.Content = Y.Node(this.Content).html();
+				Y.DOM(this.Content).hide();
+				this.Content = Y.DOM(this.Content).html();
 				this.contentType = 'html';
 			} else {
 				this.contentType = 'text';
 			}
 
 			// Create Tooltip container
-			this.Tooltip = Y.Node('<div class="exen-YAX-Tooltip ' +
+			this.Tooltip = Y.DOM('<yaxtooltip class="yax-tooltip ' +
 				this.Options.Theme + ' ' +
 				this.Options.Size + ' ' +
 				this.Options.Gravity +
-				'"><div class="TooltipText">' +
+				'"><yaxtooltip class="tooltiptext">' +
 				this.Content +
-				'</div><div class="tip"></div></div>'
+				'</yaxtooltip><yaxtooltip class="tip"></yaxtooltip></yaxtooltip>'
 			);
 
 			this.Tip = this.Tooltip.find('.tip');
@@ -754,15 +716,14 @@
 				// this.Tooltip.appendTo(this.Options.Container);
 			} else {
 				// this.Tooltip.insertAfter(this.Element.parent());
+				// this.Tooltip.insertBefore(this.Element.parent());
 				this.Tooltip.insertBefore(this.Element.parent());
-				// this.Tooltip.insertAfter(this.Element.parent());
-				// this.Element.append(this.Tooltip);
 			}
 
 
-			// this.Tooltip.insertBefore(Y.Node(this.Element));
+			// this.Tooltip.insertBefore(Y.DOM(this.Element));
 
-			// Y.Node(this.Element).parent().append(this.Tooltip);
+			// Y.DOM(this.Element).parent().append(this.Tooltip);
 
 			// this.Element.append(this.Tooltip);
 
@@ -783,48 +744,60 @@
 
 		getPosition: function () {
 			var Element = this.Element[0];
-			return Y.Node.Extend({}, (typeof Element.getBoundingClientRect === 'function') ? Element.getBoundingClientRect() : {
+			return Y.Extend({}, (Y.Lang.isFunction(Element.getBoundingClientRect)) ? Element.getBoundingClientRect() : {
 				width: Element.offsetWidth,
 				height: Element.offsetHeight
 			}, this.Element.offset());
 		},
 
 		setPositions: function () {
-			// var pos = this.getPosition(),
+			// var pos = this.getPosition();
+
 			var leftPos = 0,
 				topPos = 0,
 				ElementTop = this.Element.offset().top,
 				ElementLeft = this.Element.offset().left;
 
-			if (this.Element.css('position') === 'fixed' || this.Element.css('position') === 'absolute') {
+			if (this.Element.css('position') === 'fixed' || this.Element.css('position') ===
+				'absolute') {
 				ElementTop = 0;
 				ElementLeft = 0;
 			}
 
 			switch (this.Options.Gravity) {
 				case 'south':
-					leftPos = ElementLeft + this.Element.outerWidth() / 2 - this.Tooltip.outerWidth() / 2;
-					topPos = ElementTop - this.Tooltip.outerHeight() - this.Tip.outerHeight() / 2;
+					leftPos = ElementLeft + this.Element.outerWidth() / 2 - this.Tooltip.outerWidth() /
+						2;
+					topPos = ElementTop - this.Tooltip.outerHeight() - this.Tip.outerHeight() /
+						2;
 					break;
 
 				case 'west':
-					leftPos = ElementLeft + this.Element.outerWidth() + this.Tip.outerWidth() / 2;
-					topPos = ElementTop + this.Element.outerHeight() / 2 - (this.Tooltip.outerHeight() / 2);
+					leftPos = ElementLeft + this.Element.outerWidth() + this.Tip.outerWidth() /
+						2;
+					topPos = ElementTop + this.Element.outerHeight() / 2 - (this.Tooltip.outerHeight() /
+						2);
 					break;
 
 				case 'north':
-					leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() / 2);
-					topPos = ElementTop + this.Element.outerHeight() + this.Tip.outerHeight() / 2;
+					leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
+						2);
+					topPos = ElementTop + this.Element.outerHeight() + this.Tip.outerHeight() /
+						2;
 					break;
 
 				case 'east':
-					leftPos = ElementLeft - this.Tooltip.outerWidth() - this.Tip.outerWidth() / 2;
-					topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tooltip.outerHeight() / 2;
+					leftPos = ElementLeft - this.Tooltip.outerWidth() - this.Tip.outerWidth() /
+						2;
+					topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tooltip.outerHeight() /
+						2;
 					break;
 
 				case 'center':
-					leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() / 2);
-					topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tip.outerHeight() / 2;
+					leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
+						2);
+					topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tip.outerHeight() /
+						2;
 					break;
 			}
 
@@ -835,14 +808,16 @@
 		setEvents: function () {
 			var self = this;
 
-			if (this.Options.Trigger === 'hover' || this.Options.Trigger === 'mouseover' || this.Options.Trigger === 'onmouseover') {
+			if (this.Options.Trigger === 'hover' || this.Options.Trigger ===
+				'mouseover' || this.Options.Trigger === 'onmouseover') {
 				this.Element.mouseover(function () {
 					self.setPositions();
 					self.Show();
 				}).mouseout(function () {
 					self.Hide();
 				});
-			} else if (this.Options.Trigger === 'click' || this.Options.Trigger === 'onclick') {
+			} else if (this.Options.Trigger === 'click' || this.Options.Trigger ===
+				'onclick') {
 				this.Tooltip.click(function (event) {
 					event.stopPropagation();
 				});
@@ -854,7 +829,7 @@
 					event.stopPropagation();
 				});
 
-				Y.Node('html').click(function () {
+				Y.DOM('html').click(function () {
 					self.Hide();
 				});
 			}
@@ -869,19 +844,20 @@
 		},
 
 		addConfirm: function () {
-			this.Tooltip.append('<ul class="confirm"><li class="exen-YAX-Tooltip-yes">' +
-				this.Options.Yes + '</li><li class="exen-YAX-Tooltip-no">' + this.Options.No + '</li></ul>');
+			this.Tooltip.append('<ul class="confirm"><li class="yax-tooltip-yes">' +
+				this.Options.Yes + '</li><li class="yax-tooltip-no">' + this.Options.No +
+				'</li></ul>');
 			this.setConfirmEvents();
 		},
 
 		setConfirmEvents: function () {
 			var self = this;
 
-			this.Tooltip.find('li.exen-YAX-Tooltip-yes').click(function (event) {
+			this.Tooltip.find('li.yax-tooltip-yes').click(function (event) {
 				self.onYes();
 				event.stopPropagation();
 			});
-			this.Tooltip.find('li.exen-YAX-Tooltip-no').click(function (event) {
+			this.Tooltip.find('li.yax-tooltip-no').click(function (event) {
 				self.onNo();
 				event.stopPropagation();
 			});
@@ -890,7 +866,7 @@
 		finalMessage: function () {
 			if (this.Options.FinalMessage) {
 				var self = this;
-				self.Tooltip.find('div:first').html(this.Options.FinalMessage);
+				self.Tooltip.find('yaxtooltip:first').html(this.Options.FinalMessage);
 				self.Tooltip.find('ul').remove();
 				self.setPositions();
 				setTimeout(function () {
@@ -915,7 +891,6 @@
 
 	Y.DOM.Function.Tooltip = function (options) {
 		options = Y.Extend({}, PluginOptions, options);
-		// options = Y.Extend(PluginOptions, options);
 
 		return this.each(function () {
 			return new Tooltip(Y.DOM(this), options);
@@ -927,7 +902,6 @@
 }());
 
 //---
-
 
 /**
  * YAX Node | WiatForMe Plugin
@@ -954,20 +928,20 @@
 	//---
 
 	// Default options for the Plugin
-//	Y.Settings.Node = {
-//		WaitForMe: {
-//			Opacity: 1.0,
-//			Effect: 'bounce',
-//			Content: '',
-//			// Background: 'rgba(210, 220, 230, .6)',
-//			Background: 'rgba(245, 245, 245, .75)',
-//			Color: 'rgba(10, 20, 30, .9)',
-//			Width: null,
-//			Height: null,
-//			Container: 'body',
-//			Trigger: 'WaitForMeCloseEvent'
-//		}
-//	};
+	//	Y.Settings.Node = {
+	//		WaitForMe: {
+	//			Opacity: 1.0,
+	//			Effect: 'bounce',
+	//			Content: '',
+	//			// Background: 'rgba(210, 220, 230, .6)',
+	//			Background: 'rgba(245, 245, 245, .75)',
+	//			Color: 'rgba(10, 20, 30, .9)',
+	//			Width: null,
+	//			Height: null,
+	//			Container: 'body',
+	//			Trigger: 'WaitForMeCloseEvent'
+	//		}
+	//	};
 
 	// Default options for the Plugin
 	Y.Extend(Y.Settings.DOM, {
@@ -991,7 +965,7 @@
 		this.Options = option;
 		this.CSS_Class = 'exen-YAX-WaitForMe';
 		this.Effects = null;
-		this.EffectElementCount= null;
+		this.EffectElementCount = null;
 		this.CreateSubElement = false;
 		this.SpecificAttr = 'background-color';
 		this.EffectElementHTML = '';
@@ -1009,9 +983,9 @@
 
 			this._init_();
 
-//			if (this.Content) {
-//				this.setEvents();
-//			}
+			//			if (this.Content) {
+			//				this.setEvents();
+			//			}
 
 			this.setEvents();
 		},
@@ -1041,152 +1015,155 @@
 			var x;
 
 			switch (this.Options.Effect) {
-				case 'none':
-					this.EffectElementCount = 0;
-					break;
+			case 'none':
+				this.EffectElementCount = 0;
+				break;
 
-				case 'bounce':
-					this.EffectElementCount = 3;
-					this.ContainerSize = '';
+			case 'bounce':
+				this.EffectElementCount = 3;
+				this.ContainerSize = '';
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 
-				case 'rotateplane':
-					this.EffectElementCount = 1;
-					this.ContainerSize = '';
+			case 'rotateplane':
+				this.EffectElementCount = 1;
+				this.ContainerSize = '';
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 
-				case 'stretch':
-					this.EffectElementCount = 5;
-					this.ContainerSize = '';
+			case 'stretch':
+				this.EffectElementCount = 5;
+				this.ContainerSize = '';
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 
-				case 'orbit':
-					this.EffectElementCount = 2;
+			case 'orbit':
+				this.EffectElementCount = 2;
 
-					this.ContainerSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ContainerSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					this.ElementSize = '';
+				this.ElementSize = '';
 
-					break;
+				break;
 
-				case 'roundBounce':
-					this.EffectElementCount = 12;
+			case 'roundBounce':
+				this.EffectElementCount = 12;
 
-					this.ContainerSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ContainerSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					this.ElementSize = '';
+				this.ElementSize = '';
 
-					break;
+				break;
 
-				case 'win8':
-					this.EffectElementCount = 5;
-					this.CreateSubElement = true;
+			case 'win8':
+				this.EffectElementCount = 5;
+				this.CreateSubElement = true;
 
-					// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
-					// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
 
-					this.ContainerSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ContainerSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 
-				case 'win8_linear':
-					this.EffectElementCount = 5;
-					this.CreateSubElement = true;
+			case 'win8_linear':
+				this.EffectElementCount = 5;
+				this.CreateSubElement = true;
 
-					// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
 
-					this.ContainerSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ContainerSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					this.ElementSize = '';
+				this.ElementSize = '';
 
-					break;
+				break;
 
-				case 'ios':
-					this.EffectElementCount = 12;
+			case 'ios':
+				this.EffectElementCount = 12;
 
-					// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
 
-					this.ContainerSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ContainerSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					this.ElementSize = '';
+				this.ElementSize = '';
 
-					break;
+				break;
 
-				case 'facebook':
-					this.EffectElementCount = 3;
-					this.ContainerSize = '';
+			case 'facebook':
+				this.EffectElementCount = 3;
+				this.ContainerSize = '';
 
-					// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 
-				case 'rotation':
-					this.EffectElementCount = 1;
-					this.SpecificAttr = 'border-color';
-					this.ContainerSize = '';
+			case 'rotation':
+				this.EffectElementCount = 1;
+				this.SpecificAttr = 'border-color';
+				this.ContainerSize = '';
 
-					// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
 
-					this.ElementSize = {
-						width: this.Options.Width.toString() + 'px',
-						height: this.Options.Height.toString() + 'px'
-					};
+				this.ElementSize = {
+					width: this.Options.Width.toString() + 'px',
+					height: this.Options.Height.toString() + 'px'
+				};
 
-					break;
+				break;
 			}
 
-			this.ElementSize = 'width: ' + this.ElementSize.width + '; height: ' + this.ElementSize.height;
-			this.ContainerSize = 'width: ' + this.ContainerSize.width + '; height: ' + this.ContainerSize.height;
+			this.ElementSize = 'width: ' + this.ElementSize.width + '; height: ' + this
+				.ElementSize.height;
+			this.ContainerSize = 'width: ' + this.ContainerSize.width + '; height: ' +
+				this.ContainerSize.height;
 
 			if (Y.Lang.isEmpty(this.Options.Width) && Y.Lang.isEmpty(this.Options.Height)) {
 				this.ElementSize = Y.Lang.empty();
 				this.ContainerSize = Y.Lang.empty();
 			}
 
-			this.Effects = Y.Node('<div class="' + this.CSS_Class + '-progress ' + this.Options.Effect + '"></div>');
+			this.Effects = Y.Node('<div class="' + this.CSS_Class + '-progress ' + this
+				.Options.Effect + '"></div>');
 
 			if (this.EffectElementCount > 0) {
 
@@ -1205,14 +1182,18 @@
 
 				}
 
-				this.Effects = Y.Node('<div class="' + this.CSS_Class + '-progress ' + this.Options.Effect + '" style="' + this.ContainerSize + '">' + this.EffectElementHTML + '</div>');
+				this.Effects = Y.Node('<div class="' + this.CSS_Class + '-progress ' +
+					this.Options.Effect + '" style="' + this.ContainerSize + '">' + this.EffectElementHTML +
+					'</div>');
 
-//				this.Effects = Y.Node('<div></div>').addClass(this.CSS_Class + '-progress ' + this.Options.Effect).css(this.ContainerSize);
-//				this.Effects.append(this.EffectElementHTML);
+				//				this.Effects = Y.Node('<div></div>').addClass(this.CSS_Class + '-progress ' + this.Options.Effect).css(this.ContainerSize);
+				//				this.Effects.append(this.EffectElementHTML);
 			}
 
 			if (this.Options.Content) {
-				this.Content = Y.Node('<div class="' + this.CSS_Class + '-text" style="color: ' + this.Options.Color + ';">' + this.Options.Content + '</div>');
+				this.Content = Y.Node('<div class="' + this.CSS_Class +
+					'-text" style="color: ' + this.Options.Color + ';">' + this.Options.Content +
+					'</div>');
 			}
 
 			if (this.Element.find('> .' + this.CSS_Class)) {
@@ -1236,7 +1217,8 @@
 			});
 
 			this.Element.find('.' + this.CSS_Class + '-content').css({
-				marginTop: -this.Element.find('.' + this.CSS_Class + '-content').outerHeight() / 2 + 'px'
+				marginTop: -this.Element.find('.' + this.CSS_Class + '-content').outerHeight() /
+					2 + 'px'
 			});
 		},
 
@@ -1269,7 +1251,7 @@
 			}
 
 			// Create WaitForMe container
-			this.WaitForMe = Y.Node('<div></div>').addClass(this.CSS_Class);
+			this.WaitForMe = Y.DOM('<div></div>').addClass(this.CSS_Class);
 
 			if (this.Options.Container) {
 				this.WaitForMe.prependTo(this.Options.Container);
@@ -1313,7 +1295,6 @@
 }());
 
 //---
-
 
 /**
  * YAX Plugins | Autofix
@@ -1547,13 +1528,17 @@
 				}
 			} else {
 				if (Y.Lang.isString(path)) {
-					path = path.replace(this.HashRegex.Escape, '\\$&').replace(this.HashRegex.NamedArgument, '([^\/]*)').replace(this.HashRegex.ArgumentSplat, '(.*?)');
+					path = path.replace(this.HashRegex.Escape, '\\$&').replace(this.HashRegex
+						.NamedArgument, '([^\/]*)').replace(this.HashRegex.ArgumentSplat,
+						'(.*?)');
 					temp = new RegExp('^' + path + '$');
 				}
 
 				this.Routes.push({
 					'Route': temp,
-					'Function': callback || function () {return false;}
+					'Function': callback || function () {
+						return false;
+					}
 				});
 			}
 		},
@@ -1640,7 +1625,8 @@
 		},
 
 		getHost: function () {
-			return ((document.location + Y.Lang.empty()).replace(this.getPath() + this.getHash(), ''));
+			return ((document.location + Y.Lang.empty()).replace(this.getPath() + this.getHash(),
+				''));
 		},
 
 		getFragment: function () {
@@ -1713,7 +1699,6 @@
 	}; // END OF Router CLASS
 
 	// Assign the Router class to YAX's and Window global
-	// Y.Node.Router = global.Router = Router;
 	Y.DOM.Router = Router;
 
 	//---
@@ -1721,5 +1706,4 @@
 }(this));
 
 //---
-
 

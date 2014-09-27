@@ -4,16 +4,16 @@
 	right: auto;
 	bottom: auto;
 	left: auto;
-
-	overflow:auto;
-
+	overflow: auto;
 	height: 100%;
 }
+
 .YAX-AutoFix._Fixed._Bottom {
 	position: absolute !important;
 	bottom: 0;
 }
-.exen-YAX-Tooltip {
+
+.yax-tooltip {
 	position: absolute;
 	z-index: 9999 !important;
 	top: 0;
@@ -21,19 +21,19 @@
 	display: none;
 	height: auto;
 	text-decoration: none;
-	box-shadow: 0 0 7px rgba(10, 20, 30, .3);
-	font-family: 'OpenSans', 'Tahoma';
+	box-shadow: 0 0 7px rgba(10, 20, 30, .1);
+	font-family: 'OpenSans', 'Tahoma', 'Verdana', sans, serif;
 	font-weight: lighter !important;
 }
-.exen-YAX-Tooltip.small {
+
+.yax-tooltip.small {
 	max-width: 150px;
-	padding: 4px 6px;
-
-	border-radius: 3px;
-
+	padding: 2px 5px;
+	border-radius: 2px;
 	font-size: 13px;
 }
-.exen-YAX-Tooltip.medium {
+
+.yax-tooltip.medium {
 	max-width: 200px;
 	padding: 7px;
 
@@ -41,7 +41,8 @@
 
 	font-size: 14px;
 }
-.exen-YAX-Tooltip.large {
+
+.yax-tooltip.large {
 	max-width: 250px;
 	padding: 10px;
 
@@ -51,260 +52,272 @@
 }
 
 /* Tips */
-.exen-YAX-Tooltip .tip {
+.yax-tooltip .tip {
 	position: absolute;
-
 	width: 0;
 	height: 0;
-
 	content: "";
-
 	border-style: solid;
-
-	line-height: 0px;
+	line-height: 0;
 }
-.exen-YAX-Tooltip.south .tip {
+
+.yax-tooltip.south .tip {
 	top: 100%;
 	left: 50%;
 }
-.exen-YAX-Tooltip.west .tip {
+
+.yax-tooltip.west .tip {
 	top: 50%;
 	left: 0;
 }
-.exen-YAX-Tooltip.north .tip {
+
+.yax-tooltip.north .tip {
 	top: 0;
 	left: 50%;
 }
-.exen-YAX-Tooltip.center .tip {
+
+.yax-tooltip.center .tip {
 	top: 0;
 	left: 50%;
 }
-.exen-YAX-Tooltip.east .tip {
+
+.yax-tooltip.east .tip {
 	top: 50%;
 	left: 100%;
 }
-.exen-YAX-Tooltip.south.small .tip {
+
+.yax-tooltip.south.small .tip {
 	margin-left: -6px;
 
 	border-width: 6px 6px 0 6px;
 }
-.exen-YAX-Tooltip.south.medium .tip {
+
+.yax-tooltip.south.medium .tip {
 	margin-left: -6px;
 
 	border-width: 8px 6px 0 6px;
 }
-.exen-YAX-Tooltip.south.large .tip {
-	margin-left:-12px;
+
+.yax-tooltip.south.large .tip {
+	margin-left: -12px;
 
 	border-width: 14px 12px 0 12px;
 }
-.exen-YAX-Tooltip.west.small .tip {
-	margin-top: -6px;
-	margin-left: -6px;
 
-	border-width: 6px 6px 6px 0;
+.yax-tooltip.west.small .tip {
+	margin-top: -5px;
+	margin-left: -5px;
+
+	border-width: 5px 5px 5px 0;
 }
-.exen-YAX-Tooltip.west.medium .tip {
+
+.yax-tooltip.west.medium .tip {
 	margin-top: -6px;
 	margin-left: -8px;
 
 	border-width: 6px 8px 6px 0;
 }
-.exen-YAX-Tooltip.west.large .tip {
+
+.yax-tooltip.west.large .tip {
 	margin-top: -12px;
 	margin-left: -14px;
 
 	border-width: 12px 14px 12px 0;
 }
-.exen-YAX-Tooltip.north.small .tip {
-	margin-top: -6px;
-	margin-left: -6px;
 
-	border-width: 0 6px 6px 6px;
+.yax-tooltip.north.small .tip {
+	margin-top: -5px;
+	margin-left: -5px;
+
+	border-width: 0 5px 5px 5px;
 }
-.exen-YAX-Tooltip.center.small .tip {
+
+.yax-tooltip.center.small .tip {
 	display: none;
-
 	margin-top: -6px;
 	margin-left: -6px;
-
 	border-width: 0 6px 6px 6px;
 }
-.exen-YAX-Tooltip.north.medium .tip {
-	margin-top:-5px;
-	margin-left:-6px;
 
+.yax-tooltip.north.medium .tip {
+	margin-top: -5px;
+	margin-left: -6px;
 	border-width: 0 6px 5px 6px;
 }
-.exen-YAX-Tooltip.center.medium .tip {
+
+.yax-tooltip.center.medium .tip {
 	display: none;
-
-	margin-top:-8px;
-	margin-left:-6px;
-
+	margin-top: -8px;
+	margin-left: -6px;
 	border-width: 0 6px 8px 6px;
 }
-.exen-YAX-Tooltip.north.large .tip {
-	margin-top:-10px;
-	margin-left:-12px;
 
+.yax-tooltip.north.large .tip {
+	margin-top: -10px;
+	margin-left: -12px;
 	border-width: 0 12px 10px 12px;
 }
-.exen-YAX-Tooltip.center.large .tip {
+
+.yax-tooltip.center.large .tip {
 	display: none;
-
-	margin-top:-14px;
-	margin-left:-12px;
-
+	margin-top: -14px;
+	margin-left: -12px;
 	border-width: 0 12px 14px 12px;
 }
-.exen-YAX-Tooltip.east.small .tip {
-	margin-top:-6px;
 
+.yax-tooltip.east.small .tip {
+	margin-top: -6px;
 	border-width: 6px 0 6px 6px;
 }
-.exen-YAX-Tooltip.east.medium .tip {
-	margin-top:-6px;
 
+.yax-tooltip.east.medium .tip {
+	margin-top: -6px;
 	border-width: 6px 0 6px 8px;
 }
-.exen-YAX-Tooltip.east.large .tip {
-	margin-top:-12px;
 
+.yax-tooltip.east.large .tip {
+	margin-top: -12px;
 	border-width: 12px 0 12px 14px;
 }
+
 /* confirm */
- .exen-YAX-Tooltip ul.confirm {
-	display:inline-block;
-
-	margin:0 auto;
-	margin-top:5px;
-
-	list-style-type:none;
+.yax-tooltip ul.confirm {
+	display: inline-block;
+	margin: 5px auto;
+	list-style-type: none;
 }
-.exen-YAX-Tooltip ul.confirm li {
-	float:left;
 
-	min-width:25px;
-	margin:5px;
-	padding:10px;
-
-	-webkit-border-radius:3px;
-	-moz-border-radius:3px;
-	border-radius:3px;
-
-	-o-border-radius:3px;
+.yax-tooltip ul.confirm li {
+	float: left;
+	min-width: 25px;
+	margin: 5px;
+	padding: 10px;
+	border-radius: 3px;
 }
 
 /* themes */
-.exen-YAX-Tooltip.dark {
+.yax-tooltip.dark {
 	color: rgba(255, 255, 240, .9);
 	background-color: #0A141E;
 	background-color: rgba(10, 20, 30, .9);
 }
 
-.exen-YAX-Tooltip.dark .TooltipText {
+.yax-tooltip.dark .tooltiptext {
 	color: rgba(255, 255, 240, .9);
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, .5);
 }
 
-.exen-YAX-Tooltip.light {
+.yax-tooltip.light {
 	color: rgba(10, 20, 30, .9);
 	background-color: #ebedf3;
 }
 
-.exen-YAX-Tooltip.light .TooltipText {
+.yax-tooltip.light .tooltiptext {
 	color: rgba(10, 20, 30, .9);
 	text-shadow: 0 -1px 0 rgba(255, 255, 255, .5);
 }
 
-.exen-YAX-Tooltip.dark.south .tip {
+.yax-tooltip.dark.south .tip {
 	border-color: rgba(10, 20, 30, .9) transparent transparent transparent;
 
 	_border-color: rgba(10, 20, 30, .9) #000000 #000000 #000000;
 	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
 }
-.exen-YAX-Tooltip.dark.west .tip {
+
+.yax-tooltip.dark.west .tip {
 	border-color: transparent rgba(10, 20, 30, .9) transparent transparent;
 
 	_border-color: #000000 rgba(10, 20, 30, .9) #000000 #000000;
 	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
 }
-.exen-YAX-Tooltip.dark.north .tip {
+
+.yax-tooltip.dark.north .tip {
 	border-color: transparent transparent rgba(10, 20, 30, .9) transparent;
 
 	_border-color: #000000 #000000 rgba(10, 20, 30, .9) #000000;
 	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
 }
-.exen-YAX-Tooltip.dark.center .tip {
+
+.yax-tooltip.dark.center .tip {
 	border-color: transparent transparent rgba(10, 20, 30, .9) transparent;
 
 	_border-color: #000000 #000000 rgba(10, 20, 30, .9) #000000;
 	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
 }
-.exen-YAX-Tooltip.dark.east .tip {
+
+.yax-tooltip.dark.east .tip {
 	border-color: transparent transparent transparent rgba(10, 20, 30, .9);
 
 	_border-color: #000000 #000000 #000000 rgba(10, 20, 30, .9);
 	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
 }
-.exen-YAX-Tooltip.light.south .tip {
+
+.yax-tooltip.light.south .tip {
 	border-color: #ebedf3 transparent transparent transparent;
 
 	_border-color: #ebedf3 #000000 #000000 #000000;
 	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
 }
-.exen-YAX-Tooltip.light.west .tip {
+
+.yax-tooltip.light.west .tip {
 	border-color: transparent #ebedf3 transparent transparent;
 
 	_border-color: #000000 #ebedf3 #000000 #000000;
 	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
 }
-.exen-YAX-Tooltip.light.north .tip {
+
+.yax-tooltip.light.north .tip {
 	border-color: transparent transparent #ebedf3 transparent;
 
 	_border-color: #000000 #000000 #ebedf3 #000000;
 	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
 }
-.exen-YAX-Tooltip.light.center .tip {
+
+.yax-tooltip.light.center .tip {
 	border-color: transparent transparent #ebedf3 transparent;
 
 	_border-color: #000000 #000000 #ebedf3 #000000;
 	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
 }
-.exen-YAX-Tooltip.light.east .tip {
+
+.yax-tooltip.light.east .tip {
 	border-color: transparent transparent transparent #ebedf3;
 
-	_border-color:#000000 #000000 #000000 #ebedf3;
+	_border-color: #000000 #000000 #000000 #ebedf3;
 	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
 }
-.exen-YAX-Tooltip.dark ul.confirm li {
-	background-color:#416E85;
+
+.yax-tooltip.dark ul.confirm li {
+	background-color: #416E85;
 }
-.exen-YAX-Tooltip.dark ul.confirm li:hover {
-	background-color:#417E85;
+
+.yax-tooltip.dark ul.confirm li:hover {
+	background-color: #417E85;
 }
-.exen-YAX-Tooltip.light ul.confirm li {
-	background-color:#C1DBDB;
+
+.yax-tooltip.light ul.confirm li {
+	background-color: #C1DBDB;
 }
-.exen-YAX-Tooltip.light ul.confirm li:hover {
-	background-color:#DCE8E8;
+
+.yax-tooltip.light ul.confirm li:hover {
+	background-color: #DCE8E8;
 }
 
 /* Animations */
 .animated {
-	-webkit-animation-duration:.5s;
-	-moz-animation-duration:.5s;
-	-ms-animation-duration:.5s;
-	-o-animation-duration:.5s;
-	animation-duration:.5s;
+	-webkit-animation-duration: .5s;
+	-moz-animation-duration: 5s;
+	-ms-animation-duration: .5s;
+	-o-animation-duration: .5s;
+	animation-duration: .5s;
 
-	-webkit-animation-fill-mode:both;
-	-moz-animation-fill-mode:both;
-	-ms-animation-fill-mode:both;
-	-o-animation-fill-mode:both;
-	animation-fill-mode:both;
+	-webkit-animation-fill-mode: both;
+	-moz-animation-fill-mode: both;
+	-ms-animation-fill-mode: both;
+	-o-animation-fill-mode: both;
+	animation-fill-mode: both;
 }
+
 @-webkit-keyframes flipInUp {
 	0% {
 		-webkit-transform: perspective(400px) rotateX(-90deg);
@@ -323,6 +336,7 @@
 		opacity: 1;
 	}
 }
+
 @-moz-keyframes flipInUp {
 	0% {
 		-moz-transform: perspective(400px) rotateX(-90deg);
@@ -341,6 +355,7 @@
 		opacity: 1;
 	}
 }
+
 @-o-keyframes flipInUp {
 	0% {
 		-o-transform: perspective(400px) rotateX(-90deg);
@@ -359,6 +374,7 @@
 		opacity: 1;
 	}
 }
+
 @keyframes flipInUp {
 	0% {
 		transform: perspective(400px) rotateX(-90deg);
@@ -377,6 +393,7 @@
 		opacity: 1;
 	}
 }
+
 @-webkit-keyframes flipInRight {
 	0% {
 		-webkit-transform: perspective(400px) rotateY(-90deg);
@@ -395,6 +412,7 @@
 		opacity: 1;
 	}
 }
+
 @-moz-keyframes flipInRight {
 	0% {
 		-moz-transform: perspective(400px) rotateY(-90deg);
@@ -413,6 +431,7 @@
 		opacity: 1;
 	}
 }
+
 @-o-keyframes flipInRight {
 	0% {
 		-o-transform: perspective(400px) rotateY(-90deg);
@@ -431,6 +450,7 @@
 		opacity: 1;
 	}
 }
+
 @keyframes flipInRight {
 	0% {
 		transform: perspective(400px) rotateY(-90deg);
@@ -449,24 +469,28 @@
 		opacity: 1;
 	}
 }
+
 .flipIn {
 	-webkit-backface-visibility: visible !important;
 	-moz-backface-visibility: visible !important;
 	-o-backface-visibility: visible !important;
 	backface-visibility: visible !important
 }
+
 .flipIn.south, .flipIn.north, .flipIn.center {
 	-webkit-animation-name: flipInUp;
 	-moz-animation-name: flipInUp;
 	-o-animation-name: flipInUp;
 	animation-name: flipInUp;
 }
+
 .flipIn.west, .flipIn.east, .flipIn.center {
 	-webkit-animation-name: flipInRight;
 	-moz-animation-name: flipInRight;
 	-o-animation-name: flipInRight;
 	animation-name: flipInRight;
 }
+
 @-webkit-keyframes fadeIn {
 	0% {
 		opacity: 0;
@@ -475,6 +499,7 @@
 		opacity: 1;
 	}
 }
+
 @-moz-keyframes fadeIn {
 	0% {
 		opacity: 0;
@@ -483,6 +508,7 @@
 		opacity: 1;
 	}
 }
+
 @-o-keyframes fadeIn {
 	0% {
 		opacity: 0;
@@ -491,6 +517,7 @@
 		opacity: 1;
 	}
 }
+
 @keyframes fadeIn {
 	0% {
 		opacity: 0;
@@ -499,34 +526,41 @@
 		opacity: 1;
 	}
 }
+
 .fadeIn {
 	-webkit-animation-name: fadeIn;
 	-moz-animation-name: fadeIn;
 	-o-animation-name: fadeIn;
 	animation-name: fadeIn;
 }
+
 .fade {
 	-webkit-transition: opacity 0.15s linear;
+	-moz-transition: opacity 0.15s linear;
+	-o-transition: opacity 0.15s linear;
 	transition: opacity 0.15s linear;
 
 	opacity: 0;
 }
+
 .fade.in {
 	opacity: 1;
 }
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe .exen-YAX-WaitForMe-text .TextContent {
+
+.exen-YAX-WaitForMe-container
+.exen-YAX-WaitForMe
+.exen-YAX-WaitForMe-text
+.TextContent {
 	display: inline-block;
 	width: auto;
 	height: 22px;
 	margin: 0 auto;
 	padding-right: 4px;
 	padding-left: 4px;
-
 	color: rgba(255, 255, 255, .9);
 	border-radius: 3px;
 	background: rgba(10, 20, 30, .75);
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, .5);
-
-	font-family: 'OpenSansSemibold', 'Tahoma', sans;
+	font-family: 'OpenSansSemibold', 'Tahoma', sans, serif;
 	line-height: 22px;
 }

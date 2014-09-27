@@ -49,7 +49,7 @@
 				var name;
 
 				for (name in props) {
-					if (Y.HasOwnProperty.call(props, name)) {
+					if (props.hasOwnProperty(name)) {
 						Object.defineProperty(obj, name, props[name]);
 					}
 				}
@@ -58,22 +58,27 @@
 	}
 
 	/**
-	 * createOOClass, Class builder for OOP
+	 * createClass, Class builder for OOP
 	 * implemented `new` operator checker : throw error message when not use `new`.
-	 *
+	 */
+
+	/*
 	 * @usage Y.OO.create('className', classMembers);
 	 * @param className{string} required, Named oo-class.
 	 * @param classMembers{object} required,
 	 */
 
 	/**
-	 * inherit class, overloaded createOOClass.
+	 * inherit class, overloaded createClass.
 	 * @usage Y.OO.create(className, BaseClass, classMembers);
-	 * @param className{string} required, Named oo-subclass.
-	 * @param BaseClass{function} required, superclass created with createOOClass method.
+	 */
+
+	/*
+	 * @param {string} required, Named oo-subclass.
+	 * @param BaseClass{function} required, superclass created with createClass method.
 	 * @param classMembers{string} required, oo-subclass members.
 	 */
-	function createOOClass() {
+	function createClass() {
 		var len, ooClassName, BaseClass, members, klass = null,
 			args;
 
@@ -119,11 +124,11 @@
 
 	/**
 	 * check `is-a` utility.
-	 * @param a{OOClass} subClass
-	 * @param b{OOClass} superClass
+	 * @param accessor{object} subClass
+	 * @param b{object} superClass
 	 */
-	function isA(A, b) {
-		var tmp = (Y.Lang.isFunction(a)) ? new A() : A;
+	function isAccessor(accessor, b) {
+		var tmp = (Y.Lang.isFunction(accessor)) ? new accessor() : accessor;
 
 		var result = false;
 
@@ -143,8 +148,8 @@
 
 	Y.OO = {
 		accessor: setAccessor,
-		create: createOOClass,
-		isA: isA
+		create: createClass,
+		isAccessor: isAccessor
 	};
 
 	//---

@@ -23,8 +23,9 @@ var Dependencies = {
 			'Core/Callbacks.js',
 			'Core/Deferred.js',
 			'Core/Store.js',
-			'Core/Parser.js',
-			'Core/I18N.js'
+			'Core/Parser.js'
+
+//			'Core/Locale.js'
 
  //			'Core/Console.js'
 		],
