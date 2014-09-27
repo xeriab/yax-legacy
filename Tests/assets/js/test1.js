@@ -50,6 +50,6 @@ Y.DOM(document).ready(function () {
 //	Y.LOG(Y.Lang);
 //	Y.LOG(Y.G);
 //	Y.LOG(Y.Util);
-//	Y.LOG(Y.DOM.Function);
-	Y.LOG(Y.Lang.Keys(Y));
+	Y.LOG(Y.DOM.Function);
+//	Y.LOG(Y.Lang.Keys(Y));
 });
