@@ -15,19 +15,9 @@
 /*jslint browser: true */
 /*jslint white: true */
 /*jslint node: true */
-/*global YAX */
-
-//---
-
-// Check dependence files
-//if (typeof YAX !== 'object' || !window.YAX) {
-//	throw 'ERROR: YAX is not found. Please ensure `core.js` is referenced before the `utility.js` file.';
-//}
-
-//---
+/*global YAX, Y */
 
 (function () {
-
 	'use strict';
 
 	var lastTime = 0,
@@ -35,47 +25,45 @@
 		cancelFunction;
 
 	// Inspired by http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-
 	function getPrefixed(name) {
-		return window['webkit' + name] || window['moz' + name] || window['ms' + name];
+		return Y.Window['webkit' + name] || Y.Window['moz' + name] || Y.Window['ms' + name];
 	}
 
 	// Fallback for IE 7-8
-
 	function timeoutDefer(func) {
 		var time = +new Date(),
 			timeToCall = Math.max(0, 16 - (time - lastTime));
 
 		lastTime = time + timeToCall;
 
-		return window.setTimeout(func, timeToCall);
+		return Y.Window.setTimeout(func, timeToCall);
 	}
 
-	requestFunction = window.requestAnimationFrame ||
+	requestFunction = Y.Window.requestAnimationFrame ||
 		getPrefixed('RequestAnimationFrame') ||
 		timeoutDefer;
 
 	// cancelFunction = window.cancelAnimationFrame ||
 	// cancelFunction = window.cancelRequestAnimationFrame ||
-	cancelFunction = Y.CallProperty(window, 'cancelAnimationFrame') ||
+	cancelFunction = Y.CallProperty(Y.Window, 'cancelAnimationFrame') ||
 		getPrefixed('CancelAnimationFrame') ||
 		getPrefixed('CancelRequestAnimationFrame') ||
 
 		function (id) {
-			window.clearTimeout(id);
+			Y.Window.clearTimeout(id);
 		};
 
 	Y.Utility.requestAnimationFrame = function (func, context, immediate, element) {
 		if (immediate && requestFunction === timeoutDefer) {
 			func.call(context);
 		} else {
-			return requestFunction.call(window, Y.Bind(func, context), element);
+			return requestFunction.call(Y.Window, Y.Bind(func, context), element);
 		}
 	};
 
 	Y.Utility.cancelAnimationFrame = function (id) {
 		if (id) {
-			cancelFunction.call(window, id);
+			cancelFunction.call(Y.Window, id);
 		}
 	};
 

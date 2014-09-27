@@ -35,7 +35,6 @@ var Dependencies = {
 
 	'Node': {
 		src: [
-			'Modules/UserAgentDetector.js',
 			'Modules/Utility.js',
 
 			'Modules/Node/Node.js',
@@ -46,6 +45,8 @@ var Dependencies = {
 			'Modules/Node/Fx.js',
 			'Modules/Node/FxMethods.js',
 			'Modules/Node/Form.js',
+
+			'Modules/UserAgentDetector.js',
 
 			'Modules/Node/Extra.js',
 
@@ -63,7 +64,6 @@ var Dependencies = {
 
 	'Node Full': {
 		src: [
-			'Modules/UserAgentDetector.js',
 			'Modules/Utility.js',
 
 			'Modules/Node/Node.js',
@@ -74,6 +74,8 @@ var Dependencies = {
 			'Modules/Node/Fx.js',
 			'Modules/Node/FxMethods.js',
 			'Modules/Node/Form.js',
+
+			'Modules/UserAgentDetector.js',
 
 			// These file are not part of Node but you can
 			// add them to empower YAX.Node with some useful stuff :)
