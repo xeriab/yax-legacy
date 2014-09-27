@@ -33,7 +33,7 @@ var Dependencies = {
 		extended_desc: ''
 	},
 
-	Node: {
+	'Node': {
 		src: [
 			'Modules/UserAgentDetector.js',
 			'Modules/Utility.js',

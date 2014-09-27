@@ -63,9 +63,8 @@
 
 	//---
 
-	if (Y.G.isNode) {
-		// Cross-browser XML parsing
-
+	// Cross-browser XML parsing
+	if (!Y.G.isNodeJs) {
 		Y.Extend(Y.Lang, {
 			parseXML: function (data) {
 				if (!data || !Y.Lang.isString(data)) {

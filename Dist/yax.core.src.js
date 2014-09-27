@@ -1,11 +1,7 @@
 /**
  * YAX.JS 0.19-dev, Yet another extensible Javascript Library.
  * (C) 2013-2014 Xeriab Nabil
- */
-
-(function (global) {
-
-/*jslint indent: 4 */
+ *//*jslint indent: 4 */
 /*jslint white: true */
 /*jshint eqeqeq: false */
 /*jshint strict: false */
@@ -130,18 +126,17 @@
 /*global exports, define, module */
 
 (function () {
-	/*jshint globalstrict: false */
-	var Y = Object.create({});
+	// 'use strict';
 
-	// var Y;
+	var Y = Object.create({});
 
 	var isNode = false;
 
 	// Establish the root object, `window` in the browser, or `exports` on the server.
 	var root = this;
 
-	// Save the previous value of the `Y` variable.
-	var previousYax = root.Y || null;
+	// Save the previous value of the `Y` or `YAX` variable.
+	var previousYax = root.Y || root.YAX || null;
 
 	// Save bytes in the minified (but not gzipped) version:
 	var ArrayProto = Array.prototype;
@@ -212,16 +207,16 @@
 	//---
 
 	if (isNode) {
+		isNode = true;
+
 		Y.ENV = Object.create(null);
-
 		Y.ENV.Type = 'Nodejs';
-
-//		Y.G.isNode = isNode;
 
 		Console.info('[INFO] Running YAX.JS in "Node" Environment!');
 	} else {
-		Y.ENV = Object.create(null);
+		isNode = false;
 
+		Y.ENV = Object.create(null);
 		Y.ENV.Type = 'Browser';
 
 		Y.Window = this;
@@ -308,7 +303,7 @@
 
 	//---
 
-	// Y.G.isNode = isNode;
+	Y.G.isNodeJs = isNode;
 	Y.G.Push = Push;
 	Y.G.Slice = Slice;
 	Y.G.Concat = Concat;
@@ -328,9 +323,7 @@
 
 	//---
 
-
-
-	//---
+	/** @namespace define.amd */
 
 	// AMD registration happens at the end for compatibility with AMD loaders
 	// that may not enforce next-turn semantics on modules. Even though general
@@ -1915,9 +1908,8 @@
 
 	//---
 
-	if (Y.G.isNode) {
-		// Cross-browser XML parsing
-
+	// Cross-browser XML parsing
+	if (!Y.G.isNodeJs) {
 		Y.Extend(Y.Lang, {
 			parseXML: function (data) {
 				if (!data || !Y.Lang.isString(data)) {
@@ -2069,15 +2061,14 @@
 
 		// Bind a function to be called with a given context
 		Bind: function (func, object) {
-			var Slice = Array.prototype.slice,
-				args = Slice.call(arguments, 2);
+			var args = Y.G.Slice.call(arguments, 2);
 
 			if (func.bind) {
-				return func.bind.apply(func, Slice.call(arguments, 1));
+				return func.bind.apply(func, Y.G.Slice.call(arguments, 1));
 			}
 
 			return function () {
-				return func.apply(object, args.length ? args.concat(Slice.call(arguments)) : arguments);
+				return func.apply(object, args.length ? args.concat(Y.G.Slice.call(arguments)) : arguments);
 			};
 		},
 
@@ -2122,10 +2113,12 @@
 
 		/**
 		 * Do nothing (used as a Noop throughout the code)
-		 * @returns {null}
+		 * @returns {object}
 		 * @constructor
 		 */
-		Noop: function () {},
+		Noop: function () {
+			//...
+		},
 
 		// Trim whitespace from both sides of a string
 		Trim: function (str) {
@@ -2214,10 +2207,6 @@
 			Y.Utility.Serialise(params, object, traditional);
 
 			return params.join('&').replace(/%20/g, '+');
-		},
-
-		toString: function () {
-			return '[YAX Utility]';
 		}
 	}; // END OF Y.Utility OBJECT
 
@@ -2237,12 +2226,6 @@
 	Y.Lang.strReplace = Y.Utility.stringReplace;
 	Y.Lang.throttle = Y.Utility.Throttle;
 	Y.Lang.parameters = Y.Utility.Parameters;
-
-	//---
-
-	Y.Utility.toString = function () {
-		return '[YAX Utility]';
-	};
 
 	//---
 
@@ -3563,7 +3546,3 @@
 //---
 
 
-
-}(this));
-
-// END

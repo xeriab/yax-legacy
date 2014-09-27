@@ -30,7 +30,6 @@
 
 		construct: function () {
 			this.reset();
-
 			this._ = this.Translate;
 		},
 
@@ -308,8 +307,10 @@
 				_ref1 = c.matches;
 
 				for (key in _ref1) {
-					value = _ref1[key];
-					equal = equal && value === context[key];
+					if (_ref1.hasOwnProperty(key)) {
+						value = _ref1[key];
+						equal = equal && value === context[key];
+					}
 				}
 
 				if (equal) {
@@ -345,7 +346,8 @@
 
 	//---
 
-	Y.Locale = new Y.Locale();
+
+	Y.I18N = new Y.Locale();
 
 	// delete Y.Locale;
 

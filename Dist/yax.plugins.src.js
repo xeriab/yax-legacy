@@ -1,11 +1,7 @@
 /**
  * YAX.JS 0.19-dev, Yet another extensible Javascript Library.
  * (C) 2013-2014 Xeriab Nabil
- */
-
-(function (global) {
-
-/**
+ *//**
  * Y Plugins | LocalStorage
  *
  * Cross browser LocalStorage implementation using Y's API [CORE, Node]
@@ -1714,7 +1710,3 @@
 
 //---
 
-
-}(this));
-
-// END

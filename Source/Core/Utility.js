@@ -63,15 +63,14 @@
 
 		// Bind a function to be called with a given context
 		Bind: function (func, object) {
-			var Slice = Array.prototype.slice,
-				args = Slice.call(arguments, 2);
+			var args = Y.G.Slice.call(arguments, 2);
 
 			if (func.bind) {
-				return func.bind.apply(func, Slice.call(arguments, 1));
+				return func.bind.apply(func, Y.G.Slice.call(arguments, 1));
 			}
 
 			return function () {
-				return func.apply(object, args.length ? args.concat(Slice.call(arguments)) : arguments);
+				return func.apply(object, args.length ? args.concat(Y.G.Slice.call(arguments)) : arguments);
 			};
 		},
 
@@ -116,10 +115,12 @@
 
 		/**
 		 * Do nothing (used as a Noop throughout the code)
-		 * @returns {null}
+		 * @returns {object}
 		 * @constructor
 		 */
-		Noop: function () {},
+		Noop: function () {
+			//...
+		},
 
 		// Trim whitespace from both sides of a string
 		Trim: function (str) {
@@ -208,10 +209,6 @@
 			Y.Utility.Serialise(params, object, traditional);
 
 			return params.join('&').replace(/%20/g, '+');
-		},
-
-		toString: function () {
-			return '[YAX Utility]';
 		}
 	}; // END OF Y.Utility OBJECT
 
@@ -231,12 +228,6 @@
 	Y.Lang.strReplace = Y.Utility.stringReplace;
 	Y.Lang.throttle = Y.Utility.Throttle;
 	Y.Lang.parameters = Y.Utility.Parameters;
-
-	//---
-
-	Y.Utility.toString = function () {
-		return '[YAX Utility]';
-	};
 
 	//---
 

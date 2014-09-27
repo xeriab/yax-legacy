@@ -13,9 +13,9 @@ Y.DOM(document).ready(function () {
 	TestOneImage.width(115);
 
 	TestOneImage.css({
-		marginTop: -9,
-		marginLeft: -9,
-		maxWidth: 100
+		marginTop: -13
+//		marginLeft: -9,
+//		maxWidth: 100
 	});
 
 //	ButtonOne.button();
@@ -46,10 +46,10 @@ Y.DOM(document).ready(function () {
 //	Y.setConfig('Is.Mohamed.Mega.Man', 'Hell, YES!!');
 
 	Y.LOG('');
-//	Y.LOG(Y);
+	Y.LOG(Y);
 //	Y.LOG(Y.Lang);
 //	Y.LOG(Y.G);
 //	Y.LOG(Y.Util);
-	Y.LOG(Y.DOM.Function);
+//	Y.LOG(Y.DOM.Function);
 //	Y.LOG(Y.Lang.Keys(Y));
 });
