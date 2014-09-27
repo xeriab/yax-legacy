@@ -30,7 +30,7 @@ desc('Check YAX source for errors with JSHint');
 
 task('lint', {
 	async: true
-}, hint('Checking for JS errors...', 'Build/HintResource.js src'));
+}, hint('Checking for JS errors...', 'Build/hint_resource.js Source'));
 
 desc('Combine and compress YAX source files');
 

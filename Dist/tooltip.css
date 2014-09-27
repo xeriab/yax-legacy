@@ -1,18 +1,3 @@
-.YAX-AutoFix._Fixed {
-	position: fixed !important;
-	top: auto;
-	right: auto;
-	bottom: auto;
-	left: auto;
-	overflow: auto;
-	height: 100%;
-}
-
-.YAX-AutoFix._Fixed._Bottom {
-	position: absolute !important;
-	bottom: 0;
-}
-
 .yax-tooltip {
 	position: absolute;
 	z-index: 9999 !important;
@@ -532,35 +517,4 @@
 	-moz-animation-name: fadeIn;
 	-o-animation-name: fadeIn;
 	animation-name: fadeIn;
-}
-
-.fade {
-	-webkit-transition: opacity 0.15s linear;
-	-moz-transition: opacity 0.15s linear;
-	-o-transition: opacity 0.15s linear;
-	transition: opacity 0.15s linear;
-
-	opacity: 0;
-}
-
-.fade.in {
-	opacity: 1;
-}
-
-.exen-YAX-WaitForMe-container
-.exen-YAX-WaitForMe
-.exen-YAX-WaitForMe-text
-.TextContent {
-	display: inline-block;
-	width: auto;
-	height: 22px;
-	margin: 0 auto;
-	padding-right: 4px;
-	padding-left: 4px;
-	color: rgba(255, 255, 255, .9);
-	border-radius: 3px;
-	background: rgba(10, 20, 30, .75);
-	text-shadow: 0 -1px 0 rgba(0, 0, 0, .5);
-	font-family: 'OpenSansSemibold', 'Tahoma', sans, serif;
-	line-height: 22px;
 }

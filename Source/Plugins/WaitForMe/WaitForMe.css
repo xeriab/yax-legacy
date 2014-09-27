@@ -1,14 +1,14 @@
-.exen-YAX-WaitForMe-container {
+.yax-waitforme-container {
 	position: relative
 }
 
-body.exen-YAX-WaitForMe-container {
+body.yax-waitforme-container {
 	position: absolute;
 	width: 100%;
 	height: 100%
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe {
+.yax-waitforme-container .yax-waitforme {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -18,7 +18,7 @@ body.exen-YAX-WaitForMe-container {
 	text-align: center
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe * {
+.yax-waitforme-container .yax-waitforme * {
 	font-family: sans-serif;
 	font-size: 14px;
 	font-weight: initial;
@@ -30,29 +30,29 @@ body.exen-YAX-WaitForMe-container {
 	margin: initial
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe .exen-YAX-WaitForMe-content {
+.yax-waitforme-container .yax-waitforme .yax-waitforme-content {
 	position: absolute;
 	width: 100%;
 	top: 50%
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe .exen-YAX-WaitForMe-progress {
+.yax-waitforme-container .yax-waitforme .yax-waitforme-progress {
 	position: relative
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe .exen-YAX-WaitForMe-progress > div {
+.yax-waitforme-container .yax-waitforme .yax-waitforme-progress > div {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 	display: inline-block
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe .exen-YAX-WaitForMe-text {
+.yax-waitforme-container .yax-waitforme .yax-waitforme-text {
 	position: relative;
 	margin: 20px 0 0;
 }
 
 /* bounce */
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.bounce > div {
+.yax-waitforme-container .yax-waitforme-progress.bounce > div {
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
@@ -60,12 +60,12 @@ body.exen-YAX-WaitForMe-container {
 	animation: bounce 1.4s infinite ease-in-out;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.bounce .exen-YAX-WaitForMe-progress-element1 {
+.yax-waitforme-container .yax-waitforme-progress.bounce .yax-waitforme-progress-element1 {
 	-webkit-animation-delay: -0.32s;
 	animation-delay: -0.32s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.bounce .exen-YAX-WaitForMe-progress-element2 {
+.yax-waitforme-container .yax-waitforme-progress.bounce .yax-waitforme-progress-element2 {
 	-webkit-animation-delay: -0.16s;
 	animation-delay: -0.16s;
 }
@@ -89,7 +89,7 @@ body.exen-YAX-WaitForMe-container {
 }
 
 /* rotateplane */
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.rotateplane > div {
+.yax-waitforme-container .yax-waitforme-progress.rotateplane > div {
 	width: 30px;
 	height: 30px;
 	-webkit-animation: rotateplane 1.2s infinite ease-in-out;
@@ -121,7 +121,7 @@ body.exen-YAX-WaitForMe-container {
 }
 
 /* stretch */
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.stretch > div {
+.yax-waitforme-container .yax-waitforme-progress.stretch > div {
 	width: 8px;
 	height: 60px;
 	margin: 1px;
@@ -129,22 +129,22 @@ body.exen-YAX-WaitForMe-container {
 	animation: stretch 1.2s infinite ease-in-out;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.stretch .exen-YAX-WaitForMe-progress-element2 {
+.yax-waitforme-container .yax-waitforme-progress.stretch .yax-waitforme-progress-element2 {
 	-webkit-animation-delay: -1.1s;
 	animation-delay: -1.1s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.stretch .exen-YAX-WaitForMe-progress-element3 {
+.yax-waitforme-container .yax-waitforme-progress.stretch .yax-waitforme-progress-element3 {
 	-webkit-animation-delay: -1.0s;
 	animation-delay: -1.0s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.stretch .exen-YAX-WaitForMe-progress-element4 {
+.yax-waitforme-container .yax-waitforme-progress.stretch .yax-waitforme-progress-element4 {
 	-webkit-animation-delay: -0.9s;
 	animation-delay: -0.9s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.stretch .exen-YAX-WaitForMe-progress-element5 {
+.yax-waitforme-container .yax-waitforme-progress.stretch .yax-waitforme-progress-element5 {
 	-webkit-animation-delay: -0.8s;
 	animation-delay: -0.8s;
 }
@@ -168,7 +168,7 @@ body.exen-YAX-WaitForMe-container {
 }
 
 /* orbit */
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.orbit {
+.yax-waitforme-container .yax-waitforme-progress.orbit {
 	width: 40px;
 	height: 40px;
 	margin: auto;
@@ -176,7 +176,7 @@ body.exen-YAX-WaitForMe-container {
 	animation: orbit_rotate 2.0s infinite linear;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.orbit > div {
+.yax-waitforme-container .yax-waitforme-progress.orbit > div {
 	width: 50%;
 	height: 50%;
 	border-radius: 50%;
@@ -186,7 +186,7 @@ body.exen-YAX-WaitForMe-container {
 	animation: orbit 2.0s infinite ease-in-out;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.orbit .exen-YAX-WaitForMe-progress-element2 {
+.yax-waitforme-container .yax-waitforme-progress.orbit .yax-waitforme-progress-element2 {
 	top: auto;
 	bottom: 0;
 	-webkit-animation-delay: -1.0s;
@@ -224,13 +224,13 @@ body.exen-YAX-WaitForMe-container {
 }
 
 /* roundBounce */
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce {
 	width: 60px;
 	height: 60px;
 	margin: auto
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce > div {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce > div {
 	width: 20%;
 	height: 20%;
 	border-radius: 50%;
@@ -239,125 +239,125 @@ body.exen-YAX-WaitForMe-container {
 	animation: roundBounce 1.2s infinite ease-in-out;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element1 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element1 {
 	top: 0;
 	left: 0
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element2 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element2 {
 	top: 0;
 	right: 0
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element3 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element3 {
 	bottom: 0;
 	right: 0
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element4 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element4 {
 	bottom: 0;
 	left: 0
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element5 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element5 {
 	top: -9%;
 	left: 50%;
 	margin-top: -10%;
 	margin-left: -10%
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element6 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element6 {
 	top: 50%;
 	right: -9%;
 	margin-top: -10%;
 	margin-right: -10%
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element7 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element7 {
 	bottom: -9%;
 	left: 50%;
 	margin-bottom: -10%;
 	margin-left: -10%
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element8 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element8 {
 	top: 50%;
 	left: -9%;
 	margin-top: -10%;
 	margin-left: -10%
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element9 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element9 {
 	top: 0;
 	right: 0
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element10 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element10 {
 	bottom: 0;
 	right: 0
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element11 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element11 {
 	bottom: 0;
 	left: 0
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element12 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element12 {
 	top: 0;
 	left: 0
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element5 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element5 {
 	-webkit-animation-delay: -1.1s;
 	animation-delay: -1.1s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element9 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element9 {
 	-webkit-animation-delay: -1.0s;
 	animation-delay: -1.0s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element2 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element2 {
 	-webkit-animation-delay: -0.9s;
 	animation-delay: -0.9s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element6 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element6 {
 	-webkit-animation-delay: -0.8s;
 	animation-delay: -0.8s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element10 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element10 {
 	-webkit-animation-delay: -0.7s;
 	animation-delay: -0.7s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element3 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element3 {
 	-webkit-animation-delay: -0.6s;
 	animation-delay: -0.6s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element7 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element7 {
 	-webkit-animation-delay: -0.5s;
 	animation-delay: -0.5s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element11 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element11 {
 	-webkit-animation-delay: -0.4s;
 	animation-delay: -0.4s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element4 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element4 {
 	-webkit-animation-delay: -0.3s;
 	animation-delay: -0.3s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element8 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element8 {
 	-webkit-animation-delay: -0.2s;
 	animation-delay: -0.2s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.roundBounce .exen-YAX-WaitForMe-progress-element12 {
+.yax-waitforme-container .yax-waitforme-progress.roundBounce .yax-waitforme-progress-element12 {
 	-webkit-animation-delay: -0.1s;
 	animation-delay: -0.1s;
 }
@@ -381,12 +381,12 @@ body.exen-YAX-WaitForMe-container {
 }
 
 /* win8 */
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8 {
+.yax-waitforme-container .yax-waitforme-progress.win8 {
 	height: 40px;
 	margin: auto
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8 > div {
+.yax-waitforme-container .yax-waitforme-progress.win8 > div {
 	width: 40px;
 	height: 40px;
 	opacity: 0;
@@ -400,7 +400,7 @@ body.exen-YAX-WaitForMe-container {
 	animation: win8 5.5s infinite;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8 > div > div {
+.yax-waitforme-container .yax-waitforme-progress.win8 > div > div {
 	width: 15%;
 	height: 15%;
 	border-radius: 50%;
@@ -408,22 +408,22 @@ body.exen-YAX-WaitForMe-container {
 	margin: -12.5%
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8 .exen-YAX-WaitForMe-progress-element2 {
+.yax-waitforme-container .yax-waitforme-progress.win8 .yax-waitforme-progress-element2 {
 	-webkit-animation-delay: 0.24s;
 	animation-delay: 0.24s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8 .exen-YAX-WaitForMe-progress-element3 {
+.yax-waitforme-container .yax-waitforme-progress.win8 .yax-waitforme-progress-element3 {
 	-webkit-animation-delay: 0.48s;
 	animation-delay: 0.48s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8 .exen-YAX-WaitForMe-progress-element4 {
+.yax-waitforme-container .yax-waitforme-progress.win8 .yax-waitforme-progress-element4 {
 	-webkit-animation-delay: 0.72s;
 	animation-delay: 0.72s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8 .exen-YAX-WaitForMe-progress-element5 {
+.yax-waitforme-container .yax-waitforme-progress.win8 .yax-waitforme-progress-element5 {
 	-webkit-animation-delay: 0.96s;
 	animation-delay: 0.96s;
 }
@@ -503,13 +503,13 @@ body.exen-YAX-WaitForMe-container {
 }
 
 /* win8_linear */
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8_linear {
+.yax-waitforme-container .yax-waitforme-progress.win8_linear {
 	margin: auto;
 	width: 150px;
 	height: 6px
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8_linear > div {
+.yax-waitforme-container .yax-waitforme-progress.win8_linear > div {
 	width: 100%;
 	height: 100%;
 	left: 0;
@@ -519,28 +519,28 @@ body.exen-YAX-WaitForMe-container {
 	animation: win8_linear 3s infinite;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8_linear > div > div {
+.yax-waitforme-container .yax-waitforme-progress.win8_linear > div > div {
 	width: 4%;
 	height: 100%;
 	border-radius: 50%
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8_linear .exen-YAX-WaitForMe-progress-element2 {
+.yax-waitforme-container .yax-waitforme-progress.win8_linear .yax-waitforme-progress-element2 {
 	-webkit-animation-delay: 0.3s;
 	animation-delay: 0.3s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8_linear .exen-YAX-WaitForMe-progress-element3 {
+.yax-waitforme-container .yax-waitforme-progress.win8_linear .yax-waitforme-progress-element3 {
 	-webkit-animation-delay: 0.6s;
 	animation-delay: 0.6s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8_linear .exen-YAX-WaitForMe-progress-element4 {
+.yax-waitforme-container .yax-waitforme-progress.win8_linear .yax-waitforme-progress-element4 {
 	-webkit-animation-delay: 0.9s;
 	animation-delay: 0.9s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.win8_linear .exen-YAX-WaitForMe-progress-element5 {
+.yax-waitforme-container .yax-waitforme-progress.win8_linear .yax-waitforme-progress-element5 {
 	-webkit-animation-delay: 1.2s;
 	animation-delay: 1.2s;
 }
@@ -588,13 +588,13 @@ body.exen-YAX-WaitForMe-container {
 }
 
 /* ios */
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios {
+.yax-waitforme-container .yax-waitforme-progress.ios {
 	margin: auto;
 	width: 40px;
 	height: 40px
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios > div {
+.yax-waitforme-container .yax-waitforme-progress.ios > div {
 	width: 10%;
 	height: 26%;
 	position: absolute;
@@ -607,84 +607,84 @@ body.exen-YAX-WaitForMe-container {
 	animation: ios 1s linear infinite;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element1 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element1 {
 	-webkit-transform: rotate(0deg) translate(0, -142%);
 	-webkit-animation-delay: 0s;
 	transform: rotate(0deg) translate(0, -142%);
 	animation-delay: 0s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element2 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element2 {
 	-webkit-transform: rotate(30deg) translate(0, -142%);
 	-webkit-animation-delay: -0.9167s;
 	transform: rotate(30deg) translate(0, -142%);
 	animation-delay: -0.9167s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element3 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element3 {
 	-webkit-transform: rotate(60deg) translate(0, -142%);
 	-webkit-animation-delay: -0.833s;
 	transform: rotate(60deg) translate(0, -142%);
 	animation-delay: -0.833s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element4 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element4 {
 	-webkit-transform: rotate(90deg) translate(0, -142%);
 	-webkit-animation-delay: -0.75s;
 	transform: rotate(90deg) translate(0, -142%);
 	animation-delay: -0.75s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element5 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element5 {
 	-webkit-transform: rotate(120deg) translate(0, -142%);
 	-webkit-animation-delay: -0.667s;
 	transform: rotate(120deg) translate(0, -142%);
 	animation-delay: -0.667s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element6 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element6 {
 	-webkit-transform: rotate(150deg) translate(0, -142%);
 	-webkit-animation-delay: -0.5833s;
 	transform: rotate(150deg) translate(0, -142%);
 	animation-delay: -0.5833s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element7 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element7 {
 	-webkit-transform: rotate(180deg) translate(0, -142%);
 	-webkit-animation-delay: -0.5s;
 	transform: rotate(180deg) translate(0, -142%);
 	animation-delay: -0.5s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element8 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element8 {
 	-webkit-transform: rotate(210deg) translate(0, -142%);
 	-webkit-animation-delay: -0.41667s;
 	transform: rotate(210deg) translate(0, -142%);
 	animation-delay: -0.41667s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element9 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element9 {
 	-webkit-transform: rotate(240deg) translate(0, -142%);
 	-webkit-animation-delay: -0.333s;
 	transform: rotate(240deg) translate(0, -142%);
 	animation-delay: -0.333s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element10 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element10 {
 	-webkit-transform: rotate(270deg) translate(0, -142%);
 	-webkit-animation-delay: -0.25s;
 	transform: rotate(270deg) translate(0, -142%);
 	animation-delay: -0.25s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element11 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element11 {
 	-webkit-transform: rotate(300deg) translate(0, -142%);
 	-webkit-animation-delay: -0.1667s;
 	transform: rotate(300deg) translate(0, -142%);
 	animation-delay: -0.1667s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.ios .exen-YAX-WaitForMe-progress-element12 {
+.yax-waitforme-container .yax-waitforme-progress.ios .yax-waitforme-progress-element12 {
 	-webkit-transform: rotate(330deg) translate(0, -142%);
 	-webkit-animation-delay: -0.0833s;
 	transform: rotate(330deg) translate(0, -142%);
@@ -710,11 +710,11 @@ body.exen-YAX-WaitForMe-container {
 }
 
 /* facebook */
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.facebook {
+.yax-waitforme-container .yax-waitforme-progress.facebook {
 	margin: auto
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.facebook > div {
+.yax-waitforme-container .yax-waitforme-progress.facebook > div {
 	width: 6px;
 	height: 25px;
 	margin-left: 3px;
@@ -725,17 +725,17 @@ body.exen-YAX-WaitForMe-container {
 	transform: scale(0.7);
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.facebook > .exen-YAX-WaitForMe-progress-element1 {
+.yax-waitforme-container .yax-waitforme-progress.facebook > .yax-waitforme-progress-element1 {
 	-webkit-animation-delay: 0.39s;
 	animation-delay: 0.39s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.facebook > .exen-YAX-WaitForMe-progress-element2 {
+.yax-waitforme-container .yax-waitforme-progress.facebook > .yax-waitforme-progress-element2 {
 	-webkit-animation-delay: 0.52s;
 	animation-delay: 0.52s;
 }
 
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.facebook > .exen-YAX-WaitForMe-progress-element3 {
+.yax-waitforme-container .yax-waitforme-progress.facebook > .yax-waitforme-progress-element3 {
 	-webkit-animation-delay: 0.65s;
 	animation-delay: 0.65s;
 }
@@ -763,7 +763,7 @@ body.exen-YAX-WaitForMe-container {
 }
 
 /* rotation */
-.exen-YAX-WaitForMe-container .exen-YAX-WaitForMe-progress.rotation > div {
+.yax-waitforme-container .yax-waitforme-progress.rotation > div {
 	width: 60px;
 	height: 60px;
 	margin: auto;
@@ -793,4 +793,22 @@ body.exen-YAX-WaitForMe-container {
 	100% {
 		transform: rotate(360deg);
 	}
+}
+
+.yax-waitforme-container
+.yax-waitforme
+.yax-waitforme-text
+.TextContent {
+	display: inline-block;
+	width: auto;
+	height: 22px;
+	margin: 0 auto;
+	padding-right: 4px;
+	padding-left: 4px;
+	color: rgba(255, 255, 255, .9);
+	border-radius: 3px;
+	background: rgba(10, 20, 30, .75);
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, .5);
+	font-family: 'OpenSans', 'Tahoma', sans, serif;
+	line-height: 22px;
 }

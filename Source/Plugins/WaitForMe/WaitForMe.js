@@ -49,7 +49,7 @@
 			Width: 0,
 			Height: 0,
 			Container: 'body',
-			Trigger: 'WaitForMeCloseEvent'
+			Trigger: 'yax.waitformeclose'
 		}
 	});
 
@@ -58,7 +58,7 @@
 	function WaitForMe(element, option) {
 		this.Element = element;
 		this.Options = option;
-		this.CSS_Class = 'exen-YAX-WaitForMe';
+		this.CSS_Class = 'yax-waitforme';
 		this.Effects = null;
 		this.EffectElementCount = null;
 		this.CreateSubElement = false;
@@ -89,7 +89,7 @@
 			// Y.Node(this.Element).css('cursor', 'none');
 
 			// Close all other WaitForMe
-			Y.Node('div.exen-YAX-WaitForMe').hide();
+			Y.Node('div.yax-waitforme').hide();
 			this.WaitForMe.css('display', 'block');
 		},
 
@@ -365,12 +365,12 @@
 		setEvents: function () {
 			var self = this;
 
-			if (this.Options.Trigger === 'WaitForMeCloseEvent') {
-				this.WaitForMe.on('WaitForMeCloseEvent', function () {
+			if (this.Options.Trigger === 'yax.waitformeclose') {
+				this.WaitForMe.on('yax.waitformeclose', function () {
 					self.Close();
 				});
 
-				this.Element.on('WaitForMeCloseEvent', function () {
+				this.Element.on('yax.waitformeclose', function () {
 					self.Close();
 				});
 			}
