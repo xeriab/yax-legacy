@@ -120,9 +120,9 @@ var Dependencies = {
 			'Plugins/LocalStorage.js',
 			'Plugins/Cookies.js',
 			'Plugins/CSV.js',
-			'Plugins/Tooltip.js',
+			'Plugins/Tooltip/Tooltip.js',
 			'Plugins/WaitForMe/WaitForMe.js',
-			'Plugins/AutoFix.js',
+			'Plugins/AutoFix/AutoFix.js',
 			'Plugins/Router.js'
 		],
 

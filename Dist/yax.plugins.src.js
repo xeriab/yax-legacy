@@ -957,7 +957,7 @@
 			Width: 0,
 			Height: 0,
 			Container: 'body',
-			Trigger: 'WaitForMeCloseEvent'
+			Trigger: 'yax.waitformeclose'
 		}
 	});
 
@@ -966,7 +966,7 @@
 	function WaitForMe(element, option) {
 		this.Element = element;
 		this.Options = option;
-		this.CSS_Class = 'exen-YAX-WaitForMe';
+		this.CSS_Class = 'yax-waitforme';
 		this.Effects = null;
 		this.EffectElementCount = null;
 		this.CreateSubElement = false;
@@ -997,7 +997,7 @@
 			// Y.Node(this.Element).css('cursor', 'none');
 
 			// Close all other WaitForMe
-			Y.Node('div.exen-YAX-WaitForMe').hide();
+			Y.Node('div.yax-waitforme').hide();
 			this.WaitForMe.css('display', 'block');
 		},
 
@@ -1273,12 +1273,12 @@
 		setEvents: function () {
 			var self = this;
 
-			if (this.Options.Trigger === 'WaitForMeCloseEvent') {
-				this.WaitForMe.on('WaitForMeCloseEvent', function () {
+			if (this.Options.Trigger === 'yax.waitformeclose') {
+				this.WaitForMe.on('yax.waitformeclose', function () {
 					self.Close();
 				});
 
-				this.Element.on('WaitForMeCloseEvent', function () {
+				this.Element.on('yax.waitformeclose', function () {
 					self.Close();
 				});
 			}
@@ -1324,33 +1324,34 @@
 
 	'use strict';
 
-	// Plugin information
+	Y.Extend(Y.Settings.DOM, {
+		AutoFix: {
+			CustomOffset: true,
+			Manual: true,
+			OnlyInContainer: true
+		}
+	});
 
-	// Default options for the Plugin
-	var defaults = {
-		customOffset: true,
-		manual: true,
-		onlyInContainer: true
-	};
+	var PluginOptions = Y.Settings.DOM.AutoFix;
 
 	Y.DOM.Function.AutoFix = function (options) {
-		var settings = Y.Extend(defaults, options, {}),
+		var settings = Y.Extend(PluginOptions, options, {}),
 			el = Y.DOM(this),
 			curpos = el.position(),
-			offset = settings.customOffset,
+			offset = settings.CustomOffset,
 			pos = el.offset(),
 			fixAll;
 
-		el.addClass('YAX-AutoFix');
+		el.addClass('yax-autofix');
 
 		Y.DOM.Function.ManualFix = function () {
 			el = Y.DOM(this);
 			pos = el.offset();
 
-			if (el.hasClass('_Fixed')) {
-				el.removeClass('_Fixed');
+			if (el.hasClass('_fixed')) {
+				el.removeClass('_fixed');
 			} else {
-				el.addClass('_Fixed').css({
+				el.addClass('_fixed').css({
 					top: 0,
 					left: pos.left,
 					right: 'auto',
@@ -1364,33 +1365,35 @@
 				offset = el.parent().offset().top;
 			}
 
-			if (Y.DOM(document).scrollTop() > offset && Y.DOM(document).scrollTop() <= (el.parent().height() + (offset - Y.DOM(window).height()))) {
-				el.removeClass('_Bottom').addClass('_Fixed').css({
+			if (Y.DOM(Y.Document).scrollTop() > offset &&
+				Y.DOM(Y.Document).scrollTop() <= (el.parent().height() +
+				(offset - Y.DOM(Y.Window).height()))) {
+				el.removeClass('_bottom').addClass('_fixed').css({
 					top: 0,
 					left: pos.left,
 					right: 'auto',
 					bottom: 'auto'
 				});
 			} else {
-				if (Y.DOM(document).scrollTop() > offset) {
-					if (settings.onlyInContainer === true) {
-						if (Y.DOM(document).scrollTop() > (el.parent().height() - Y.DOM(window).height())) {
-							el.addClass('_Bottom _Fixed').removeAttr('style').css({
+				if (Y.DOM(Y.Document).scrollTop() > offset) {
+					if (settings.OnlyInContainer === true) {
+						if (Y.DOM(Y.Document).scrollTop() > (el.parent().height() - Y.DOM(Y.Window).height())) {
+							el.addClass('_bottom _fixed').removeAttr('style').css({
 								left: curpos.left
 							});
 						} else {
-							el.removeClass('_Bottom _Fixed').removeAttr('style');
+							el.removeClass('_bottom _fixed').removeAttr('style');
 
 						}
 					}
 				} else {
-					el.removeClass('_Bottom _Fixed').removeAttr('style');
+					el.removeClass('_bottom _fixed').removeAttr('style');
 				}
 			}
 		};
 
-		if (settings.manual === false) {
-			Y.DOM(window).scroll(function () {
+		if (settings.Manual === false) {
+			Y.DOM(Y.Window).scroll(function () {
 				fixAll(el, settings, curpos, pos);
 			});
 		}

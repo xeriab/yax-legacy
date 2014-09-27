@@ -114,11 +114,11 @@ exports.build = function (callback, compsBase32, buildName) {
 
 	var srcDelta = getSizeDelta(newSrc, oldSrc, true);
 
-	console.log('\tUncompressed: ' + bytesToKB(newSrc.length) + srcDelta);
+	console.log('   Uncompressed: ' + bytesToKB(newSrc.length) + srcDelta);
 
 	if (newSrc !== oldSrc) {
 		fs.writeFileSync(srcPath, newSrc);
-		console.log('\tSaved to ' + srcPath);
+		console.log('   Saved to ' + srcPath);
 	}
 
 	var path = pathPart + '.js';
@@ -133,7 +133,7 @@ exports.build = function (callback, compsBase32, buildName) {
 
 	var delta = getSizeDelta(newCompressed, oldCompressed);
 
-	console.log('\tCompressed: ' + bytesToKB(newCompressed.length) + delta);
+	console.log('   Compressed: ' + bytesToKB(newCompressed.length) + delta);
 
 	var newGzipped;
 	var gzippedDelta = '';
@@ -141,10 +141,10 @@ exports.build = function (callback, compsBase32, buildName) {
 	function done() {
 		if (newCompressed !== oldCompressed) {
 			fs.writeFileSync(path, newCompressed);
-			console.log('\tSaved to ' + path);
+			console.log('   Saved to ' + path);
 		}
 
-		console.log('\tGzipped: ' + bytesToKB(newGzipped.length) + gzippedDelta);
+		console.log('   Gzipped: ' + bytesToKB(newGzipped.length) + gzippedDelta);
 
 		callback();
 	}
