@@ -77,7 +77,7 @@ function combineFiles(files) {
 	var content = '';
 
 	for (var i = 0, len = files.length; i < len; i++) {
-		content += fs.readFileSync(files[i], 'utf8') + '\n\n';
+		content += fs.readFileSync(files[i], 'utf8') + '\n\n\t';
 	}
 
 	return content;
@@ -98,11 +98,11 @@ exports.build = function (callback, compsBase32, buildName) {
 
 	var outro = '\n}());\n\n// END\n';
 
-//	var newSrc = copy + intro + combineFiles(files) + outro;
+	var newSrc = copy + intro + combineFiles(files) + outro;
 
 //	var newSrc = copy + combineFiles(files);
 
-	var newSrc = combineFiles(files);
+//	var newSrc = combineFiles(files);
 
 	// var pathPart = 'Dist/yax' + (buildName ? '_' + buildName : '');
 	var pathPart = 'Dist/yax' + (buildName ? '.' + buildName : '');
