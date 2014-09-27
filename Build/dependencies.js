@@ -37,6 +37,34 @@ var Dependencies = {
 		src: [
 			'Modules/UserAgentDetector.js',
 			'Modules/Utility.js',
+
+			'Modules/Node/Node.js',
+			'Modules/Node/Selector.js',
+			'Modules/Node/Data.js',
+			'Modules/Node/Events.js',
+			'Modules/Node/Ajax.js',
+			'Modules/Node/Fx.js',
+			'Modules/Node/FxMethods.js',
+			'Modules/Node/Form.js',
+
+			'Modules/Node/Extra.js',
+
+			'Modules/Node/EventLogger.js',
+
+			'Support/Compatibility.js',
+
+			'Modules/Node/EventSpecial.js'
+		],
+
+		desc: 'YAX.JS Node/DOM Module.',
+
+		extended_desc: ''
+	},
+	Node: {
+		src: [
+			'Modules/UserAgentDetector.js',
+			'Modules/Utility.js',
+
 			'Modules/Node/Node.js',
 			'Modules/Node/Selector.js',
 			'Modules/Node/Data.js',
@@ -48,21 +76,24 @@ var Dependencies = {
 
 			// These file are not part of Node but you can
 			// add them to empower YAX.Node with some useful stuff :)
- //			'Modules/Node/EventPress.js',
- //			'Modules/Node/EventTouch.js',
- //			'Modules/Node/EventShake.js',
- //			'Modules/Node/EventGesture.js',
- //			'Modules/Node/Assets.js',
- //			'Modules/Node/Stack.js',
+
+			'Modules/Node/EventPress.js',
+			'Modules/Node/EventTouch.js',
+			'Modules/Node/EventShake.js',
+			'Modules/Node/EventGesture.js',
+			'Modules/Node/Assets.js',
+			'Modules/Node/Stack.js',
 
 			'Modules/Node/Extra.js',
-			'Modules/Node/EventLogger.js',
-			'Support/Compatibility.js',
-			'Modules/Node/EventSpecial.js'
 
+			'Modules/Node/EventLogger.js',
+
+			'Support/Compatibility.js',
+
+			'Modules/Node/EventSpecial.js'
 		],
 
-		desc: 'YAX.JS Node/DOM Module.',
+		desc: 'YAX.JS Node/DOM module with extra functionalities.',
 
 		extended_desc: ''
 	},
