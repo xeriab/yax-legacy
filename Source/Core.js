@@ -4,17 +4,17 @@
 /*jshint strict: false */
 /*global window, Y, YAX */
 
-var JSDOM = require('jsdom').jsdom;
+//var JSDOM = require('jsdom').jsdom;
 
-var Window = JSDOM('<html><body><div class="Test1">Test</div></body></html>').parentWindow;
+//var Window = JSDOM('<html><body><div class="Test1">Test</div></body></html>').parentWindow;
 
 require('./Require.js');
 
 require('./YAX.js');
 
-Y.Window = Window;
-Y.Document = Y.Window.document;
-Y.Location = Y.Window.location;
+//Y.Window = Window;
+//Y.Document = Y.Window.document;
+//Y.Location = Y.Window.location;
 
 require('./Core/Core.js');
 require('./Core/Regex.js');
@@ -26,37 +26,22 @@ require('./Core/Tools.js');
 require('./Core/Events.js');
 require('./Core/Callbacks.js');
 require('./Core/Deferred.js');
-require('./Core/Console.js');
 require('./Core/Store.js');
 require('./Core/Parser.js');
-require('./Core/I18N.js');
 
-// require('./plugins/localstorage.js');
-// require('./plugins/cookies.js');
-// require('./plugins/csv.js');
-
-// require('./modules/node/node.js');
-
-// require('./')
-
-
-// require('./plugins/yax.autofix.js');
+//Y.Define('Lumlim', function (require, exports, module) {
+//	var Lumlim = {
+//		VERSION: '0.1.9',
+//		NAME: 'App'
+//	};
 //
-// var Store = new Y.Store('Cookies');
+//	module.exports = Lumlim;
 //
-
-//Y.Define('YAXJS', function (require, exports, module) {
-//var YAXJS = {
-//VERSION: '0.1.9',
-//};
-//module.exports = YAXJS;
+//	return Lumlim;
 //});
-//
-//Y.Log(Y.Require('YAXJS'));
 
-
-// Y.Log(Y.DOM('*'))
-
-
-Y.LOG(Y.VERSION);
-Y.LOG(Y.CODENAME);
+//var lumlim_app = Y.Require('Lumlim');
+//Y.LOG(Y.VERSION);
+//Y.LOG(Y.CODENAME);
+//Y.LOG(Y.Lang.Keys(Y));
+//Y.LOG(lumlim_app);

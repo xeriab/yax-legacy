@@ -209,7 +209,7 @@
 
 		Y.ENV.Type = 'Nodejs';
 
-		Y.G.isNode = isNode;
+//		Y.G.isNode = isNode;
 
 		Console.info('[INFO] Running YAX.JS in "Node" Environment!');
 	} else {

@@ -479,7 +479,7 @@
 			$btn = $btn.closest('.btn');
 		}
 
-		// Plugin.call($btn, 'toggle');
+		Plugin.call($btn, 'toggle');
 
 		e.preventDefault();
 	});

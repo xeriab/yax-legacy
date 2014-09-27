@@ -13,19 +13,21 @@ Y.DOM(document).ready(function () {
 	TestOneImage.width(115);
 
 	TestOneImage.css({
-		marginTop: -13
+		marginTop: -9,
+		marginLeft: -9,
+		maxWidth: 100
 	});
 
 //	ButtonOne.button();
 
 	// Y.Lang.delay(3000);
 
-	ButtonOne.Tooltip({
+	TestOneImage.Tooltip({
 		Content: 'Testing Tooltips!',
-		Gravity: 'north',
+		Gravity: 'west',
 		Theme: 'dark',
 		Animation: 'flipIn'
-	}).button();
+	});
 
 //	Y.DOM('body').toggle();
 //	Y.DOM('body').css('display', 'block');
@@ -34,13 +36,20 @@ Y.DOM(document).ready(function () {
 //	Y.DOM('body').addClass('animated');
 //	Y.DOM('body').addClass('flipIn');
 
-
-//	Wrapper.WaitForMe({
-//		Effect: 'rotation'
+//
+//	$('body').WaitForMe({
+//		Effect: 'orbit'
 //	});
 
 //	Wrapper.trigger('WaitForMeCloseEvent');
 
+//	Y.setConfig('Is.Mohamed.Mega.Man', 'Hell, YES!!');
+
 	Y.LOG('');
-	Y.LOG(Y);
+//	Y.LOG(Y);
+//	Y.LOG(Y.Lang);
+//	Y.LOG(Y.G);
+//	Y.LOG(Y.Util);
+//	Y.LOG(Y.DOM.Function);
+	Y.LOG(Y.Lang.Keys(Y));
 });
