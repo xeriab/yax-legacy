@@ -2503,9 +2503,7 @@
 			}
 		},
 		selected: function () {
-//			console.log('aa')
 			if (visible(this)) {
-				console.log('aa');
 				return this;
 			}
 		},
@@ -3174,6 +3172,8 @@
 			mouseenter: 'mouseover',
 			mouseleave: 'mouseout'
 		},
+
+		inputEvents = ['focus', 'blur'],
 
 		focus = {
 			focus: 'focusin',
@@ -3899,11 +3899,19 @@
 
 		return this.each(function () {
 			// items in the collection might not be Node elements
-			if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
+			/*if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
 				this.dispatchEvent(event);
 			} else {
 				Y.DOM(this).triggerHandler(event, args);
-			}
+			}*/
+
+			if (event.type && ~inputEvents.indexOf(event.type)) {
+				this[event.type]();
+			} else if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
+				this.dispatchEvent(event);
+			} /*else {
+				Y.DOM(this).triggerHandler(event, args);
+			}*/
 		});
 	};
 
@@ -3969,7 +3977,7 @@
 		return callback ? this.bind('hashchange', callback) : this.trigger('hashchange', callback);
 	};
 
-	['focus', 'blur'].forEach(function (name) {
+	inputEvents.forEach(function (name) {
 		Y.DOM.Function[name] = function (callback) {
 			if (callback) {
 				this.bind(name, callback);
@@ -4009,9 +4017,9 @@
 
 	//---
 
-	Y.DOM.Event.prototype.isDefaultPrevented = function () {
-		return this.defaultPrevented;
-	};
+//	Y.DOM.Event.prototype.isDefaultPrevented = function () {
+//		return this.defaultPrevented;
+//	};
 
 	//---
 

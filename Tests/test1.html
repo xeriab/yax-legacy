@@ -86,9 +86,8 @@
 
 	<script src="../Dist/yax.core.src.js"></script>
 	<script src="../Dist/yax.dom.src.js"></script>
-	<script src="../Dist/yax.plugins.src.js"></script>
-	<script src="../Dist/yax.bootstrap.src.js"></script>
-	<script src="../Source/Core/Locale.js"></script>
+	<!--<script src="../Dist/yax.plugins.src.js"></script>-->
+	<!--<script src="../Source/Core/Locale.js"></script>-->
 </head>
 <body>
 <!-- Fixed navbar -->
@@ -100,6 +99,14 @@
 		</div>
 		<div class="navbar-collapse collapse">
 			<ul class="nav nav-pills pull-right">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">Action</a></li>
+						<li><a href="#">Another action</a></li>
+						<li><a href="#">Something else here</a></li>
+					</ul>
+				</li>
 				<li class="">
 					<a href="#">Home</a>
 				</li>
@@ -113,16 +120,11 @@
 </div>
 
 <div class="container">
-	<div class="jumbotron" >
+	<div class="jumbotron">
 		<h1>Heading</h1>
 		<p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-		<p class="active">
-			<a class="btn btn-primary btn-lg button" href="#" role="button" id="ButtonOne">Click Me</a>
-		</p>
-
-
-		<div id="TestOne">
-		</div>
+		<a class="btn btn-primary btn-lg button" href="#" id="ButtonOne">Click Me</a>
+		<div id="TestOne"></div>
 	</div>
 
 	<div class="row marketing">
@@ -145,6 +147,11 @@
 </div>
 <!-- /container -->
 <!--<script src="assets/js/jquery-2.1.1.js"></script>-->
+
+<!--<script src="assets/js/zepto.js"></script>-->
+<!--<script src="assets/js/bootstrap.js"></script>-->
+<script src="../Dist/yax.bootstrap.src.js"></script>
+<script src="../Dist/yax.plugins.src.js"></script>
 <script src="assets/js/test1.js"></script>
 
 </body>

@@ -25,8 +25,12 @@ Y.DOM(Y.Document).ready(function () {
 		Animation: 'flipIn'
 	});
 
+	Y.DOM('.btn').removeData('toggle');
+
+//	ButtonOne.button('toggle');
+	Y.DOM('.dropdown-toggle').dropdown();
+
 	// Wrapper.WaitForMe({Effect: 'orbit'});
 
 	Y.LOG('');
-	Y.LOG(Y);
 });

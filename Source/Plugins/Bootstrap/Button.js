@@ -16,14 +16,12 @@
 /*global Y, YAX, $*/
 
 (function () {
-
 	'use strict';
 
 	// BUTTON PUBLIC CLASS DEFINITION
 	// ==============================
-
 	var Button = function (element, options) {
-		this.$element = Y.DOM(element);
+		this.element = Y.DOM(element);
 		this.options = Y.Extend({}, Button.DEFAULTS, options);
 		this.isLoading = false;
 	};
@@ -36,7 +34,7 @@
 
 	Button.prototype.setState = function (state) {
 		var d = 'disabled';
-		var $el = this.$element;
+		var $el = this.element;
 		var val = $el.is('input') ? 'val' : 'html';
 		var data = $el.data();
 
@@ -63,33 +61,31 @@
 
 	Button.prototype.toggle = function () {
 		var changed = true;
-		var $parent = this.$element.closest('[data-toggle="buttons"]');
+		var parent = this.element.closest('[data-toggle="buttons"]');
 
-		if ($parent.length) {
-			var $input = this.$element.find('input');
+		if (parent.length) {
+			var $input = this.element.find('input');
 
 			if ($input.prop('type') === 'radio') {
-				if ($input.prop('checked') && this.$element.hasClass('active')) {
+				if ($input.prop('checked') && this.element.hasClass('active')) {
 					changed = false;
 				} else {
-					$parent.find('.active').removeClass('active');
+					parent.find('.active').removeClass('active');
 				}
 			}
 
 			if (changed) {
-				$input.prop('checked', !this.$element.hasClass('active')).trigger('change');
+				$input.prop('checked', !this.element.hasClass('active')).trigger('change');
 			}
 		}
 
 		if (changed) {
-			this.$element.toggleClass('active');
+			this.element.toggleClass('active');
 		}
 	};
 
-
 	// BUTTON PLUGIN DEFINITION
 	// ========================
-
 	function Plugin(option) {
 		return this.each(function () {
 			var $this = Y.DOM(this);
@@ -99,11 +95,7 @@
 			if (!data) {
 				data = new Button(this, options);
 				$this.data('bs.button', data);
-
-				// Y.LOG($this);
 			}
-
-			// Y.LOG(option);
 
 			if (option === 'toggle') {
 				data.toggle();
@@ -118,24 +110,17 @@
 	Y.DOM.fn.button = Plugin;
 	Y.DOM.fn.button.Constructor = Button;
 
-
 	// BUTTON NO CONFLICT
 	// ==================
-
 	Y.DOM.fn.button.noConflict = function () {
 		Y.DOM.fn.button = old;
 		return this;
 	};
 
-
 	// BUTTON DATA-API
 	// ===============
-
 	Y.DOM(Y.Document).on('click.bs.button.data-api', '[data-toggle^="button"]', function (e) {
-		// Y.LOG(e);
 		var $btn = Y.DOM(e.target);
-
-		// Y.LOG($btn);
 
 		if (!$btn.hasClass('btn')) {
 			$btn = $btn.closest('.btn');

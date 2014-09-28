@@ -29,6 +29,20 @@
 		Y.DOM(element).on('click.bs.dropdown', this.toggle);
 	};
 
+	function getParent($this) {
+		var selector = $this.attr('data-target');
+
+		if (!selector) {
+			selector = $this.attr('href');
+			selector = selector && /#[A-Za-z]/.test(selector) && selector
+				.replace(/.*(?=#[^\s]*$)/, ''); // strip for ie7
+		}
+
+		var $parent = selector && Y.DOM(selector);
+
+		return $parent && $parent.length ? $parent : $this.parent();
+	}
+
 	function clearMenus(e) {
 		if (e && e.which === 3) {
 			return;
@@ -38,7 +52,10 @@
 
 		Y.DOM(toggle).each(function () {
 			var $parent = getParent(Y.DOM(this));
-			var relatedTarget = { relatedTarget: this };
+
+			var relatedTarget = {
+				relatedTarget: this
+			};
 
 			if (!$parent.hasClass('open')) {
 				return;
@@ -56,20 +73,6 @@
 
 	Dropdown.VERSION = '3.2.0';
 
-	function getParent($this) {
-		var selector = $this.attr('data-target');
-
-		if (!selector) {
-			selector = $this.attr('href');
-			selector = selector && /#[A-Za-z]/.test(selector) && selector
-				.replace(/.*(?=#[^\s]*$)/, ''); // strip for ie7
-		}
-
-		var $parent = selector && Y.DOM(selector);
-
-		return $parent && $parent.length ? $parent : $this.parent();
-	}
-
 	Dropdown.prototype.toggle = function (e) {
 		var $this = Y.DOM(this);
 
@@ -78,7 +81,12 @@
 		}
 
 		var $parent = getParent($this);
+
 		var isActive = $parent.hasClass('open');
+
+//		Y.LOG(isActive)
+//		Y.LOG($this)
+//		Y.LOG($parent)
 
 		clearMenus();
 
@@ -149,7 +157,7 @@
 			index++;
 		} // down
 
-		if (!~index) {
+		if (!(~index)) {
 			index = 0;
 		}
 
@@ -163,6 +171,8 @@
 		return this.each(function () {
 			var $this = Y.DOM(this);
 			var data = $this.data('bs.dropdown');
+
+
 
 			if (!data) {
 				data = new Dropdown(this);

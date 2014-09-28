@@ -53,9 +53,7 @@
 			}
 		},
 		selected: function () {
-//			console.log('aa')
 			if (visible(this)) {
-				console.log('aa');
 				return this;
 			}
 		},
