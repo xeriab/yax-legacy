@@ -4,44 +4,48 @@
 /*jshint strict: false */
 /*global window, Y, YAX */
 
-//var JSDOM = require('jsdom').jsdom;
+// var JSDOM = require('jsdom')dom;
+// var Window = JSDOM('<html><body><div class="Test1">Test</div></body></html>').parentWindow;
 
-//var Window = JSDOM('<html><body><div class="Test1">Test</div></body></html>').parentWindow;
+require('./Require');
 
-require('./Require.js');
+require('./YAX');
 
-require('./YAX.js');
+// Y.Window = Window;
+// Y.Document = Y.Window.document;
+// Y.Location = Y.Window.location;
 
-//Y.Window = Window;
-//Y.Document = Y.Window.document;
-//Y.Location = Y.Window.location;
+require('./Core/Core');
+require('./Core/Regex');
+require('./Core/Global');
+require('./Core/Strings');
+require('./Core/Utility');
+require('./Core/Class');
+require('./Core/Events');
+require('./Core/Callbacks');
+require('./Core/Deferred');
+require('./Core/Store');
+require('./Core/Parser');
 
-require('./Core/Core.js');
-require('./Core/Regex.js');
-require('./Core/Global.js');
-require('./Core/Strings.js');
-require('./Core/Utility.js');
-require('./Core/Class.js');
-require('./Core/Tools.js');
-require('./Core/Events.js');
-require('./Core/Callbacks.js');
-require('./Core/Deferred.js');
-require('./Core/Store.js');
-require('./Core/Parser.js');
+var root = module;
 
-//Y.Define('Lumlim', function (require, exports, module) {
-//	var Lumlim = {
-//		VERSION: '0.1.9',
-//		NAME: 'App'
-//	};
-//
-//	module.exports = Lumlim;
-//
-//	return Lumlim;
-//});
+Y.Define('Lumlim', function(require, exports, module) {
+    var Lumlim = {
+        VERSION: '0.1.9',
+        NAME: 'App'
+    };
+
+    module = root;
+
+    module.exports = Lumlim;
+
+    return Lumlim;
+});
+
+Y.Require('Lumlim');
 
 //var lumlim_app = Y.Require('Lumlim');
 //Y.LOG(Y.VERSION);
 //Y.LOG(Y.CODENAME);
 //Y.LOG(Y.Lang.Keys(Y));
-//Y.LOG(lumlim_app);
+Y.LOG(Y);

@@ -16,7 +16,7 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-(function (undef) {
+(function(undef) {
 
 	'use strict';
 
@@ -47,7 +47,7 @@
 	function getType(variable) {
 		var str = typeof variable,
 			name,
-			getFuncName = function (func) {
+			getFuncName = function(func) {
 				name = (/\W*function\s+([\w\$]+)\s*\(/).exec(func);
 
 				if (!name) {
@@ -61,7 +61,7 @@
 			if (variable !== null) {
 				// From: http://javascript.crockford.com/remedial.html
 				if (typeof variable.length === 'number' && !(variable.propertyIsEnumerable(
-					'length')) && typeof variable.splice === 'function') {
+						'length')) && typeof variable.splice === 'function') {
 					str = 'array';
 				} else if (variable.constructor && getFuncName(variable.constructor)) {
 					name = getFuncName(variable.constructor);
@@ -279,7 +279,7 @@
 		}
 
 		return _type === 'array' || len === 0 ||
-			typeof len === 'number' && len > 0 && 
+			typeof len === 'number' && len > 0 &&
 			(len - 1) in object;
 	}
 
@@ -582,12 +582,13 @@
 	}
 
 	function arrayToObject(array, type, data) {
-		var tmp = {}, x, n;
+		var tmp = {},
+			x, n;
 
 		if (type && isNumber(type) && type === 1 && !data) {
 			for (x = 0; x < array.length; ++x) {
 				if (!isUndefined(array[x]) && !isUndefined(array[x][0]) && !isUndefined(
-					array[x][1])) {
+						array[x][1])) {
 					tmp[(array[x][0]).toString()] = array[x][1];
 				}
 			}
@@ -648,7 +649,8 @@
 	}
 
 	function toObject(array) {
-		var temp = {}, x;
+		var temp = {},
+			x;
 
 		// temp['__proto__'] = array['__proto__'];
 
@@ -729,7 +731,7 @@
 			item,
 			j,
 			value,
-		// The padding given at the beginning of the line.
+			// The padding given at the beginning of the line.
 			levelPadding = '';
 
 		if (!level) {
@@ -765,7 +767,7 @@
 	}
 
 	function compact(array) {
-		return Y.G.Filter.call(array, function (item) {
+		return Y.G.Filter.call(array, function(item) {
 			return item !== null;
 		});
 	}
@@ -791,7 +793,7 @@
 	}
 
 	function unique(array) {
-		return Y.G.Filter.call(array, function (item, index) {
+		return Y.G.Filter.call(array, function(item, index) {
 			return array.indexOf(item) === index;
 		});
 	}
@@ -821,7 +823,7 @@
 	}
 
 	function foreach(array, func) {
-		every(array, function (element) {
+		every(array, function(element) {
 			return !func(element);
 		});
 	}
@@ -882,7 +884,7 @@
 
 		oldValue = Y._CONFIG_STORAGE[varName].LOCAL_VALUE;
 
-		setArray = function (_oldValue, _newValue) {
+		setArray = function(_oldValue, _newValue) {
 			// Although these are set individually, they are all accumulated
 			if (isUndefined(_oldValue)) {
 				self._CONFIG_STORAGE[varName].LOCAL_VALUE = [];
@@ -943,7 +945,7 @@
 		'Error',
 		'global',
 		'HTMLDocument'
-	], function (index, name) {
+	], function(index, name) {
 		classToType['[object ' + name + ']'] = name.toLowerCase();
 	});
 
@@ -968,12 +970,13 @@
 
 		ClassToType: classToType,
 
-		Extend: function (object) {
+		Extend: function(object) {
 			if (!isObject(object) && !isFunction(object)) {
 				return object;
 			}
 
-			var source, prop, x = 1, length = arguments.length;
+			var source, prop, x = 1,
+				length = arguments.length;
 
 			// Extend Y itself if only one argument is passed
 			if (length === x) {
@@ -1096,7 +1099,7 @@
 
 		isSet: isSet,
 
-		makeArray: function (arrayLikeThing) {
+		makeArray: function(arrayLikeThing) {
 			return Y.G.Slice.call(arrayLikeThing);
 		},
 
@@ -1132,23 +1135,23 @@
 		Y.TRACE = Y.Lang.Noop;
 	}
 
-	Y.WARN.toString = function () {
+	Y.WARN.toString = function() {
 		return '[YAX::Console::Warn]';
 	};
 
-	Y.LOG.toString = function () {
+	Y.LOG.toString = function() {
 		return '[YAX::Console::Log]';
 	};
 
-	Y.ERROR.toString = function () {
+	Y.ERROR.toString = function() {
 		return '[YAX::Console::Error]';
 	};
 
-	Y.INFO.toString = function () {
+	Y.INFO.toString = function() {
 		return '[YAX::Console::Info]';
 	};
 
-	Y.TRACE.toString = function () {
+	Y.TRACE.toString = function() {
 		return '[YAX::Console::Trace]';
 	};
 
@@ -1156,14 +1159,14 @@
 
 	// Shortcut function for checking if an object has a given property directly
 	// on itself (in other words, not on a prototype).
-	Y.Lang.Has = function (obj, key) {
+	Y.Lang.Has = function(obj, key) {
 		return obj !== null && Y.HasOwnProperty.call(obj, key);
 		// return obj !== null && obj.hasOwnProperty(key);
 	};
 
 	// Retrieve the names of an object's properties.
 	// Delegates to **ECMAScript 5**'s native `.keys`
-	Y.Lang.Keys = function (obj) {
+	Y.Lang.Keys = function(obj) {
 		var key;
 
 		if (!isObject(obj) && !isFunction(obj)) {
@@ -1191,7 +1194,7 @@
 	};
 
 	// Retrieve the values of an object's properties.
-	Y.Lang.Values = function (obj) {
+	Y.Lang.Values = function(obj) {
 		var keys = Y.Lang.Keys(obj);
 		var length = keys.length;
 		var values = new Array(length);
@@ -1205,7 +1208,7 @@
 	};
 
 	// Convert an object into a list of `[key, value]` pairs.
-	Y.Lang.Pairs = function (obj) {
+	Y.Lang.Pairs = function(obj) {
 		var keys = Y.Lang.Keys(obj);
 		var length = keys.length;
 		var pairs = new Array(length);
@@ -1219,7 +1222,7 @@
 	};
 
 	// Invert the keys and values of an object. The values must be serializable.
-	Y.Lang.Invert = function (obj) {
+	Y.Lang.Invert = function(obj) {
 		var result = {};
 		var keys = Y.Lang.Keys(obj);
 		var x;
@@ -1234,7 +1237,7 @@
 
 	// Return a sorted list of the function names available on the object.
 	// Aliased as `methods`
-	Y.Lang.Functions = Y.Lang.Methods = function (obj) {
+	Y.Lang.Functions = Y.Lang.Methods = function(obj) {
 		var names = [];
 		var key;
 
@@ -1262,8 +1265,8 @@
 	var unescapeMap = Y.Lang.Invert(escapeMap);
 
 	// Functions for escaping and unescaping strings to/from HTML interpolation.
-	var createEscaper = function (map) {
-		var escaper = function (match) {
+	var createEscaper = function(map) {
+		var escaper = function(match) {
 			return map[match];
 		};
 
@@ -1272,7 +1275,7 @@
 		var testRegexp = new RegExp(source);
 		var replaceRegexp = new RegExp(source, 'g');
 
-		return function (string) {
+		return function(string) {
 			string = string === null ? '' : Y.Lang.empty() + string;
 			return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
 		};
@@ -1284,7 +1287,7 @@
 	//---
 
 	// Fill in a given object with default properties.
-	Y.Lang.Defaults = function (obj) {
+	Y.Lang.Defaults = function(obj) {
 		var x;
 		var length;
 		var source;
@@ -1337,7 +1340,7 @@
 
 	var escaper = /\\|'|\r|\n|\u2028|\u2029/g;
 
-	var escapeChar = function (match) {
+	var escapeChar = function(match) {
 		return '\\' + escapes[match];
 	};
 
@@ -1345,7 +1348,7 @@
 	// Underscore templating handles arbitrary delimiters, preserves whitespace,
 	// and correctly escapes quotes within interpolated code.
 	// NB: `oldSettings` only exists for backwards compatibility.
-	Y.Lang.Template = function (text, settings, oldSettings) {
+	Y.Lang.Template = function(text, settings, oldSettings) {
 		if (!settings && oldSettings) {
 			settings = oldSettings;
 		}
@@ -1354,16 +1357,14 @@
 
 		// Combine delimiters into one regular expression via alternation.
 		var matcher = new RegExp([
-			(settings.escape || noMatch).source,
-			(settings.interpolate || noMatch).source,
-			(settings.evaluate || noMatch).source
+			(settings.escape || noMatch).source, (settings.interpolate || noMatch).source, (settings.evaluate || noMatch).source
 		].join('|') + '|$', 'g');
 
 		// Compile the template source, escaping string literals appropriately.
 		var index = 0;
 		var source = '__p += \'';
 
-		text.replace(matcher, function (match, escape, interpolate, evaluate, offset) {
+		text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
 			source += text.slice(index, offset).replace(escaper, escapeChar);
 			index = offset + match.length;
 
@@ -1402,7 +1403,7 @@
 
 		var template;
 
-		template = function (data) {
+		template = function(data) {
 			return render.call(this, data, Y);
 		};
 

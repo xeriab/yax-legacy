@@ -329,8 +329,8 @@
 
 	/** @namespace root.R */
 	/** @namespace root.D */
-	Y.Require = root.R || null;
-	Y.Define = root.D || null;
+	Y.Require = root.R || require || null;
+	Y.Define = root.D || define || null;
 
 	//---
 

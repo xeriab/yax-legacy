@@ -26,8 +26,8 @@ Y.DOM(document).ready(function () {
 
 
 	Y.LOG('');
-	Y.LOG(Y);
-	Y.LOG(TestOneImage);
+	Y.LOG(Y.DOM.Function['YAX.DOM']);
+	// Y.LOG(TestOneImage.size());
 	// Y.LOG(Y.DOM.Function);
 	// Y.LOG(Y.DOM);
 	// Y.LOG(Y.DOM('<div><span>Test</span></div>').insertBefore('#TestOne'));

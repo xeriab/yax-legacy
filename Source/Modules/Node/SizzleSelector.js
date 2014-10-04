@@ -19,7 +19,7 @@
 
 //---
 
-(function () {
+(function() {
 
 	'use strict';
 
@@ -35,7 +35,7 @@
 
 	//---
 
-	Y.DOM = function (selector, context) {
+	Y.DOM = function(selector, context) {
 		return new YAXDOM.init(selector, context);
 	};
 
@@ -63,7 +63,7 @@
 
 		each: tmpYaxDom.each,
 
-		map: function (callback) {
+		map: function(callback) {
 			return this.pushStack(Y.DOM.map(this, function(elem, i) {
 				return callback.call(elem, i, elem);
 			}));
@@ -117,7 +117,7 @@
 	// data: string of html
 	// context (optional): If specified, the fragment will be created in this context, defaults to Y.Document
 	// keepScripts (optional): If true, will include scripts passed in the html string
-	Y.DOM.parseHTML = function (data, context, keepScripts) {
+	Y.DOM.parseHTML = function(data, context, keepScripts) {
 		if (!data || typeof data !== "string") {
 			return null;
 		}
@@ -149,7 +149,7 @@
 	// Implement the identical functionality for filter and not
 	function winnow(elements, qualifier, not) {
 		if (Y.Lang.isFunction(qualifier)) {
-			return Y.Lang.grep(elements, function (elem, i) {
+			return Y.Lang.grep(elements, function(elem, i) {
 				/* jshint -W018 */
 				return !!qualifier.call(elem, i, elem) !== not;
 			});
@@ -157,7 +157,7 @@
 		}
 
 		if (qualifier.nodeType) {
-			return Y.Lang.grep(elements, function (elem) {
+			return Y.Lang.grep(elements, function(elem) {
 				return (elem === qualifier) !== not;
 			});
 
@@ -171,12 +171,12 @@
 			qualifier = Y.DOM.filter(qualifier, elements);
 		}
 
-		return Y.Lang.grep(elements, function (elem) {
+		return Y.Lang.grep(elements, function(elem) {
 			return (Y.G.IndexOf.call(qualifier, elem) >= 0) !== not;
 		});
 	}
 
-	Y.DOM.filter = function (expr, elems, not) {
+	Y.DOM.filter = function(expr, elems, not) {
 		var elem = elems[0];
 
 		if (not) {
@@ -185,20 +185,20 @@
 
 		return elems.length === 1 && elem.nodeType === 1 ?
 			Y.DOM.find.matchesSelector(elem, expr) ? [elem] : [] :
-			Y.DOM.find.matches(expr, Y.Lang.grep(elems, function (elem) {
+			Y.DOM.find.matches(expr, Y.Lang.grep(elems, function(elem) {
 				return elem.nodeType === 1;
 			}));
 	};
 
 	Y.DOM.Function.extend({
-		find: function (selector) {
+		find: function(selector) {
 			var x;
 			var len = this.length;
 			var ret = [];
 			var self = this;
 
 			if (!Y.Lang.isString(selector)) {
-				return this.pushStack(Y.DOM(selector).filter(function () {
+				return this.pushStack(Y.DOM(selector).filter(function() {
 					for (x = 0; x < len; x++) {
 						if (Y.DOM.contains(self[x], this)) {
 							return true;
@@ -219,22 +219,22 @@
 			return ret;
 		},
 
-		filter: function (selector) {
+		filter: function(selector) {
 			return this.pushStack(winnow(this, selector || [], false));
 		},
 
-		not: function (selector) {
+		not: function(selector) {
 			return this.pushStack(winnow(this, selector || [], true));
 		},
 
-		is: function (selector) {
+		is: function(selector) {
 			return !!winnow(
 				this,
 				// If this is a positional/relative selector, check membership in the returned set
 				// so $("p:first").is("p:last") won't return true for a doc with two "p".
-					typeof selector === "string" && Y.RegEx.rneedsContext.test(selector) ?
-					Y.DOM(selector) :
-					selector || [],
+				typeof selector === "string" && Y.RegEx.rneedsContext.test(selector) ?
+				Y.DOM(selector) :
+				selector || [],
 				false
 			).length;
 		}
@@ -243,7 +243,7 @@
 	//---
 
 	// var init = Y.DOM.Function.init = function (selector, context) {
-	var init = YAXDOM.init = function (selector, context) {
+	var init = YAXDOM.init = function(selector, context) {
 		var match, element;
 
 		// HANDLE: Y.DOM(""), Y.DOM(null), Y.DOM(undefined), Y.DOM(false)
@@ -270,7 +270,7 @@
 					// Intentionally let the error be thrown if parseHTML is not present
 					Y.Lang.merge(this, Y.DOM.parseHTML(
 						match[1],
-							context && context.nodeType ? context.ownerDocument || context : Y.Document,
+						context && context.nodeType ? context.ownerDocument || context : Y.Document,
 						true
 					));
 
@@ -288,7 +288,7 @@
 					}
 
 					return this;
-				// HANDLE: Y.DOM(#id)
+					// HANDLE: Y.DOM(#id)
 				} else {
 					element = Y.Document.getElementById(match[2]);
 
@@ -305,26 +305,26 @@
 
 					return this;
 				}
-			// HANDLE: Y.DOM(expr, Y.DOM(...))
+				// HANDLE: Y.DOM(expr, Y.DOM(...))
 			} else if (!context || context['Y.DOM']) {
 				return (context || rootYaxDom).find(selector);
-			// HANDLE: Y.DOM(expr, context)
-			// (which is just equivalent to: Y.DOM(context).find(expr)
+				// HANDLE: Y.DOM(expr, context)
+				// (which is just equivalent to: Y.DOM(context).find(expr)
 			} else {
 				return this.constructor(context).find(selector);
 			}
-		// HANDLE: Y.DOM(DOMElement)
+			// HANDLE: Y.DOM(DOMElement)
 		} else if (selector.nodeType) {
 			this.context = this[0] = selector;
 			this.length = 1;
 			return this;
-		// HANDLE: Y.DOM(function)
-		// Shortcut for Y.Document ready
+			// HANDLE: Y.DOM(function)
+			// Shortcut for Y.Document ready
 		} else if (Y.Lang.isFunction(selector)) {
 			if (!Y.Lang.isUndefined(rootYaxDom.ready)) {
 				return rootYaxDom.ready(selector);
 			}
-			
+
 			return selector(Y.DOM);
 		}
 
@@ -374,8 +374,7 @@
 		if (arr !== null) {
 			if (Y.Lang.isArraylike(arr)) {
 				Y.Lang.merge(ret,
-					typeof arr === "string" ?
-					[arr] : arr
+					typeof arr === "string" ? [arr] : arr
 				);
 			} else {
 				Y.G.Push.call(ret, arr);
@@ -411,9 +410,8 @@
 		// Use typeof to avoid zero-argument method invocation on host objects (#15151)
 		var ret = !Y.Lang.isUndefined(context.getElementsByTagName) ?
 			context.getElementsByTagName(tag || "*") :
-				!Y.Lang.isUndefined(context.querySelectorAll) ?
-			context.querySelectorAll(tag || "*") :
-			[];
+			!Y.Lang.isUndefined(context.querySelectorAll) ?
+			context.querySelectorAll(tag || "*") : [];
 
 		return (Y.Lang.isUndefined(tag) || tag) && Y.DOM.nodeName(context, tag) ?
 			Y.Lang.merge([context], ret) :
@@ -692,7 +690,8 @@
 			special = Y.DOM.event.special,
 			i = 0;
 
-		for (null ; (elem = elems[i]) !== undefined; i++) {
+		for (null;
+			(elem = elems[i]) !== undefined; i++) {
 			if (Y.DOM.acceptData(elem)) {
 				key = elem[Y.DOM.dataPrivative.expando];
 
@@ -768,12 +767,13 @@
 			});
 		},
 
-		removea: function(selector, keepData /* Internal Use Only */) {
+		removea: function(selector, keepData /* Internal Use Only */ ) {
 			var elem,
 				elems = selector ? Y.DOM.filter(selector, this) : this,
 				i = 0;
 
-			for (null; (elem = elems[i]) !== null; i++) {
+			for (null;
+				(elem = elems[i]) !== null; i++) {
 				if (!keepData && elem.nodeType === 1) {
 					Y.DOM.cleanData(getAll(elem));
 				}
@@ -793,7 +793,8 @@
 			var elem,
 				i = 0;
 
-			for (null; (elem = this[i]) !== null; i++) {
+			for (null;
+				(elem = this[i]) !== null; i++) {
 				if (elem.nodeType === 1) {
 
 					// Prevent memory leaks
@@ -846,7 +847,7 @@
 						elem = 0;
 
 						// If using innerHTML throws an exception, use the fallback method
-					} catch(e) {}
+					} catch (e) {}
 				}
 
 				if (elem) {

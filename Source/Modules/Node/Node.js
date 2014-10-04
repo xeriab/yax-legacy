@@ -17,7 +17,7 @@
 /*jshint node: true */
 /*global Y, YAX */
 
-(function (undef) {
+(function(undef) {
 
 	'use strict';
 
@@ -123,7 +123,7 @@
 
 	//---
 
-	Y.DOM = function (selector, context) {
+	Y.DOM = function(selector, context) {
 		return YAXDOM.init(selector, context);
 	};
 
@@ -357,14 +357,14 @@
 	function children(element) {
 		return element.hasOwnProperty('children') ?
 			Y.G.Slice.call(element.children) :
-			map(element.childNodes, function (node) {
+			map(element.childNodes, function(node) {
 				if (node.nodeType === 1) {
 					return node;
 				}
 			});
 	}
 
-	CCSS = function (element, name, csssComputed) {
+	CCSS = function(element, name, csssComputed) {
 		var width, minWidth, maxWidth,
 			computed = csssComputed || getStyles(element),
 			// Support: IE9
@@ -411,10 +411,10 @@
 
 	function argumentWidthOrHeight(element, name, extra, isBorderBox, styles) {
 		var i = extra === (isBorderBox ? 'border' : 'content') ?
-				// If we already have the right measurement, avoid augmentation
-				4 :
-				// Otherwise initialise for horizontal or vertical properties
-					name === 'width' ? 1 : 0,
+			// If we already have the right measurement, avoid augmentation
+			4 :
+			// Otherwise initialise for horizontal or vertical properties
+			name === 'width' ? 1 : 0,
 			val = 0;
 
 		for (null; i < 4; i += 2) {
@@ -489,11 +489,11 @@
 			argumentWidthOrHeight(
 				element,
 				name,
-					extra || (isBorderBox ? 'border' : 'content'),
+				extra || (isBorderBox ? 'border' : 'content'),
 				valueIsBorderBox,
 				styles
 			)
-			) + 'px';
+		) + 'px';
 	}
 
 	function globalEval(code) {
@@ -524,7 +524,7 @@
 		 * @returns {*}
 		 * @constructor
 		 */
-		Matches: function (element, selector) {
+		Matches: function(element, selector) {
 			var result, matchesSelector, temp, parent;
 
 			if (!element || element.nodeType !== 1) {
@@ -569,7 +569,7 @@
 		// The generated DOM nodes are returned as an array.
 		// This function can be overriden in plugins for example to make
 		// it compatible with browsers that don't support the DOM fully.
-		Fragment: function (html, name, properties) {
+		Fragment: function(html, name, properties) {
 			var dom, nodes, container, self;
 
 			// A special case optimization for a single tag
@@ -594,7 +594,7 @@
 
 				container.innerHTML = Y.Lang.empty() + html;
 
-				dom = Y.Each(Y.G.Slice.call(container.childNodes), function () {
+				dom = Y.Each(Y.G.Slice.call(container.childNodes), function() {
 					self = this;
 					// container.removeChild(this);
 					container.removeChild(self);
@@ -604,7 +604,7 @@
 			if (Y.Lang.isPlainObject(properties)) {
 				nodes = Y.DOM(dom);
 
-				Y.Each(properties, function (key, value) {
+				Y.Each(properties, function(key, value) {
 					if (MethodAttributes.indexOf(key) > -1) {
 						nodes[key](value);
 					} else {
@@ -620,7 +620,7 @@
 		// takes a CSS selector and an optional context (and handles various
 		// special cases).
 		// This method can be overriden in plugins.
-		init: function (selector, context) {
+		init: function(selector, context) {
 			var dom;
 
 			// If nothing given, return an empty YAX collection
@@ -688,7 +688,7 @@
 		// `YAXDOM.QSA` is YAX's CSS selector implementation which
 		// uses `Y.Document.querySelectorAll` and optimizes for some special cases, like `#id`.
 		// This method can be overriden in plugins.
-		QSA: function (element, selector) {
+		QSA: function(element, selector) {
 			var found, maybeID, maybeClass, nameOnly, isSimple, result;
 
 			if (selector[0] === '#') {
@@ -720,15 +720,15 @@
 				}
 			} else {
 				result = (!Y.Lang.isUndefined(element) && element.nodeType !== 1 &&
-					element.nodeType !== 9) ? Object.create({}) :
+						element.nodeType !== 9) ? Object.create({}) :
 					Y.G.Slice.call(
-							isSimple && !maybeID ?
-							// If it's simple, it could be a class
-							maybeClass ? element.getElementsByClassName(nameOnly) :
-								// Or a tag
-								element.getElementsByTagName(selector) :
-							// Or it's not simple, and we need to query all
-							element.querySelectorAll(selector)
+						isSimple && !maybeID ?
+						// If it's simple, it could be a class
+						maybeClass ? element.getElementsByClassName(nameOnly) :
+						// Or a tag
+						element.getElementsByTagName(selector) :
+						// Or it's not simple, and we need to query all
+						element.querySelectorAll(selector)
 					);
 			}
 
@@ -739,7 +739,7 @@
 		// of nodes with `Y.DOM.Function` and thus supplying all the Y.DOM functions
 		// to the array. Note that `__proto__` is not supported on Internet
 		// Explorer. This method can be overriden in Plugins.
-		Y: function (dom, selector) {
+		Y: function(dom, selector) {
 			var result;
 
 			result = dom || [];
@@ -757,7 +757,7 @@
 		 * YAXDOM.isY` should return `true` if the given object is
 		 * a YAX.DOM collection. This method can be overriden in plugins.
 		 */
-		isY: function (object) {
+		isY: function(object) {
 			return object instanceof this.Y;
 		}
 	});
@@ -768,7 +768,7 @@
 		var result;
 
 		if (Y.Lang.isNull(selector) || Y.Lang.isUndefined(selector) || Y.Lang.isEmpty(
-			selector)) {
+				selector)) {
 			result = Y.DOM(nodes);
 		} else {
 			result = Y.DOM(nodes).filter(selector);
@@ -789,7 +789,7 @@
 		// 	return YAXDOM.init(selector, context);
 		// },
 
-		getStyle: function (el, style) {
+		getStyle: function(el, style) {
 			var value, css;
 
 			value = el.style[style] || (el.currentStyle && el.currentStyle[style]);
@@ -802,7 +802,7 @@
 			return value === 'auto' ? null : value;
 		},
 
-		documentIsLtr: function () {
+		documentIsLtr: function() {
 			Y.DOM.docIsLTR = Y.DOM.docIsLTR || DomNode.getStyle(Y.Document.body,
 				'direction') === 'ltr';
 			return Y.DOM.docIsLTR;
@@ -821,30 +821,30 @@
 			extend: Y.Extend,
 			// `map` and `slice` in the jQuery API work differently
 			// from their array counterparts
-			map: function (callback) {
-				return Y.DOM(map(this, function (el, i) {
+			map: function(callback) {
+				return Y.DOM(map(this, function(el, i) {
 					return callback.call(el, i, el);
 				}));
 			},
-			slice: function () {
+			slice: function() {
 				return Y.DOM(Y.G.Slice.apply(this, arguments));
 				// return Y.DOM.pushStack(Slice.apply(this, arguments));
 			},
-			ready: function (callback) {
+			ready: function(callback) {
 				// need to check if Y.Document.body exists for IE as that browser reports
 				// Y.Document ready when it hasn't yet created the body element
 				if (Y.RegEx.ReadyReplacement.test(Y.CallProperty(Y.Document, 'readyState')) &&
 					Y.Document.body) {
 					callback(Y.DOM);
 				} else {
-					Y.Document.addEventListener('DOMContentLoaded', function () {
+					Y.Document.addEventListener('DOMContentLoaded', function() {
 						callback(Y.DOM);
 					}, false);
 				}
 
 				return this;
 			},
-			get: function (num) {
+			get: function(num) {
 				// return num === undef ? Slice.call(this) : this[num >= 0 ? num : num + this.length];
 
 				return num === null ?
@@ -853,51 +853,51 @@
 					// Return just the object
 					(num < 0 ? this[this.length + num] : this[num]);
 			},
-			toArray: function () {
+			toArray: function() {
 				// return this.get();
 				return Y.G.Slice.call(this);
 			},
-			size: function () {
+			size: function() {
 				return this.length;
 			},
-			remove: function () {
-				return this.each(function () {
+			remove: function() {
+				return this.each(function() {
 					if (this.parentNode !== null) {
 						this.parentNode.removeChild(this);
 					}
 				});
 			},
-			error: function (message) {
+			error: function(message) {
 				throw new Error(message);
 			},
-			each: function (callback) {
-				Y.G.ArrayProto.every.call(this, function (el, index) {
+			each: function(callback) {
+				Y.G.ArrayProto.every.call(this, function(el, index) {
 					return callback.call(el, index, el) !== false;
 				});
 
 				return this;
 			},
-			filter: function (selector) {
+			filter: function(selector) {
 				if (Y.Lang.isFunction(selector)) {
 					return this.not(this.not(selector));
 				}
 
-				return Y.DOM(Y.G.Filter.call(this, function (element) {
+				return Y.DOM(Y.G.Filter.call(this, function(element) {
 					return YAXDOM.Matches(element, selector);
 				}));
 			},
-			add: function (selector, context) {
+			add: function(selector, context) {
 				return Y.DOM(Y.Lang.unique(this.concat(Y.DOM(selector, context))));
 			},
-			is: function (selector) {
+			is: function(selector) {
 				return this.length > 0 && YAXDOM.Matches(this[0], selector);
 			},
-			not: function (selector) {
+			not: function(selector) {
 				var nodes = [],
 					excludes;
 
 				if (Y.Lang.isFunction(selector) && selector.call !== undef) {
-					this.each(function (index) {
+					this.each(function(index) {
 						if (!selector.call(this, index)) {
 							nodes.push(this);
 						}
@@ -905,9 +905,9 @@
 				} else {
 					excludes = Y.Lang.isString(selector) ? this.filter(selector) :
 						(Y.Lang.likeArray(selector) && Y.Lang.isFunction(selector.item)) ? Y.G.Slice
-							.call(selector) : Y.DOM(selector);
+						.call(selector) : Y.DOM(selector);
 
-					this.forEach(function (el) {
+					this.forEach(function(el) {
 						if (excludes.indexOf(el) < 0) {
 							nodes.push(el);
 						}
@@ -916,43 +916,43 @@
 
 				return Y.DOM(nodes);
 			},
-			has: function (selector) {
-				return this.filter(function () {
+			has: function(selector) {
+				return this.filter(function() {
 					return Y.Lang.isObject(selector) ?
 						contains(this, selector) :
 						Y.DOM(this).find(selector).size();
 				});
 			},
-			eq: function (index) {
+			eq: function(index) {
 				return index === -1 ? this.slice(index) : this.slice(index, +index + 1);
 			},
-			first: function () {
+			first: function() {
 				var el = this[0];
 				return el && !Y.Lang.isObject(el) ? el : Y.DOM(el);
 			},
-			last: function () {
+			last: function() {
 				var el = this[this.length - 1];
 				return el && !Y.Lang.isObject(el) ? el : Y.DOM(el);
 			},
 
-			find: function (selector) {
+			find: function(selector) {
 				var result;
 				var self = this;
 
 				if (!selector) {
 					result = [];
 				} else if (Y.Lang.isObject(selector)) {
-					result = Y.DOM(selector).filter(function () {
+					result = Y.DOM(selector).filter(function() {
 						var node = this;
 
-						return Y.G.ArrayProto.some.call(self, function (parent) {
+						return Y.G.ArrayProto.some.call(self, function(parent) {
 							return Y.DOM.contains(parent, node);
 						});
 					});
 				} else if (this.length === 1) {
 					result = Y.DOM(YAXDOM.QSA(this[0], selector));
 				} else {
-					result = this.map(function () {
+					result = this.map(function() {
 						return YAXDOM.QSA(this, selector);
 					});
 				}
@@ -960,7 +960,7 @@
 				return result;
 			},
 
-			closest: function (selector, context) {
+			closest: function(selector, context) {
 				var node = this[0],
 					collection = false;
 
@@ -969,19 +969,19 @@
 				}
 
 				while (node && Y.Lang.isFalse(collection ? collection.indexOf(node) >= 0 :
-					YAXDOM.Matches(node, selector))) {
+						YAXDOM.Matches(node, selector))) {
 					node = node !== context && !Y.Lang.isDocument(node) && node.parentNode;
 				}
 
 				return Y.DOM(node);
 			},
-			parents: function (selector) {
+			parents: function(selector) {
 				var ancestors = [],
 					nodes = this,
 					tempFunc, x = 0,
 					result;
 
-				tempFunc = function (node) {
+				tempFunc = function(node) {
 					node = node.parentNode;
 
 					if (node && !Y.Lang.isDocument(node) && ancestors.indexOf(node) < x) {
@@ -997,7 +997,7 @@
 				}
 
 				if (Y.Lang.isUndefined(selector) || Y.Lang.isNull(selector) || Y.Lang.isEmpty(
-					selector)) {
+						selector)) {
 					result = filtered(ancestors, '*');
 				} else {
 					result = filtered(ancestors, selector);
@@ -1005,39 +1005,39 @@
 
 				return result;
 			},
-			parent: function (selector) {
+			parent: function(selector) {
 				return filtered(Y.Lang.unique(this.pluck('parentNode')), selector);
 			},
-			children: function (selector) {
-				return filtered(this.map(function () {
+			children: function(selector) {
+				return filtered(this.map(function() {
 					return children(this);
 				}), selector);
 			},
-			contents: function () {
-				return this.map(function () {
+			contents: function() {
+				return this.map(function() {
 					return Y.G.Slice.call(this.childNodes);
 				});
 			},
-			siblings: function (selector) {
-				return filtered(this.map(function (i, el) {
-					return Y.G.Filter.call(children(el.parentNode), function (child) {
+			siblings: function(selector) {
+				return filtered(this.map(function(i, el) {
+					return Y.G.Filter.call(children(el.parentNode), function(child) {
 						return child !== el;
 					});
 				}), selector);
 			},
-			empty: function () {
-				return this.each(function () {
+			empty: function() {
+				return this.each(function() {
 					this.innerHTML = Y.Lang.empty();
 				});
 			},
 			// `pluck` is borrowed from Prototype.js
-			pluck: function (property) {
-				return map(this, function (el) {
+			pluck: function(property) {
+				return map(this, function(el) {
 					return el[property];
 				});
 			},
-			show: function () {
-				return this.each(function () {
+			show: function() {
+				return this.each(function() {
 					if (this.style.display === 'none') {
 						this.style.display = Y.Lang.empty();
 					}
@@ -1049,10 +1049,10 @@
 					}
 				});
 			},
-			replaceWith: function (newContent) {
+			replaceWith: function(newContent) {
 				return this.before(newContent).remove();
 			},
-			wrap: function (structure) {
+			wrap: function(structure) {
 				var func = Y.Lang.isFunction(structure),
 					dom, clone;
 
@@ -1061,14 +1061,14 @@
 					clone = dom.parentNode || this.length > 1;
 				}
 
-				return this.each(function (index) {
+				return this.each(function(index) {
 					Y.DOM(this).wrapAll(
 						func ? structure.call(this, index) :
-							clone ? dom.cloneNode(true) : dom
+						clone ? dom.cloneNode(true) : dom
 					);
 				});
 			},
-			wrapAll: function (structure) {
+			wrapAll: function(structure) {
 				if (this[0]) {
 					Y.DOM(this[0]).before(structure = Y.DOM(structure));
 
@@ -1086,10 +1086,10 @@
 
 				return this;
 			},
-			wrapInner: function (structure) {
+			wrapInner: function(structure) {
 				var func = Y.Lang.isFunction(structure),
 					self, dom, contents;
-				return this.each(function (index) {
+				return this.each(function(index) {
 					self = Y.DOM(this);
 
 					contents = self.contents();
@@ -1105,23 +1105,23 @@
 					// contents.length ? contents.wrapAll(dom) : self.append(dom);
 				});
 			},
-			unwrap: function () {
-				this.parent().each(function () {
+			unwrap: function() {
+				this.parent().each(function() {
 					Y.DOM(this).replaceWith(Y.DOM(this).children());
 				});
 
 				return this;
 			},
-			clone: function () {
-				return this.map(function () {
+			clone: function() {
+				return this.map(function() {
 					return this.cloneNode(true);
 				});
 			},
-			hide: function () {
+			hide: function() {
 				return this.css('display', 'none');
 			},
-			toggle: function (setting) {
-				return this.each(function () {
+			toggle: function(setting) {
+				return this.each(function() {
 					var el = Y.DOM(this),
 						val;
 
@@ -1140,48 +1140,48 @@
 					}
 				});
 			},
-			prev: function (selector) {
+			prev: function(selector) {
 				return Y.DOM(this.pluck('previousElementSibling')).filter(selector ||
 					'*');
 			},
-			next: function (selector) {
+			next: function(selector) {
 				return Y.DOM(this.pluck('nextElementSibling')).filter(selector || '*');
 			},
-			html: function (html) {
+			html: function(html) {
 				return arguments.length === 0 ?
 					(this.length > 0 ? this[0].innerHTML : null) :
-					this.each(function (index) {
+					this.each(function(index) {
 						var originHtml = this.innerHTML;
 						Y.DOM(this).empty().append(functionArgument(this, html, index,
 							originHtml));
 					});
 			},
-			text: function (text) {
+			text: function(text) {
 				return arguments.length === 0 ?
 					(this.length > 0 ? this[0].textContent : null) :
-					this.each(function () {
+					this.each(function() {
 						this.textContent = (text === undef) ? Y.Lang.empty() : Y.Lang.empty() +
 							text;
 					});
 			},
-			title: function (title) {
+			title: function(title) {
 				return arguments.length === 0 ?
 					(this.length > 0 ? this[0].title : null) :
-					this.each(function () {
+					this.each(function() {
 						this.title = (title === undef) ? Y.Lang.empty() : Y.Lang.empty() +
 							title;
 					});
 			},
-			attr: function (name, value) {
+			attr: function(name, value) {
 				var result;
 
 				return (Y.Lang.isString(name) && value === undef) ?
 					(this.length === 0 || this[0].nodeType !== 1 ? undef :
 						(name === 'value' && this[0].nodeName === 'INPUT') ? this.val() :
-							(Y.Lang.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
-								name)) ? this[0][name] : result
-						) :
-					this.each(function (index) {
+						(Y.Lang.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
+							name)) ? this[0][name] : result
+					) :
+					this.each(function(index) {
 						if (this.nodeType !== 1) {
 							return;
 						}
@@ -1200,10 +1200,10 @@
 						}
 					});
 			},
-			draggable: function (value) {
+			draggable: function(value) {
 				return arguments.length === 0 ?
 					(this.length > 0 ? this[0].draggable : null) :
-					this.each(function () {
+					this.each(function() {
 						var tmp = this.draggable;
 
 						if (Y.Lang.isUndefined(value) || !Y.Lang.isBool(value)) {
@@ -1213,8 +1213,8 @@
 						}
 					});
 			},
-			removeAttr: function (name) {
-				return this.each(function () {
+			removeAttr: function(name) {
+				return this.each(function() {
 					if (this.nodeType === 1) {
 						setAttribute(this, name);
 					}
@@ -1222,43 +1222,43 @@
 					// this.nodeType === 1 && setAttribute(this, name);
 				});
 			},
-			prop: function (name, value) {
+			prop: function(name, value) {
 				name = properitiesMap[name] || name;
 				return (value === undef) ?
 					(this[0] && this[0][name]) :
-					this.each(function (index) {
+					this.each(function(index) {
 						this[name] = functionArgument(this, value, index, this[name]);
 					});
 			},
-			data: function (name, value) {
+			data: function(name, value) {
 				var data = this.attr('data-' + Y.Lang.dasherise(name), value);
 				return data !== null ? Y.Lang.deserialiseValue(data) : undef;
 			},
-			val: function (value) {
+			val: function(value) {
 				return arguments.length === 0 ?
 					(this[0] && (this[0].multiple ?
-						Y.DOM(this[0]).find('option').filter(function () {
+						Y.DOM(this[0]).find('option').filter(function() {
 							return this.selected;
 						}).pluck('value') :
 						this[0].value)) :
-					this.each(function (index) {
+					this.each(function(index) {
 						this.value = functionArgument(this, value, index, this.value);
 					});
 			},
-			value: function (value) {
+			value: function(value) {
 				return arguments.length === 0 ?
 					(this[0] && (this[0].multiple ?
-						Y.DOM(this[0]).find('option').filter(function () {
+						Y.DOM(this[0]).find('option').filter(function() {
 							return this.selected;
 						}).pluck('value') :
 						this[0].value)) :
-					this.each(function (index) {
+					this.each(function(index) {
 						this.value = functionArgument(this, value, index, this.value);
 					});
 			},
-			offset: function (coordinates) {
+			offset: function(coordinates) {
 				if (coordinates) {
-					return this.each(function (index) {
+					return this.each(function(index) {
 						var $this = Y.DOM(this),
 							coords = functionArgument(this, coordinates, index, $this.offset()),
 							parentOffset = $this.offsetParent().offset(),
@@ -1281,7 +1281,7 @@
 
 				var obj = this[0].getBoundingClientRect();
 
-				this.offset.toString = function () {
+				this.offset.toString = function() {
 					return {
 						left: obj.left + window.pageXOffset + 'px',
 						top: obj.top + window.pageYOffset + 'px',
@@ -1297,11 +1297,11 @@
 					height: Math.round(obj.height)
 				};
 			},
-			getOffset: function (options) {
+			getOffset: function(options) {
 				if (arguments.length) {
 					return options === undef ?
 						this :
-						this.each(function (i) {
+						this.each(function(i) {
 							Y.DOM.offset.setOffset(this, options, i);
 						});
 				}
@@ -1338,7 +1338,7 @@
 					left: box.left + win.pageXOffset - docElem.clientLeft
 				};
 			},
-			css: function (name, value) {
+			css: function(name, value) {
 				var element = this[0],
 					computedStyle = getStyles(element),
 					props;
@@ -1356,7 +1356,7 @@
 					if (Y.Lang.isArray(name)) {
 						props = Object.create({});
 
-						Y.Each(Y.Lang.isArray(name) ? name : [name], function (tmp, prop) {
+						Y.Each(Y.Lang.isArray(name) ? name : [name], function(tmp, prop) {
 							props[prop] = (element.style[Y.Lang.camelise(prop)] || computedStyle.getPropertyValue(
 								prop));
 						});
@@ -1367,13 +1367,13 @@
 
 				if (Y.Lang.type(name) === 'string') {
 					if (!value && value !== 0) {
-						this.each(function () {
+						this.each(function() {
 							this.style.removeProperty(Y.Lang.dasherise(name));
 						});
 					}
 				}
 
-				return Y.DOM.Access(this, function (element, name, value) {
+				return Y.DOM.Access(this, function(element, name, value) {
 					var styles, len, mapo = Object.create({}),
 						i = 0;
 
@@ -1394,11 +1394,11 @@
 				}, name, value, arguments.length > 1);
 			},
 
-			prevAll: function (elem) {
+			prevAll: function(elem) {
 				return Y.DOM.dir(elem, "previousSibling");
 			},
 
-			index: function (element) {
+			index: function(element) {
 				//				if (!element) {
 				//					return (this[0] && this[0].parentNode) ? this.first().prevAll().length : -1;
 				//				}
@@ -1414,36 +1414,36 @@
 				return element ? this.indexOf(Y.DOM(element)[0]) : this.parent().children()
 					.indexOf(this[0]);
 			},
-			hasClass: function (name) {
+			hasClass: function(name) {
 				if (!name) {
 					return false;
 				}
 
-				return Y.G.ArrayProto.some.call(this, function (el) {
+				return Y.G.ArrayProto.some.call(this, function(el) {
 					return this.test(className(el));
 				}, classReplacement(name));
 			},
-			hasId: function (name) {
+			hasId: function(name) {
 				if (!name) {
 					return false;
 				}
 
-				return Y.G.ArrayProto.some.call(this, function (el) {
+				return Y.G.ArrayProto.some.call(this, function(el) {
 					return this.test(idName(el));
 				}, idReplacement(name));
 			},
-			addId: function (name) {
+			addId: function(name) {
 				if (!name) {
 					return this;
 				}
 
-				return this.each(function (index) {
+				return this.each(function(index) {
 					IDsList = [];
 
 					var id = idName(this),
 						newName = functionArgument(this, name, index, id);
 
-					newName.split(/\s+/g).forEach(function (ID) {
+					newName.split(/\s+/g).forEach(function(ID) {
 						if (!Y.DOM(this).hasId(ID)) {
 							IDsList.push(ID);
 						}
@@ -1456,12 +1456,12 @@
 					// IDsList.length && idName(this, id + (id ? ' ' : Y.Lang.empty()) + IDsList.join(' '));
 				});
 			},
-			addClass: function (name) {
+			addClass: function(name) {
 				if (!name) {
 					return this;
 				}
 
-				return this.each(function (index) {
+				return this.each(function(index) {
 					if (!('className' in this)) {
 						return;
 					}
@@ -1471,7 +1471,7 @@
 					var cls = className(this),
 						newName = functionArgument(this, name, index, cls);
 
-					newName.split(/\s+/g).forEach(function (Class) {
+					newName.split(/\s+/g).forEach(function(Class) {
 						if (!Y.DOM(this).hasClass(Class)) {
 							ClassList.push(Class);
 						}
@@ -1485,8 +1485,8 @@
 					// ClassList.length && className(this, cls + (cls ? ' ' : Y.Lang.empty()) + ClassList.join(' '));
 				});
 			},
-			removeId: function (name) {
-				return this.each(function (index) {
+			removeId: function(name) {
+				return this.each(function(index) {
 					if (name === undef) {
 						return idName(this, Y.Lang.empty());
 					}
@@ -1494,15 +1494,15 @@
 					IDsList = idName(this);
 
 					functionArgument(this, name, index, IDsList).split(/\s+/g).forEach(
-						function (ID) {
+						function(ID) {
 							IDsList = IDsList.replace(idReplacement(ID), ' ');
 						});
 
 					idName(this, IDsList.trim());
 				});
 			},
-			removeClass: function (name) {
-				return this.each(function (index) {
+			removeClass: function(name) {
+				return this.each(function(index) {
 					if (!('className' in this)) {
 						return;
 					}
@@ -1514,25 +1514,25 @@
 					ClassList = className(this);
 
 					functionArgument(this, name, index, ClassList).split(/\s+/g).forEach(
-						function (Class) {
+						function(Class) {
 							ClassList = ClassList.replace(classReplacement(Class), ' ');
 						});
 
 					className(this, ClassList.trim());
 				});
 			},
-			toggleClass: function (name, when) {
+			toggleClass: function(name, when) {
 				if (!name) {
 					return this;
 				}
 
-				return this.each(function (index) {
+				return this.each(function(index) {
 					var $this = Y.DOM(this),
 						names = functionArgument(this, name, index, className(this));
 
-					names.split(/\s+/g).forEach(function (Class) {
+					names.split(/\s+/g).forEach(function(Class) {
 						if (Y.Lang.isUndefined(when) || Y.Lang.isNull(when) || !Y.Lang.isSet(
-							when)) {
+								when)) {
 							if (!$this.hasClass(Class)) {
 								$this.addClass(Class);
 							} else {
@@ -1544,7 +1544,7 @@
 					});
 				});
 			},
-			scrollTop: function (value) {
+			scrollTop: function(value) {
 				if (!this.length) {
 					return;
 				}
@@ -1556,14 +1556,14 @@
 				}
 
 				return this.each(hasScrollTop ?
-					function () {
+					function() {
 						this.scrollTop = value;
 					} :
-					function () {
+					function() {
 						this.scrollTo(this.scrollX, value);
 					});
 			},
-			scrollLeft: function (value) {
+			scrollLeft: function(value) {
 				if (!this.length) {
 					return;
 				}
@@ -1575,14 +1575,14 @@
 				}
 
 				return this.each(hasScrollLeft ?
-					function () {
+					function() {
 						this.scrollLeft = value;
 					} :
-					function () {
+					function() {
 						this.scrollTo(value, this.scrollY);
 					});
 			},
-			position: function () {
+			position: function() {
 				if (!this[0]) {
 					return;
 				}
@@ -1622,15 +1622,15 @@
 						true)
 				};
 			},
-			getPosition: function () {
+			getPosition: function() {
 				if (!this.length) {
 					return;
 				}
 
 				var element = this[0],
-				// Get *real* offsetParent
+					// Get *real* offsetParent
 					offsetParent = this.offsetParent(),
-				// Get correct offsets
+					// Get correct offsets
 					offset = this.offset(),
 					parentOffset = Y.RegEx.RootNodeReplacement.test(offsetParent[0].nodeName) ? {
 						top: 0,
@@ -1655,19 +1655,19 @@
 					left: offset.left - parentOffset.left
 				};
 			},
-			offsetParent: function () {
-				return this.map(function () {
+			offsetParent: function() {
+				return this.map(function() {
 					var offsetParent = this.offsetParent || docElement;
 
 					while (offsetParent && (!Y.DOM.nodeName(offsetParent, 'html') && Y.DOM
-						.CSS(offsetParent, 'position') === 'static')) {
+							.CSS(offsetParent, 'position') === 'static')) {
 						offsetParent = offsetParent.offsetParent;
 					}
 
 					return offsetParent || docElement;
 				});
 			},
-			detach: function (selector) {
+			detach: function(selector) {
 				return this.remove(selector, true);
 				// return this.remove(selector);
 			},
@@ -1678,7 +1678,7 @@
 			Y.Lang.randomNumber(10000, 70000)).replace(/\D/g, Y.Lang.empty()),
 		// Multifunctional method to get and set values of a collection
 		// The value/s can optionally be executed if it's a function
-		Access: function (elems, callback, key, value, chainable, emptyGet, raw) {
+		Access: function(elems, callback, key, value, chainable, emptyGet, raw) {
 			var i = 0,
 				length = elems.length,
 				bulk = key === null;
@@ -1708,7 +1708,7 @@
 						// ...except when executing function values
 					} else {
 						bulk = callback;
-						callback = function (element, key, value) {
+						callback = function(element, key, value) {
 							return bulk.call(Y.DOM(element), value);
 						};
 					}
@@ -1729,7 +1729,7 @@
 		// A method for quickly swapping in/out CSS properties to get correct calculations.
 		// Note: this method belongs to the css module but it's needed here for the support module.
 		// If support gets modularized, this method should be moved back to the css module.
-		Swap: function (element, options, callback, args) {
+		Swap: function(element, options, callback, args) {
 			var ret, name,
 				old = Object.create({});
 
@@ -1754,7 +1754,7 @@
 		},
 		// Take an array of elements and push it onto the stack
 		// (returning the new matched element set)
-		pushStack: function (elems) {
+		pushStack: function(elems) {
 			// Build a new YAX matched element set
 			var ret = Y.Lang.merge(this.constructor(), elems);
 
@@ -1765,7 +1765,7 @@
 			// Return the newly-formed element set
 			return ret;
 		},
-		nodeName: function (element, name) {
+		nodeName: function(element, name) {
 			if (Y.Lang.isSet(element) && !Y.Lang.isSet(name)) {
 				return element.nodeName;
 			}
@@ -1778,7 +1778,7 @@
 		// behavior of getting and setting a style property
 		CSS_Hooks: {
 			opacity: {
-				get: function (element, computed) {
+				get: function(element, computed) {
 					if (computed) {
 						// We should always get a number back from opacity
 						var ret = CCSS(element, 'opacity');
@@ -1807,7 +1807,7 @@
 			'float': 'cssFloat'
 		},
 		// Get and set the style property on a DOM DOM
-		Style: function (element, name, value, extra) {
+		Style: function(element, name, value, extra) {
 			// Don't set styles on text and comment nodes
 			if (!element || element.nodeType === 3 || element.nodeType === 8 || !
 				element.style) {
@@ -1851,13 +1851,13 @@
 				// Fixes #8908, it can be done more correctly by specifying setters in CSS_Hooks,
 				// but it would mean to define eight (for every problematic property) identical functions
 				if (!this.Support.clearCloneStyle && Y.Lang.isEmpty(value) && name.indexOf(
-					'background') === 0) {
+						'background') === 0) {
 					style[name] = 'inherit';
 				}
 
 				// If a hook was provided, use that value, otherwise just set the specified value
 				if (!hooks || !(hooks.hasOwnProperty('set')) || (value = hooks.set(
-					element, value, extra)) !== undef) {
+						element, value, extra)) !== undef) {
 					style[name] = value;
 
 					if (!newvalue && newvalue !== 0) {
@@ -1869,7 +1869,7 @@
 			} else {
 				// If a hook was provided get the non-computed value from there
 				if (hooks && hooks.hasOwnProperty('get') && (ret = hooks.get(element,
-					false, extra)) !== undef) {
+						false, extra)) !== undef) {
 					return ret;
 				}
 
@@ -1877,7 +1877,7 @@
 				return style[name];
 			}
 		},
-		CSS: function (element, name, extra, styles) {
+		CSS: function(element, name, extra, styles) {
 			var val, num, hooks,
 				origName = Y.Lang.camelise(name);
 
@@ -1926,7 +1926,7 @@
 
 	Y.Extend(Y.DOM, {
 		offset: {
-			setOffset: function (element, options, i) {
+			setOffset: function(element, options, i) {
 				var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft,
 					calculatePosition,
 					position = Y.DOM.CSS(element, "position"),
@@ -2046,11 +2046,11 @@
 	Y.Each({
 		scrollLeft: 'pageXOffset',
 		scrollTop: 'pageYOffset'
-	}, function (method, prop) {
+	}, function(method, prop) {
 		var top = 'pageYOffset' === prop;
 
-		Y.DOM.Function[method] = function (val) {
-			return Y.DOM.Access(this, function (element, method, val) {
+		Y.DOM.Function[method] = function(val) {
+			return Y.DOM.Access(this, function(element, method, val) {
 				var win = getWindow(element);
 
 				if (val === undef) {
@@ -2073,31 +2073,31 @@
 
 	//---
 
-	Y.Each(['height', 'width'], function (i, name) {
+	Y.Each(['height', 'width'], function(i, name) {
 		Y.DOM.CSS_Hooks[name] = {
-			get: function (element, computed, extra) {
+			get: function(element, computed, extra) {
 				if (computed) {
 					// certain elements can have dimension info if we invisibly show them
 					// however, it must have a current display style that would benefit from this
 					return element.offsetWidth === 0 && Y.RegEx.rdisplayswap.test(Y.DOM.CSS(element,
-						'display')) ?
-						Y.DOM.Swap(element, cssShow, function () {
+							'display')) ?
+						Y.DOM.Swap(element, cssShow, function() {
 							return getWidthOrHeight(element, name, extra);
 						}) :
 						getWidthOrHeight(element, name, extra);
 				}
 			},
-			set: function (element, value, extra) {
+			set: function(element, value, extra) {
 				var styles = extra && getStyles(element);
 				return setPositiveNumber(element, value, extra ?
-						argumentWidthOrHeight(
-							element,
-							name,
-							extra,
-								Y.DOM.Support.boxSizing && Y.DOM.CSS(element, 'boxSizing', false,
-								styles) === 'border-box',
-							styles
-						) : 0
+					argumentWidthOrHeight(
+						element,
+						name,
+						extra,
+						Y.DOM.Support.boxSizing && Y.DOM.CSS(element, 'boxSizing', false,
+							styles) === 'border-box',
+						styles
+					) : 0
 				);
 			}
 		};
@@ -2108,20 +2108,20 @@
 	Y.Each({
 		Height: 'height',
 		Width: 'width'
-	}, function (name, type) {
+	}, function(name, type) {
 		Y.Each({
 			padding: 'inner' + name,
 			content: type,
 			'': 'outer' + name
-		}, function (defaultExtra, funcName) {
+		}, function(defaultExtra, funcName) {
 			// margin is only for outerHeight, outerWidth
-			Y.DOM.Function[funcName] = function (margin, value) {
+			Y.DOM.Function[funcName] = function(margin, value) {
 				var chainable = arguments.length && (defaultExtra || typeof margin !==
 						'boolean'),
 					extra = defaultExtra || (margin === true || value === true ? 'margin' :
 						'border');
 
-				return Y.DOM.Access(this, function (element, type, value) {
+				return Y.DOM.Access(this, function(element, type, value) {
 					var doc;
 
 					if (Y.Lang.isWindow(element)) {
@@ -2163,12 +2163,12 @@
 
 	// Generate the `after`, `prepend`, `before`, `append`,
 	// `insertAfter`, `insertBefore`, `appendTo`, and `prependTo` methods.
-	adjacencyOperators.forEach(function (operator, operatorIndex) {
+	adjacencyOperators.forEach(function(operator, operatorIndex) {
 		var inside = operatorIndex % 2; //=> prepend, append
 
-		Y.DOM.Function[operator] = function () {
+		Y.DOM.Function[operator] = function() {
 			// Arguments can be nodes, arrays of nodes, YAX objects and HTML strings
-			var nodes = map(arguments, function (arg) {
+			var nodes = map(arguments, function(arg) {
 					return Y.Lang.isObject(arg) ||
 						Y.Lang.isArray(arg) ||
 						Y.Lang.isNull(arg) ?
@@ -2182,18 +2182,18 @@
 				return this;
 			}
 
-			return this.each(function (tmp, target) {
+			return this.each(function(tmp, target) {
 				parent = inside ? target : target.parentNode;
 
 				// Convert all methods to a "before" operation
 				target = operatorIndex === 0 ? target.nextSibling :
-						operatorIndex === 1 ? target.firstChild :
-						operatorIndex === 2 ? target :
+					operatorIndex === 1 ? target.firstChild :
+					operatorIndex === 2 ? target :
 					null;
 
 				parentInDocument = docElement.contains(parent);
 
-				nodes.forEach(function (node) {
+				nodes.forEach(function(node) {
 					if (copyByClone) {
 						node = node.cloneNode(true);
 					} else if (!parent) {
@@ -2206,7 +2206,7 @@
 
 					// for (var ancestor = parent.parentNode; ancestor !== null && ancestor !== Y.Document.createElement; ancestor = ancestor.parentNode);
 
-					traverseNode(parent.insertBefore(node, target), function (el) {
+					traverseNode(parent.insertBefore(node, target), function(el) {
 						if (Y.Lang.isNull(el.nodeName) && el.nodeName.toUpperCase() ===
 							'SCRIPT' && (!el.type || el.type === 'text/javascript')) {
 							if (!el.src) {
@@ -2224,7 +2224,7 @@
 		// before   => insertBefore
 		// append   => appendTo
 		Y.DOM.Function[inside ? operator + 'To' : 'insert' + (operatorIndex ?
-			'Before' : 'After')] = function (html) {
+			'Before' : 'After')] = function(html) {
 			Y.DOM(html)[operator](this);
 			return this;
 		};
@@ -2239,6 +2239,7 @@
 	//Y.Extend(YAXDOM.Y.prototype, Y.DOM.Function);
 
 	YAXDOM.Y.prototype = Y.DOM.Function;
+	Y.DOM.prototype = Y.DOM.Function;
 
 	Y.DOM.YAXDOM = YAXDOM;
 	Y.DOM.globalEval = globalEval;

@@ -127,8 +127,11 @@
 	};
 
 	String.prototype.toCamel = function () {
-		return this.replace(/(\-[a-z])/g, function ($1) {
-			return $1.toUpperCase().replace('-', '');
+		return this.replace(/(\-[a-z])|(\_[a-z])|(\s[a-z])/g, function ($1) {
+			return $1.toUpperCase()
+				.replace('-', '')
+				.replace('_', '')
+				.replace(' ', '');
 		});
 	};
 
@@ -161,7 +164,7 @@
 
 	//---
 
-	Y.VERSION = Y._INFO.VERSION = 0.18;
+	Y.VERSION = Y._INFO.VERSION = 0.19;
 	Y._INFO.BUILD = 4352;
 	Y._INFO.STATUS = 'dev';
 	Y._INFO.CODENAME = 'Raghda';
@@ -212,8 +215,8 @@
 
 	/** @namespace root.R */
 	/** @namespace root.D */
-	Y.Require = root.R || null;
-	Y.Define = root.D || null;
+	Y.Require = root.R || require || null;
+	Y.Define = root.D || define || null;
 
 	//---
 
