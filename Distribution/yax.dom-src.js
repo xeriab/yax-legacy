@@ -77,9 +77,9 @@
 //---
 
 /**
- * Node/Node Module
+ * DOM/DOM Module
  *
- * Cross browser Node utilities using YAX's API.
+ * Cross browser DOM utilities using YAX's API.
  *
  * @version     0.15
  * @depends:    Core
@@ -99,142 +99,111 @@
 
 	'use strict';
 
-	var YAXDOM = Object.create(null),
+	var YAXDOM = Object.create({});
 
-		ClassList,
+	var ClassList;
 
-		IDsList,
+	var IDsList;
 
-		docElement = Y.Document.documentElement,
+	var docElement = Y.Document.documentElement;
 
-		elementDisplay = {},
+	var elementDisplay = Object.create({});
 
-		ClassCache = {},
+	var ClassCache = Object.create({});
 
-		IDsCache = {},
+	var IDsCache = Object.create({});
 
-		FragmentReplacement = /^\s*<(\w+|!)[^>]*>/,
+	// Special attributes that should be get/set via method calls
+	var MethodAttributes = [
+		'title',
+		'value',
+		'val',
+		'css',
+		'html',
+		'text',
+		'data',
+		'width',
+		'height',
+		'offset'
+	];
 
-		SingleTagReplacement = /^<(\w+)\s*\/?>(?:<\/\1>|)$/,
+	var adjacencyOperators = [
+		'after',
+		'prepend',
+		'before',
+		'append'
+	];
 
-		TagExpanderReplacement =
-		/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
+	var Table = Y.Document.createElement('table');
 
-		ReadyReplacement = /complete|loaded|interactive/,
+	var TableRow = Y.Document.createElement('tr');
 
-		//SimpleSelectorReplacement = /^[\w-]*$/,
-		SimpleSelectorReplacement = /^[\w\-]*$/,
+	var Containers = {
+		'tr': Y.Document.createElement('tbody'),
+		'tbody': Table,
+		'thead': Table,
+		'tfoot': Table,
+		'td': TableRow,
+		'th': TableRow,
+		'*': Y.Document.createElement('div')
+	};
 
-		RootNodeReplacement = /^(?:body|html)$/i,
+	var temporaryParent = Y.Document.createElement('div');
 
-		SelectorGroupReplacement = /(([\w#:.~>+()\s-]+|\*|\[.*?\])+)\s*(,|$)/g,
+	var properitiesMap = {
+		'tabindex': 'tabIndex',
+		'readonly': 'readOnly',
+		'for': 'htmlFor',
+		'class': 'className',
+		'maxlength': 'maxLength',
+		'cellspacing': 'cellSpacing',
+		'cellpadding': 'cellPadding',
+		'rowspan': 'rowSpan',
+		'colspan': 'colSpan',
+		'usemap': 'useMap',
+		'frameborder': 'frameBorder',
+		'contenteditable': 'contentEditable',
+		'scrollw': 'scrollWidth',
+		'scrollh': 'scrollHeight',
+		'tagname': 'tagName'
+	};
 
-		// Special attributes that should be get/set via method calls
-		MethodAttributes = [
-			'title',
-			'value',
-			'val',
-			'css',
-			'html',
-			'text',
-			'data',
-			'width',
-			'height',
-			'offset'
-		],
+	var CCSS;
 
-		adjacencyOperators = [
-			'after',
-			'prepend',
-			'before',
-			'append'
-		],
+	var cssShow = {
+		position: 'absolute',
+		visibility: 'hidden',
+		display: 'block'
+	};
 
-		Table = Y.Document.createElement('table'),
+	var cssNormalTransform = {
+		letterSpacing: 0,
+		fontWeight: 400
+	};
 
-		TableRow = Y.Document.createElement('tr'),
+	var cssExpand = [
+		'Top',
+		'Right',
+		'Bottom',
+		'Left'
+	];
 
-		Containers = {
-			'tr': Y.Document.createElement('tbody'),
-			'tbody': Table,
-			'thead': Table,
-			'tfoot': Table,
-			'td': TableRow,
-			'th': TableRow,
-			'*': Y.Document.createElement('div')
-		},
+	var cssPrefixes = [
+		'Webkit',
+		'O',
+		'Moz',
+		'ms'
+	];
 
-		temporaryParent = Y.Document.createElement('div'),
+	var DomNode;
 
-		ClassTag = 'YAX' + (+new Date()),
+	var ClassTag = 'YAX' + Y.Lang.now;
 
-		properitiesMap = {
-			'tabindex': 'tabIndex',
-			'readonly': 'readOnly',
-			'for': 'htmlFor',
-			'class': 'className',
-			'maxlength': 'maxLength',
-			'cellspacing': 'cellSpacing',
-			'cellpadding': 'cellPadding',
-			'rowspan': 'rowSpan',
-			'colspan': 'colSpan',
-			'usemap': 'useMap',
-			'frameborder': 'frameBorder',
-			'contenteditable': 'contentEditable',
-			'scrollw': 'scrollWidth',
-			'scrollh': 'scrollHeight',
-			'tagname': 'tagName'
-		},
+	//---
 
-		CCSS,
-
-		// Matching numbers
-		//pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
-		pnum = /[+\-]?(?:\d*\.|)\d+(?:[eE][+\-]?\d+|)/.source,
-		//		pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
-		//pnum = /[+\-]?\d*\.?\d+(?:e[+\-]?\d+)?/i.source,
-
-		// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
-		// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
-		rdisplayswap = /^(none|table(?!-c[ea]).+)/,
-
-		rmargin = /^margin/,
-
-		//rnumsplit = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(.*)$', 'i'),
-		rnumsplit = new RegExp('^(' + pnum + ')(.*)$', 'i'),
-
-		//rnumnonpx = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(?!px)[a-z%]+$', 'i'),
-		rnumnonpx = new RegExp('^(' + pnum + ')(?!px)[a-z%]+$', 'i'),
-
-		//rrelNum = new RegExp('^([+-])=(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')', 'i'),
-		rrelNum = new RegExp('^([+-])=(' + pnum + ')', 'i'),
-
-		cssShow = {
-			position: 'absolute',
-			visibility: 'hidden',
-			display: 'block'
-		},
-
-		cssNormalTransform = {
-			letterSpacing: 0,
-			fontWeight: 400
-		},
-
-		cssExpand = [
-			'Top',
-			'Right',
-			'Bottom',
-			'Left'
-		],
-
-		cssPrefixes = [
-			'Webkit',
-			'O',
-			'Moz',
-			'ms'
-		],
-
-		DomNode;
+	Y.DOM = function (selector, context) {
+		return YAXDOM.init(selector, context);
+	};
 
 	// BEGIN OF [Private Functions]
 
@@ -357,7 +326,7 @@
 		var result, len = array.length;
 
 		if (len > 0) {
-			result = Y.Node.Function.concat.apply([], array);
+			result = Y.DOM.Function.concat.apply([], array);
 		} else {
 			result = array;
 		}
@@ -483,15 +452,14 @@
 
 		if (computed) {
 			if (Y.Lang.isEmpty(ret) && !contains(element.ownerDocument, element)) {
-				ret = Y.Node.Style(element, name);
+				ret = Y.DOM.Style(element, name);
 			}
 
 			// Support: Safari 5.1
 			// A tribute to the "awesome hack by Dean Edwards"
 			// Safari 5.1.7 (at least) returns percentage for a larger set of values, but width seems to be reliably pixels
 			// this is against the CSSOM draft spec: http://dev.w3.org/csswg/cssom/#resolved-values
-			if (rnumnonpx.test(ret) && rmargin.test(name)) {
-
+			if (Y.RegEx.rnumnonpx.test(ret) && Y.RegEx.rmargin.test(name)) {
 				// Remember the original values
 				width = style.width;
 				minWidth = style.minWidth;
@@ -512,7 +480,7 @@
 	};
 
 	function setPositiveNumber(element, value, subtract) {
-		var matches = rnumsplit.exec(value);
+		var matches = Y.RegEx.rnumsplit.exec(value);
 		return matches ?
 			// Guard against undefined "subtract", e.g., when used as in CSS_Hooks
 			Math.max(0, matches[1] - (subtract || 0)) + (matches[2] || 'px') :
@@ -521,36 +489,36 @@
 
 	function argumentWidthOrHeight(element, name, extra, isBorderBox, styles) {
 		var i = extra === (isBorderBox ? 'border' : 'content') ?
-			// If we already have the right measurement, avoid augmentation
-			4 :
-			// Otherwise initialise for horizontal or vertical properties
-			name === 'width' ? 1 : 0,
+				// If we already have the right measurement, avoid augmentation
+				4 :
+				// Otherwise initialise for horizontal or vertical properties
+					name === 'width' ? 1 : 0,
 			val = 0;
 
 		for (null; i < 4; i += 2) {
 			// both box models exclude margin, so add it if we want it
 			if (extra === 'margin') {
-				val += Y.Node.CSS(element, extra + cssExpand[i], true, styles);
+				val += Y.DOM.CSS(element, extra + cssExpand[i], true, styles);
 			}
 
 			if (isBorderBox) {
 				// border-box includes padding, so remove it if we want content
 				if (extra === 'content') {
-					val -= Y.Node.CSS(element, 'padding' + cssExpand[i], true, styles);
+					val -= Y.DOM.CSS(element, 'padding' + cssExpand[i], true, styles);
 				}
 
 				// at this point, extra isn't border nor margin, so remove border
 				if (extra !== 'margin') {
-					val -= Y.Node.CSS(element, 'border' + cssExpand[i] + 'Width', true,
+					val -= Y.DOM.CSS(element, 'border' + cssExpand[i] + 'Width', true,
 						styles);
 				}
 			} else {
 				// at this point, extra isn't content, so add padding
-				val += Y.Node.CSS(element, 'padding' + cssExpand[i], true, styles);
+				val += Y.DOM.CSS(element, 'padding' + cssExpand[i], true, styles);
 
 				// at this point, extra isn't content nor padding, so add border
 				if (extra !== 'padding') {
-					val += Y.Node.CSS(element, 'border' + cssExpand[i] + 'Width', true,
+					val += Y.DOM.CSS(element, 'border' + cssExpand[i] + 'Width', true,
 						styles);
 				}
 			}
@@ -564,7 +532,7 @@
 		var valueIsBorderBox = true,
 			val = name === 'width' ? element.offsetWidth : element.offsetHeight,
 			styles = getStyles(element),
-			isBorderBox = Y.Node.Support.boxSizing && Y.Node.CSS(element, 'boxSizing',
+			isBorderBox = Y.DOM.Support.boxSizing && Y.DOM.CSS(element, 'boxSizing',
 				false, styles) === 'border-box';
 
 		// val = val.toString();
@@ -581,13 +549,13 @@
 			}
 
 			// Computed unit is not pixels. Stop here and return.
-			if (rnumnonpx.test(val.toString())) {
+			if (Y.RegEx.rnumnonpx.test(val.toString())) {
 				return val;
 			}
 
 			// we need the check for style in case a browser which returns unreliable values
 			// for getComputedStyle silently falls back to the reliable element.style
-			valueIsBorderBox = isBorderBox && (Y.Node.Support.boxSizingReliable || val ===
+			valueIsBorderBox = isBorderBox && (Y.DOM.Support.boxSizingReliable || val ===
 				element.style[name]);
 
 			// Normalize "", auto, and prepare for extra
@@ -599,11 +567,11 @@
 			argumentWidthOrHeight(
 				element,
 				name,
-				extra || (isBorderBox ? 'border' : 'content'),
+					extra || (isBorderBox ? 'border' : 'content'),
 				valueIsBorderBox,
 				styles
 			)
-		) + 'px';
+			) + 'px';
 	}
 
 	function globalEval(code) {
@@ -622,34 +590,11 @@
 		}
 	}
 
-	// Given a selector, splits it into groups. Necessary because naively
-	// splitting on commas will do the wrong thing.
-	//
-	// Examples:
-	// "div.foo" -> ["div.foo"]
-	// "div, p" -> ["div", "p"]
-	// "div[title='foo, bar'], p" -> ["div[title='foo, bar']", "p"]
-	function splitSelector(selector) {
-		var results = [];
-		selector.replace(SelectorGroupReplacement, function (m, unit) {
-			results.push(unit.trim());
-		});
-		return results;
-	}
-
-	// Checks whether the selector has a combinator in it. If not, it's a
-	// "simple selector" and can be optimized in some cases.
-	// This logic isn't exhaustive, but it doesn't have to be. False
-	// positives are OK.
-	function hasCombinator(selector) {
-		return selector.match(/[\s>~+]/);
-	}
-
 	// END OF [Private Functions]
 
 	//---
 
-	YAXDOM = {
+	Y.Extend(YAXDOM, {
 		/**
 		 *
 		 * @param element
@@ -688,34 +633,38 @@
 			/* jshint -W052 */
 			result = ~YAXDOM.QSA(parent, selector).indexOf(element);
 
-			temp && temporaryParent.appendChild(element);
+			// temp && temporaryParent.appendChild(element);
+
+			if (temp) {
+				temporaryParent.appendChild(element);
+			}
 
 			return result;
 		},
 
 		// `YAXDOM.Fragment` takes a html string and an optional tag name
-		// to generate Node nodes nodes from the given html string.
-		// The generated Node nodes are returned as an array.
+		// to generate DOM nodes from the given html string.
+		// The generated DOM nodes are returned as an array.
 		// This function can be overriden in plugins for example to make
-		// it compatible with browsers that don't support the Node fully.
+		// it compatible with browsers that don't support the DOM fully.
 		Fragment: function (html, name, properties) {
-			var dom, nodes, container;
+			var dom, nodes, container, self;
 
 			// A special case optimization for a single tag
-			if (SingleTagReplacement.test(html)) {
-				dom = Y.Node(Y.Document.createElement(RegExp.$1));
+			if (Y.RegEx.SingleTagReplacement.test(html)) {
+				dom = Y.DOM(Y.Document.createElement(RegExp.$1));
 			}
 
 			if (!dom) {
 				if (html.replace) {
-					html = html.replace(TagExpanderReplacement, '<$1></$2>');
+					html = html.replace(Y.RegEx.TagExpanderReplacement, '<$1></$2>');
 				}
 
 				if (name === undef) {
-					name = FragmentReplacement.test(html) && RegExp.$1;
+					name = Y.RegEx.FragmentReplacement.test(html) && RegExp.$1;
 				}
 
-				if (!(Containers.hasOwnProperty(name))) {
+				if (!(Y.HasOwnProperty.call(Containers, name))) {
 					name = '*';
 				}
 
@@ -724,12 +673,14 @@
 				container.innerHTML = Y.Lang.empty() + html;
 
 				dom = Y.Each(Y.G.Slice.call(container.childNodes), function () {
-					container.removeChild(this);
+					self = this;
+					// container.removeChild(this);
+					container.removeChild(self);
 				});
 			}
 
 			if (Y.Lang.isPlainObject(properties)) {
-				nodes = Y.Node(dom);
+				nodes = Y.DOM(dom);
 
 				Y.Each(properties, function (key, value) {
 					if (MethodAttributes.indexOf(key) > -1) {
@@ -743,9 +694,7 @@
 			return dom;
 		},
 
-		// constructor: YAXDOM,
-
-		// `YAXDOM.init` is Y.Node's counterpart to jQuery's `Y.Node.Function.init` and
+		// `YAXDOM.init` is Y.DOM's counterpart to jQuery's `Y.DOM.Function.init` and
 		// takes a CSS selector and an optional context (and handles various
 		// special cases).
 		// This method can be overriden in plugins.
@@ -762,56 +711,56 @@
 				selector = selector.trim();
 
 				// If it's a html Fragment, create nodes from it
-				// Note: In both Chrome 21 and Firefox 15, Node error 12
+				// Note: In both Chrome 21 and Firefox 15, DOM error 12
 				// is thrown if the Fragment doesn't begin with <
-				// if (selector[0] === '<' && FragmentReplacement.test(selector)) {
+				// if (selector[0] === '<' && Y.RegEx.FragmentReplacement.test(selector)) {
 				if (selector[0] === '<' && selector[selector.length - 1] === '>' &&
-					FragmentReplacement.test(selector) && selector.length >= 3) {
+					Y.RegEx.FragmentReplacement.test(selector) && selector.length >= 3) {
 					dom = YAXDOM.Fragment(selector, RegExp.$1, context);
 					// selector = selector.replace('<', '').replace('>', '');
 					selector = null;
 				} else if (context !== undef) {
 					// If there's a context, create a collection on that context first, and select nodes from there
-					return Y.Node(context).find(selector);
+					return Y.DOM(context).find(selector);
 				} else {
 					// If it's a CSS selector, use it to select nodes.
-					dom = YAXDOM.QSA(Y.Document, selector);
+					dom = this.QSA(Y.Document, selector);
 				}
 			}
 
-			// If a function is given, call it when the Node is ready
+			// If a function is given, call it when the DOM is ready
 			else if (Y.Lang.isFunction(selector)) {
-				return Y.Node(Y.Document).ready(selector);
+				return Y.DOM(Y.Document).ready(selector);
 				// If a YAX collection is given, just return it
-			} else if (YAXDOM.isY(selector)) {
+			} else if (this.isY(selector)) {
 				return selector;
 			} else {
 				// normalize array if an array of nodes is given
 				if (Y.Lang.isArray(selector)) {
 					dom = Y.Lang.compact(selector);
-					// dom = Y.Node.makeArray(selector, YAXDOM.Y());
-					// Wrap Node nodes.
+					// dom = Y.DOM.makeArray(selector, this.Y());
+					// Wrap DOM nodes.
 				} else if (Y.Lang.isObject(selector)) {
 					dom = [selector];
 					selector = null;
 					// If it's a html Fragment, create nodes from it
-				} else if (FragmentReplacement.test(selector)) {
-					dom = YAXDOM.Fragment(selector.trim(), RegExp.$1, context);
+				} else if (Y.RegEx.FragmentReplacement.test(selector)) {
+					dom = this.Fragment(selector.trim(), RegExp.$1, context);
 					selector = null;
 					// If there's a context, create a collection on that context first, and select
 					// nodes from there
 				} else if (Y.Lang.isDefined(context)) {
-					// return Y.Node(context).find(selector);
+					return Y.DOM(context).find(selector);
 					// console.log(context);
-					//result = Y.Node(context).find(selector);
+					//result = Y.DOM(context).find(selector);
 					// And last but no least, if it's a CSS selector, use it to select nodes.
 				} else {
-					dom = YAXDOM.QSA(Y.Document, selector);
+					dom = this.QSA(Y.Document, selector);
 				}
 			}
 
 			// Create a new YAXDOM collection from the nodes found
-			return YAXDOM.Y(dom, selector);
+			return this.Y(dom, selector);
 		},
 
 		// `YAXDOM.QSA` is YAX's CSS selector implementation which
@@ -835,7 +784,7 @@
 				nameOnly = selector;
 			}
 
-			isSimple = SimpleSelectorReplacement.test(nameOnly);
+			isSimple = Y.RegEx.SimpleSelectorReplacement.test(nameOnly);
 
 			if (Y.Lang.isDocument(element) && isSimple && maybeID) {
 				found = element.getElementById(nameOnly);
@@ -844,56 +793,52 @@
 					// result = {'res': found};
 					result = [found];
 				} else {
-					// result = {};
+					// result = Object.create({});
 					result = [];
 				}
 			} else {
 				result = (!Y.Lang.isUndefined(element) && element.nodeType !== 1 &&
-					element.nodeType !== 9) ? {} :
+					element.nodeType !== 9) ? Object.create({}) :
 					Y.G.Slice.call(
-						isSimple && !maybeID ?
-						// If it's simple, it could be a class
-						maybeClass ? element.getElementsByClassName(nameOnly) :
-						// Or a tag
-						element.getElementsByTagName(selector) :
-						// Or it's not simple, and we need to query all
-						element.querySelectorAll(selector)
-				);
+							isSimple && !maybeID ?
+							// If it's simple, it could be a class
+							maybeClass ? element.getElementsByClassName(nameOnly) :
+								// Or a tag
+								element.getElementsByTagName(selector) :
+							// Or it's not simple, and we need to query all
+							element.querySelectorAll(selector)
+					);
 			}
 
 			return result;
 		},
 
-		// `YAXDOM.Y` swaps out the prototype of the given `Node` array
-		// of nodes with `Y.Node.Function` and thus supplying all the Y.Node functions
+		// `YAXDOM.Y` swaps out the prototype of the given `DOM` array
+		// of nodes with `Y.DOM.Function` and thus supplying all the Y.DOM functions
 		// to the array. Note that `__proto__` is not supported on Internet
 		// Explorer. This method can be overriden in Plugins.
 		Y: function (dom, selector) {
 			var result;
 
 			result = dom || [];
-
+			// result = dom || Object.create({});
 			/* jshint -W103 */
-			result.__proto__ = Y.Node.Function;
-
+			// result.__proto__ = Y.DOM.Function;
+			result.__proto__ = Y.DOM.Function;
+			// Y.Extend(result.__proto__, Y.DOM.Function);
 			result.selector = selector || Y.Lang.empty();
 
 			return result;
 		},
 
 		/**
-		 * Y.Node.isY` should return `true` if the given object is a YAX collection. This method can be overriden in plugins.
+		 * YAXDOM.isY` should return `true` if the given object is
+		 * a YAX.DOM collection. This method can be overriden in plugins.
 		 */
 		isY: function (object) {
-			return object instanceof YAXDOM.Y;
+			return object instanceof this.Y;
 		}
-	};
-
-	//---
-
-	Y.Node = function (selector, context) {
-		return new YAXDOM.init(selector, context);
-	};
+	});
 
 	//---
 
@@ -902,9 +847,9 @@
 
 		if (Y.Lang.isNull(selector) || Y.Lang.isUndefined(selector) || Y.Lang.isEmpty(
 			selector)) {
-			result = Y.Node(nodes);
+			result = Y.DOM(nodes);
 		} else {
-			result = Y.Node(nodes).filter(selector);
+			result = Y.DOM(nodes).filter(selector);
 		}
 
 		return result;
@@ -913,14 +858,14 @@
 	//---
 
 	/**
-	 * Y.DomNode is a Node class that Y.Node classes inherit from.
+	 * Y.DomNode is a DOM class that Y.DOM classes inherit from.
 	 */
 	Y.DomNode = Y.Class.Extend({
 		CLASS_NAME: 'DOM',
 
-		initialise: function (selector, context) {
-			return YAXDOM.init(selector, context);
-		},
+		// initialise: function (selector, context) {
+		// 	return YAXDOM.init(selector, context);
+		// },
 
 		getStyle: function (el, style) {
 			var value, css;
@@ -936,41 +881,42 @@
 		},
 
 		documentIsLtr: function () {
-			Y.Node.docIsLTR = Y.Node.docIsLTR || DomNode.getStyle(Y.Document.body,
+			Y.DOM.docIsLTR = Y.DOM.docIsLTR || DomNode.getStyle(Y.Document.body,
 				'direction') === 'ltr';
-			return Y.Node.docIsLTR;
+			return Y.DOM.docIsLTR;
 		},
 
 		'Function': {
+			'YAX.DOM': '0.10',
 			// Because a collection acts like an array
 			// copy over these useful array functions.
 			forEach: Y.G.ArrayProto.forEach,
 			reduce: Y.G.ArrayProto.reduce,
 			push: Y.G.Push,
 			sort: Y.G.ArrayProto.sort,
-			indexOf: Y.G.ArrayProto.indexOf,
+			indexOf: Y.G.IndexOf,
 			concat: Y.G.Concat,
 			extend: Y.Extend,
 			// `map` and `slice` in the jQuery API work differently
 			// from their array counterparts
 			map: function (callback) {
-				return Y.Node(map(this, function (el, i) {
+				return Y.DOM(map(this, function (el, i) {
 					return callback.call(el, i, el);
 				}));
 			},
 			slice: function () {
-				return Y.Node(Y.G.Slice.apply(this, arguments));
-				// return Y.Node.pushStack(Slice.apply(this, arguments));
+				return Y.DOM(Y.G.Slice.apply(this, arguments));
+				// return Y.DOM.pushStack(Slice.apply(this, arguments));
 			},
 			ready: function (callback) {
 				// need to check if Y.Document.body exists for IE as that browser reports
 				// Y.Document ready when it hasn't yet created the body element
-				if (ReadyReplacement.test(Y.CallProperty(Y.Document, 'readyState')) &&
+				if (Y.RegEx.ReadyReplacement.test(Y.CallProperty(Y.Document, 'readyState')) &&
 					Y.Document.body) {
-					callback(Y.Node);
+					callback(Y.DOM);
 				} else {
 					Y.Document.addEventListener('DOMContentLoaded', function () {
-						callback(Y.Node);
+						callback(Y.DOM);
 					}, false);
 				}
 
@@ -1014,12 +960,12 @@
 					return this.not(this.not(selector));
 				}
 
-				return Y.Node(Y.G.Filter.call(this, function (element) {
+				return Y.DOM(Y.G.Filter.call(this, function (element) {
 					return YAXDOM.Matches(element, selector);
 				}));
 			},
 			add: function (selector, context) {
-				return Y.Node(Y.Lang.unique(this.concat(Y.Node(selector, context))));
+				return Y.DOM(Y.Lang.unique(this.concat(Y.DOM(selector, context))));
 			},
 			is: function (selector) {
 				return this.length > 0 && YAXDOM.Matches(this[0], selector);
@@ -1037,7 +983,7 @@
 				} else {
 					excludes = Y.Lang.isString(selector) ? this.filter(selector) :
 						(Y.Lang.likeArray(selector) && Y.Lang.isFunction(selector.item)) ? Y.G.Slice
-						.call(selector) : Y.Node(selector);
+							.call(selector) : Y.DOM(selector);
 
 					this.forEach(function (el) {
 						if (excludes.indexOf(el) < 0) {
@@ -1046,13 +992,13 @@
 					});
 				}
 
-				return Y.Node(nodes);
+				return Y.DOM(nodes);
 			},
 			has: function (selector) {
 				return this.filter(function () {
 					return Y.Lang.isObject(selector) ?
 						contains(this, selector) :
-						Y.Node(this).find(selector).size();
+						Y.DOM(this).find(selector).size();
 				});
 			},
 			eq: function (index) {
@@ -1060,108 +1006,44 @@
 			},
 			first: function () {
 				var el = this[0];
-				return el && !Y.Lang.isObject(el) ? el : Y.Node(el);
+				return el && !Y.Lang.isObject(el) ? el : Y.DOM(el);
 			},
 			last: function () {
 				var el = this[this.length - 1];
-				return el && !Y.Lang.isObject(el) ? el : Y.Node(el);
+				return el && !Y.Lang.isObject(el) ? el : Y.DOM(el);
 			},
-			find: function (selector) {
-				var result, $this = this,
-					error = false,
-					node;
 
-				/*if (Y.Lang.isObject(selector)) {
-					result = Y.Node(selector).filter(function () {
-						node = this;
-						return Y.G.ArrayProto.some.call($this, function (parent) {
-							return contains(parent, node);
+			find: function (selector) {
+				var result;
+				var self = this;
+
+				if (!selector) {
+					result = [];
+				} else if (Y.Lang.isObject(selector)) {
+					result = Y.DOM(selector).filter(function () {
+						var node = this;
+
+						return Y.G.ArrayProto.some.call(self, function (parent) {
+							return Y.DOM.contains(parent, node);
 						});
 					});
 				} else if (this.length === 1) {
-					result = Y.Node(YAXDOM.QSA(this[0], selector));
+					result = Y.DOM(YAXDOM.QSA(this[0], selector));
 				} else {
 					result = this.map(function () {
 						return YAXDOM.QSA(this, selector);
 					});
-				}*/
-
-				if (Y.Lang.isObject(selector)) {
-					result = Y.Node(selector).filter(function () {
-						node = this;
-						return Y.G.ArrayProto.some.call($this, function (parent) {
-							return contains(parent, node);
-						});
-					});
-				} else {
-					var slow = false;
-
-					selector = splitSelector(selector).map(function (unit) {
-						if (hasCombinator(selector)) {
-							slow = true;
-							return '.' + ClassTag + ' ' + unit;
-						}
-
-						return unit;
-					}).join(', ');
-
-					var findBySelector = function findBySelector(elem, selector, slow) {
-						if (elem.length == 1) {
-							if (slow) {
-								elem.addClass(ClassTag);
-							}
-
-							result = Y.Node(YAXDOM.QSA(elem[0], selector));
-
-							if (slow) {
-								elem.removeClass(ClassTag);
-							}
-						} else {
-							result = elem.map(function () {
-								if (slow) {
-									Y.Node(this).addClass(ClassTag);
-								}
-
-								var result = YAXDOM.QSA(this, selector);
-
-								if (slow) {
-									Y.Node(this).removeClass(ClassTag);
-								}
-
-								return result;
-							});
-						}
-
-						return result;
-					};
-
-					if (slow) {
-						try {
-							result = findBySelector(this, selector, slow);
-						} catch (e) {
-							Y.ERROR('error performing selector: %o', selector);
-							error = true;
-							throw e;
-						} finally {
-							// If an error was thrown, we should assume that the class name
-							// cleanup didn't happen, and do it ourselves.
-							if (error) {
-								Y.Node('.' + ClassTag).removeClass(ClassTag);
-							}
-						}
-					} else {
-						result = findBySelector(this, selector, slow);
-					}
 				}
 
 				return result;
 			},
+
 			closest: function (selector, context) {
 				var node = this[0],
 					collection = false;
 
 				if (Y.Lang.isObject(selector)) {
-					collection = Y.Node(selector);
+					collection = Y.DOM(selector);
 				}
 
 				while (node && Y.Lang.isFalse(collection ? collection.indexOf(node) >= 0 :
@@ -1169,7 +1051,7 @@
 					node = node !== context && !Y.Lang.isDocument(node) && node.parentNode;
 				}
 
-				return Y.Node(node);
+				return Y.DOM(node);
 			},
 			parents: function (selector) {
 				var ancestors = [],
@@ -1253,20 +1135,20 @@
 					dom, clone;
 
 				if (this[0] && !func) {
-					dom = Y.Node(structure).get(0);
+					dom = Y.DOM(structure).get(0);
 					clone = dom.parentNode || this.length > 1;
 				}
 
 				return this.each(function (index) {
-					Y.Node(this).wrapAll(
+					Y.DOM(this).wrapAll(
 						func ? structure.call(this, index) :
-						clone ? dom.cloneNode(true) : dom
+							clone ? dom.cloneNode(true) : dom
 					);
 				});
 			},
 			wrapAll: function (structure) {
 				if (this[0]) {
-					Y.Node(this[0]).before(structure = Y.Node(structure));
+					Y.DOM(this[0]).before(structure = Y.DOM(structure));
 
 					var childreno, self = this;
 
@@ -1277,7 +1159,7 @@
 						structure = children.first();
 					}
 
-					Y.Node(structure).append(self);
+					Y.DOM(structure).append(self);
 				}
 
 				return this;
@@ -1286,7 +1168,7 @@
 				var func = Y.Lang.isFunction(structure),
 					self, dom, contents;
 				return this.each(function (index) {
-					self = Y.Node(this);
+					self = Y.DOM(this);
 
 					contents = self.contents();
 
@@ -1303,7 +1185,7 @@
 			},
 			unwrap: function () {
 				this.parent().each(function () {
-					Y.Node(this).replaceWith(Y.Node(this).children());
+					Y.DOM(this).replaceWith(Y.DOM(this).children());
 				});
 
 				return this;
@@ -1318,7 +1200,7 @@
 			},
 			toggle: function (setting) {
 				return this.each(function () {
-					var el = Y.Node(this),
+					var el = Y.DOM(this),
 						val;
 
 					val = el.css('display') === 'none';
@@ -1337,18 +1219,18 @@
 				});
 			},
 			prev: function (selector) {
-				return Y.Node(this.pluck('previousElementSibling')).filter(selector ||
+				return Y.DOM(this.pluck('previousElementSibling')).filter(selector ||
 					'*');
 			},
 			next: function (selector) {
-				return Y.Node(this.pluck('nextElementSibling')).filter(selector || '*');
+				return Y.DOM(this.pluck('nextElementSibling')).filter(selector || '*');
 			},
 			html: function (html) {
 				return arguments.length === 0 ?
 					(this.length > 0 ? this[0].innerHTML : null) :
 					this.each(function (index) {
 						var originHtml = this.innerHTML;
-						Y.Node(this).empty().append(functionArgument(this, html, index,
+						Y.DOM(this).empty().append(functionArgument(this, html, index,
 							originHtml));
 					});
 			},
@@ -1374,9 +1256,9 @@
 				return (Y.Lang.isString(name) && value === undef) ?
 					(this.length === 0 || this[0].nodeType !== 1 ? undef :
 						(name === 'value' && this[0].nodeName === 'INPUT') ? this.val() :
-						(Y.Lang.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
-							name)) ? this[0][name] : result
-					) :
+							(Y.Lang.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
+								name)) ? this[0][name] : result
+						) :
 					this.each(function (index) {
 						if (this.nodeType !== 1) {
 							return;
@@ -1433,7 +1315,7 @@
 			val: function (value) {
 				return arguments.length === 0 ?
 					(this[0] && (this[0].multiple ?
-						Y.Node(this[0]).find('option').filter(function () {
+						Y.DOM(this[0]).find('option').filter(function () {
 							return this.selected;
 						}).pluck('value') :
 						this[0].value)) :
@@ -1444,7 +1326,7 @@
 			value: function (value) {
 				return arguments.length === 0 ?
 					(this[0] && (this[0].multiple ?
-						Y.Node(this[0]).find('option').filter(function () {
+						Y.DOM(this[0]).find('option').filter(function () {
 							return this.selected;
 						}).pluck('value') :
 						this[0].value)) :
@@ -1455,7 +1337,7 @@
 			offset: function (coordinates) {
 				if (coordinates) {
 					return this.each(function (index) {
-						var $this = Y.Node(this),
+						var $this = Y.DOM(this),
 							coords = functionArgument(this, coordinates, index, $this.offset()),
 							parentOffset = $this.offsetParent().offset(),
 							props = {
@@ -1498,7 +1380,7 @@
 					return options === undef ?
 						this :
 						this.each(function (i) {
-							Y.Node.offset.setOffset(this, options, i);
+							Y.DOM.offset.setOffset(this, options, i);
 						});
 				}
 
@@ -1516,7 +1398,7 @@
 
 				docElem = Y.Document.documentElement;
 
-				// Make sure it's not a disconnected Node node
+				// Make sure it's not a disconnected DOM node
 				if (!contains(docElem, element)) {
 					return box;
 				}
@@ -1550,7 +1432,7 @@
 					}
 
 					if (Y.Lang.isArray(name)) {
-						props = {};
+						props = Object.create({});
 
 						Y.Each(Y.Lang.isArray(name) ? name : [name], function (tmp, prop) {
 							props[prop] = (element.style[Y.Lang.camelise(prop)] || computedStyle.getPropertyValue(
@@ -1569,8 +1451,8 @@
 					}
 				}
 
-				return Y.Node.Access(this, function (element, name, value) {
-					var styles, len, mapo = {},
+				return Y.DOM.Access(this, function (element, name, value) {
+					var styles, len, mapo = Object.create({}),
 						i = 0;
 
 					if (Y.Lang.isArray(name)) {
@@ -1578,20 +1460,20 @@
 						len = name.length;
 
 						for (i; i < len; i++) {
-							mapo[name[i]] = Y.Node.CSS(element, name[i], false, styles);
+							mapo[name[i]] = Y.DOM.CSS(element, name[i], false, styles);
 						}
 
 						return mapo;
 					}
 
 					return value !== undef ?
-						Y.Node.Style(element, name, value) :
-						Y.Node.CSS(element, name);
+						Y.DOM.Style(element, name, value) :
+						Y.DOM.CSS(element, name);
 				}, name, value, arguments.length > 1);
 			},
 
 			prevAll: function (elem) {
-				return Y.Node.dir(elem, "previousSibling");
+				return Y.DOM.dir(elem, "previousSibling");
 			},
 
 			index: function (element) {
@@ -1599,15 +1481,15 @@
 				//					return (this[0] && this[0].parentNode) ? this.first().prevAll().length : -1;
 				//				}
 
-				//				return this.indexOf(Y.Node(element)[0]);
+				//				return this.indexOf(Y.DOM(element)[0]);
 
 				//				if (Y.Lang.isString(element)) {
-				//					return this.indexOf.call(Y.Node(element), this[0]);
+				//					return this.indexOf.call(Y.DOM(element), this[0]);
 				//				}
 
 				//				return this.indexOf.call(this, element.YAXDOM ? element[0] : element);
 
-				return element ? this.indexOf(Y.Node(element)[0]) : this.parent().children()
+				return element ? this.indexOf(Y.DOM(element)[0]) : this.parent().children()
 					.indexOf(this[0]);
 			},
 			hasClass: function (name) {
@@ -1640,7 +1522,7 @@
 						newName = functionArgument(this, name, index, id);
 
 					newName.split(/\s+/g).forEach(function (ID) {
-						if (!Y.Node(this).hasId(ID)) {
+						if (!Y.DOM(this).hasId(ID)) {
 							IDsList.push(ID);
 						}
 					}, this);
@@ -1668,7 +1550,7 @@
 						newName = functionArgument(this, name, index, cls);
 
 					newName.split(/\s+/g).forEach(function (Class) {
-						if (!Y.Node(this).hasClass(Class)) {
+						if (!Y.DOM(this).hasClass(Class)) {
 							ClassList.push(Class);
 						}
 					}, this);
@@ -1723,7 +1605,7 @@
 				}
 
 				return this.each(function (index) {
-					var $this = Y.Node(this),
+					var $this = Y.DOM(this),
 						names = functionArgument(this, name, index, className(this));
 
 					names.split(/\s+/g).forEach(function (Class) {
@@ -1790,7 +1672,7 @@
 					};
 
 				// Fixed elements are offset from window (parentOffset = {top:0, left: 0}, because it is it's only offset parent
-				if (Y.Node.CSS(element, 'position') === "fixed") {
+				if (Y.DOM.CSS(element, 'position') === "fixed") {
 					// We assume that getBoundingClientRect is available when computed position is fixed
 					offset = element.getBoundingClientRect();
 
@@ -1801,20 +1683,20 @@
 					// Get correct offsets
 					offset = this.offset();
 
-					if (!Y.Node.nodeName(offsetParent[0], "html")) {
+					if (!Y.DOM.nodeName(offsetParent[0], "html")) {
 						parentOffset = offsetParent.offset();
 					}
 
 					// Add offsetParent borders
-					parentOffset.top += Y.Node.CSS(offsetParent[0], "borderTopWidth", true);
-					parentOffset.left += Y.Node.CSS(offsetParent[0], "borderLeftWidth", true);
+					parentOffset.top += Y.DOM.CSS(offsetParent[0], "borderTopWidth", true);
+					parentOffset.left += Y.DOM.CSS(offsetParent[0], "borderLeftWidth", true);
 				}
 
 				// Subtract parent offsets and element margins
 				return {
-					top: offset.top - parentOffset.top - Y.Node.CSS(element, "marginTop",
+					top: offset.top - parentOffset.top - Y.DOM.CSS(element, "marginTop",
 						true),
-					left: offset.left - parentOffset.left - Y.Node.CSS(element, "marginLeft",
+					left: offset.left - parentOffset.left - Y.DOM.CSS(element, "marginLeft",
 						true)
 				};
 			},
@@ -1824,11 +1706,11 @@
 				}
 
 				var element = this[0],
-					// Get *real* offsetParent
+				// Get *real* offsetParent
 					offsetParent = this.offsetParent(),
-					// Get correct offsets
+				// Get correct offsets
 					offset = this.offset(),
-					parentOffset = RootNodeReplacement.test(offsetParent[0].nodeName) ? {
+					parentOffset = Y.RegEx.RootNodeReplacement.test(offsetParent[0].nodeName) ? {
 						top: 0,
 						left: 0
 					} : offsetParent.offset();
@@ -1836,13 +1718,13 @@
 				// Subtract element margins
 				// note: when an element has margin: auto the offsetLeft and marginLeft
 				// are the same in Safari causing offset.left to incorrectly be 0
-				offset.top -= parseFloat(Y.Node(element).css('margin-top')) || 0;
-				offset.left -= parseFloat(Y.Node(element).css('margin-left')) || 0;
+				offset.top -= parseFloat(Y.DOM(element).css('margin-top')) || 0;
+				offset.left -= parseFloat(Y.DOM(element).css('margin-left')) || 0;
 
 				// Add offsetParent borders
-				parentOffset.top += parseFloat(Y.Node(offsetParent[0]).css(
+				parentOffset.top += parseFloat(Y.DOM(offsetParent[0]).css(
 					'border-top-width')) || 0;
-				parentOffset.left += parseFloat(Y.Node(offsetParent[0]).css(
+				parentOffset.left += parseFloat(Y.DOM(offsetParent[0]).css(
 					'border-left-width')) || 0;
 
 				// Subtract the two offsets
@@ -1855,7 +1737,7 @@
 				return this.map(function () {
 					var offsetParent = this.offsetParent || docElement;
 
-					while (offsetParent && (!Y.Node.nodeName(offsetParent, 'html') && Y.Node
+					while (offsetParent && (!Y.DOM.nodeName(offsetParent, 'html') && Y.DOM
 						.CSS(offsetParent, 'position') === 'static')) {
 						offsetParent = offsetParent.offsetParent;
 					}
@@ -1905,7 +1787,7 @@
 					} else {
 						bulk = callback;
 						callback = function (element, key, value) {
-							return bulk.call(Y.Node(element), value);
+							return bulk.call(Y.DOM(element), value);
 						};
 					}
 				}
@@ -1927,7 +1809,7 @@
 		// If support gets modularized, this method should be moved back to the css module.
 		Swap: function (element, options, callback, args) {
 			var ret, name,
-				old = {};
+				old = Object.create({});
 
 			// Remember the old values, and insert the new ones
 			for (name in options) {
@@ -1955,14 +1837,20 @@
 			var ret = Y.Lang.merge(this.constructor(), elems);
 
 			// Add the old object onto the stack (as a reference)
-			ret.prev = this;
+			ret.prevObject = this;
 			ret.context = this.context;
 
 			// Return the newly-formed element set
 			return ret;
 		},
 		nodeName: function (element, name) {
-			return element.nodeName && element.nodeName.toLowerCase() === name.toLowerCase();
+			if (Y.Lang.isSet(element) && !Y.Lang.isSet(name)) {
+				return element.nodeName;
+			}
+
+			if (Y.Lang.isSet(element) && Y.Lang.isSet(name)) {
+				return element.nodeName && element.nodeName.toLowerCase() === name.toLowerCase();
+			}
 		},
 		// Add in style property hooks for overriding the default
 		// behavior of getting and setting a style property
@@ -1996,7 +1884,7 @@
 			// normalize float css property
 			'float': 'cssFloat'
 		},
-		// Get and set the style property on a Node Node
+		// Get and set the style property on a DOM DOM
 		Style: function (element, name, value, extra) {
 			// Don't set styles on text and comment nodes
 			if (!element || element.nodeType === 3 || element.nodeType === 8 || !
@@ -2021,7 +1909,7 @@
 
 			// Check if we're setting a value
 			if (value !== undef) {
-				ret = rrelNum.exec(value);
+				ret = Y.RegEx.rrelNum.exec(value);
 
 				// Convert relative number strings (+= or -=) to relative numbers. #7345
 				if (Y.Lang.isString(value) && ret) {
@@ -2051,7 +1939,8 @@
 					style[name] = value;
 
 					if (!newvalue && newvalue !== 0) {
-						style.setProperty(name, Y.Lang.empty());
+						// style.setProperty(name, Y.Lang.empty());
+						style.setProperty(name, Y.Lang.empty(), Y.Lang.empty());
 						style.removeProperty(name);
 					}
 				}
@@ -2109,14 +1998,18 @@
 
 	//---
 
-	Y.Extend(Y.Node, {
+	Y.DOM.ClassTag = ClassTag;
+
+	//---
+
+	Y.Extend(Y.DOM, {
 		offset: {
 			setOffset: function (element, options, i) {
 				var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft,
 					calculatePosition,
-					position = Y.Node.CSS(element, "position"),
-					curElem = Y.Node(element),
-					props = {};
+					position = Y.DOM.CSS(element, "position"),
+					curElem = Y.DOM(element),
+					props = Object.create({});
 
 				// Set position first, in-case top/left are set even on static element
 				if (position === "static") {
@@ -2124,8 +2017,8 @@
 				}
 
 				curOffset = curElem.offset();
-				curCSSTop = Y.Node.CSS(element, "top");
-				curCSSLeft = Y.Node.CSS(element, "left");
+				curCSSTop = Y.DOM.CSS(element, "top");
+				curCSSLeft = Y.DOM.CSS(element, "left");
 				calculatePosition = (position === "absolute" || position === "fixed") &&
 					(curCSSTop + curCSSLeft).indexOf("auto") > -1;
 
@@ -2201,16 +2094,6 @@
 
 		Function: DomNode.Function,
 
-		expr: {},
-
-		Expr: {},
-
-		support: {},
-
-		map: map,
-
-		Map: map,
-
 		UUID: 0,
 
 		GUID: 0,
@@ -2224,14 +2107,16 @@
 		parseJSON: Y.Lang.parseJSON
 	});
 
-	Y.Node.Support = Y.Node.support;
+	Y.DOM.Support = Y.DOM.support = Object.create({});
+	Y.DOM.Expr = Y.DOM.expr = Object.create({});
+	Y.DOM.Map = Y.DOM.map = map;
 
 	//---
 
 
 	//---
 
-	// Y.Node.prototype = DomNode.prototype;
+	Y.DOM.prototype = DomNode.prototype;
 
 	//---
 
@@ -2242,8 +2127,8 @@
 	}, function (method, prop) {
 		var top = 'pageYOffset' === prop;
 
-		Y.Node.Function[method] = function (val) {
-			return Y.Node.Access(this, function (element, method, val) {
+		Y.DOM.Function[method] = function (val) {
+			return Y.DOM.Access(this, function (element, method, val) {
 				var win = getWindow(element);
 
 				if (val === undef) {
@@ -2262,19 +2147,19 @@
 
 	//---
 
-	Y.Node.cssExpand = cssExpand;
+	Y.DOM.cssExpand = cssExpand;
 
 	//---
 
 	Y.Each(['height', 'width'], function (i, name) {
-		Y.Node.CSS_Hooks[name] = {
+		Y.DOM.CSS_Hooks[name] = {
 			get: function (element, computed, extra) {
 				if (computed) {
 					// certain elements can have dimension info if we invisibly show them
 					// however, it must have a current display style that would benefit from this
-					return element.offsetWidth === 0 && rdisplayswap.test(Y.Node.CSS(element,
-							'display')) ?
-						Y.Node.Swap(element, cssShow, function () {
+					return element.offsetWidth === 0 && Y.RegEx.rdisplayswap.test(Y.DOM.CSS(element,
+						'display')) ?
+						Y.DOM.Swap(element, cssShow, function () {
 							return getWidthOrHeight(element, name, extra);
 						}) :
 						getWidthOrHeight(element, name, extra);
@@ -2283,14 +2168,14 @@
 			set: function (element, value, extra) {
 				var styles = extra && getStyles(element);
 				return setPositiveNumber(element, value, extra ?
-					argumentWidthOrHeight(
-						element,
-						name,
-						extra,
-						Y.Node.Support.boxSizing && Y.Node.CSS(element, 'boxSizing', false,
-							styles) === 'border-box',
-						styles
-					) : 0
+						argumentWidthOrHeight(
+							element,
+							name,
+							extra,
+								Y.DOM.Support.boxSizing && Y.DOM.CSS(element, 'boxSizing', false,
+								styles) === 'border-box',
+							styles
+						) : 0
 				);
 			}
 		};
@@ -2308,13 +2193,13 @@
 			'': 'outer' + name
 		}, function (defaultExtra, funcName) {
 			// margin is only for outerHeight, outerWidth
-			Y.Node.Function[funcName] = function (margin, value) {
+			Y.DOM.Function[funcName] = function (margin, value) {
 				var chainable = arguments.length && (defaultExtra || typeof margin !==
 						'boolean'),
 					extra = defaultExtra || (margin === true || value === true ? 'margin' :
 						'border');
 
-				return Y.Node.Access(this, function (element, type, value) {
+				return Y.DOM.Access(this, function (element, type, value) {
 					var doc;
 
 					if (Y.Lang.isWindow(element)) {
@@ -2339,9 +2224,9 @@
 
 					return value === undef ?
 						// Get width or height on the element, requesting but not forcing parseFloat
-						Y.Node.CSS(element, type, extra) :
+						Y.DOM.CSS(element, type, extra) :
 						// Set width or height on the element
-						Y.Node.Style(element, type, value, extra);
+						Y.DOM.Style(element, type, value, extra);
 				}, type, chainable ? margin : undef, chainable, null);
 			};
 		});
@@ -2349,7 +2234,8 @@
 
 	//---
 
-	Y.Node.Extend = Y.Node.extend = Y.Extend;
+	Y.DOM.Extend = Y.DOM.extend = Y.Extend;
+	Y.DOM.Function.extend = Y.Extend;
 
 	//---
 
@@ -2358,7 +2244,7 @@
 	adjacencyOperators.forEach(function (operator, operatorIndex) {
 		var inside = operatorIndex % 2; //=> prepend, append
 
-		Y.Node.Function[operator] = function () {
+		Y.DOM.Function[operator] = function () {
 			// Arguments can be nodes, arrays of nodes, YAX objects and HTML strings
 			var nodes = map(arguments, function (arg) {
 					return Y.Lang.isObject(arg) ||
@@ -2379,8 +2265,8 @@
 
 				// Convert all methods to a "before" operation
 				target = operatorIndex === 0 ? target.nextSibling :
-					operatorIndex === 1 ? target.firstChild :
-					operatorIndex === 2 ? target :
+						operatorIndex === 1 ? target.firstChild :
+						operatorIndex === 2 ? target :
 					null;
 
 				parentInDocument = docElement.contains(parent);
@@ -2389,7 +2275,7 @@
 					if (copyByClone) {
 						node = node.cloneNode(true);
 					} else if (!parent) {
-						return Y.Node(node).remove();
+						return Y.DOM(node).remove();
 					}
 
 					if (parentInDocument) {
@@ -2415,9 +2301,9 @@
 		// prepend  => prependTo
 		// before   => insertBefore
 		// append   => appendTo
-		Y.Node.Function[inside ? operator + 'To' : 'insert' + (operatorIndex ?
+		Y.DOM.Function[inside ? operator + 'To' : 'insert' + (operatorIndex ?
 			'Before' : 'After')] = function (html) {
-			Y.Node(html)[operator](this);
+			Y.DOM(html)[operator](this);
 			return this;
 		};
 	});
@@ -2428,19 +2314,23 @@
 
 	//---
 
-	Y.Extend(YAXDOM.Y.prototype, Y.Node.Function);
+	//Y.Extend(YAXDOM.Y.prototype, Y.DOM.Function);
 
-	Y.Node.YAXDOM = YAXDOM;
-	Y.Node.globalEval = globalEval;
-	Y.Node.getStyles = getStyles;
-	Y.Node.getDocStyles = getDocStyles;
+	YAXDOM.Y.prototype = Y.DOM.Function;
+
+	Y.DOM.YAXDOM = YAXDOM;
+	Y.DOM.globalEval = globalEval;
+	Y.DOM.getStyles = getStyles;
+	Y.DOM.getDocStyles = getDocStyles;
 
 	//---
 
-	if (typeof window.$ === 'undefined') {
-		Y.DOM = Y.Node;
-		window.$ = Y.DOM;
-	}
+
+	Y.Window.Y.DOM = Y.Window.$ = Y.DOM;
+
+	//---
+
+	return Y.DOM;
 
 	//---
 
@@ -2449,11 +2339,11 @@
 //---
 
 /**
- * YAX Node | Selector
+ * YAX Node | Simple Selector
  *
- * Cross browser selector implementation using YAX's API [Node]
+ * Cross browser simple selector implementation using YAX's API [Node]
  *
- * @version     0.15
+ * @version     0.19
  * @depends:    Core, Node
  * @license     Dual licensed under the MIT and GPL licenses.
  */
@@ -2473,13 +2363,14 @@
 
 	'use strict';
 
-	var YAXDOM = Y.DOM.YAXDOM,
-		oldQSA = YAXDOM.QSA,
-		oldMatches = YAXDOM.Matches,
-		filterReplacement = new RegExp('(.*):(\\w+)(?:\\(([^)]+)\\))?$\\s*'),
-		childReplacement = /^\s*>/,
-		classTag = 'YAX' + Y.Lang.now,
-		Filters;
+	var YAXDOM = Y.DOM.YAXDOM;
+
+	// var tmpYaxDom = Y.DOM;
+
+	var oldQSA = YAXDOM.QSA;
+	var oldMatches = YAXDOM.Matches;
+	var classTag = Y.DOM.ClassTag;
+	var Filters;
 
 	//---
 
@@ -2546,7 +2437,7 @@
 		// Quote the hash in `a[href^=#]` expression
 		selector = selector.replace(/\=#\]/g, '="#"]');
 
-		var filter, argument, match = filterReplacement.exec(selector), num;
+		var filter, argument, match = Y.RegEx.FilterReplacement.exec(selector), num;
 
 		if (match && Filters.hasOwnProperty(match[2])) {
 			filter = Filters[match[2]];
@@ -2574,7 +2465,7 @@
 			try {
 				if (!_selector && filter) {
 					_selector = '*';
-				} else if (childReplacement.test(_selector)) {
+				} else if (Y.RegEx.ChildReplacement.test(_selector)) {
 					// support "> *" child queries by tagging the parent node with a
 					// unique class and prepending that classname onto the selector
 					taggedParent = Y.DOM(node).addClass(classTag);
@@ -2593,7 +2484,7 @@
 			}
 
 			return !filter ? nodes :
-				Y.Lang.unique(Y.DOM.Map(nodes, function (n, i) {
+				Y.Lang.unique(Y.DOM.map(nodes, function (n, i) {
 					return filter.call(n, i, nodes, argument);
 				}));
 		});
@@ -2665,7 +2556,8 @@
 		//  -
 		//    - Any
 		return owner.nodeType ?
-			owner.nodeType === 1 || owner.nodeType === 9 : true;
+			owner.nodeType === 1 || owner.nodeType === 9 : 
+			true;
 	};
 
 	Data.prototype = {
@@ -2811,6 +2703,7 @@
 				}
 
 				i = name.length;
+
 				while (i--) {
 					delete cache[name[i]];
 				}
@@ -2855,10 +2748,6 @@
 	function dataAttribute(elem, key, data) {
 		var name;
 
-//		console.log(elem)
-//		console.log(key)
-//		console.log(data)
-
 		// If nothing was found internally, try to fetch any
 		// data from the HTML5 data-* attribute
 		if (data === undef && elem.nodeType === 1) {
@@ -2884,6 +2773,7 @@
 				data = undef;
 			}
 		}
+
 		return data;
 	}
 
@@ -2919,9 +2809,6 @@
 			store = data[id];
 		}
 
-		//id = node[exp] || (node[exp] = ++Y.DOM.UUID);
-		//store = data[id] || (data[id] = attributeData(node));
-
 		if (name !== undef) {
 			store[Y.Lang.camelise(name)] = value;
 		}
@@ -2933,7 +2820,6 @@
 	// 1. first try key as given,
 	// 2. then try Camelised key,
 	// 3. fall back to reading "data-*" attribute.
-
 	function getData(node, name) {
 		var id = node[exp],
 			store = id && data[id],
@@ -3087,21 +2973,6 @@
 		}
 
 		return result;
-
-//		return value === undef ?
-//			// set multiple values via object
-//			Y.Lang.isPlainObject(name) ?
-//				this.each(function (i, node) {
-//					Y.Each(name, function (key, value) {
-//						setData(node, key, value);
-//					});
-//				}) :
-//				// get value from first element
-//					this.length === 0 ? undef : getData(this[0], name) :
-//			// set value on all elements
-//			this.each(function () {
-//				setData(this, name, value);
-//			});
 	};
 
 	Y.DOM.Function.removeData = function (names) {
@@ -3349,7 +3220,8 @@
 
 	//---
 
-	Y.DOM.Event = Y.DOM.event = function (type, props) {
+
+	Y.DOM.Event = function (type, props) {
 		var event, name, bubbles;
 
 		// Allow instantiation without the 'new' keyword
@@ -3384,7 +3256,7 @@
 
 		event.initEvent(type, bubbles, true);
 
-		// this.timeStamp = type && type.timeStamp || Y.Lang.now();
+		this.timeStamp = type && type.timeStamp || Y.Lang.now;
 
 		// Mark it as fixed
 		this[Y.DOM.expando] = true;
@@ -3403,10 +3275,6 @@
 	Y.Extend(Y.DOM.Event, {
 		on: function (object, types, func, context) {
 			var type, x, len;
-
-			//console.log(object);
-			//console.log(types);
-			//console.log(func);
 
 			if (Y.Lang.isObject(types)) {
 				for (type in types) {
@@ -3661,7 +3529,11 @@
 
 	//---
 
-	Y.Extend(Y.DOM.Event, {
+	Y.DOM.event = Object.create({});
+
+	//---
+
+	Y.Extend(Y.DOM.event, {
 		add: function (element, events, func, data, selector, delegator, capture) {
 			var set = eventHandlers(element);
 			var callback;
@@ -3678,6 +3550,7 @@
 
 				// Emulate mouseenter, mouseleave
 				if (Y.HasOwnProperty.call(hover, handler.e)) {
+				//if (handler.e in hover) {
 					func = function (e) {
 						var related = e.relatedTarget;
 
@@ -3714,9 +3587,9 @@
 
 				set.push(handler);
 
-				if (Y.Lang.hasProperty(element, 'addEventListener')) {
-					Y.DOM.Event.addListener(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
-				}
+//				if (Y.Lang.hasProperty(element, 'addEventListener')) {
+				Y.DOM.Event.on(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+//				}
 			});
 		},
 
@@ -3725,9 +3598,9 @@
 				findHandlers(element, event, func, selector).forEach(function (handler) {
 					delete eventHandlers(element)[handler.i];
 
-					if (Y.Lang.hasProperty(element, 'removeEventListener')) {
-						Y.DOM.Event.removeListener(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
-					}
+//					if (Y.Lang.hasProperty(element, 'removeEventListener')) {
+					Y.DOM.Event.off(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+//					}
 				});
 			});
 		},
@@ -3838,7 +3711,7 @@
 		return $this.each(function (_, element) {
 			if (one) {
 				autoRemove = function (event) {
-					Y.DOM.Event.remove(element, event.type, callback);
+					Y.DOM.event.remove(element, event.type, callback);
 					return callback.apply(this, arguments);
 				};
 			}
@@ -3859,7 +3732,7 @@
 				};
 			}
 
-			Y.DOM.Event.add(element, event, callback, data, selector, delegator || autoRemove);
+			Y.DOM.event.add(element, event, callback, data, selector, delegator || autoRemove);
 		});
 	};
 
@@ -3884,7 +3757,7 @@
 		}
 
 		return $this.each(function () {
-			Y.DOM.Event.remove(this, event, callback, selector);
+			Y.DOM.event.remove(this, event, callback, selector);
 		});
 	};
 
@@ -3909,7 +3782,7 @@
 				this[event.type]();
 			} else if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
 				this.dispatchEvent(event);
-			} /*else {
+			}/* else {
 				Y.DOM(this).triggerHandler(event, args);
 			}*/
 		});
@@ -3977,6 +3850,10 @@
 		return callback ? this.bind('hashchange', callback) : this.trigger('hashchange', callback);
 	};
 
+	Y.DOM.Function.hover = function(over, out) {
+		return this.mouseenter(over).mouseleave(out || over);
+	};
+
 	inputEvents.forEach(function (name) {
 		Y.DOM.Function[name] = function (callback) {
 			if (callback) {
@@ -3997,7 +3874,7 @@
 	});
 
 	// Generate extended `remove` and `empty` functions
-	['remove', 'empty'].forEach(function (method) {
+	/*['remove', 'empty'].forEach(function (method) {
 		var origFn = Y.DOM.Function[method];
 
 		Y.DOM.Function[method] = function () {
@@ -4008,18 +3885,18 @@
 			}
 
 			elements.forEach(function (element) {
-				Y.DOM.Event.remove(element);
+				Y.DOM.event.remove(element);
 			});
 
 			return origFn.call(this);
 		};
-	});
+	});*/
 
 	//---
 
-//	Y.DOM.Event.prototype.isDefaultPrevented = function () {
-//		return this.defaultPrevented;
-//	};
+	Y.DOM.Event.prototype.isDefaultPrevented = function () {
+		return this.defaultPrevented;
+	};
 
 	//---
 
@@ -4061,22 +3938,6 @@
 	// BEGIN OF [Private Functions]
 
 	Y.DOM.AjaxActive = Y.DOM.active = 0;
-
-	function globalEval(code) {
-		var script, indirect = eval;
-
-		code = Y.Lang.trim(code);
-
-		if (code) {
-			if (code.indexOf('use strict') === 1) {
-				script = document.createElement('script');
-				script.text = code;
-				document.head.appendChild(script).parentNode.removeChild(script);
-			} else {
-				indirect(code);
-			}
-		}
-	}
 
 	// Trigger a custom event and return false if it was cancelled
 	function triggerAndReturn(context, event, data) {
@@ -4573,12 +4434,10 @@
 
 						result = xhr.responseText;
 
-						// Y.Log(dataType);
-
 						try {
 							// http://perfectionkills.com/global-eval-what-are-the-options/
 							if (dataType === 'script') {
-								globalEval(result);
+								Y.DOM.globalEval(result);
 							}
 
 							if (dataType === 'xml') {
@@ -4586,13 +4445,13 @@
 							}
 
 							if (dataType === 'json') {
-								// globalEval(result);
-								result = Y.RegEx.blankReplacement.test(result) ? null : Y.Lang.parseJSON(
-									result);
+								result = Y.RegEx.blankReplacement.test(result) ? 
+									null : 
+									Y.Lang.parseJSON(result);
 							}
 						} catch (err) {
 							error = err;
-							//							Y.ERROR(err);
+							// Y.ERROR(err);
 						}
 
 						if (error) {
@@ -4691,14 +4550,13 @@
 		}
 
 		options.success = function (response) {
-			self.html(selector ? Y.DOM('<div>').html(response.replace(Y.RegEx.scriptReplacement,
-				'')).find(selector) : response);
+			self.html(selector ? 
+				Y.DOM('<div>').html(response.replace(Y.RegEx.scriptReplacement, '')).find(selector) : 
+				response);
 
 			if (callback) {
 				callback.apply(self, arguments);
 			}
-
-			// callback && callback.apply(self, arguments);
 		};
 
 		Y.DOM.Ajax(options);
@@ -5708,779 +5566,6 @@
 
 
 /**
- * YAX Node | Press Event
- *
- * Cross browser press event implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint browser: true */
-/*jslint white: true */
-/*jshint -W084 */
-/*jslint node: false */
-/*global YAX, Y */
-
-//---
-
-(function () {
-
-	'use strict';
-
-
-	var ghostsLifeTime = 1000,
-		normalizeArgs,
-		ghosts,
-		callbacks,
-		handlers,
-		doc,
-		removeGhosts,
-		handleGhosts,
-		i,
-		l;
-
-	normalizeArgs = function (args) {
-		var callback,
-			selector;
-
-		if (Y.Lang.isFunction(args[0])) {
-			callback = args[0];
-		} else {
-			selector = args[0];
-			callback = args[1];
-		}
-
-		return [selector, callback];
-	};
-
-	if (Y.UserAgent.Features.Touch) {
-		ghosts = [];
-		callbacks = [];
-		handlers = [];
-		doc = Y.DOM(document);
-
-		removeGhosts = function () {
-			ghosts.splice(0, 2);
-		};
-
-		handleGhosts = function (e) {
-			for (i = 0, l = ghosts.length; i < l; i += 2) {
-				if (Math.abs(e.pageX - ghosts[i]) < 25 && Math.abs(e.pageY - ghosts[i + 1]) < 25) {
-					e.stopPropagation();
-					e.preventDefault();
-				}
-			}
-		};
-
-		doc.on('click', handleGhosts);
-
-		Y.DOM.Function.onpress = function () {
-			// Passing empty selectors, empty arguments list or a document node cause bugs on android/iOS
-			// Just to be on the safe side allowing only element and document fragment nodes to be used
-			if (!arguments.length || !this.length || !this[0].nodeType || (this[0].nodeType !== 1 && this[0].nodeType !== 11)) {
-				return;
-			}
-
-			var touches = [],
-				that = this,
-				args,
-				handleTouchStart,
-				handleTouchMove,
-				handleTouchEnd,
-				resetHandlers;
-
-			args = normalizeArgs(arguments);
-
-			handleTouchStart = function (e) {
-				e.stopPropagation();
-				/** @namespace e.touches */
-				var coords = e.touches ? e.touches[0] : e; // Android weirdness fix
-
-				/** @namespace coords.pageX */
-				/** @namespace coords.pageY */
-				touches[0] = coords.pageX;
-				touches[1] = coords.pageY;
-
-				doc.on('touchmove.onpress', handleTouchMove);
-
-				if (args[0]) {
-					that.on('touchend.onpress', args[0], handleTouchEnd);
-				} else {
-					that.on('touchend.onpress', handleTouchEnd);
-				}
-
-				// args[0] ? that.on('touchend.onpress', args[0], handleTouchEnd) : that.on('touchend.onpress', handleTouchEnd);
-			};
-
-			handleTouchMove = function (e) {
-				if (Math.abs(e.touches[0].pageX - touches[0]) > 10 || Math.abs(e.touches[0].pageY - touches[1]) > 10) {
-					resetHandlers();
-				}
-			};
-
-			handleTouchEnd = function (e) {
-				resetHandlers();
-
-				args[1].call(this, e);
-
-				if (e.type === 'touchend') {
-					ghosts.push(touches[0], touches[1]);
-					window.setTimeout(removeGhosts, ghostsLifeTime);
-				}
-			};
-
-			resetHandlers = function () {
-				doc.off('touchmove.onpress', handleTouchMove);
-
-				if (args[0]) {
-					that.off('touchend.onpress', args[0], handleTouchEnd);
-				} else {
-					that.off('touchend.onpress', handleTouchEnd);
-				}
-
-				// args[0] ? that.off('touchend.onpress', args[0], handleTouchEnd) : that.off('touchend.onpress', handleTouchEnd);
-			};
-
-			callbacks.push(args[1]);
-
-			handlers.push(handleTouchStart);
-
-			if (args[0]) {
-				this.on('touchstart.onpress', args[0], handleTouchStart);
-				// this.on('click', args[0], handleTouchStart);
-				this.on('press.onpress', args[0], args[1]);
-			} else {
-				this.on('touchstart.onpress', handleTouchStart);
-				// this.on('click', handleTouchStart);
-				this.on('press.onpress', args[1]);
-			}
-		};
-
-		Y.DOM.Function.offpress = function () {
-			var args = normalizeArgs(arguments),
-				x;
-
-			if (args[1]) {
-				x = callbacks.indexOf(args[1]);
-
-				if (x < 0) { // Something went terribly wrong and there is no associated callback/handler
-					return;
-				}
-
-				if (args[0]) {
-					this.off('touchstart.onpress', args[0], handlers[x]);
-					//this.off('click.onpress', args[0], handlers[x]);
-					this.off('press.onpress', args[0], args[x]);
-				} else {
-					this.off('touchstart.onpress', handlers[x]);
-					//this.off('click.onpress', handlers[x]);
-					this.off('press.onpress', args[1]);
-				}
-				callbacks.splice(x, 1);
-				handlers.splice(x, 1);
-			} else {
-				if (args[0]) {
-					this.off('touchstart.onpress', args[0]);
-					//this.off('click.onpress', args[0]);
-					this.off('press.onpress', args[0]);
-				} else {
-					this.off('touchstart.onpress');
-					//this.off('click.onpress');
-					this.off('press.onpress');
-				}
-			}
-		};
-	} else {
-		Y.DOM.Function.onpress = function () {
-			var args = normalizeArgs(arguments);
-
-			if (args[0]) {
-				this.on('click.onpress', args[0], args[1]);
-				this.on('press.onpress', args[0], args[1]);
-			} else {
-				this.on('click.onpress', args[1]);
-				this.on('press.onpress', args[1]);
-			}
-		};
-
-		Y.DOM.Function.offpress = function () {
-			var args = normalizeArgs(arguments);
-
-			if (args[0]) {
-				this.off('.onpress', args[0], args[1]);
-			} else {
-				this.off('.onpress', args[1]);
-			}
-
-			// args[0] ? this.off('.onpress', args[0], args[1]) : this.off('.onpress', args[1]);
-		};
-	}
-
-	//---
-
-}());
-
-//---
-
-
-/**
- * YAX Node | Touch Event
- *
- * Cross browser touch event implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint browser: true */
-/*jslint white: true */
-/*jshint -W084 */
-/*jslint node: false */
-/*global YAX, Y, MSGesture */
-
-//---
-
-(function () {
-
-	'use strict';
-
-	var touch = {},
-		touchTimeout,
-		tapTimeout,
-		swipeTimeout,
-		longTapTimeout,
-		longTapDelay = 750,
-		gesture,
-		document = Y.Document;
-
-	function swipeDirection(x1, x2, y1, y2) {
-		return Math.abs(x1 - x2) >= Math.abs(y1 - y2) ? (x1 - x2 > 0 ? 'Left' : 'Right') : (y1 - y2 > 0 ? 'Up' : 'Down');
-	}
-
-	function longTap() {
-		longTapTimeout = null;
-
-		if (touch.last) {
-			touch.el.trigger('longTap');
-			touch = {};
-		}
-	}
-
-	function cancelLongTap() {
-		if (longTapTimeout) {
-			clearTimeout(longTapTimeout);
-		}
-
-		longTapTimeout = null;
-	}
-
-	function cancelAll() {
-		if (touchTimeout) {
-			clearTimeout(touchTimeout);
-		}
-
-		if (tapTimeout) {
-			clearTimeout(tapTimeout);
-		}
-
-		if (swipeTimeout) {
-			clearTimeout(swipeTimeout);
-		}
-
-		if (longTapTimeout) {
-			clearTimeout(longTapTimeout);
-		}
-
-		touchTimeout = tapTimeout = swipeTimeout = longTapTimeout = null;
-		touch = {};
-	}
-
-	function isPrimaryTouch(event) {
-		/** @namespace event.pointerType */
-		/** @namespace event.MSPOINTER_TYPE_TOUCH */
-		/** @namespace event.isPrimary */
-		return (event.pointerType === 'touch' || event.pointerType === event.MSPOINTER_TYPE_TOUCH) && event.isPrimary;
-	}
-
-	function isPointerEventType(e, type) {
-		return (e.type === 'pointer' + type || e.type.toLowerCase() === 'mspointer' + type);
-	}
-
-	// console.log(Y.DOM(document))
-
-	Y.DOM(document).ready(function () {
-		var now,
-			delta,
-			deltaX = 0,
-			deltaY = 0,
-			firstTouch,
-			isPointerType;
-		/** @namespace Y.Window.hasOwnProperty */
-		if (Y.Window.hasOwnProperty('MSGesture')) {
-			gesture = new MSGesture();
-			gesture.target = document.body;
-		}
-
-		/** @namespace e.velocityX */
-		/** @namespace e.velocityY */
-		Y.DOM(document)
-			.bind('MSGestureEnd', function (e) {
-
-				var swipeDirectionFromVelocity = e.velocityX > 1 ? 'Right' : e.velocityX < -1 ? 'Left' : e.velocityY > 1 ? 'Down' : e.velocityY < -1 ? 'Up' : null;
-
-				if (swipeDirectionFromVelocity) {
-					touch.el.trigger('swipe');
-					touch.el.trigger('swipe' + swipeDirectionFromVelocity);
-				}
-			})
-			.on('touchstart MSPointerDown pointerdown', function (e) {
-				isPointerType = isPointerEventType(e, 'down');
-
-				if (isPointerType && !isPrimaryTouch(e)) {
-					return;
-				}
-
-				firstTouch = isPointerType ? e : e.touches[0];
-
-				if (e.touches && e.touches.length === 1 && touch.x2) {
-					// Clear out touch movement data if we have it sticking around
-					// This can occur if touchcancel doesn't fire due to preventDefault, etc.
-					touch.x2 = undefined;
-					touch.y2 = undefined;
-				}
-
-				now = Date.now();
-				delta = now - (touch.last || now);
-				touch.el = Y.DOM(firstTouch.target.hasOwnProperty('tagName') ? firstTouch.target : firstTouch.target.parentNode);
-
-				if (touchTimeout) {
-					clearTimeout(touchTimeout);
-				}
-
-				touch.x1 = firstTouch.pageX;
-
-				touch.y1 = firstTouch.pageY;
-
-				if (delta > 0 && delta <= 250) {
-					touch.isDoubleTap = true;
-				}
-
-				touch.last = now;
-
-				longTapTimeout = setTimeout(longTap, longTapDelay);
-
-				/** @namespace e.pointerId */
-				/** @namespace gesture.addPointer */
-
-				// adds the current touch contact for IE gesture recognition
-				if (gesture && isPointerType) {
-					gesture.addPointer(e.pointerId);
-				}
-			})
-			.on('touchmove MSPointerMove pointermove', function (e) {
-				isPointerType = isPointerEventType(e, 'move');
-
-				if (isPointerType && !isPrimaryTouch(e)) {
-					return;
-				}
-
-				firstTouch = isPointerType ? e : e.touches[0];
-
-				cancelLongTap();
-
-				touch.x2 = firstTouch.pageX;
-				touch.y2 = firstTouch.pageY;
-
-				deltaX += Math.abs(touch.x1 - touch.x2);
-				deltaY += Math.abs(touch.y1 - touch.y2);
-			})
-			.on('touchend MSPointerUp pointerup', function (e) {
-				isPointerType = isPointerEventType(e, 'up');
-
-				if (isPointerType && !isPrimaryTouch(e)) {
-					return;
-				}
-
-				cancelLongTap();
-
-				// swipe
-				if ((touch.x2 && Math.abs(touch.x1 - touch.x2) > 30) ||
-					(touch.y2 && Math.abs(touch.y1 - touch.y2) > 30)) {
-
-					swipeTimeout = setTimeout(function () {
-						touch.el.trigger('swipe');
-						touch.el.trigger('swipe' + (swipeDirection(touch.x1, touch.x2, touch.y1, touch.y2)));
-						touch = {};
-					}, 0);
-
-					// normal tap
-				} else if (touch.hasOwnProperty('last')) {
-					// don't fire tap when delta position changed by more than 30 pixels,
-					// for instance when moving to a point and back to origin
-					if (deltaX < 30 && deltaY < 30) {
-						// delay by one tick so we can cancel the 'tap' event if 'scroll' fires
-						// ('tap' fires before 'scroll')
-						tapTimeout = setTimeout(function () {
-
-							// trigger universal 'tap' with the option to cancelTouch()
-							// (cancelTouch cancels processing of single vs double taps for faster 'tap' response)
-							var event = Y.DOM.Event('tap');
-							event.cancelTouch = cancelAll;
-							touch.el.trigger(event);
-
-							// trigger double tap immediately
-							if (touch.isDoubleTap) {
-								if (touch.el) {
-									touch.el.trigger('doubleTap');
-								}
-
-								touch = {};
-							}
-
-							// trigger single tap after 250ms of inactivity
-							else {
-								touchTimeout = setTimeout(function () {
-									touchTimeout = null;
-									if (touch.el) {
-										touch.el.trigger('singleTap');
-									}
-
-									touch = {};
-								}, 250);
-							}
-						}, 0);
-					} else {
-						touch = {};
-					}
-				}
-
-				deltaX = deltaY = 0;
-
-			})
-			// when the browser window loses focus,
-			// for example when a modal dialog is shown,
-			// cancel all ongoing events
-			.on('touchcancel MSPointerCancel pointercancel', cancelAll);
-
-		// scrolling the window indicates intention of the user
-		// to scroll, not tap or swipe, so cancel all ongoing events
-		Y.DOM(window).on('scroll', cancelAll);
-	});
-
-	[
-		'swipe',
-		'swipeLeft',
-		'swipeRight',
-		'swipeUp',
-		'swipeDown',
-		'doubleTap',
-		'tap',
-		'singleTap',
-		'longTap'
-	].forEach(function (event) {
-		Y.DOM.Function[event] = function (callback) {
-			return this.bind(event, callback);
-		};
-	});
-	
-	//---
-
-}());
-
-//---
-
-
-/**
- * YAX Node | Shake Event
- *
- * Cross browser shake event implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint browser: true */
-/*jslint white: true */
-/*jshint -W084 */
-/*jslint node: false */
-/*global YAX, Y */
-
-//---
-
-(function () {
-
-	'use strict';
-
-	/** @namespace Y.Window.DeviceMotionEvent */
-	if (!Y.Lang.isUndefined(Y.Window.DeviceMotionEvent)) {
-		Y.DOM.Function.onshake = function (callb, sens) {
-			// Shake sensitivity (a lower number is more sensitive)
-			var sensitivity = sens || 20,
-				checkDelay = 150,
-				callbackDelay = 2500,
-				// Position variables
-				x1 = 0,
-				y1 = 0,
-				z1 = 0,
-				x2 = 0,
-				y2 = 0,
-				z2 = 0,
-				checkDeviceMotion = function () {
-					var change = Math.abs((x1 - x2) + (y1 - y2) + (z1 - z2));
-
-					// Update new position
-					x2 = x1;
-					y2 = y1;
-					z2 = z1;
-
-					if (change > sensitivity) {
-						callb.call(window);
-						setTimeout(checkDeviceMotion, callbackDelay);
-					} else {
-						setTimeout(checkDeviceMotion, checkDelay);
-					}
-				};
-
-			// Listen to motion events and update the position
-			window.addEventListener('devicemotion', function (e) {
-				/** @namespace e.accelerationIncludingGravity */
-				x1 = e.accelerationIncludingGravity.x;
-				y1 = e.accelerationIncludingGravity.y;
-				/** @namespace e.accelerationIncludingGravity.z */
-				z1 = e.accelerationIncludingGravity.z;
-			}, false);
-
-			// Periodically check the position and fire
-			// if the change is greater than the sensitivity
-			checkDeviceMotion();
-		};
-	} else {
-		Y.DOM.Function.onshake = Y.Lang.Noop;
-	}
-
-	//---
-
-}());
-
-//---
-
-
-/**
- * YAX Node | Gesture Event
- *
- * Cross browser gesture event implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint browser: true */
-/*jslint white: true */
-/*jshint -W084 */
-/*jslint node: false */
-/*global YAX, Y */
-
-//---
-
-(function () {
-
-	'use strict';
-
-	var gesture = {}, gestureTimeout = Y.Lang.Noop;
-
-	function parentIfText (node) {
-		return node.hasOwnProperty('tagName') ? node : node.parentNode;
-	}
-
-	if (Y.UserAgent.OS.iOS) {
-		Y.DOM(document).bind('gesturestart', function (event) {
-			var now = Y.Lang.now;
-			// var delta = now - (gesture.last || now);
-			gesture.target = parentIfText(event.target);
-
-			if (gestureTimeout) {
-				clearTimeout(gestureTimeout);
-			}
-
-			gesture.e1 = event.scale;
-
-			gesture.last = now;
-		}).bind('gesturechange', function (event) {
-			gesture.e2 = event.scale;
-		}).bind('gestureend', function () {
-			if (gesture.e2 > 0) {
-				if (Math.abs(gesture.e1 - gesture.e2) !== 0 &&
-				Y.DOM(gesture.target).trigger('pinch') &&
-				Y.DOM(gesture.target).trigger('pinch' + (gesture.e1 - gesture.e2 > 0 ? 'In' : 'Out'))) {
-					gesture.e1 = gesture.e2 = gesture.last = 0;
-				}
-			} else if (gesture.hasOwnProperty('last')) {
-				gesture = {};
-			}
-		});
-
-		//---
-
-		[
-			'pinc',
-			'pinchIn',
-			'pinchOut'
-		].forEach(function (event) {
-			Y.DOM.Function[event] = function (callback) {
-				return this.bind(event, callback);
-			};
-		});
-	}
-
-	//---
-
-}());
-
-//---
-
-
-/**
- * YAX Node | Assets
- *
- * Cross browser assets implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint browser: true */
-/*jslint white: true */
-/*jshint -W084 */
-/*jslint node: false */
-/*global YAX, Y */
-
-//---
-
-(function () {
-
-	'use strict';
-
-	var cache = [], timeout;
-
-	Y.DOM.Function.remove = function () {
-		// var self = this;
-
-		return this.each(function () {
-			if (this.parentNode) {
-				if (this.tagName === 'IMG') {
-					cache.push(this);
-
-					this.src = Y.Utility.emptyImageUrl;
-
-					if (timeout) {
-						clearTimeout(timeout);
-					}
-
-					timeout = setTimeout(function () {
-						cache = [];
-					}, 60000);
-				}
-
-				// this.parentNode.removeChild(this);
-				this.parentNode.removeChild(this);
-			}
-		});
-	};
-
-	//---
-
-}());
-
-//---
-
-
-/**
- * YAX Node | Stack
- *
- * Cross browser stack implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint browser: true */
-/*jslint white: true */
-/*jshint -W084 */
-/*jslint node: false */
-/*global YAX, Y */
-
-//---
-
-(function () {
-
-	'use strict';
-
-	Y.DOM.Function.end = function () {
-		return this.prev || Y.DOM();
-	};
-
-	Y.DOM.Function.andSelf = function () {
-		return this.add(this.prev || Y.DOM());
-	};
-
-	//---
-
-	[
-		'filter',
-		'add',
-		'not',
-		'eq',
-		'first',
-		'last',
-		'find',
-		'closest',
-		'parents',
-		'parent',
-		'children',
-		'siblings'
-	].forEach(function (property) {
-		var callback = Y.DOM.Function[property];
-
-		Y.DOM.Function[property] = function () {
-			var ret = callback.apply(this, arguments);
-			ret.prev = this;
-			return ret;
-		};
-	});
-
-	//---
-
-}());
-
-//---
-
-
-/**
  * YAX Node | Extra
  *
  * Cross browser extra functions using YAX's API [Node]
@@ -6845,7 +5930,7 @@
 
 
 /**
- * Node/DOM Compatibility
+ * DOM/DOM Compatibility
  *
  * Compatibility Module for YAX's DOM API.
  *
@@ -6870,21 +5955,21 @@
 	//---
 
 	// Map over Yax.DOM in case of overwrite
-	var _YaxDOM = Y.Window.Y.Node;
+	var _YaxDOM = Y.Window.Y.DOM;
 
 	// Map over the $ in case of overwrite
 	var _$ = Y.Window.$;
 
 	_YaxDOM.noConflict = function (deep) {
-		if (Y.Window.$ === Y.Node) {
+		if (Y.Window.$ === Y.DOM) {
 			Y.Window.$ = _$;
 		}
 
-		if (deep && Y.Window.Y.Node === Y.Node) {
-			Y.Window.Y.Node = _YaxDOM;
+		if (deep && Y.Window.Y.DOM === Y.DOM) {
+			Y.Window.Y.DOM = _YaxDOM;
 		}
 
-		return Y.Node;
+		return Y.DOM;
 	};
 
 	//---
@@ -6903,6 +5988,8 @@
 	Y.DOM.isNumeric = Y.Lang.isNumeric;
 	Y.DOM.isEmptyObject = Y.Lang.isObjectEmpty;
 	Y.DOM.noop = Y.DOM.Noop = Y.Lang.noop;
+	Y.DOM.grep = Y.Lang.grep;
+	Y.DOM.merge = Y.Lang.merge;
 
 	Y.DOM.when = Y.Lang.When;
 
@@ -6920,7 +6007,9 @@
 
 	Y.DOM.Function.ready = function (callback) {
 		// Add the callback
-		Y.DOM.ready.promise(this).done(callback);
+//		Y.DOM.ready.promise().done(callback);
+
+		Y.DOM.ready.promise().done(callback);
 
 		return this;
 	};
@@ -6981,7 +6070,7 @@
 			readyList.resolveWith(Y.Document, [Y.DOM]);
 
 			// Trigger any bound ready events
-			if (Y.DOM.fn.triggerHandler) {
+			if (Y.DOM.Function.triggerHandler) {
 				Y.DOM(Y.Document).triggerHandler('ready');
 				Y.DOM(Y.Document).off('ready');
 			}
@@ -6998,8 +6087,6 @@
 	}
 
 	Y.DOM.ready.promise = function (obj) {
-		// Y.LOG(readyList);
-
 		if (!readyList) {
 			readyList = Y.DOM.Deferred();
 
@@ -7024,14 +6111,9 @@
 	// Kick off the DOM ready check even if the user does not
 	Y.DOM.ready.promise();
 
-	if (Y.HasOwnProperty.call(Y.Window, 'Sizzle')) {
-		Y.DOM.isXMLDoc = Y.Window.Sizzle.isXML;
-		Y.DOM.text = Y.DOM.Text = Y.Window.Sizzle.getText;
-	}
-
 	//---
 
-	Y.DOM.event.simulate = function (type, elem, event, bubble) {
+	/*Y.DOM.event.simulate = function (type, elem, event, bubble) {
 		var e = Y.Extend(new Y.DOM.Event(type), event, {
 			type: type,
 			isSimulated: true,
@@ -7069,7 +6151,7 @@
 				}
 			}
 		};
-	});
+	});*/
 
 	//---
 
@@ -7081,109 +6163,6 @@
 		});
 	}
 
-
-	//---
-
-}());
-
-//---
-
-
-/**
- * YAX Node | Special Event
- *
- * Cross browser special event implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint browser: true */
-/*jslint white: true */
-/*jshint -W084 */
-/*jslint node: false */
-/*global YAX, Y */
-
-//---
-
-(function () {
-
-	'use strict';
-
-	//---
-
-	Y.DOM.Function.bind = function (eventName, data, callback) {
-		var el = this;
-		// var $this = Y.DOM(el);
-		var specialEvent;
-
-		if (!Y.Lang.isSet(callback)) {
-			callback = data;
-			data = null;
-		}
-
-		if (Y.DOM.YAXDOM) {
-			Y.DOM.each(eventName.split(/\s/), function (i, eventName) {
-				eventName = eventName.split(/\./)[0];
-
-				var tmp = Y.HasOwnProperty.call(Y.DOM.Event.special, eventName);
-
-				if (tmp) {
-					specialEvent = Y.DOM.event.special[eventName];
-
-					/// init enable special events on Y.DOM
-					if (!specialEvent._init) {
-						specialEvent._init = true;
-
-						/// intercept and replace the special event handler to add functionality
-						specialEvent.originalHandler = specialEvent.handler;
-
-						specialEvent.handler = function () {
-							/// make event argument writable, like on jQuery
-							var args = Y.G.Slice.call(arguments);
-
-							args[0] = Y.Extend({}, args[0]);
-
-							/// define the event handle, Y.DOM.event.dispatch is only for newer versions of jQuery
-							Y.DOM.Event.handle = function () {
-								/// make context of trigger the event element
-								var args_ = Y.G.Slice.call(arguments);
-								var event = args_[0];
-								var $target = Y.DOM(event.target);
-
-								$target.trigger.apply($target, arguments);
-
-							};
-
-							specialEvent.originalHandler.apply(this, args);
-						};
-					}
-
-					//Y.LOG(el);
-					//Y.LOG(data);
-					//Y.LOG(specialEvent);
-					//Y.LOG(eventName);
-					//Y.LOG(eventName);
-
-					/// setup special events on Y.DOM
-					// specialEvent.setup.apply(el, [data]);
-					specialEvent.setup.apply(el, [data]);
-				}
-			});
-		}
-
-		// Y.LOG(bindBeforeSpecialEvents);
-//		Y.LOG(callback);
-
-		// return bindBeforeSpecialEvents.apply(this, [eventName, callback]);
-		// return Y.Window.bindBeforeSpecialEvents.apply(this, [eventName, callback]);
-		// return Y.DOM.Function.bindEvent.apply(this, [eventName, callback]);
-		return Y.DOM.Function.bindEvent.apply(this, [eventName, callback]);
-	};
 
 	//---
 

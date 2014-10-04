@@ -78,7 +78,13 @@
 			},
 
 			promise: function (obj) {
-				return obj !== null ? Y.Extend(obj, promise) : promise;
+				if (Y.Lang.isSet(obj)) {
+					return Y.Extend(obj, promise);
+				}
+
+				return promise;
+
+				// return obj !== null ? Y.Extend(obj, promise) : promise;
 			}
 		};
 

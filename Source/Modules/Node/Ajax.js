@@ -32,22 +32,6 @@
 
 	Y.DOM.AjaxActive = Y.DOM.active = 0;
 
-	function globalEval(code) {
-		var script, indirect = eval;
-
-		code = Y.Lang.trim(code);
-
-		if (code) {
-			if (code.indexOf('use strict') === 1) {
-				script = document.createElement('script');
-				script.text = code;
-				document.head.appendChild(script).parentNode.removeChild(script);
-			} else {
-				indirect(code);
-			}
-		}
-	}
-
 	// Trigger a custom event and return false if it was cancelled
 	function triggerAndReturn(context, event, data) {
 		var eventName = Y.DOM.Event(event);
@@ -543,12 +527,10 @@
 
 						result = xhr.responseText;
 
-						// Y.Log(dataType);
-
 						try {
 							// http://perfectionkills.com/global-eval-what-are-the-options/
 							if (dataType === 'script') {
-								globalEval(result);
+								Y.DOM.globalEval(result);
 							}
 
 							if (dataType === 'xml') {
@@ -556,13 +538,13 @@
 							}
 
 							if (dataType === 'json') {
-								// globalEval(result);
-								result = Y.RegEx.blankReplacement.test(result) ? null : Y.Lang.parseJSON(
-									result);
+								result = Y.RegEx.blankReplacement.test(result) ? 
+									null : 
+									Y.Lang.parseJSON(result);
 							}
 						} catch (err) {
 							error = err;
-							//							Y.ERROR(err);
+							// Y.ERROR(err);
 						}
 
 						if (error) {
@@ -661,14 +643,13 @@
 		}
 
 		options.success = function (response) {
-			self.html(selector ? Y.DOM('<div>').html(response.replace(Y.RegEx.scriptReplacement,
-				'')).find(selector) : response);
+			self.html(selector ? 
+				Y.DOM('<div>').html(response.replace(Y.RegEx.scriptReplacement, '')).find(selector) : 
+				response);
 
 			if (callback) {
 				callback.apply(self, arguments);
 			}
-
-			// callback && callback.apply(self, arguments);
 		};
 
 		Y.DOM.Ajax(options);

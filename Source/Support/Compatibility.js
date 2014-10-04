@@ -1,5 +1,5 @@
 /**
- * Node/DOM Compatibility
+ * DOM/DOM Compatibility
  *
  * Compatibility Module for YAX's DOM API.
  *
@@ -24,21 +24,21 @@
 	//---
 
 	// Map over Yax.DOM in case of overwrite
-	var _YaxDOM = Y.Window.Y.Node;
+	var _YaxDOM = Y.Window.Y.DOM;
 
 	// Map over the $ in case of overwrite
 	var _$ = Y.Window.$;
 
 	_YaxDOM.noConflict = function (deep) {
-		if (Y.Window.$ === Y.Node) {
+		if (Y.Window.$ === Y.DOM) {
 			Y.Window.$ = _$;
 		}
 
-		if (deep && Y.Window.Y.Node === Y.Node) {
-			Y.Window.Y.Node = _YaxDOM;
+		if (deep && Y.Window.Y.DOM === Y.DOM) {
+			Y.Window.Y.DOM = _YaxDOM;
 		}
 
-		return Y.Node;
+		return Y.DOM;
 	};
 
 	//---
@@ -57,6 +57,8 @@
 	Y.DOM.isNumeric = Y.Lang.isNumeric;
 	Y.DOM.isEmptyObject = Y.Lang.isObjectEmpty;
 	Y.DOM.noop = Y.DOM.Noop = Y.Lang.noop;
+	Y.DOM.grep = Y.Lang.grep;
+	Y.DOM.merge = Y.Lang.merge;
 
 	Y.DOM.when = Y.Lang.When;
 
@@ -74,7 +76,9 @@
 
 	Y.DOM.Function.ready = function (callback) {
 		// Add the callback
-		Y.DOM.ready.promise(this).done(callback);
+//		Y.DOM.ready.promise().done(callback);
+
+		Y.DOM.ready.promise().done(callback);
 
 		return this;
 	};
@@ -135,7 +139,7 @@
 			readyList.resolveWith(Y.Document, [Y.DOM]);
 
 			// Trigger any bound ready events
-			if (Y.DOM.fn.triggerHandler) {
+			if (Y.DOM.Function.triggerHandler) {
 				Y.DOM(Y.Document).triggerHandler('ready');
 				Y.DOM(Y.Document).off('ready');
 			}
@@ -152,8 +156,6 @@
 	}
 
 	Y.DOM.ready.promise = function (obj) {
-		// Y.LOG(readyList);
-
 		if (!readyList) {
 			readyList = Y.DOM.Deferred();
 
@@ -178,14 +180,9 @@
 	// Kick off the DOM ready check even if the user does not
 	Y.DOM.ready.promise();
 
-	if (Y.HasOwnProperty.call(Y.Window, 'Sizzle')) {
-		Y.DOM.isXMLDoc = Y.Window.Sizzle.isXML;
-		Y.DOM.text = Y.DOM.Text = Y.Window.Sizzle.getText;
-	}
-
 	//---
 
-	Y.DOM.event.simulate = function (type, elem, event, bubble) {
+	/*Y.DOM.event.simulate = function (type, elem, event, bubble) {
 		var e = Y.Extend(new Y.DOM.Event(type), event, {
 			type: type,
 			isSimulated: true,
@@ -223,7 +220,7 @@
 				}
 			}
 		};
-	});
+	});*/
 
 	//---
 

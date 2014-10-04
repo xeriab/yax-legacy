@@ -1,9 +1,9 @@
 /**
- * YAX Node | Selector
+ * YAX Node | Simple Selector
  *
- * Cross browser selector implementation using YAX's API [Node]
+ * Cross browser simple selector implementation using YAX's API [Node]
  *
- * @version     0.15
+ * @version     0.19
  * @depends:    Core, Node
  * @license     Dual licensed under the MIT and GPL licenses.
  */
@@ -23,13 +23,14 @@
 
 	'use strict';
 
-	var YAXDOM = Y.DOM.YAXDOM,
-		oldQSA = YAXDOM.QSA,
-		oldMatches = YAXDOM.Matches,
-		filterReplacement = new RegExp('(.*):(\\w+)(?:\\(([^)]+)\\))?$\\s*'),
-		childReplacement = /^\s*>/,
-		classTag = 'YAX' + Y.Lang.now,
-		Filters;
+	var YAXDOM = Y.DOM.YAXDOM;
+
+	// var tmpYaxDom = Y.DOM;
+
+	var oldQSA = YAXDOM.QSA;
+	var oldMatches = YAXDOM.Matches;
+	var classTag = Y.DOM.ClassTag;
+	var Filters;
 
 	//---
 
@@ -96,7 +97,7 @@
 		// Quote the hash in `a[href^=#]` expression
 		selector = selector.replace(/\=#\]/g, '="#"]');
 
-		var filter, argument, match = filterReplacement.exec(selector), num;
+		var filter, argument, match = Y.RegEx.FilterReplacement.exec(selector), num;
 
 		if (match && Filters.hasOwnProperty(match[2])) {
 			filter = Filters[match[2]];
@@ -124,7 +125,7 @@
 			try {
 				if (!_selector && filter) {
 					_selector = '*';
-				} else if (childReplacement.test(_selector)) {
+				} else if (Y.RegEx.ChildReplacement.test(_selector)) {
 					// support "> *" child queries by tagging the parent node with a
 					// unique class and prepending that classname onto the selector
 					taggedParent = Y.DOM(node).addClass(classTag);
@@ -143,7 +144,7 @@
 			}
 
 			return !filter ? nodes :
-				Y.Lang.unique(Y.DOM.Map(nodes, function (n, i) {
+				Y.Lang.unique(Y.DOM.map(nodes, function (n, i) {
 					return filter.call(n, i, nodes, argument);
 				}));
 		});

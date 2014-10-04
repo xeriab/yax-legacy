@@ -37,7 +37,7 @@
 					if (Y.HasOwnProperty.call(types, type)) {
 						// We don't process space-separated events here for performance;
 						// It's a hot path since Layer uses the on(obj) syntax
-						this.eventOn(type, types[type], callback);
+						this._On(type, types[type], callback);
 					}
 				}
 
@@ -46,7 +46,7 @@
 				types = Y.Utility.splitWords(types);
 
 				for (i = 0, len = types.length; i < len; i++) {
-					this.eventOn(types[i], callback, context);
+					this._On(types[i], callback, context);
 				}
 			}
 
@@ -61,14 +61,14 @@
 			} else if (Y.Lang.isObject(types)) {
 				for (type in types) {
 					if (Y.HasOwnProperty.call(types, type)) {
-						this.eventOff(type, types[type], callback);
+						this._Off(type, types[type], callback);
 					}
 				}
 			} else {
 				types = Y.Utility.splitWords(types);
 
 				for (i = 0, len = types.length; i < len; i++) {
-					this.eventOff(types[i], callback, context);
+					this._Off(types[i], callback, context);
 				}
 			}
 
@@ -76,7 +76,7 @@
 		},
 
 		// Attach listener (without syntactic sugar now)
-		eventOn: function (type, callback, context) {
+		_On: function (type, callback, context) {
 			// var events = this.eventsArray = this.eventsArray || {},
 			var events = this.eventsArray || {},
 				contextId = context && context !== this && Y.Stamp(context),
@@ -112,7 +112,7 @@
 			}
 		},
 
-		eventOff: function (type, callback, context) {
+		_Off: function (type, callback, context) {
 			var events = this.eventsArray,
 				indexKey = type + '_idx',
 				indexLenKey = type + '_len',

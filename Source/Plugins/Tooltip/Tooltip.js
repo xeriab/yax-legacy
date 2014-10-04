@@ -63,8 +63,8 @@
 			Y.DOM(this.Element).css('cursor', 'pointer');
 
 			// Close all other Tooltips
-			// Y.DOM('yaxtooltip.yax-tooltip').hide();
-			Y.DOM('yaxtooltip.yax-tooltip').remove();
+			// Y.DOM('div.yax-tooltip').hide();
+			Y.DOM('div.yax-tooltip').remove();
 			Y.Window.clearTimeout(this.Delay);
 			this.setContent();
 			this.setPositions();
@@ -128,13 +128,13 @@
 			}
 
 			// Create Tooltip container
-			this.Tooltip = Y.DOM('<yaxtooltip class="yax-tooltip ' +
+			this.Tooltip = Y.DOM('<div class="yax-tooltip ' +
 				this.Options.Theme + ' ' +
 				this.Options.Size + ' ' +
 				this.Options.Gravity +
-				'"><yaxtooltip class="tooltiptext">' +
+				'"><div class="tooltiptext">' +
 				this.Content +
-				'</yaxtooltip><yaxtooltip class="tip"></yaxtooltip></yaxtooltip>'
+				'</div><div class="tip"></div></div>'
 			);
 
 			this.Tip = this.Tooltip.find('.tip');
@@ -298,7 +298,7 @@
 		finalMessage: function () {
 			if (this.Options.FinalMessage) {
 				var self = this;
-				self.Tooltip.find('yaxtooltip:first').html(this.Options.FinalMessage);
+				self.Tooltip.find('div:first').html(this.Options.FinalMessage);
 				self.Tooltip.find('ul').remove();
 				self.setPositions();
 				setTimeout(function () {

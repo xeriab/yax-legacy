@@ -77,9 +77,9 @@
 //---
 
 /**
- * Node/Node Module
+ * DOM/DOM Module
  *
- * Cross browser Node utilities using YAX's API.
+ * Cross browser DOM utilities using YAX's API.
  *
  * @version     0.15
  * @depends:    Core
@@ -99,142 +99,111 @@
 
 	'use strict';
 
-	var YAXDOM = Object.create(null),
+	var YAXDOM = Object.create({});
 
-		ClassList,
+	var ClassList;
 
-		IDsList,
+	var IDsList;
 
-		docElement = Y.Document.documentElement,
+	var docElement = Y.Document.documentElement;
 
-		elementDisplay = {},
+	var elementDisplay = Object.create({});
 
-		ClassCache = {},
+	var ClassCache = Object.create({});
 
-		IDsCache = {},
+	var IDsCache = Object.create({});
 
-		FragmentReplacement = /^\s*<(\w+|!)[^>]*>/,
+	// Special attributes that should be get/set via method calls
+	var MethodAttributes = [
+		'title',
+		'value',
+		'val',
+		'css',
+		'html',
+		'text',
+		'data',
+		'width',
+		'height',
+		'offset'
+	];
 
-		SingleTagReplacement = /^<(\w+)\s*\/?>(?:<\/\1>|)$/,
+	var adjacencyOperators = [
+		'after',
+		'prepend',
+		'before',
+		'append'
+	];
 
-		TagExpanderReplacement =
-		/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
+	var Table = Y.Document.createElement('table');
 
-		ReadyReplacement = /complete|loaded|interactive/,
+	var TableRow = Y.Document.createElement('tr');
 
-		//SimpleSelectorReplacement = /^[\w-]*$/,
-		SimpleSelectorReplacement = /^[\w\-]*$/,
+	var Containers = {
+		'tr': Y.Document.createElement('tbody'),
+		'tbody': Table,
+		'thead': Table,
+		'tfoot': Table,
+		'td': TableRow,
+		'th': TableRow,
+		'*': Y.Document.createElement('div')
+	};
 
-		RootNodeReplacement = /^(?:body|html)$/i,
+	var temporaryParent = Y.Document.createElement('div');
 
-		SelectorGroupReplacement = /(([\w#:.~>+()\s-]+|\*|\[.*?\])+)\s*(,|$)/g,
+	var properitiesMap = {
+		'tabindex': 'tabIndex',
+		'readonly': 'readOnly',
+		'for': 'htmlFor',
+		'class': 'className',
+		'maxlength': 'maxLength',
+		'cellspacing': 'cellSpacing',
+		'cellpadding': 'cellPadding',
+		'rowspan': 'rowSpan',
+		'colspan': 'colSpan',
+		'usemap': 'useMap',
+		'frameborder': 'frameBorder',
+		'contenteditable': 'contentEditable',
+		'scrollw': 'scrollWidth',
+		'scrollh': 'scrollHeight',
+		'tagname': 'tagName'
+	};
 
-		// Special attributes that should be get/set via method calls
-		MethodAttributes = [
-			'title',
-			'value',
-			'val',
-			'css',
-			'html',
-			'text',
-			'data',
-			'width',
-			'height',
-			'offset'
-		],
+	var CCSS;
 
-		adjacencyOperators = [
-			'after',
-			'prepend',
-			'before',
-			'append'
-		],
+	var cssShow = {
+		position: 'absolute',
+		visibility: 'hidden',
+		display: 'block'
+	};
 
-		Table = Y.Document.createElement('table'),
+	var cssNormalTransform = {
+		letterSpacing: 0,
+		fontWeight: 400
+	};
 
-		TableRow = Y.Document.createElement('tr'),
+	var cssExpand = [
+		'Top',
+		'Right',
+		'Bottom',
+		'Left'
+	];
 
-		Containers = {
-			'tr': Y.Document.createElement('tbody'),
-			'tbody': Table,
-			'thead': Table,
-			'tfoot': Table,
-			'td': TableRow,
-			'th': TableRow,
-			'*': Y.Document.createElement('div')
-		},
+	var cssPrefixes = [
+		'Webkit',
+		'O',
+		'Moz',
+		'ms'
+	];
 
-		temporaryParent = Y.Document.createElement('div'),
+	var DomNode;
 
-		ClassTag = 'YAX' + (+new Date()),
+	var ClassTag = 'YAX' + Y.Lang.now;
 
-		properitiesMap = {
-			'tabindex': 'tabIndex',
-			'readonly': 'readOnly',
-			'for': 'htmlFor',
-			'class': 'className',
-			'maxlength': 'maxLength',
-			'cellspacing': 'cellSpacing',
-			'cellpadding': 'cellPadding',
-			'rowspan': 'rowSpan',
-			'colspan': 'colSpan',
-			'usemap': 'useMap',
-			'frameborder': 'frameBorder',
-			'contenteditable': 'contentEditable',
-			'scrollw': 'scrollWidth',
-			'scrollh': 'scrollHeight',
-			'tagname': 'tagName'
-		},
+	//---
 
-		CCSS,
-
-		// Matching numbers
-		//pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
-		pnum = /[+\-]?(?:\d*\.|)\d+(?:[eE][+\-]?\d+|)/.source,
-		//		pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
-		//pnum = /[+\-]?\d*\.?\d+(?:e[+\-]?\d+)?/i.source,
-
-		// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
-		// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
-		rdisplayswap = /^(none|table(?!-c[ea]).+)/,
-
-		rmargin = /^margin/,
-
-		//rnumsplit = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(.*)$', 'i'),
-		rnumsplit = new RegExp('^(' + pnum + ')(.*)$', 'i'),
-
-		//rnumnonpx = new RegExp('^(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')(?!px)[a-z%]+$', 'i'),
-		rnumnonpx = new RegExp('^(' + pnum + ')(?!px)[a-z%]+$', 'i'),
-
-		//rrelNum = new RegExp('^([+-])=(' + (/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source) + ')', 'i'),
-		rrelNum = new RegExp('^([+-])=(' + pnum + ')', 'i'),
-
-		cssShow = {
-			position: 'absolute',
-			visibility: 'hidden',
-			display: 'block'
-		},
-
-		cssNormalTransform = {
-			letterSpacing: 0,
-			fontWeight: 400
-		},
-
-		cssExpand = [
-			'Top',
-			'Right',
-			'Bottom',
-			'Left'
-		],
-
-		cssPrefixes = [
-			'Webkit',
-			'O',
-			'Moz',
-			'ms'
-		],
-
-		DomNode;
+	Y.DOM = function (selector, context) {
+		return YAXDOM.init(selector, context);
+	};
 
 	// BEGIN OF [Private Functions]
 
@@ -357,7 +326,7 @@
 		var result, len = array.length;
 
 		if (len > 0) {
-			result = Y.Node.Function.concat.apply([], array);
+			result = Y.DOM.Function.concat.apply([], array);
 		} else {
 			result = array;
 		}
@@ -483,15 +452,14 @@
 
 		if (computed) {
 			if (Y.Lang.isEmpty(ret) && !contains(element.ownerDocument, element)) {
-				ret = Y.Node.Style(element, name);
+				ret = Y.DOM.Style(element, name);
 			}
 
 			// Support: Safari 5.1
 			// A tribute to the "awesome hack by Dean Edwards"
 			// Safari 5.1.7 (at least) returns percentage for a larger set of values, but width seems to be reliably pixels
 			// this is against the CSSOM draft spec: http://dev.w3.org/csswg/cssom/#resolved-values
-			if (rnumnonpx.test(ret) && rmargin.test(name)) {
-
+			if (Y.RegEx.rnumnonpx.test(ret) && Y.RegEx.rmargin.test(name)) {
 				// Remember the original values
 				width = style.width;
 				minWidth = style.minWidth;
@@ -512,7 +480,7 @@
 	};
 
 	function setPositiveNumber(element, value, subtract) {
-		var matches = rnumsplit.exec(value);
+		var matches = Y.RegEx.rnumsplit.exec(value);
 		return matches ?
 			// Guard against undefined "subtract", e.g., when used as in CSS_Hooks
 			Math.max(0, matches[1] - (subtract || 0)) + (matches[2] || 'px') :
@@ -521,36 +489,36 @@
 
 	function argumentWidthOrHeight(element, name, extra, isBorderBox, styles) {
 		var i = extra === (isBorderBox ? 'border' : 'content') ?
-			// If we already have the right measurement, avoid augmentation
-			4 :
-			// Otherwise initialise for horizontal or vertical properties
-			name === 'width' ? 1 : 0,
+				// If we already have the right measurement, avoid augmentation
+				4 :
+				// Otherwise initialise for horizontal or vertical properties
+					name === 'width' ? 1 : 0,
 			val = 0;
 
 		for (null; i < 4; i += 2) {
 			// both box models exclude margin, so add it if we want it
 			if (extra === 'margin') {
-				val += Y.Node.CSS(element, extra + cssExpand[i], true, styles);
+				val += Y.DOM.CSS(element, extra + cssExpand[i], true, styles);
 			}
 
 			if (isBorderBox) {
 				// border-box includes padding, so remove it if we want content
 				if (extra === 'content') {
-					val -= Y.Node.CSS(element, 'padding' + cssExpand[i], true, styles);
+					val -= Y.DOM.CSS(element, 'padding' + cssExpand[i], true, styles);
 				}
 
 				// at this point, extra isn't border nor margin, so remove border
 				if (extra !== 'margin') {
-					val -= Y.Node.CSS(element, 'border' + cssExpand[i] + 'Width', true,
+					val -= Y.DOM.CSS(element, 'border' + cssExpand[i] + 'Width', true,
 						styles);
 				}
 			} else {
 				// at this point, extra isn't content, so add padding
-				val += Y.Node.CSS(element, 'padding' + cssExpand[i], true, styles);
+				val += Y.DOM.CSS(element, 'padding' + cssExpand[i], true, styles);
 
 				// at this point, extra isn't content nor padding, so add border
 				if (extra !== 'padding') {
-					val += Y.Node.CSS(element, 'border' + cssExpand[i] + 'Width', true,
+					val += Y.DOM.CSS(element, 'border' + cssExpand[i] + 'Width', true,
 						styles);
 				}
 			}
@@ -564,7 +532,7 @@
 		var valueIsBorderBox = true,
 			val = name === 'width' ? element.offsetWidth : element.offsetHeight,
 			styles = getStyles(element),
-			isBorderBox = Y.Node.Support.boxSizing && Y.Node.CSS(element, 'boxSizing',
+			isBorderBox = Y.DOM.Support.boxSizing && Y.DOM.CSS(element, 'boxSizing',
 				false, styles) === 'border-box';
 
 		// val = val.toString();
@@ -581,13 +549,13 @@
 			}
 
 			// Computed unit is not pixels. Stop here and return.
-			if (rnumnonpx.test(val.toString())) {
+			if (Y.RegEx.rnumnonpx.test(val.toString())) {
 				return val;
 			}
 
 			// we need the check for style in case a browser which returns unreliable values
 			// for getComputedStyle silently falls back to the reliable element.style
-			valueIsBorderBox = isBorderBox && (Y.Node.Support.boxSizingReliable || val ===
+			valueIsBorderBox = isBorderBox && (Y.DOM.Support.boxSizingReliable || val ===
 				element.style[name]);
 
 			// Normalize "", auto, and prepare for extra
@@ -599,11 +567,11 @@
 			argumentWidthOrHeight(
 				element,
 				name,
-				extra || (isBorderBox ? 'border' : 'content'),
+					extra || (isBorderBox ? 'border' : 'content'),
 				valueIsBorderBox,
 				styles
 			)
-		) + 'px';
+			) + 'px';
 	}
 
 	function globalEval(code) {
@@ -622,34 +590,11 @@
 		}
 	}
 
-	// Given a selector, splits it into groups. Necessary because naively
-	// splitting on commas will do the wrong thing.
-	//
-	// Examples:
-	// "div.foo" -> ["div.foo"]
-	// "div, p" -> ["div", "p"]
-	// "div[title='foo, bar'], p" -> ["div[title='foo, bar']", "p"]
-	function splitSelector(selector) {
-		var results = [];
-		selector.replace(SelectorGroupReplacement, function (m, unit) {
-			results.push(unit.trim());
-		});
-		return results;
-	}
-
-	// Checks whether the selector has a combinator in it. If not, it's a
-	// "simple selector" and can be optimized in some cases.
-	// This logic isn't exhaustive, but it doesn't have to be. False
-	// positives are OK.
-	function hasCombinator(selector) {
-		return selector.match(/[\s>~+]/);
-	}
-
 	// END OF [Private Functions]
 
 	//---
 
-	YAXDOM = {
+	Y.Extend(YAXDOM, {
 		/**
 		 *
 		 * @param element
@@ -688,34 +633,38 @@
 			/* jshint -W052 */
 			result = ~YAXDOM.QSA(parent, selector).indexOf(element);
 
-			temp && temporaryParent.appendChild(element);
+			// temp && temporaryParent.appendChild(element);
+
+			if (temp) {
+				temporaryParent.appendChild(element);
+			}
 
 			return result;
 		},
 
 		// `YAXDOM.Fragment` takes a html string and an optional tag name
-		// to generate Node nodes nodes from the given html string.
-		// The generated Node nodes are returned as an array.
+		// to generate DOM nodes from the given html string.
+		// The generated DOM nodes are returned as an array.
 		// This function can be overriden in plugins for example to make
-		// it compatible with browsers that don't support the Node fully.
+		// it compatible with browsers that don't support the DOM fully.
 		Fragment: function (html, name, properties) {
-			var dom, nodes, container;
+			var dom, nodes, container, self;
 
 			// A special case optimization for a single tag
-			if (SingleTagReplacement.test(html)) {
-				dom = Y.Node(Y.Document.createElement(RegExp.$1));
+			if (Y.RegEx.SingleTagReplacement.test(html)) {
+				dom = Y.DOM(Y.Document.createElement(RegExp.$1));
 			}
 
 			if (!dom) {
 				if (html.replace) {
-					html = html.replace(TagExpanderReplacement, '<$1></$2>');
+					html = html.replace(Y.RegEx.TagExpanderReplacement, '<$1></$2>');
 				}
 
 				if (name === undef) {
-					name = FragmentReplacement.test(html) && RegExp.$1;
+					name = Y.RegEx.FragmentReplacement.test(html) && RegExp.$1;
 				}
 
-				if (!(Containers.hasOwnProperty(name))) {
+				if (!(Y.HasOwnProperty.call(Containers, name))) {
 					name = '*';
 				}
 
@@ -724,12 +673,14 @@
 				container.innerHTML = Y.Lang.empty() + html;
 
 				dom = Y.Each(Y.G.Slice.call(container.childNodes), function () {
-					container.removeChild(this);
+					self = this;
+					// container.removeChild(this);
+					container.removeChild(self);
 				});
 			}
 
 			if (Y.Lang.isPlainObject(properties)) {
-				nodes = Y.Node(dom);
+				nodes = Y.DOM(dom);
 
 				Y.Each(properties, function (key, value) {
 					if (MethodAttributes.indexOf(key) > -1) {
@@ -743,9 +694,7 @@
 			return dom;
 		},
 
-		// constructor: YAXDOM,
-
-		// `YAXDOM.init` is Y.Node's counterpart to jQuery's `Y.Node.Function.init` and
+		// `YAXDOM.init` is Y.DOM's counterpart to jQuery's `Y.DOM.Function.init` and
 		// takes a CSS selector and an optional context (and handles various
 		// special cases).
 		// This method can be overriden in plugins.
@@ -762,56 +711,56 @@
 				selector = selector.trim();
 
 				// If it's a html Fragment, create nodes from it
-				// Note: In both Chrome 21 and Firefox 15, Node error 12
+				// Note: In both Chrome 21 and Firefox 15, DOM error 12
 				// is thrown if the Fragment doesn't begin with <
-				// if (selector[0] === '<' && FragmentReplacement.test(selector)) {
+				// if (selector[0] === '<' && Y.RegEx.FragmentReplacement.test(selector)) {
 				if (selector[0] === '<' && selector[selector.length - 1] === '>' &&
-					FragmentReplacement.test(selector) && selector.length >= 3) {
+					Y.RegEx.FragmentReplacement.test(selector) && selector.length >= 3) {
 					dom = YAXDOM.Fragment(selector, RegExp.$1, context);
 					// selector = selector.replace('<', '').replace('>', '');
 					selector = null;
 				} else if (context !== undef) {
 					// If there's a context, create a collection on that context first, and select nodes from there
-					return Y.Node(context).find(selector);
+					return Y.DOM(context).find(selector);
 				} else {
 					// If it's a CSS selector, use it to select nodes.
-					dom = YAXDOM.QSA(Y.Document, selector);
+					dom = this.QSA(Y.Document, selector);
 				}
 			}
 
-			// If a function is given, call it when the Node is ready
+			// If a function is given, call it when the DOM is ready
 			else if (Y.Lang.isFunction(selector)) {
-				return Y.Node(Y.Document).ready(selector);
+				return Y.DOM(Y.Document).ready(selector);
 				// If a YAX collection is given, just return it
-			} else if (YAXDOM.isY(selector)) {
+			} else if (this.isY(selector)) {
 				return selector;
 			} else {
 				// normalize array if an array of nodes is given
 				if (Y.Lang.isArray(selector)) {
 					dom = Y.Lang.compact(selector);
-					// dom = Y.Node.makeArray(selector, YAXDOM.Y());
-					// Wrap Node nodes.
+					// dom = Y.DOM.makeArray(selector, this.Y());
+					// Wrap DOM nodes.
 				} else if (Y.Lang.isObject(selector)) {
 					dom = [selector];
 					selector = null;
 					// If it's a html Fragment, create nodes from it
-				} else if (FragmentReplacement.test(selector)) {
-					dom = YAXDOM.Fragment(selector.trim(), RegExp.$1, context);
+				} else if (Y.RegEx.FragmentReplacement.test(selector)) {
+					dom = this.Fragment(selector.trim(), RegExp.$1, context);
 					selector = null;
 					// If there's a context, create a collection on that context first, and select
 					// nodes from there
 				} else if (Y.Lang.isDefined(context)) {
-					// return Y.Node(context).find(selector);
+					return Y.DOM(context).find(selector);
 					// console.log(context);
-					//result = Y.Node(context).find(selector);
+					//result = Y.DOM(context).find(selector);
 					// And last but no least, if it's a CSS selector, use it to select nodes.
 				} else {
-					dom = YAXDOM.QSA(Y.Document, selector);
+					dom = this.QSA(Y.Document, selector);
 				}
 			}
 
 			// Create a new YAXDOM collection from the nodes found
-			return YAXDOM.Y(dom, selector);
+			return this.Y(dom, selector);
 		},
 
 		// `YAXDOM.QSA` is YAX's CSS selector implementation which
@@ -835,7 +784,7 @@
 				nameOnly = selector;
 			}
 
-			isSimple = SimpleSelectorReplacement.test(nameOnly);
+			isSimple = Y.RegEx.SimpleSelectorReplacement.test(nameOnly);
 
 			if (Y.Lang.isDocument(element) && isSimple && maybeID) {
 				found = element.getElementById(nameOnly);
@@ -844,56 +793,57 @@
 					// result = {'res': found};
 					result = [found];
 				} else {
-					// result = {};
+					// result = Object.create({});
 					result = [];
 				}
 			} else {
 				result = (!Y.Lang.isUndefined(element) && element.nodeType !== 1 &&
-					element.nodeType !== 9) ? {} :
+					element.nodeType !== 9) ? Object.create({}) :
 					Y.G.Slice.call(
-						isSimple && !maybeID ?
-						// If it's simple, it could be a class
-						maybeClass ? element.getElementsByClassName(nameOnly) :
-						// Or a tag
-						element.getElementsByTagName(selector) :
-						// Or it's not simple, and we need to query all
-						element.querySelectorAll(selector)
-				);
+							isSimple && !maybeID ?
+							// If it's simple, it could be a class
+							maybeClass ? element.getElementsByClassName(nameOnly) :
+								// Or a tag
+								element.getElementsByTagName(selector) :
+							// Or it's not simple, and we need to query all
+							element.querySelectorAll(selector)
+					);
 			}
 
 			return result;
 		},
 
-		// `YAXDOM.Y` swaps out the prototype of the given `Node` array
-		// of nodes with `Y.Node.Function` and thus supplying all the Y.Node functions
+		// `YAXDOM.Y` swaps out the prototype of the given `DOM` array
+		// of nodes with `Y.DOM.Function` and thus supplying all the Y.DOM functions
 		// to the array. Note that `__proto__` is not supported on Internet
 		// Explorer. This method can be overriden in Plugins.
 		Y: function (dom, selector) {
 			var result;
 
 			result = dom || [];
-
+			// result = dom || Object.create({});
 			/* jshint -W103 */
-			result.__proto__ = Y.Node.Function;
-
+			// result.__proto__ = Y.DOM.Function;
+			result.__proto__ = Y.DOM.Function;
 			result.selector = selector || Y.Lang.empty();
 
 			return result;
 		},
 
 		/**
-		 * Y.Node.isY` should return `true` if the given object is a YAX collection. This method can be overriden in plugins.
+		 * Y.DOM.isY` should return `true` if the given object is
+		 * a YAX collection. This method can be overriden in plugins.
 		 */
 		isY: function (object) {
-			return object instanceof YAXDOM.Y;
+			return object instanceof this.Y;
 		}
-	};
+	});
 
 	//---
 
-	Y.Node = function (selector, context) {
-		return new YAXDOM.init(selector, context);
-	};
+	/*Y.DOM = function (selector, context) {
+		return YAXDOM.init(selector, context);
+	};*/
 
 	//---
 
@@ -902,9 +852,9 @@
 
 		if (Y.Lang.isNull(selector) || Y.Lang.isUndefined(selector) || Y.Lang.isEmpty(
 			selector)) {
-			result = Y.Node(nodes);
+			result = Y.DOM(nodes);
 		} else {
-			result = Y.Node(nodes).filter(selector);
+			result = Y.DOM(nodes).filter(selector);
 		}
 
 		return result;
@@ -913,7 +863,7 @@
 	//---
 
 	/**
-	 * Y.DomNode is a Node class that Y.Node classes inherit from.
+	 * Y.DomNode is a DOM class that Y.DOM classes inherit from.
 	 */
 	Y.DomNode = Y.Class.Extend({
 		CLASS_NAME: 'DOM',
@@ -936,9 +886,9 @@
 		},
 
 		documentIsLtr: function () {
-			Y.Node.docIsLTR = Y.Node.docIsLTR || DomNode.getStyle(Y.Document.body,
+			Y.DOM.docIsLTR = Y.DOM.docIsLTR || DomNode.getStyle(Y.Document.body,
 				'direction') === 'ltr';
-			return Y.Node.docIsLTR;
+			return Y.DOM.docIsLTR;
 		},
 
 		'Function': {
@@ -948,29 +898,29 @@
 			reduce: Y.G.ArrayProto.reduce,
 			push: Y.G.Push,
 			sort: Y.G.ArrayProto.sort,
-			indexOf: Y.G.ArrayProto.indexOf,
+			indexOf: Y.G.IndexOf,
 			concat: Y.G.Concat,
 			extend: Y.Extend,
 			// `map` and `slice` in the jQuery API work differently
 			// from their array counterparts
 			map: function (callback) {
-				return Y.Node(map(this, function (el, i) {
+				return Y.DOM(map(this, function (el, i) {
 					return callback.call(el, i, el);
 				}));
 			},
 			slice: function () {
-				return Y.Node(Y.G.Slice.apply(this, arguments));
-				// return Y.Node.pushStack(Slice.apply(this, arguments));
+				return Y.DOM(Y.G.Slice.apply(this, arguments));
+				// return Y.DOM.pushStack(Slice.apply(this, arguments));
 			},
 			ready: function (callback) {
 				// need to check if Y.Document.body exists for IE as that browser reports
 				// Y.Document ready when it hasn't yet created the body element
-				if (ReadyReplacement.test(Y.CallProperty(Y.Document, 'readyState')) &&
+				if (Y.RegEx.ReadyReplacement.test(Y.CallProperty(Y.Document, 'readyState')) &&
 					Y.Document.body) {
-					callback(Y.Node);
+					callback(Y.DOM);
 				} else {
 					Y.Document.addEventListener('DOMContentLoaded', function () {
-						callback(Y.Node);
+						callback(Y.DOM);
 					}, false);
 				}
 
@@ -1014,12 +964,12 @@
 					return this.not(this.not(selector));
 				}
 
-				return Y.Node(Y.G.Filter.call(this, function (element) {
+				return Y.DOM(Y.G.Filter.call(this, function (element) {
 					return YAXDOM.Matches(element, selector);
 				}));
 			},
 			add: function (selector, context) {
-				return Y.Node(Y.Lang.unique(this.concat(Y.Node(selector, context))));
+				return Y.DOM(Y.Lang.unique(this.concat(Y.DOM(selector, context))));
 			},
 			is: function (selector) {
 				return this.length > 0 && YAXDOM.Matches(this[0], selector);
@@ -1037,7 +987,7 @@
 				} else {
 					excludes = Y.Lang.isString(selector) ? this.filter(selector) :
 						(Y.Lang.likeArray(selector) && Y.Lang.isFunction(selector.item)) ? Y.G.Slice
-						.call(selector) : Y.Node(selector);
+							.call(selector) : Y.DOM(selector);
 
 					this.forEach(function (el) {
 						if (excludes.indexOf(el) < 0) {
@@ -1046,13 +996,13 @@
 					});
 				}
 
-				return Y.Node(nodes);
+				return Y.DOM(nodes);
 			},
 			has: function (selector) {
 				return this.filter(function () {
 					return Y.Lang.isObject(selector) ?
 						contains(this, selector) :
-						Y.Node(this).find(selector).size();
+						Y.DOM(this).find(selector).size();
 				});
 			},
 			eq: function (index) {
@@ -1060,108 +1010,44 @@
 			},
 			first: function () {
 				var el = this[0];
-				return el && !Y.Lang.isObject(el) ? el : Y.Node(el);
+				return el && !Y.Lang.isObject(el) ? el : Y.DOM(el);
 			},
 			last: function () {
 				var el = this[this.length - 1];
-				return el && !Y.Lang.isObject(el) ? el : Y.Node(el);
+				return el && !Y.Lang.isObject(el) ? el : Y.DOM(el);
 			},
-			find: function (selector) {
-				var result, $this = this,
-					error = false,
-					node;
 
-				/*if (Y.Lang.isObject(selector)) {
-					result = Y.Node(selector).filter(function () {
-						node = this;
-						return Y.G.ArrayProto.some.call($this, function (parent) {
-							return contains(parent, node);
+			find: function (selector) {
+				var result;
+				var self = this;
+
+				if (!selector) {
+					result = [];
+				} else if (Y.Lang.isObject(selector)) {
+					result = Y.DOM(selector).filter(function () {
+						var node = this;
+
+						return Y.G.ArrayProto.some.call(self, function (parent) {
+							return Y.DOM.contains(parent, node);
 						});
 					});
 				} else if (this.length === 1) {
-					result = Y.Node(YAXDOM.QSA(this[0], selector));
+					result = Y.DOM(YAXDOM.QSA(this[0], selector));
 				} else {
 					result = this.map(function () {
 						return YAXDOM.QSA(this, selector);
 					});
-				}*/
-
-				if (Y.Lang.isObject(selector)) {
-					result = Y.Node(selector).filter(function () {
-						node = this;
-						return Y.G.ArrayProto.some.call($this, function (parent) {
-							return contains(parent, node);
-						});
-					});
-				} else {
-					var slow = false;
-
-					selector = splitSelector(selector).map(function (unit) {
-						if (hasCombinator(selector)) {
-							slow = true;
-							return '.' + ClassTag + ' ' + unit;
-						}
-
-						return unit;
-					}).join(', ');
-
-					var findBySelector = function findBySelector(elem, selector, slow) {
-						if (elem.length == 1) {
-							if (slow) {
-								elem.addClass(ClassTag);
-							}
-
-							result = Y.Node(YAXDOM.QSA(elem[0], selector));
-
-							if (slow) {
-								elem.removeClass(ClassTag);
-							}
-						} else {
-							result = elem.map(function () {
-								if (slow) {
-									Y.Node(this).addClass(ClassTag);
-								}
-
-								var result = YAXDOM.QSA(this, selector);
-
-								if (slow) {
-									Y.Node(this).removeClass(ClassTag);
-								}
-
-								return result;
-							});
-						}
-
-						return result;
-					};
-
-					if (slow) {
-						try {
-							result = findBySelector(this, selector, slow);
-						} catch (e) {
-							Y.ERROR('error performing selector: %o', selector);
-							error = true;
-							throw e;
-						} finally {
-							// If an error was thrown, we should assume that the class name
-							// cleanup didn't happen, and do it ourselves.
-							if (error) {
-								Y.Node('.' + ClassTag).removeClass(ClassTag);
-							}
-						}
-					} else {
-						result = findBySelector(this, selector, slow);
-					}
 				}
 
 				return result;
 			},
+
 			closest: function (selector, context) {
 				var node = this[0],
 					collection = false;
 
 				if (Y.Lang.isObject(selector)) {
-					collection = Y.Node(selector);
+					collection = Y.DOM(selector);
 				}
 
 				while (node && Y.Lang.isFalse(collection ? collection.indexOf(node) >= 0 :
@@ -1169,7 +1055,7 @@
 					node = node !== context && !Y.Lang.isDocument(node) && node.parentNode;
 				}
 
-				return Y.Node(node);
+				return Y.DOM(node);
 			},
 			parents: function (selector) {
 				var ancestors = [],
@@ -1253,20 +1139,20 @@
 					dom, clone;
 
 				if (this[0] && !func) {
-					dom = Y.Node(structure).get(0);
+					dom = Y.DOM(structure).get(0);
 					clone = dom.parentNode || this.length > 1;
 				}
 
 				return this.each(function (index) {
-					Y.Node(this).wrapAll(
+					Y.DOM(this).wrapAll(
 						func ? structure.call(this, index) :
-						clone ? dom.cloneNode(true) : dom
+							clone ? dom.cloneNode(true) : dom
 					);
 				});
 			},
 			wrapAll: function (structure) {
 				if (this[0]) {
-					Y.Node(this[0]).before(structure = Y.Node(structure));
+					Y.DOM(this[0]).before(structure = Y.DOM(structure));
 
 					var childreno, self = this;
 
@@ -1277,7 +1163,7 @@
 						structure = children.first();
 					}
 
-					Y.Node(structure).append(self);
+					Y.DOM(structure).append(self);
 				}
 
 				return this;
@@ -1286,7 +1172,7 @@
 				var func = Y.Lang.isFunction(structure),
 					self, dom, contents;
 				return this.each(function (index) {
-					self = Y.Node(this);
+					self = Y.DOM(this);
 
 					contents = self.contents();
 
@@ -1303,7 +1189,7 @@
 			},
 			unwrap: function () {
 				this.parent().each(function () {
-					Y.Node(this).replaceWith(Y.Node(this).children());
+					Y.DOM(this).replaceWith(Y.DOM(this).children());
 				});
 
 				return this;
@@ -1318,7 +1204,7 @@
 			},
 			toggle: function (setting) {
 				return this.each(function () {
-					var el = Y.Node(this),
+					var el = Y.DOM(this),
 						val;
 
 					val = el.css('display') === 'none';
@@ -1337,18 +1223,18 @@
 				});
 			},
 			prev: function (selector) {
-				return Y.Node(this.pluck('previousElementSibling')).filter(selector ||
+				return Y.DOM(this.pluck('previousElementSibling')).filter(selector ||
 					'*');
 			},
 			next: function (selector) {
-				return Y.Node(this.pluck('nextElementSibling')).filter(selector || '*');
+				return Y.DOM(this.pluck('nextElementSibling')).filter(selector || '*');
 			},
 			html: function (html) {
 				return arguments.length === 0 ?
 					(this.length > 0 ? this[0].innerHTML : null) :
 					this.each(function (index) {
 						var originHtml = this.innerHTML;
-						Y.Node(this).empty().append(functionArgument(this, html, index,
+						Y.DOM(this).empty().append(functionArgument(this, html, index,
 							originHtml));
 					});
 			},
@@ -1374,9 +1260,9 @@
 				return (Y.Lang.isString(name) && value === undef) ?
 					(this.length === 0 || this[0].nodeType !== 1 ? undef :
 						(name === 'value' && this[0].nodeName === 'INPUT') ? this.val() :
-						(Y.Lang.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
-							name)) ? this[0][name] : result
-					) :
+							(Y.Lang.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
+								name)) ? this[0][name] : result
+						) :
 					this.each(function (index) {
 						if (this.nodeType !== 1) {
 							return;
@@ -1433,7 +1319,7 @@
 			val: function (value) {
 				return arguments.length === 0 ?
 					(this[0] && (this[0].multiple ?
-						Y.Node(this[0]).find('option').filter(function () {
+						Y.DOM(this[0]).find('option').filter(function () {
 							return this.selected;
 						}).pluck('value') :
 						this[0].value)) :
@@ -1444,7 +1330,7 @@
 			value: function (value) {
 				return arguments.length === 0 ?
 					(this[0] && (this[0].multiple ?
-						Y.Node(this[0]).find('option').filter(function () {
+						Y.DOM(this[0]).find('option').filter(function () {
 							return this.selected;
 						}).pluck('value') :
 						this[0].value)) :
@@ -1455,7 +1341,7 @@
 			offset: function (coordinates) {
 				if (coordinates) {
 					return this.each(function (index) {
-						var $this = Y.Node(this),
+						var $this = Y.DOM(this),
 							coords = functionArgument(this, coordinates, index, $this.offset()),
 							parentOffset = $this.offsetParent().offset(),
 							props = {
@@ -1498,7 +1384,7 @@
 					return options === undef ?
 						this :
 						this.each(function (i) {
-							Y.Node.offset.setOffset(this, options, i);
+							Y.DOM.offset.setOffset(this, options, i);
 						});
 				}
 
@@ -1516,7 +1402,7 @@
 
 				docElem = Y.Document.documentElement;
 
-				// Make sure it's not a disconnected Node node
+				// Make sure it's not a disconnected DOM node
 				if (!contains(docElem, element)) {
 					return box;
 				}
@@ -1550,7 +1436,7 @@
 					}
 
 					if (Y.Lang.isArray(name)) {
-						props = {};
+						props = Object.create({});
 
 						Y.Each(Y.Lang.isArray(name) ? name : [name], function (tmp, prop) {
 							props[prop] = (element.style[Y.Lang.camelise(prop)] || computedStyle.getPropertyValue(
@@ -1569,8 +1455,8 @@
 					}
 				}
 
-				return Y.Node.Access(this, function (element, name, value) {
-					var styles, len, mapo = {},
+				return Y.DOM.Access(this, function (element, name, value) {
+					var styles, len, mapo = Object.create({}),
 						i = 0;
 
 					if (Y.Lang.isArray(name)) {
@@ -1578,20 +1464,20 @@
 						len = name.length;
 
 						for (i; i < len; i++) {
-							mapo[name[i]] = Y.Node.CSS(element, name[i], false, styles);
+							mapo[name[i]] = Y.DOM.CSS(element, name[i], false, styles);
 						}
 
 						return mapo;
 					}
 
 					return value !== undef ?
-						Y.Node.Style(element, name, value) :
-						Y.Node.CSS(element, name);
+						Y.DOM.Style(element, name, value) :
+						Y.DOM.CSS(element, name);
 				}, name, value, arguments.length > 1);
 			},
 
 			prevAll: function (elem) {
-				return Y.Node.dir(elem, "previousSibling");
+				return Y.DOM.dir(elem, "previousSibling");
 			},
 
 			index: function (element) {
@@ -1599,15 +1485,15 @@
 				//					return (this[0] && this[0].parentNode) ? this.first().prevAll().length : -1;
 				//				}
 
-				//				return this.indexOf(Y.Node(element)[0]);
+				//				return this.indexOf(Y.DOM(element)[0]);
 
 				//				if (Y.Lang.isString(element)) {
-				//					return this.indexOf.call(Y.Node(element), this[0]);
+				//					return this.indexOf.call(Y.DOM(element), this[0]);
 				//				}
 
 				//				return this.indexOf.call(this, element.YAXDOM ? element[0] : element);
 
-				return element ? this.indexOf(Y.Node(element)[0]) : this.parent().children()
+				return element ? this.indexOf(Y.DOM(element)[0]) : this.parent().children()
 					.indexOf(this[0]);
 			},
 			hasClass: function (name) {
@@ -1640,7 +1526,7 @@
 						newName = functionArgument(this, name, index, id);
 
 					newName.split(/\s+/g).forEach(function (ID) {
-						if (!Y.Node(this).hasId(ID)) {
+						if (!Y.DOM(this).hasId(ID)) {
 							IDsList.push(ID);
 						}
 					}, this);
@@ -1668,7 +1554,7 @@
 						newName = functionArgument(this, name, index, cls);
 
 					newName.split(/\s+/g).forEach(function (Class) {
-						if (!Y.Node(this).hasClass(Class)) {
+						if (!Y.DOM(this).hasClass(Class)) {
 							ClassList.push(Class);
 						}
 					}, this);
@@ -1723,7 +1609,7 @@
 				}
 
 				return this.each(function (index) {
-					var $this = Y.Node(this),
+					var $this = Y.DOM(this),
 						names = functionArgument(this, name, index, className(this));
 
 					names.split(/\s+/g).forEach(function (Class) {
@@ -1790,7 +1676,7 @@
 					};
 
 				// Fixed elements are offset from window (parentOffset = {top:0, left: 0}, because it is it's only offset parent
-				if (Y.Node.CSS(element, 'position') === "fixed") {
+				if (Y.DOM.CSS(element, 'position') === "fixed") {
 					// We assume that getBoundingClientRect is available when computed position is fixed
 					offset = element.getBoundingClientRect();
 
@@ -1801,20 +1687,20 @@
 					// Get correct offsets
 					offset = this.offset();
 
-					if (!Y.Node.nodeName(offsetParent[0], "html")) {
+					if (!Y.DOM.nodeName(offsetParent[0], "html")) {
 						parentOffset = offsetParent.offset();
 					}
 
 					// Add offsetParent borders
-					parentOffset.top += Y.Node.CSS(offsetParent[0], "borderTopWidth", true);
-					parentOffset.left += Y.Node.CSS(offsetParent[0], "borderLeftWidth", true);
+					parentOffset.top += Y.DOM.CSS(offsetParent[0], "borderTopWidth", true);
+					parentOffset.left += Y.DOM.CSS(offsetParent[0], "borderLeftWidth", true);
 				}
 
 				// Subtract parent offsets and element margins
 				return {
-					top: offset.top - parentOffset.top - Y.Node.CSS(element, "marginTop",
+					top: offset.top - parentOffset.top - Y.DOM.CSS(element, "marginTop",
 						true),
-					left: offset.left - parentOffset.left - Y.Node.CSS(element, "marginLeft",
+					left: offset.left - parentOffset.left - Y.DOM.CSS(element, "marginLeft",
 						true)
 				};
 			},
@@ -1824,11 +1710,11 @@
 				}
 
 				var element = this[0],
-					// Get *real* offsetParent
+				// Get *real* offsetParent
 					offsetParent = this.offsetParent(),
-					// Get correct offsets
+				// Get correct offsets
 					offset = this.offset(),
-					parentOffset = RootNodeReplacement.test(offsetParent[0].nodeName) ? {
+					parentOffset = Y.RegEx.RootNodeReplacement.test(offsetParent[0].nodeName) ? {
 						top: 0,
 						left: 0
 					} : offsetParent.offset();
@@ -1836,13 +1722,13 @@
 				// Subtract element margins
 				// note: when an element has margin: auto the offsetLeft and marginLeft
 				// are the same in Safari causing offset.left to incorrectly be 0
-				offset.top -= parseFloat(Y.Node(element).css('margin-top')) || 0;
-				offset.left -= parseFloat(Y.Node(element).css('margin-left')) || 0;
+				offset.top -= parseFloat(Y.DOM(element).css('margin-top')) || 0;
+				offset.left -= parseFloat(Y.DOM(element).css('margin-left')) || 0;
 
 				// Add offsetParent borders
-				parentOffset.top += parseFloat(Y.Node(offsetParent[0]).css(
+				parentOffset.top += parseFloat(Y.DOM(offsetParent[0]).css(
 					'border-top-width')) || 0;
-				parentOffset.left += parseFloat(Y.Node(offsetParent[0]).css(
+				parentOffset.left += parseFloat(Y.DOM(offsetParent[0]).css(
 					'border-left-width')) || 0;
 
 				// Subtract the two offsets
@@ -1855,7 +1741,7 @@
 				return this.map(function () {
 					var offsetParent = this.offsetParent || docElement;
 
-					while (offsetParent && (!Y.Node.nodeName(offsetParent, 'html') && Y.Node
+					while (offsetParent && (!Y.DOM.nodeName(offsetParent, 'html') && Y.DOM
 						.CSS(offsetParent, 'position') === 'static')) {
 						offsetParent = offsetParent.offsetParent;
 					}
@@ -1905,7 +1791,7 @@
 					} else {
 						bulk = callback;
 						callback = function (element, key, value) {
-							return bulk.call(Y.Node(element), value);
+							return bulk.call(Y.DOM(element), value);
 						};
 					}
 				}
@@ -1927,7 +1813,7 @@
 		// If support gets modularized, this method should be moved back to the css module.
 		Swap: function (element, options, callback, args) {
 			var ret, name,
-				old = {};
+				old = Object.create({});
 
 			// Remember the old values, and insert the new ones
 			for (name in options) {
@@ -1955,14 +1841,20 @@
 			var ret = Y.Lang.merge(this.constructor(), elems);
 
 			// Add the old object onto the stack (as a reference)
-			ret.prev = this;
+			ret.prevObject = this;
 			ret.context = this.context;
 
 			// Return the newly-formed element set
 			return ret;
 		},
 		nodeName: function (element, name) {
-			return element.nodeName && element.nodeName.toLowerCase() === name.toLowerCase();
+			if (Y.Lang.isSet(element) && !Y.Lang.isSet(name)) {
+				return element.nodeName;
+			}
+
+			if (Y.Lang.isSet(element) && Y.Lang.isSet(name)) {
+				return element.nodeName && element.nodeName.toLowerCase() === name.toLowerCase();
+			}
 		},
 		// Add in style property hooks for overriding the default
 		// behavior of getting and setting a style property
@@ -1996,7 +1888,7 @@
 			// normalize float css property
 			'float': 'cssFloat'
 		},
-		// Get and set the style property on a Node Node
+		// Get and set the style property on a DOM DOM
 		Style: function (element, name, value, extra) {
 			// Don't set styles on text and comment nodes
 			if (!element || element.nodeType === 3 || element.nodeType === 8 || !
@@ -2021,7 +1913,7 @@
 
 			// Check if we're setting a value
 			if (value !== undef) {
-				ret = rrelNum.exec(value);
+				ret = Y.RegEx.rrelNum.exec(value);
 
 				// Convert relative number strings (+= or -=) to relative numbers. #7345
 				if (Y.Lang.isString(value) && ret) {
@@ -2051,7 +1943,8 @@
 					style[name] = value;
 
 					if (!newvalue && newvalue !== 0) {
-						style.setProperty(name, Y.Lang.empty());
+						// style.setProperty(name, Y.Lang.empty());
+						style.setProperty(name, Y.Lang.empty(), Y.Lang.empty());
 						style.removeProperty(name);
 					}
 				}
@@ -2109,14 +2002,18 @@
 
 	//---
 
-	Y.Extend(Y.Node, {
+	Y.DOM.ClassTag = ClassTag;
+
+	//---
+
+	Y.Extend(Y.DOM, {
 		offset: {
 			setOffset: function (element, options, i) {
 				var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft,
 					calculatePosition,
-					position = Y.Node.CSS(element, "position"),
-					curElem = Y.Node(element),
-					props = {};
+					position = Y.DOM.CSS(element, "position"),
+					curElem = Y.DOM(element),
+					props = Object.create({});
 
 				// Set position first, in-case top/left are set even on static element
 				if (position === "static") {
@@ -2124,8 +2021,8 @@
 				}
 
 				curOffset = curElem.offset();
-				curCSSTop = Y.Node.CSS(element, "top");
-				curCSSLeft = Y.Node.CSS(element, "left");
+				curCSSTop = Y.DOM.CSS(element, "top");
+				curCSSLeft = Y.DOM.CSS(element, "left");
 				calculatePosition = (position === "absolute" || position === "fixed") &&
 					(curCSSTop + curCSSLeft).indexOf("auto") > -1;
 
@@ -2199,17 +2096,7 @@
 
 		CSS_Hooks: DomNode.CSS_Hooks,
 
-		Function: DomNode.Function,
-
-		expr: {},
-
-		Expr: {},
-
-		support: {},
-
-		map: map,
-
-		Map: map,
+		Function: [DomNode.Function],
 
 		UUID: 0,
 
@@ -2224,14 +2111,16 @@
 		parseJSON: Y.Lang.parseJSON
 	});
 
-	Y.Node.Support = Y.Node.support;
+	Y.DOM.Support = Y.DOM.support = Object.create({});
+	Y.DOM.Expr = Y.DOM.expr = Object.create({});
+	Y.DOM.Map = Y.DOM.map = map;
 
 	//---
 
 
 	//---
 
-	// Y.Node.prototype = DomNode.prototype;
+	Y.DOM.prototype = DomNode.prototype;
 
 	//---
 
@@ -2242,8 +2131,8 @@
 	}, function (method, prop) {
 		var top = 'pageYOffset' === prop;
 
-		Y.Node.Function[method] = function (val) {
-			return Y.Node.Access(this, function (element, method, val) {
+		Y.DOM.Function[method] = function (val) {
+			return Y.DOM.Access(this, function (element, method, val) {
 				var win = getWindow(element);
 
 				if (val === undef) {
@@ -2262,19 +2151,19 @@
 
 	//---
 
-	Y.Node.cssExpand = cssExpand;
+	Y.DOM.cssExpand = cssExpand;
 
 	//---
 
 	Y.Each(['height', 'width'], function (i, name) {
-		Y.Node.CSS_Hooks[name] = {
+		Y.DOM.CSS_Hooks[name] = {
 			get: function (element, computed, extra) {
 				if (computed) {
 					// certain elements can have dimension info if we invisibly show them
 					// however, it must have a current display style that would benefit from this
-					return element.offsetWidth === 0 && rdisplayswap.test(Y.Node.CSS(element,
-							'display')) ?
-						Y.Node.Swap(element, cssShow, function () {
+					return element.offsetWidth === 0 && Y.RegEx.rdisplayswap.test(Y.DOM.CSS(element,
+						'display')) ?
+						Y.DOM.Swap(element, cssShow, function () {
 							return getWidthOrHeight(element, name, extra);
 						}) :
 						getWidthOrHeight(element, name, extra);
@@ -2283,14 +2172,14 @@
 			set: function (element, value, extra) {
 				var styles = extra && getStyles(element);
 				return setPositiveNumber(element, value, extra ?
-					argumentWidthOrHeight(
-						element,
-						name,
-						extra,
-						Y.Node.Support.boxSizing && Y.Node.CSS(element, 'boxSizing', false,
-							styles) === 'border-box',
-						styles
-					) : 0
+						argumentWidthOrHeight(
+							element,
+							name,
+							extra,
+								Y.DOM.Support.boxSizing && Y.DOM.CSS(element, 'boxSizing', false,
+								styles) === 'border-box',
+							styles
+						) : 0
 				);
 			}
 		};
@@ -2308,13 +2197,13 @@
 			'': 'outer' + name
 		}, function (defaultExtra, funcName) {
 			// margin is only for outerHeight, outerWidth
-			Y.Node.Function[funcName] = function (margin, value) {
+			Y.DOM.Function[funcName] = function (margin, value) {
 				var chainable = arguments.length && (defaultExtra || typeof margin !==
 						'boolean'),
 					extra = defaultExtra || (margin === true || value === true ? 'margin' :
 						'border');
 
-				return Y.Node.Access(this, function (element, type, value) {
+				return Y.DOM.Access(this, function (element, type, value) {
 					var doc;
 
 					if (Y.Lang.isWindow(element)) {
@@ -2339,9 +2228,9 @@
 
 					return value === undef ?
 						// Get width or height on the element, requesting but not forcing parseFloat
-						Y.Node.CSS(element, type, extra) :
+						Y.DOM.CSS(element, type, extra) :
 						// Set width or height on the element
-						Y.Node.Style(element, type, value, extra);
+						Y.DOM.Style(element, type, value, extra);
 				}, type, chainable ? margin : undef, chainable, null);
 			};
 		});
@@ -2349,7 +2238,8 @@
 
 	//---
 
-	Y.Node.Extend = Y.Node.extend = Y.Extend;
+	Y.DOM.Extend = Y.DOM.extend = Y.Extend;
+	Y.DOM.Function.extend = Y.Extend;
 
 	//---
 
@@ -2358,7 +2248,7 @@
 	adjacencyOperators.forEach(function (operator, operatorIndex) {
 		var inside = operatorIndex % 2; //=> prepend, append
 
-		Y.Node.Function[operator] = function () {
+		Y.DOM.Function[operator] = function () {
 			// Arguments can be nodes, arrays of nodes, YAX objects and HTML strings
 			var nodes = map(arguments, function (arg) {
 					return Y.Lang.isObject(arg) ||
@@ -2379,8 +2269,8 @@
 
 				// Convert all methods to a "before" operation
 				target = operatorIndex === 0 ? target.nextSibling :
-					operatorIndex === 1 ? target.firstChild :
-					operatorIndex === 2 ? target :
+						operatorIndex === 1 ? target.firstChild :
+						operatorIndex === 2 ? target :
 					null;
 
 				parentInDocument = docElement.contains(parent);
@@ -2389,7 +2279,7 @@
 					if (copyByClone) {
 						node = node.cloneNode(true);
 					} else if (!parent) {
-						return Y.Node(node).remove();
+						return Y.DOM(node).remove();
 					}
 
 					if (parentInDocument) {
@@ -2415,9 +2305,9 @@
 		// prepend  => prependTo
 		// before   => insertBefore
 		// append   => appendTo
-		Y.Node.Function[inside ? operator + 'To' : 'insert' + (operatorIndex ?
+		Y.DOM.Function[inside ? operator + 'To' : 'insert' + (operatorIndex ?
 			'Before' : 'After')] = function (html) {
-			Y.Node(html)[operator](this);
+			Y.DOM(html)[operator](this);
 			return this;
 		};
 	});
@@ -2428,19 +2318,23 @@
 
 	//---
 
-	Y.Extend(YAXDOM.Y.prototype, Y.Node.Function);
+	//Y.Extend(YAXDOM.Y.prototype, Y.DOM.Function);
 
-	Y.Node.YAXDOM = YAXDOM;
-	Y.Node.globalEval = globalEval;
-	Y.Node.getStyles = getStyles;
-	Y.Node.getDocStyles = getDocStyles;
+	YAXDOM.Y.prototype = Y.DOM.Function;
+
+	Y.DOM.YAXDOM = YAXDOM;
+	Y.DOM.globalEval = globalEval;
+	Y.DOM.getStyles = getStyles;
+	Y.DOM.getDocStyles = getDocStyles;
 
 	//---
 
-	if (typeof window.$ === 'undefined') {
-		Y.DOM = Y.Node;
-		window.$ = Y.DOM;
-	}
+
+	Y.Window.Y.DOM = Y.Window.$ = Y.DOM;
+
+	//---
+
+	return Y.DOM;
 
 	//---
 
@@ -2449,12 +2343,12 @@
 //---
 
 /**
- * YAX Node | Selector
+ * Y DOM | Sizzle Selector
  *
- * Cross browser selector implementation using YAX's API [Node]
+ * Cross browser sizzle selector implementation using Y's API [DOM]
  *
- * @version     0.15
- * @depends:    Core, Node
+ * @version     0.19
+ * @depends:    Core, DOM
  * @license     Dual licensed under the MIT and GPL licenses.
  */
 
@@ -2465,7 +2359,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global YAX, Y */
+/*global Y, Y, Sizzle */
 
 //---
 
@@ -2473,137 +2367,987 @@
 
 	'use strict';
 
-	var YAXDOM = Y.DOM.YAXDOM,
-		oldQSA = YAXDOM.QSA,
-		oldMatches = YAXDOM.Matches,
-		filterReplacement = new RegExp('(.*):(\\w+)(?:\\(([^)]+)\\))?$\\s*'),
-		childReplacement = /^\s*>/,
-		classTag = 'YAX' + Y.Lang.now,
-		Filters;
+	var YAXDOM = Y.DOM.YAXDOM;
+
+	var tmpYaxDom = Y.DOM;
+
+	var rootYaxDom;
+
+	var version = '0.10';
+
+	var ClassTag = 'YAX' + Y.Lang.now;
 
 	//---
 
-	function visible(element) {
-		element = Y.DOM(element);
-		return !!(element.width() || element.height()) && element.css('display') !== 'none';
-	}
-
-	// Complex selectors are not supported:
-	//   li:has(label:contains("foo")) + li:has(label:contains("bar"))
-	//   ul.inner:first > li
-	Filters = Y.DOM.Expr[':'] = Y.DOM.expr[':'] = {
-		visible: function () {
-			if (visible(this)) {
-				return this;
-			}
-		},
-		hidden: function () {
-			if (visible(this)) {
-				return this;
-			}
-		},
-		selected: function () {
-			if (visible(this)) {
-				return this;
-			}
-		},
-		checked: function () {
-			if (visible(this)) {
-				return this;
-			}
-		},
-		parent: function () {
-			return this.parentNode;
-		},
-		first: function (index) {
-			if (index === 0) {
-				return this;
-			}
-		},
-		last: function (index, nodes) {
-			if (index === nodes.length - 1) {
-				return this;
-			}
-		},
-		eq: function (index, _, value) {
-			if (index === value) {
-				return this;
-			}
-		},
-		contains: function (index, _, text) {
-			if (Y.DOM(this).text().indexOf(text) > -1) {
-				return this;
-			}
-		},
-		has: function (index, _, selector) {
-			if (Y.DOM.YAXDOM.QSA(this, selector).length) {
-				return this;
-			}
-		}
+	Y.DOM = function (selector, context) {
+		return new YAXDOM.init(selector, context);
 	};
 
-	function process(selector, callback) {
-		// Quote the hash in `a[href^=#]` expression
-		selector = selector.replace(/\=#\]/g, '="#"]');
+	//---
 
-		var filter, argument, match = filterReplacement.exec(selector), num;
+	Y.Extend(Y.DOM, tmpYaxDom);
 
-		if (match && Filters.hasOwnProperty(match[2])) {
-			filter = Filters[match[2]];
-			argument = match[3];
-			selector = match[1];
+	//---
 
-			if (argument) {
-				num = Number(argument);
+	Y.DOM.ClassTag = ClassTag;
 
-				if (isNaN(num)) {
-					argument = argument.replace(/^["']|["']$/g, '');
-				} else {
-					argument = num;
-				}
-			}
+	Y.DOM.Function = Y.DOM.fn = Y.DOM.prototype = {
+		// The current version of Y.DOM being used
+		'Y.DOM': version,
+
+		constructor: Y.DOM,
+
+		// Start with an empty selector
+		selector: '',
+
+		// The default length of a Y.DOM object is 0
+		length: 0,
+
+		pushStack: tmpYaxDom.pushStack,
+
+		each: tmpYaxDom.each,
+
+		map: function (callback) {
+			return this.pushStack(Y.DOM.map(this, function(elem, i) {
+				return callback.call(elem, i, elem);
+			}));
+		},
+
+		// For internal use only.
+		// Behaves like an Array's method, not like a Y.DOM method.
+		push: Y.G.Push,
+		sort: Y.G.ArrayProto.sort,
+		splice: Y.G.ArrayProto.splice
+	};
+
+	Y.DOM.extend = Y.DOM.Function.extend = tmpYaxDom.extend;
+
+	//---
+
+	Y.DOM.each = tmpYaxDom.each;
+
+	var tmp_ = tmpYaxDom.expr[':'];
+
+	Y.DOM.find = Sizzle;
+	Y.DOM.expr = Y.DOM.Expr = Sizzle.selectors;
+	Y.DOM.expr[':'] = Y.DOM.Expr[':'] = Y.DOM.expr.pseudos;
+	Y.DOM.expr[':'] = Y.Extend(Y.DOM.expr[':'], tmp_);
+	Y.DOM.unique = Sizzle.uniqueSort;
+	Y.DOM.text = Sizzle.getText;
+	Y.DOM.isXMLDoc = Sizzle.isXML;
+	Y.DOM.contains = Sizzle.contains;
+
+	Y.RegEx.rneedsContext = Y.DOM.expr.match.needsContext;
+
+	var wrapMap = {
+		// Support: IE9
+		option: [1, "<select multiple='multiple'>", "</select>"],
+		thead: [1, "<table>", "</table>"],
+		col: [2, "<table><colgroup>", "</colgroup></table>"],
+		tr: [2, "<table><tbody>", "</tbody></table>"],
+		td: [3, "<table><tbody><tr>", "</tr></tbody></table>"],
+
+		_default: [0, "", ""]
+	};
+
+	// Support: IE9
+	wrapMap.optgroup = wrapMap.option;
+
+	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
+	wrapMap.th = wrapMap.td;
+
+	Y.Extend(Y.DOM.Function, tmpYaxDom.Function);
+
+	// data: string of html
+	// context (optional): If specified, the fragment will be created in this context, defaults to Y.Document
+	// keepScripts (optional): If true, will include scripts passed in the html string
+	Y.DOM.parseHTML = function (data, context, keepScripts) {
+		if (!data || typeof data !== "string") {
+			return null;
 		}
 
-		return callback(selector, filter, argument);
-	}
+		if (typeof context === "boolean") {
+			keepScripts = context;
+			context = false;
+		}
 
-	YAXDOM.QSA = function (node, selector) {
-		var taggedParent, nodes;
+		context = context || Y.Document;
 
-		return process(selector, function (_selector, filter, argument) {
-			try {
-				if (!_selector && filter) {
-					_selector = '*';
-				} else if (childReplacement.test(_selector)) {
-					// support "> *" child queries by tagging the parent node with a
-					// unique class and prepending that classname onto the selector
-					taggedParent = Y.DOM(node).addClass(classTag);
-					_selector = '.' + classTag + ' ' + _selector;
-				}
+		var parsed = Y.RegEx.rsingleTag.exec(data),
+			scripts = !keepScripts && [];
 
-				nodes = oldQSA(node, _selector);
-			} catch (e) {
-				// console.error('error performing selector: %o', selector);
-				Y.ERROR('Error performing selector: ' + selector);
-				throw e;
-			} finally {
-				if (taggedParent) {
-					taggedParent.removeClass(classTag);
-				}
+		// Single tag
+		if (parsed) {
+			return [context.createElement(parsed[1])];
+		}
+
+		parsed = Y.DOM.buildFragment([data], context, scripts);
+
+		if (scripts && scripts.length) {
+			Y.DOM(scripts).remove();
+		}
+
+		return Y.Lang.merge([], parsed.childNodes);
+	};
+
+	// Implement the identical functionality for filter and not
+	function winnow(elements, qualifier, not) {
+		if (Y.Lang.isFunction(qualifier)) {
+			return Y.Lang.grep(elements, function (elem, i) {
+				/* jshint -W018 */
+				return !!qualifier.call(elem, i, elem) !== not;
+			});
+
+		}
+
+		if (qualifier.nodeType) {
+			return Y.Lang.grep(elements, function (elem) {
+				return (elem === qualifier) !== not;
+			});
+
+		}
+
+		if (typeof qualifier === "string") {
+			if (Y.RegEx.risSimple.test(qualifier)) {
+				return Y.DOM.filter(qualifier, elements, not);
 			}
 
-			return !filter ? nodes :
-				Y.Lang.unique(Y.DOM.Map(nodes, function (n, i) {
-					return filter.call(n, i, nodes, argument);
+			qualifier = Y.DOM.filter(qualifier, elements);
+		}
+
+		return Y.Lang.grep(elements, function (elem) {
+			return (Y.G.IndexOf.call(qualifier, elem) >= 0) !== not;
+		});
+	}
+
+	Y.DOM.filter = function (expr, elems, not) {
+		var elem = elems[0];
+
+		if (not) {
+			expr = ":not(" + expr + ")";
+		}
+
+		return elems.length === 1 && elem.nodeType === 1 ?
+			Y.DOM.find.matchesSelector(elem, expr) ? [elem] : [] :
+			Y.DOM.find.matches(expr, Y.Lang.grep(elems, function (elem) {
+				return elem.nodeType === 1;
+			}));
+	};
+
+	Y.DOM.Function.extend({
+		find: function (selector) {
+			var x;
+			var len = this.length;
+			var ret = [];
+			var self = this;
+
+			if (!Y.Lang.isString(selector)) {
+				return this.pushStack(Y.DOM(selector).filter(function () {
+					for (x = 0; x < len; x++) {
+						if (Y.DOM.contains(self[x], this)) {
+							return true;
+						}
+					}
 				}));
-		});
+			}
+
+			for (x = 0; x < len; x++) {
+				Y.DOM.find(selector, self[x], ret);
+			}
+
+			// Needed because $(selector, context) becomes $(context).find(selector)
+			ret = this.pushStack(len > 1 ? Y.Lang.unique(ret) : ret);
+
+			ret.selector = this.selector ? this.selector + ' ' + selector : selector;
+
+			return ret;
+		},
+
+		filter: function (selector) {
+			return this.pushStack(winnow(this, selector || [], false));
+		},
+
+		not: function (selector) {
+			return this.pushStack(winnow(this, selector || [], true));
+		},
+
+		is: function (selector) {
+			return !!winnow(
+				this,
+				// If this is a positional/relative selector, check membership in the returned set
+				// so $("p:first").is("p:last") won't return true for a doc with two "p".
+					typeof selector === "string" && Y.RegEx.rneedsContext.test(selector) ?
+					Y.DOM(selector) :
+					selector || [],
+				false
+			).length;
+		}
+	});
+
+	//---
+
+	// var init = Y.DOM.Function.init = function (selector, context) {
+	var init = YAXDOM.init = function (selector, context) {
+		var match, element;
+
+		// HANDLE: Y.DOM(""), Y.DOM(null), Y.DOM(undefined), Y.DOM(false)
+		if (!selector) {
+			return this;
+		}
+
+		// Handle HTML strings
+		if (Y.Lang.isString(selector)) {
+			// if (selector[0] === "<" && selector[selector.length - 1] === ">" && selector.length >= 3) {
+			if (selector[0] === '<' && selector[selector.length - 1] === '>' && selector.length >= 3) {
+				// Assume that strings that start and end with <> are HTML and skip the regex check
+				match = [null, selector, null];
+			} else {
+				match = Y.RegEx.rquickExpr.exec(selector);
+			}
+
+			// Match html or make sure no context is specified for #id
+			if (match && (match[1] || !context)) {
+				// HANDLE: Y.DOM(html) -> Y.DOM(array)
+				if (match[1]) {
+					context = context instanceof Y.DOM ? context[0] : context;
+					// scripts is true for back-compat
+					// Intentionally let the error be thrown if parseHTML is not present
+					Y.Lang.merge(this, Y.DOM.parseHTML(
+						match[1],
+							context && context.nodeType ? context.ownerDocument || context : Y.Document,
+						true
+					));
+
+					// HANDLE: Y.DOM(html, props)
+					if (Y.RegEx.rsingleTag.test(match[1]) && Y.Lang.isPlainObject(context)) {
+						for (match in context) {
+							// Properties of context are called as methods if possible
+							if (Y.Lang.isFunction(this[match])) {
+								this[match](context[match]);
+								// ...and otherwise set as attributes
+							} else {
+								this.attr(match, context[match]);
+							}
+						}
+					}
+
+					return this;
+				// HANDLE: Y.DOM(#id)
+				} else {
+					element = Y.Document.getElementById(match[2]);
+
+					// Check parentNode to catch when Blackberry 4.6 returns
+					// nodes that are no longer in the Y.Document #6963
+					if (element && element.parentNode) {
+						// Inject the element directly into the Y.DOM object
+						this.length = 1;
+						this[0] = element;
+					}
+
+					this.context = Y.Document;
+					this.selector = selector;
+
+					return this;
+				}
+			// HANDLE: Y.DOM(expr, Y.DOM(...))
+			} else if (!context || context['Y.DOM']) {
+				return (context || rootYaxDom).find(selector);
+			// HANDLE: Y.DOM(expr, context)
+			// (which is just equivalent to: Y.DOM(context).find(expr)
+			} else {
+				return this.constructor(context).find(selector);
+			}
+		// HANDLE: Y.DOM(DOMElement)
+		} else if (selector.nodeType) {
+			this.context = this[0] = selector;
+			this.length = 1;
+			return this;
+		// HANDLE: Y.DOM(function)
+		// Shortcut for Y.Document ready
+		} else if (Y.Lang.isFunction(selector)) {
+			if (!Y.Lang.isUndefined(rootYaxDom.ready)) {
+				return rootYaxDom.ready(selector);
+			}
+			
+			return selector(Y.DOM);
+		}
+
+		if (selector.selector !== undefined) {
+			this.selector = selector.selector;
+			this.context = selector.context;
+		}
+
+		return Y.DOM.makeArray(selector, this);
 	};
 
-	YAXDOM.Matches = function (node, selector) {
-		return process(selector, function (_selector, filter, argument) {
-			return (!_selector || oldMatches(node, _selector)) && (!filter || filter.call(node, null, argument) === node);
-		});
+	// Give the init function the Y.DOM prototype for later instantiation
+	init.prototype = Y.DOM.Function;
+
+	// Initialize central reference
+	rootYaxDom = Y.DOM(Y.Document);
+
+	Y.DOM.Support = Y.DOM.support = Object.create({});
+
+	Y.DOM.Support = tmpYaxDom.Support;
+	Y.DOM.support = tmpYaxDom.Support;
+
+	Y.DOM.access = tmpYaxDom.Access;
+	Y.DOM.Access = tmpYaxDom.Access;
+	Y.DOM.style = tmpYaxDom.Style;
+	Y.DOM.Style = tmpYaxDom.Style;
+	Y.DOM.CSS = tmpYaxDom.CSS;
+	Y.DOM.css = tmpYaxDom.CSS;
+
+	Y.DOM.cssHooks = tmpYaxDom.CSS_Hooks;
+	Y.DOM.CSS_Hooks = tmpYaxDom.CSS_Hooks;
+	Y.DOM.cssNumber = tmpYaxDom.CSS_Number;
+	Y.DOM.CSS_Number = tmpYaxDom.CSS_Number;
+	Y.DOM.cssProps = tmpYaxDom.CSS_Properities;
+	Y.DOM.CSS_Properities = tmpYaxDom.CSS_Properities;
+
+	Y.DOM.expando = tmpYaxDom.Expando;
+	Y.DOM.nodeName = tmpYaxDom.nodeName;
+	Y.DOM.dataPrivative = tmpYaxDom.dataPrivative;
+	Y.DOM.dataUser = tmpYaxDom.dataUser;
+	Y.DOM.data_priv = tmpYaxDom.dataPrivative;
+	Y.DOM.data_user = tmpYaxDom.data_user;
+
+	Y.DOM.makeArray = function(arr, results) {
+		var ret = results || [];
+
+		if (arr !== null) {
+			if (Y.Lang.isArraylike(arr)) {
+				Y.Lang.merge(ret,
+					typeof arr === "string" ?
+					[arr] : arr
+				);
+			} else {
+				Y.G.Push.call(ret, arr);
+			}
+		}
+
+		return ret;
 	};
+
+	Y.RegEx.rscriptTypeMasked = /^true\/(.*)/;
+
+	// Replace/restore the type attribute of script elements for safe DOM manipulation
+	function disableScript(elem) {
+		elem.type = (elem.getAttribute("type") !== null) + "/" + elem.type;
+		return elem;
+	}
+
+	function restoreScript(elem) {
+		var match = Y.RegEx.rscriptTypeMasked.exec(elem.type);
+
+		if (match) {
+			elem.type = match[1];
+		} else {
+			elem.removeAttribute("type");
+		}
+
+		return elem;
+	}
+
+
+	function getAll(context, tag) {
+		// Support: IE9-11+
+		// Use typeof to avoid zero-argument method invocation on host objects (#15151)
+		var ret = !Y.Lang.isUndefined(context.getElementsByTagName) ?
+			context.getElementsByTagName(tag || "*") :
+				!Y.Lang.isUndefined(context.querySelectorAll) ?
+			context.querySelectorAll(tag || "*") :
+			[];
+
+		return (Y.Lang.isUndefined(tag) || tag) && Y.DOM.nodeName(context, tag) ?
+			Y.Lang.merge([context], ret) :
+			ret;
+	}
+
+	// Mark scripts as having already been evaluated
+	function setGlobalEval(elems, refElements) {
+		var i = 0,
+			l = elems.length;
+
+		for (i; i < l; i++) {
+			Y.DOM.dataPrivative.set(
+				elems[i], "globalEval", !refElements || Y.DOM.dataPrivative.get(refElements[i], "globalEval")
+			);
+		}
+	}
+
+	function fixInput(src, dest) {
+		var nodeName = dest.nodeName.toLowerCase();
+
+		// Fails to persist the checked state of a cloned checkbox or radio button.
+		if (nodeName === "input" && Y.RegEx.rcheckableType.test(src.type)) {
+			dest.checked = src.checked;
+
+			// Fails to return the selected option to the default selected state when cloning options
+		} else if (nodeName === "input" || nodeName === "textarea") {
+			dest.defaultValue = src.defaultValue;
+		}
+	}
+
+	function cloneCopyEvent(src, dest) {
+		var i, l, type, pdataOld, pdataCur, udataOld, udataCur, events;
+
+		if (dest.nodeType !== 1) {
+			return;
+		}
+
+		// 1. Copy private data: events, handlers, etc.
+		if (Y.DOM.dataPrivative.hasData(src)) {
+			pdataOld = Y.DOM.dataPrivative.access(src);
+			pdataCur = Y.DOM.dataPrivative.set(dest, pdataOld);
+			events = pdataOld.events;
+
+			if (events) {
+				delete pdataCur.handle;
+				pdataCur.events = {};
+
+				for (type in events) {
+					for (i = 0, l = events[type].length; i < l; i++) {
+						Y.DOM.event.add(dest, type, events[type][i]);
+					}
+				}
+			}
+		}
+
+		// 2. Copy user data
+		if (Y.DOM.dataUser.hasData(src)) {
+			udataOld = Y.DOM.dataUser.access(src);
+			udataCur = Y.DOM.extend({}, udataOld);
+
+			Y.DOM.dataUser.set(dest, udataCur);
+		}
+	}
+
+	function manipulationTarget(elem, content) {
+		return Y.DOM.nodeName(elem, "table") &&
+			Y.DOM.nodeName(content.nodeType !== 11 ? content : content.firstChild, "tr") ?
+
+			elem.getElementsByTagName("tbody")[0] ||
+			elem.appendChild(elem.ownerDocument.createElement("tbody")) :
+			elem;
+	}
+
+	Y.DOM.map = function(elems, callback, arg) {
+		var value,
+			i = 0,
+			length = elems.length,
+			isArray = Y.Lang.isArraylike(elems),
+			ret = [];
+
+		// Go through the array, translating each of the items to their new values
+		if (isArray) {
+			for (i; i < length; i++) {
+				value = callback(elems[i], i, arg);
+
+				if (value !== null) {
+					ret.push(value);
+				}
+			}
+
+			// Go through every key on the object,
+		} else {
+			for (i in elems) {
+				value = callback(elems[i], i, arg);
+
+				if (value !== null) {
+					ret.push(value);
+				}
+			}
+		}
+
+		// Flatten any nested arrays
+		return Y.G.Concat.apply([], ret);
+	};
+
+	(function() {
+		var fragment = document.createDocumentFragment(),
+			div = fragment.appendChild(document.createElement("div")),
+			input = document.createElement("input");
+
+		// #11217 - WebKit loses check when the name is after the checked attribute
+		// Support: Windows Web Apps (WWA)
+		// `name` and `type` need .setAttribute for WWA
+		input.setAttribute("type", "radio");
+		input.setAttribute("checked", "checked");
+		input.setAttribute("name", "t");
+
+		div.appendChild(input);
+
+		// Support: Safari 5.1, iOS 5.1, Android 4.x, Android 2.3
+		// old WebKit doesn't clone checked state correctly in fragments
+		Y.DOM.support.checkClone = div.cloneNode(true).cloneNode(true).lastChild.checked;
+
+		// Make sure textarea (and checkbox) defaultValue is properly cloned
+		// Support: IE9-IE11+
+		div.innerHTML = "<textarea>x</textarea>";
+		Y.DOM.support.noCloneChecked = !!div.cloneNode(true).lastChild.defaultValue;
+	}());
+
+	Y.DOM.clone = function(elem, dataAndEvents, deepDataAndEvents) {
+		var i, l, srcElements, destElements,
+			clone = elem.cloneNode(true),
+			inPage = Y.DOM.contains(elem.ownerDocument, elem);
+
+		// Fix IE cloning issues
+		if (!Y.DOM.support.noCloneChecked && (elem.nodeType === 1 || elem.nodeType === 11) &&
+			!Y.DOM.isXMLDoc(elem)) {
+
+			// We eschew Sizzle here for performance reasons: http://jsperf.com/getall-vs-sizzle/2
+			destElements = getAll(clone);
+			srcElements = getAll(elem);
+
+			for (i = 0, l = srcElements.length; i < l; i++) {
+				fixInput(srcElements[i], destElements[i]);
+			}
+		}
+
+		// Copy the events from the original to the clone
+		if (dataAndEvents) {
+			if (deepDataAndEvents) {
+				srcElements = srcElements || getAll(elem);
+				destElements = destElements || getAll(clone);
+
+				for (i = 0, l = srcElements.length; i < l; i++) {
+					cloneCopyEvent(srcElements[i], destElements[i]);
+				}
+			} else {
+				cloneCopyEvent(elem, clone);
+			}
+		}
+
+		// Preserve script evaluation history
+		destElements = getAll(clone, "script");
+		if (destElements.length > 0) {
+			setGlobalEval(destElements, !inPage && getAll(elem, "script"));
+		}
+
+		// Return the cloned set
+		return clone;
+	};
+
+	Y.DOM.buildFragment = function(elems, context, scripts, selection) {
+		var elem, tmp, tag, wrap, contains, j,
+			fragment = context.createDocumentFragment(),
+			nodes = [],
+			i = 0,
+			l = elems.length;
+
+		for (i; i < l; i++) {
+			elem = elems[i];
+
+			if (elem || elem === 0) {
+
+				// Add nodes directly
+				if (Y.Lang.isObject(elem)) {
+					// Support: QtWebKit, PhantomJS
+					// push.apply(_, arraylike) throws on ancient WebKit
+					Y.Lang.merge(nodes, elem.nodeType ? [elem] : elem);
+
+					// Convert non-html into a text node
+				} else if (!Y.RegEx.rhtml.test(elem)) {
+					nodes.push(context.createTextNode(elem));
+					// Convert html into DOM nodes
+				} else {
+					tmp = tmp || fragment.appendChild(context.createElement("div"));
+
+					// Deserialize a standard representation
+					tag = (Y.RegEx.rtagName.exec(elem) || ["", ""])[1].toLowerCase();
+					wrap = wrapMap[tag] || wrapMap._default;
+					tmp.innerHTML = wrap[1] + elem.replace(Y.RegEx.rxhtmlTag, "<$1></$2>") + wrap[2];
+
+					// Descend through wrappers to the right content
+					j = wrap[0];
+
+					while (j--) {
+						tmp = tmp.lastChild;
+					}
+
+					// Support: QtWebKit, PhantomJS
+					// push.apply(_, arraylike) throws on ancient WebKit
+					Y.Lang.merge(nodes, tmp.childNodes);
+
+					// Remember the top-level container
+					tmp = fragment.firstChild;
+
+					// Ensure the created nodes are orphaned (#12392)
+					tmp.textContent = '';
+				}
+			}
+		}
+
+		// Remove wrapper from fragment
+		fragment.textContent = '';
+
+		i = 0;
+
+		while ((elem = nodes[i++])) {
+
+			// #4087 - If origin and destination elements are the same, and this is
+			// that element, do not do anything
+			if (selection && Y.Lang.inArray(elem, selection) !== -1) {
+				continue;
+			}
+
+			contains = Y.DOM.contains(elem.ownerDocument, elem);
+
+			// Append to fragment
+			tmp = getAll(fragment.appendChild(elem), 'script');
+
+			// Preserve script evaluation history
+			if (contains) {
+				setGlobalEval(tmp);
+			}
+
+			// Capture executables
+			if (scripts) {
+				j = 0;
+				while ((elem = tmp[j++])) {
+					if (Y.RegEx.rscriptType.test(elem.type || '')) {
+						scripts.push(elem);
+					}
+				}
+			}
+		}
+
+		return fragment;
+	};
+
+	/**
+	 * Determines whether an object can have data
+	 */
+	Y.DOM.acceptData = function(owner) {
+		// Accepts only:
+		//  - Node
+		//    - Node.ELEMENT_NODE
+		//    - Node.DOCUMENT_NODE
+		//  - Object
+		//    - Any
+		/* jshint -W018 */
+		return owner.nodeType === 1 || owner.nodeType === 9 || !(+owner.nodeType);
+	};
+
+	Y.DOM.cleanData = function(elems) {
+		var data, elem, type, key,
+			special = Y.DOM.event.special,
+			i = 0;
+
+		for (null ; (elem = elems[i]) !== undefined; i++) {
+			if (Y.DOM.acceptData(elem)) {
+				key = elem[Y.DOM.dataPrivative.expando];
+
+				data = Y.DOM.dataPrivative.cache[key];
+
+				if (key && data) {
+					if (data.events) {
+						for (type in data.events) {
+							if (special[type]) {
+								Y.DOM.event.remove(elem, type);
+
+								// This is a shortcut to avoid jQuery.event.remove's overhead
+							} else {
+								Y.DOM.removeEvent(elem, type, data.handle);
+							}
+						}
+					}
+					if (Y.DOM.dataPrivative.cache[key]) {
+						// Discard any remaining `private` data
+						delete Y.DOM.dataPrivative.cache[key];
+					}
+				}
+			}
+			// Discard any remaining `user` data
+			delete Y.DOM.dataUser.cache[elem[Y.DOM.dataUser.expando]];
+		}
+	};
+
+	Y.DOM.Function.extend({
+		text: function(value) {
+			return Y.DOM.Access(this, function(value) {
+				return value === undefined ?
+					Y.DOM.text(this) :
+					this.empty().each(function() {
+						if (this.nodeType === 1 || this.nodeType === 11 || this.nodeType === 9) {
+							this.textContent = value;
+						}
+					});
+			}, null, value, arguments.length);
+		},
+
+		append: function() {
+			return this.domManip(arguments, function(elem) {
+				if (this.nodeType === 1 || this.nodeType === 11 || this.nodeType === 9) {
+					var target = manipulationTarget(this, elem);
+					target.appendChild(elem);
+				}
+			});
+		},
+
+		prepend: function() {
+			return this.domManip(arguments, function(elem) {
+				if (this.nodeType === 1 || this.nodeType === 11 || this.nodeType === 9) {
+					var target = manipulationTarget(this, elem);
+					target.insertBefore(elem, target.firstChild);
+				}
+			});
+		},
+
+		before: function() {
+			return this.domManip(arguments, function(elem) {
+				if (this.parentNode) {
+					this.parentNode.insertBefore(elem, this);
+				}
+			});
+		},
+
+		after: function() {
+			return this.domManip(arguments, function(elem) {
+				if (this.parentNode) {
+					this.parentNode.insertBefore(elem, this.nextSibling);
+				}
+			});
+		},
+
+		removea: function(selector, keepData /* Internal Use Only */) {
+			var elem,
+				elems = selector ? Y.DOM.filter(selector, this) : this,
+				i = 0;
+
+			for (null; (elem = elems[i]) !== null; i++) {
+				if (!keepData && elem.nodeType === 1) {
+					Y.DOM.cleanData(getAll(elem));
+				}
+
+				if (elem.parentNode) {
+					if (keepData && Y.DOM.contains(elem.ownerDocument, elem)) {
+						setGlobalEval(getAll(elem, "script"));
+					}
+					elem.parentNode.removeChild(elem);
+				}
+			}
+
+			return this;
+		},
+
+		emptya: function() {
+			var elem,
+				i = 0;
+
+			for (null; (elem = this[i]) !== null; i++) {
+				if (elem.nodeType === 1) {
+
+					// Prevent memory leaks
+					Y.DOM.cleanData(getAll(elem, false));
+
+					// Remove any remaining nodes
+					elem.textContent = "";
+				}
+			}
+
+			return this;
+		},
+
+		clone: function(dataAndEvents, deepDataAndEvents) {
+			dataAndEvents = dataAndEvents === null ? false : dataAndEvents;
+			deepDataAndEvents = deepDataAndEvents === null ? dataAndEvents : deepDataAndEvents;
+
+			return this.map(function() {
+				return Y.DOM.clone(this, dataAndEvents, deepDataAndEvents);
+			});
+		},
+
+		html: function(value) {
+			return Y.DOM.access(this, function(value) {
+				var elem = this[0] || {},
+					i = 0,
+					l = this.length;
+
+				if (value === undefined && elem.nodeType === 1) {
+					return elem.innerHTML;
+				}
+
+				// See if we can take a shortcut and just use innerHTML
+				if (typeof value === "string" && !Y.RegEx.rnoInnerhtml.test(value) &&
+					!wrapMap[(Y.RegEx.rtagName.exec(value) || ["", ""])[1].toLowerCase()]) {
+
+					value = value.replace(Y.RegEx.rxhtmlTag, "<$1></$2>");
+
+					try {
+						for (i; i < l; i++) {
+							elem = this[i] || {};
+
+							// Remove element nodes and prevent memory leaks
+							if (elem.nodeType === 1) {
+								Y.DOM.cleanData(getAll(elem, false));
+								elem.innerHTML = value;
+							}
+						}
+
+						elem = 0;
+
+						// If using innerHTML throws an exception, use the fallback method
+					} catch(e) {}
+				}
+
+				if (elem) {
+					this.empty().append(value);
+				}
+			}, null, value, arguments.length);
+		},
+
+		replaceWith: function() {
+			var arg = arguments[0];
+
+			// Make the changes, replacing each context element with the new content
+			this.domManip(arguments, function(elem) {
+				arg = this.parentNode;
+
+				Y.DOM.cleanData(getAll(this));
+
+				if (arg) {
+					arg.replaceChild(elem, this);
+				}
+			});
+
+			// Force removal if there was no new content (e.g., from empty arguments)
+			return arg && (arg.length || arg.nodeType) ? this : this.remove();
+		},
+
+		detach: function(selector) {
+			return this.remove(selector, true);
+		},
+
+		domManip: function(args, callback) {
+			// Flatten any nested arrays
+			args = Y.G.Concat.apply([], args);
+
+			var fragment, first, scripts, hasScripts, node, doc,
+				i = 0,
+				l = this.length,
+				set = this,
+				iNoClone = l - 1,
+				value = args[0],
+				isFunction = Y.Lang.isFunction(value);
+
+			// We can't cloneNode fragments that contain checked, in WebKit
+			if (isFunction ||
+				(l > 1 && typeof value === "string" &&
+					!Y.DOM.support.checkClone && Y.RegEx.rchecked.test(value))) {
+				return this.each(function(index) {
+					var self = set.eq(index);
+					if (isFunction) {
+						args[0] = value.call(this, index, self.html());
+					}
+					self.domManip(args, callback);
+				});
+			}
+
+			if (l) {
+				fragment = Y.DOM.buildFragment(args, this[0].ownerDocument, false, this);
+				first = fragment.firstChild;
+
+				if (fragment.childNodes.length === 1) {
+					fragment = first;
+				}
+
+				if (first) {
+					var t1 = getAll(fragment, "script");
+					scripts = Y.DOM.map(t1, disableScript);
+					hasScripts = scripts.length;
+
+					// Use the original fragment for the last item instead of the first because it can end up
+					// being emptied incorrectly in certain situations (#8070).
+					for (i; i < l; i++) {
+						node = fragment;
+
+						if (i !== iNoClone) {
+							node = Y.DOM.clone(node, true, true);
+
+							// Keep references to cloned scripts for later restoration
+							if (hasScripts) {
+								// Support: QtWebKit
+								// Y.DOM.merge because push.apply(_, arraylike) throws
+								Y.DOM.merge(scripts, getAll(node, "script"));
+							}
+						}
+
+						callback.call(this[i], node, i);
+					}
+
+					if (hasScripts) {
+						doc = scripts[scripts.length - 1].ownerDocument;
+
+						// Reenable scripts
+						Y.DOM.map(scripts, restoreScript);
+
+						// Evaluate executable scripts on first document insertion
+						for (i = 0; i < hasScripts; i++) {
+							node = scripts[i];
+							if (Y.RegEx.rscriptType.test(node.type || "") &&
+								!Y.DOM.data_priv.access(node, "globalEval") && Y.DOM.contains(doc, node)) {
+
+								if (node.src) {
+									// Optional AJAX dependency, but won't run scripts if not present
+									if (Y.DOM._evalUrl) {
+										Y.DOM._evalUrl(node.src);
+									}
+								} else {
+									Y.DOM.globalEval(node.textContent.replace(Y.RegEx.rcleanScript, ""));
+								}
+							}
+						}
+					}
+				}
+			}
+
+			return this;
+		}
+	});
+
+	Y.DOM.each({
+		appendTo: "append",
+		prependTo: "prepend",
+		insertBefore: "before",
+		insertAfter: "after",
+		replaceAll: "replaceWith"
+	}, function(name, original) {
+		Y.DOM.Function[name] = function(selector) {
+			var elems,
+				ret = [],
+				insert = Y.DOM(selector),
+				last = insert.length - 1,
+				i = 0;
+
+			for (i; i <= last; i++) {
+				elems = i === last ? this : this.clone(true);
+				Y.DOM(insert[i])[original](elems);
+				// Support: QtWebKit
+				// .get() because push.apply(_, arraylike) throws
+				Y.G.Push.apply(ret, elems.get());
+			}
+
+			return this.pushStack(ret);
+		};
+	});
+
+	//---
+
+	Y.DOM.globalEval = tmpYaxDom.globalEval;
+
+
+	Y.DOM.YAXDOM = YAXDOM;
+
+	//---
+
+	Y.Window.Y.DOM = Y.Window.$ = Y.DOM;
+
+	//---
+
+	return Y.DOM;
 
 	//---
 
@@ -2665,7 +3409,8 @@
 		//  -
 		//    - Any
 		return owner.nodeType ?
-			owner.nodeType === 1 || owner.nodeType === 9 : true;
+			owner.nodeType === 1 || owner.nodeType === 9 : 
+			true;
 	};
 
 	Data.prototype = {
@@ -2811,6 +3556,7 @@
 				}
 
 				i = name.length;
+
 				while (i--) {
 					delete cache[name[i]];
 				}
@@ -2855,10 +3601,6 @@
 	function dataAttribute(elem, key, data) {
 		var name;
 
-//		console.log(elem)
-//		console.log(key)
-//		console.log(data)
-
 		// If nothing was found internally, try to fetch any
 		// data from the HTML5 data-* attribute
 		if (data === undef && elem.nodeType === 1) {
@@ -2884,6 +3626,7 @@
 				data = undef;
 			}
 		}
+
 		return data;
 	}
 
@@ -2919,9 +3662,6 @@
 			store = data[id];
 		}
 
-		//id = node[exp] || (node[exp] = ++Y.DOM.UUID);
-		//store = data[id] || (data[id] = attributeData(node));
-
 		if (name !== undef) {
 			store[Y.Lang.camelise(name)] = value;
 		}
@@ -2933,7 +3673,6 @@
 	// 1. first try key as given,
 	// 2. then try Camelised key,
 	// 3. fall back to reading "data-*" attribute.
-
 	function getData(node, name) {
 		var id = node[exp],
 			store = id && data[id],
@@ -3087,21 +3826,6 @@
 		}
 
 		return result;
-
-//		return value === undef ?
-//			// set multiple values via object
-//			Y.Lang.isPlainObject(name) ?
-//				this.each(function (i, node) {
-//					Y.Each(name, function (key, value) {
-//						setData(node, key, value);
-//					});
-//				}) :
-//				// get value from first element
-//					this.length === 0 ? undef : getData(this[0], name) :
-//			// set value on all elements
-//			this.each(function () {
-//				setData(this, name, value);
-//			});
 	};
 
 	Y.DOM.Function.removeData = function (names) {
@@ -3162,865 +3886,938 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
+
 (function (undef) {
 
 	'use strict';
 
-	var YID = 1,
-
-		hover = {
-			mouseenter: 'mouseover',
-			mouseleave: 'mouseout'
-		},
-
-		inputEvents = ['focus', 'blur'],
-
-		focus = {
-			focus: 'focusin',
-			blur: 'focusout'
-		},
-
-		ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$)/,
-
-		focusinSupported = Y.HasOwnProperty.call(Y.Window, 'onfocusin'),
-
-		eventMethods = {
-			preventDefault: 'isDefaultPrevented',
-			stopImmediatePropagation: 'isImmediatePropagationStopped',
-			stopPropagation: 'isPropagationStopped'
-		},
-
-		eventsKey = 'YAX_EVENTS',
-
-		returnTrue,
-
-		returnFalse,
-
-		document = Y.Document,
-
-		specialEvents = Object.create({});
-
-	specialEvents.click =
-		specialEvents.mousedown =
-			specialEvents.mouseup =
-				specialEvents.mousemove = 'MouseEvents';
-
 	//---
 
-	// BEGIN OF [Private Functions]
 
-	function yID(element) {
-		element.YID = YID++;
+	var
+		rkeyEvent = /^key/,
+		rmouseEvent = /^(?:mouse|pointer|contextmenu)|click/,
+		rfocusMorph = /^(?:focusinfocus|focusoutblur)$/,
+		rtypenamespace = /^([^.]*)(?:\.(.+)|)$/;
 
-		return element.YID;
+	var rnotwhite = (/\S+/g);
 
-		// return element.YID || (element.YID = YID++);
-	}
-
-	function parse(event) {
-		var parts = (Y.Lang.empty() + event).split('.');
-
-		return {
-			e: parts[0],
-			ns: parts.slice(1).sort().join(' ')
-		};
-	}
-
-	function matcherFor(ns) {
-		return new RegExp('(?:^|)' + ns.replace(' ', ' .* ?') + '(?: |$)');
-	}
-
-	function eventHandlers(element) {
-		//element.EventHandlers = [];
-
-		//return element.EventHandlers;
-
-		var result = null;
-
-		if (Y.HasOwnProperty.call(element, 'EventHandlers')) {
-			result = element.EventHandlers;
-		} else {
-			element.EventHandlers = [];
-
-			result = element.EventHandlers;
-		}
-
-		return result;
-
-		// return element.EventHandlers || (element.EventHandlers = []);
-	}
-
-	function findHandlers(element, event, func, selector) {
-		var result = parse(event), matcher;
-
-		if (result.ns) {
-			matcher = matcherFor(result.ns);
-		}
-
-		return (eventHandlers(element) || []).filter(function (handler) {
-			return handler && (!result.e || handler.e === result.e) && (!result.ns || matcher.test(handler.ns)) && (!func || yID(handler.callback) === yID(func)) && (!selector || handler.selector === selector);
-		});
-	}
-
-	function eventCapture(handler, captureSetting) {
-		return !(!handler.del || !(!focusinSupported && Y.Lang.hasProperty(focus, handler.e))) || Y.Lang.isSet(captureSetting);
-	}
-
-	function realEvent(type) {
-		return hover[type] || (focusinSupported && focus[type]) || type;
-	}
-
-	function compatible(event, source) {
-		if (source || !event.isDefaultPrevented) {
-			// source || (source = event);
-			source = source || event;
-
-			Y.Each(eventMethods, function (name, predicate) {
-				var sourceMethod = source[name];
-
-				event[name] = function () {
-					this[predicate] = returnTrue;
-					return sourceMethod && sourceMethod.apply(source, arguments);
-				};
-
-				event[predicate] = returnFalse;
-			});
-
-			if (!Y.Lang.isUndefined(source.defaultPrevented)) {
-				if (source.defaultPrevented) {
-					event.isDefaultPrevented = returnTrue;
-				}
-			} else {
-				if (Y.Lang.hasProperty(source, 'returnValue')) {
-					if (source.returnValue === false) {
-						event.isDefaultPrevented = returnTrue;
-					}
-				} else {
-					/** @namespace source.getPreventDefault */
-					if (source.getPreventDefault && source.getPreventDefault()) {
-						event.isDefaultPrevented = returnTrue;
-					}
-				}
-			}
-
-			/*if (source.defaultPrevented !== undefined ? source.defaultPrevented :
-					'returnValue' in source ? source.returnValue === false :
-				source.getPreventDefault && source.getPreventDefault()) {
-				event.isDefaultPrevented = returnTrue;
-			}*/
-		}
-
-		return event;
-	}
-
-	returnTrue = function () {
+	function returnTrue() {
 		return true;
-	};
+	}
 
-	returnFalse = function () {
+	function returnFalse() {
 		return false;
-	};
+	}
 
-	/*function safeActiveElement() {
+	function safeActiveElement() {
 		try {
-			return Y.Document.activeElement;
+			return document.activeElement;
 		} catch (err) {
 			Y.ERROR(err);
 		}
-	}*/
-
-	function createProxy(event) {
-		var key, proxy = {
-			originalEvent: event
-		};
-
-		for (key in event) {
-			if (event.hasOwnProperty(key)) {
-				if (!ignoreProperties.test(key) && !Y.Lang.isUndefined(event[key])) {
-					proxy[key] = event[key];
-				}
-			}
-		}
-
-		return compatible(proxy, event);
 	}
 
-	// END OF [Private Functions]
-
-	//---
-
-	Y.DOM.Event = Y.DOM.event = function (type, props) {
-		var event, name, bubbles;
-
-		// Allow instantiation without the 'new' keyword
-		if (!(this instanceof Y.DOM.Event)) {
-			return new Y.DOM.Event(type, props);
-		}
-
-		if (!Y.Lang.isString(type)) {
-			props = type;
-			type = props.type;
-		}
-
-		event = Y.Document.createEvent(specialEvents[type] || 'Events');
-
-		bubbles = true;
-
-		if (props) {
-			for (name in props) {
-				if (props.hasOwnProperty(name)) {
-					if (name === 'bubbles') {
-						bubbles = Y.Lang.isSet(props[name]);
-					} else {
-						event[name] = props[name];
-					}
-
-					// (name === 'bubbles') ? (bubbles = !!props[name]) : (event[name] = props[name]);
-				}
-			}
-
-			Y.DOM.extend(this, props);
-		}
-
-		event.initEvent(type, bubbles, true);
-
-		// this.timeStamp = type && type.timeStamp || Y.Lang.now();
-
-		// Mark it as fixed
-		this[Y.DOM.expando] = true;
-
-		return compatible(event);
-	};
-
-	//---
-
-
-	//---
-
-	/**
-	 * Y.DOM.Event contains functions for working with Node events.
+	/*
+	 * Helper functions for managing events -- not part of the public interface.
+	 * Props to Dean Edwards' addEvent library for many of the ideas.
 	 */
-	Y.Extend(Y.DOM.Event, {
-		on: function (object, types, func, context) {
-			var type, x, len;
+	Y.DOM.event = {
 
-			//console.log(object);
-			//console.log(types);
-			//console.log(func);
+		global: {},
 
-			if (Y.Lang.isObject(types)) {
-				for (type in types) {
-					if (types.hasOwnProperty(type)) {
-						this.addListener(object, type, types[type], func);
-					}
-				}
-			} else {
-				types = Y.Utility.splitWords(types);
+		add: function(elem, types, handler, data, selector) {
 
-				for (x = 0, len = types.length; x < len; x++) {
-					this.addListener(object, types[x], func, context);
-				}
-			}
-		},
+			var handleObjIn, eventHandle, tmp,
+				events, t, handleObj,
+				special, handlers, type, namespaces, origType,
+				elemData = Y.DOM.data_priv.get(elem);
 
-		addListener: function (object, type, callback, context) {
-			var id, originalHandler, handler;
-
-			id = type + Y.Stamp(callback) + (context ? '_' + Y.Stamp(context) : '');
-
-			if (object[eventsKey] && object[eventsKey][id]) {
-				return this;
-			}
-
-			handler = function (event) {
-				return callback.call(context || object, event || Y.Window.event);
-			};
-
-			originalHandler = handler;
-
-			/** @namespace this.addPointerListener */
-			if (Y.UserAgent.Features.Pointer && type.indexOf('touch') === 0) {
-				return this.addPointerListener(object, type, handler, id);
-			}
-
-			/** @namespace this.addDoubleTapListener */
-			if (Y.UserAgent.Features.Touch && (type === 'dblclick') && this.addDoubleTapListener) {
-				this.addDoubleTapListener(object, handler, id);
-			}
-
-			if (Y.Lang.hasProperty(object, 'addEventListener')) {
-				if (type === 'mousewheel') {
-					object.addEventListener('DOMMouseScroll', handler, false);
-					object.addEventListener(type, handler, false);
-				} else if ((type === 'mouseenter') || (type === 'mouseleave')) {
-					handler = function (event) {
-						event = event || Y.Window.event;
-						if (!Y.DOM.Event._checkMouse(object, event)) {
-							return;
-						}
-						return originalHandler(event);
-					};
-
-					object.addEventListener(type === 'mouseenter' ? 'mouseover' : 'mouseout', handler, false);
-				} else {
-					if (type === 'click' && Y.UserAgent.OS.Android) {
-						handler = function (event) {
-							return Y.DOM.Event._filterClick(event, originalHandler);
-						};
-					}
-
-					object.addEventListener(type, handler, false);
-				}
-			} else if (Y.Lang.hasProperty(object, 'attachEvent')) {
-				object.attachEvent('on' + type, handler);
-			}
-
-			object[eventsKey] = object[eventsKey] || {};
-			object[eventsKey][id] = handler;
-
-			return this;
-		},
-
-		off: function (object, types, func, context) {
-			var type, x, len;
-
-			if (Y.Lang.isObject(types)) {
-				for (type in types) {
-					if (types.hasOwnProperty(type)) {
-						this.removeListener(object, type, types[type], func);
-					}
-				}
-			} else {
-				types = Y.Utility.splitWords(types);
-
-				for (x = 0, len = types.length; x < len; x++) {
-					this.removeListener(object, types[x], func, context);
-				}
-			}
-		},
-
-		removeListener: function (object, type, callback, context) {
-			var id, handler;
-
-			id = type + Y.Stamp(callback) + (context ? '_' + Y.Stamp(context) : '');
-
-			handler = object[eventsKey] && object[eventsKey][id];
-
-			if (!handler) {
-				return this;
-			}
-
-			/** @namespace this.removePointerListener */
-			/** @namespace this.removeDoubleTapListener */
-			if (Y.UserAgent.Features.Pointer && type.indexOf('touch') === 0) {
-				this.removePointerListener(object, type, id);
-			} else if (Y.UserAgent.Features.Touch && (type === 'dblclick') && this.removeDoubleTapListener) {
-				this.removeDoubleTapListener(object, id);
-			} else if (Y.Lang.hasProperty(object, 'removeEventListener')) {
-				if (type === 'mousewheel') {
-					object.removeEventListener('DOMMouseScroll', handler, false);
-					object.removeEventListener(type, handler, false);
-				} else {
-					object.removeEventListener(
-							type === 'mouseenter' ? 'mouseover' :
-								type === 'mouseleave' ? 'mouseout' : type, handler, false);
-				}
-			} else if (Y.Lang.hasProperty(object, 'detachEvent')) {
-				object.detachEvent('on' + type, handler);
-			}
-
-			object[eventsKey][id] = null;
-
-			return this;
-		},
-
-		stopPropagation: function (event) {
-			if (event.stopPropagation) {
-				event.stopPropagation();
-			} else {
-				event.cancelBubble = true;
-			}
-
-			Y.DOM.Event._skipped(event);
-
-			return this;
-		},
-
-		disableScrollPropagation: function (el) {
-			var stop = Y.DOM.Event.stopPropagation;
-
-			return Y.DOM.Event
-				.on(el, 'mousewheel', stop)
-				.on(el, 'MozMousePixelScroll', stop);
-		},
-
-//		disableClickPropagation: function (el) {
-//			var stop = Y.DOM.Event.stopPropagation, i;
-//
-//			for (i = Y.DOM.Event.Draggable.prototype.START.length - 1; i >= 0; i--) {
-//				Y.DOM.Event.on(el, Y.DOM.Event.Draggable.prototype.START[i], stop);
-//			}
-//
-//			return Y.DOM.Event
-//				.on(el, 'click', Y.DOM.Event._fakeStop)
-//				.on(el, 'dblclick', stop);
-//		},
-
-		preventDefault: function (event) {
-			if (event.preventDefault) {
-				event.preventDefault();
-			} else {
-				event.returnValue = false;
-			}
-
-			return this;
-		},
-
-		stop: function (event) {
-			return Y.DOM.Event
-				.preventDefault(event)
-				.stopPropagation(event);
-		},
-
-		getWheelDelta: function (event) {
-			var delta = 0;
-
-			if (event.wheelDelta) {
-				delta = event.wheelDelta / 120;
-			}
-
-			if (event.detail) {
-				delta = -event.detail / 3;
-			}
-
-			return delta;
-		},
-
-		_skipEvents: {},
-
-		_fakeStop: function (event) {
-			// fakes stopPropagation by setting a special event flag, checked/reset with Y.DOM.Event._skipped(e)
-			Y.DOM.Event._skipEvents[event.type] = true;
-		},
-
-		_skipped: function (event) {
-			var skipped = this._skipEvents[event.type];
-			// reset when checking, as it's only used in map container and propagates outside of the map
-			this._skipEvents[event.type] = false;
-			return skipped;
-		},
-
-		// check if element really left/entered the event target (for mouseenter/mouseleave)
-		_checkMouse: function (el, event) {
-			var related = event.relatedTarget;
-
-			if (!related) {
-				return true;
-			}
-
-			try {
-				while (related && (related !== el)) {
-					related = related.parentNode;
-				}
-			} catch (err) {
-				return false;
-			}
-
-			return (related !== el);
-		},
-
-		// this is a horrible workaround for a bug in Android where a single touch triggers two click events
-		_filterClick: function (event, handler) {
-			var timeStamp = (event.timeStamp || event.originalEvent.timeStamp),
-				elapsed = Y.DOM.Event._lastClick && (timeStamp - Y.DOM.Event._lastClick);
-
-			// are they closer together than 1000ms yet more than 100ms?
-			// Android typically triggers them ~300ms apart while multiple listeners
-			// on the same event should be triggered far faster;
-			// or check if click is simulated on the element, and if it is, reject any non-simulated events
-
-			/** @namespace event.target._simulatedClick */
-			/** @namespace event._simulated */
-			if ((elapsed && elapsed > 100 && elapsed < 1000) || (event.target._simulatedClick && !event._simulated)) {
-				Y.DOM.Event.stop(event);
+			// Don't attach events to noData or text/comment nodes (but allow plain objects)
+			if (!elemData) {
 				return;
 			}
 
-			Y.DOM.Event._lastClick = timeStamp;
+			// Caller can pass in an object of custom data in lieu of the handler
+			if (handler.handler) {
+				handleObjIn = handler;
+				handler = handleObjIn.handler;
+				selector = handleObjIn.selector;
+			}
 
-			return handler(event);
-		}
-	});
+			// Make sure that the handler has a unique ID, used to find/remove it later
+			if (!handler.guid) {
+				handler.guid = Y.DOM.guid++;
+			}
 
-	//---
-
-	// Y.DOM.Event.on = Y.DOM.Event.addListener;
-	// Y.DOM.Event.off = Y.DOM.Event.removeListener;
-
-	Y.DOM.Event.wheelDelta = Y.DOM.Event.getWheelDelta;
-
-	//---
-
-	Y.Extend(Y.DOM.Event, {
-		add: function (element, events, func, data, selector, delegator, capture) {
-			var set = eventHandlers(element);
-			var callback;
-
-			events.split(/\s/).forEach(function (event) {
-				if (event === 'ready') {
-					return Y.DOM(document).ready(func);
-				}
-
-				var handler = parse(event);
-
-				handler.callback = func;
-				handler.selector = selector;
-
-				// Emulate mouseenter, mouseleave
-				if (Y.HasOwnProperty.call(hover, handler.e)) {
-					func = function (e) {
-						var related = e.relatedTarget;
-
-						if (!related || (related !== this && !Y.DOM.contains(this, related))) {
-							return handler.callback.apply(this, arguments);
-						}
-					};
-				}
-
-				handler.del = delegator;
-
-				callback = delegator || func;
-
-				handler.proxy = function (e) {
-					e = compatible(e);
-
-					if (e.isImmediatePropagationStopped()) {
-						return;
-					}
-
-					e.data = data;
-
-					var result = callback.apply(element, e._args === undef ? [e] : [e].concat(e._args));
-
-					if (result === false) {
-						e.preventDefault();
-						e.stopPropagation();
-					}
-
-					return result;
+			// Init the element's event structure and main handler, if this is the first
+			if (!(events = elemData.events)) {
+				events = elemData.events = {};
+			}
+			if (!(eventHandle = elemData.handle)) {
+				eventHandle = elemData.handle = function(e) {
+					// Discard the second event of a Y.DOM.event.trigger() and
+					// when an event is called after a page has unloaded
+					return typeof Y.DOM !== "undefined" && Y.DOM.event.triggered !== e.type ?
+						Y.DOM.event.dispatch.apply(elem, arguments) : undef;
 				};
+			}
 
-				handler.i = set.length;
+			// Handle multiple events separated by a space
+			types = (types || "").match(rnotwhite) || [""];
+			t = types.length;
+			while (t--) {
+				tmp = rtypenamespace.exec(types[t]) || [];
+				type = origType = tmp[1];
+				namespaces = (tmp[2] || "").split(".").sort();
 
-				set.push(handler);
-
-				if (Y.Lang.hasProperty(element, 'addEventListener')) {
-					Y.DOM.Event.addListener(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+				// There *must* be a type, no attaching namespace-only handlers
+				if (!type) {
+					continue;
 				}
-			});
-		},
 
-		remove: function (element, events, func, selector, capture) {
-			(events || '').split(/\s/).forEach(function (event) {
-				findHandlers(element, event, func, selector).forEach(function (handler) {
-					delete eventHandlers(element)[handler.i];
+				// If event changes its type, use the special event handlers for the changed type
+				special = Y.DOM.event.special[type] || {};
 
-					if (Y.Lang.hasProperty(element, 'removeEventListener')) {
-						Y.DOM.Event.removeListener(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+				// If selector defined, determine special event api type, otherwise given type
+				type = (selector ? special.delegateType : special.bindType) || type;
+
+				// Update special based on newly reset type
+				special = Y.DOM.event.special[type] || {};
+
+				// handleObj is passed to all event handlers
+				handleObj = Y.DOM.extend({
+					type: type,
+					origType: origType,
+					data: data,
+					handler: handler,
+					guid: handler.guid,
+					selector: selector,
+					needsContext: selector && Y.DOM.expr.match.needsContext.test(selector),
+					namespace: namespaces.join(".")
+				}, handleObjIn);
+
+				// Init the event handler queue if we're the first
+				if (!(handlers = events[type])) {
+					handlers = events[type] = [];
+					handlers.delegateCount = 0;
+
+					// Only use addEventListener if the special events handler returns false
+					if (!special.setup ||
+						special.setup.call(elem, data, namespaces, eventHandle) === false) {
+
+						if (elem.addEventListener) {
+							elem.addEventListener(type, eventHandle, false);
+						}
 					}
-				});
-			});
+				}
+
+				if (special.add) {
+					special.add.call(elem, handleObj);
+
+					if (!handleObj.handler.guid) {
+						handleObj.handler.guid = handler.guid;
+					}
+				}
+
+				// Add to the element's handler list, delegates in front
+				if (selector) {
+					handlers.splice(handlers.delegateCount++, 0, handleObj);
+				} else {
+					handlers.push(handleObj);
+				}
+
+				// Keep track of which events have ever been used, for event optimization
+				Y.DOM.event.global[type] = true;
+			}
+
 		},
 
-		special: Object.create({})
+		// Detach an event or set of events from an element
+		remove: function(elem, types, handler, selector, mappedTypes) {
+
+			var j, origCount, tmp,
+				events, t, handleObj,
+				special, handlers, type, namespaces, origType,
+				elemData = Y.DOM.data_priv.hasData(elem) && Y.DOM.data_priv.get(elem);
+
+			if (!elemData || !(events = elemData.events)) {
+				return;
+			}
+
+			// Once for each type.namespace in types; type may be omitted
+			types = (types || "").match(rnotwhite) || [""];
+			t = types.length;
+			while (t--) {
+				tmp = rtypenamespace.exec(types[t]) || [];
+				type = origType = tmp[1];
+				namespaces = (tmp[2] || "").split(".").sort();
+
+				// Unbind all events (on this namespace, if provided) for the element
+				if (!type) {
+					for (type in events) {
+						Y.DOM.event.remove(elem, type + types[t], handler, selector, true);
+					}
+					continue;
+				}
+
+				special = Y.DOM.event.special[type] || {};
+				type = (selector ? special.delegateType : special.bindType) || type;
+				handlers = events[type] || [];
+				tmp = tmp[2] && new RegExp("(^|\\.)" + namespaces.join("\\.(?:.*\\.|)") + "(\\.|$)");
+
+				// Remove matching events
+				origCount = j = handlers.length;
+				while (j--) {
+					handleObj = handlers[j];
+
+					if ((mappedTypes || origType === handleObj.origType) &&
+						(!handler || handler.guid === handleObj.guid) &&
+						(!tmp || tmp.test(handleObj.namespace)) &&
+						(!selector || selector === handleObj.selector ||
+							selector === "**" && handleObj.selector)) {
+						handlers.splice(j, 1);
+
+						if (handleObj.selector) {
+							handlers.delegateCount--;
+						}
+						if (special.remove) {
+							special.remove.call(elem, handleObj);
+						}
+					}
+				}
+
+				// Remove generic event handler if we removed something and no more handlers exist
+				// (avoids potential for endless recursion during removal of special event handlers)
+				if (origCount && !handlers.length) {
+					if (!special.teardown ||
+						special.teardown.call(elem, namespaces, elemData.handle) === false) {
+
+						Y.DOM.removeEvent(elem, type, elemData.handle);
+					}
+
+					delete events[type];
+				}
+			}
+
+			// Remove the expando if it's no longer used
+			if (Y.DOM.isEmptyObject(events)) {
+				delete elemData.handle;
+				Y.DOM.data_priv.remove(elem, "events");
+			}
+		},
+
+		trigger: function(event, data, elem, onlyHandlers) {
+
+			var i, cur, tmp, bubbleType, ontype, handle, special,
+				eventPath = [elem || document],
+				type = Y.HasOwnProperty.call(event, "type") ? event.type : event,
+				namespaces = Y.HasOwnProperty.call(event, "namespace") ? event.namespace.split(".") : [];
+
+			cur = tmp = elem = elem || document;
+
+			// Don't do events on text and comment nodes
+			if (elem.nodeType === 3 || elem.nodeType === 8) {
+				return;
+			}
+
+			// focus/blur morphs to focusin/out; ensure we're not firing them right now
+			if (rfocusMorph.test(type + Y.DOM.event.triggered)) {
+				return;
+			}
+
+			if (type.indexOf(".") >= 0) {
+				// Namespaced trigger; create a regexp to match event type in handle()
+				namespaces = type.split(".");
+				type = namespaces.shift();
+				namespaces.sort();
+			}
+			ontype = type.indexOf(":") < 0 && "on" + type;
+
+			// Caller can pass in a Y.DOM.Event object, Object, or just an event type string
+			event = event[Y.DOM.expando] ?
+				event :
+				new Y.DOM.Event(type, typeof event === "object" && event);
+
+			// Trigger bitmask: & 1 for native handlers; & 2 for Y.DOM (always true)
+			event.isTrigger = onlyHandlers ? 2 : 3;
+			event.namespace = namespaces.join(".");
+			event.rnamespace = event.namespace ?
+				new RegExp("(^|\\.)" + namespaces.join("\\.(?:.*\\.|)") + "(\\.|$)") :
+				null;
+
+			// Clean up the event in case it is being reused
+			event.result = undef;
+			if (!event.target) {
+				event.target = elem;
+			}
+
+			// Clone any incoming data and prepend the event, creating the handler arg list
+			data = data == null ?
+				[event] :
+				Y.DOM.makeArray(data, [event]);
+
+			// Allow special events to draw outside the lines
+			special = Y.DOM.event.special[type] || {};
+			if (!onlyHandlers && special.trigger && special.trigger.apply(elem, data) === false) {
+				return;
+			}
+
+			// Determine event propagation path in advance, per W3C events spec (#9951)
+			// Bubble up to document, then to window; watch for a global ownerDocument var (#9724)
+			if (!onlyHandlers && !special.noBubble && !Y.DOM.isWindow(elem)) {
+
+				bubbleType = special.delegateType || type;
+				if (!rfocusMorph.test(bubbleType + type)) {
+					cur = cur.parentNode;
+				}
+				for (; cur; cur = cur.parentNode) {
+					eventPath.push(cur);
+					tmp = cur;
+				}
+
+				// Only add window if we got to document (e.g., not plain obj or detached DOM)
+				if (tmp === (elem.ownerDocument || document)) {
+					eventPath.push(tmp.defaultView || tmp.parentWindow || window);
+				}
+			}
+
+			// Fire handlers on the event path
+			i = 0;
+			while ((cur = eventPath[i++]) && !event.isPropagationStopped()) {
+
+				event.type = i > 1 ?
+					bubbleType :
+					special.bindType || type;
+
+				// Y.DOM handler
+				handle = (Y.DOM.data_priv.get(cur, "events") || {})[event.type] &&
+					Y.DOM.data_priv.get(cur, "handle");
+				if (handle) {
+					handle.apply(cur, data);
+				}
+
+				// Native handler
+				handle = ontype && cur[ontype];
+				if (handle && handle.apply && Y.DOM.acceptData(cur)) {
+					event.result = handle.apply(cur, data);
+					if (event.result === false) {
+						event.preventDefault();
+					}
+				}
+			}
+			event.type = type;
+
+			// If nobody prevented the default action, do it now
+			if (!onlyHandlers && !event.isDefaultPrevented()) {
+
+				if ((!special._default || special._default.apply(eventPath.pop(), data) === false) &&
+					Y.DOM.acceptData(elem)) {
+
+					// Call a native DOM method on the target with the same name name as the event.
+					// Don't do default actions on window, that's where global variables be (#6170)
+					if (ontype && Y.DOM.isFunction(elem[type]) && !Y.DOM.isWindow(elem)) {
+
+						// Don't re-trigger an onFOO event when we call its FOO() method
+						tmp = elem[ontype];
+
+						if (tmp) {
+							elem[ontype] = null;
+						}
+
+						// Prevent re-triggering of the same event, since we already bubbled it above
+						Y.DOM.event.triggered = type;
+						elem[type]();
+						Y.DOM.event.triggered = undef;
+
+						if (tmp) {
+							elem[ontype] = tmp;
+						}
+					}
+				}
+			}
+
+			return event.result;
+		},
+
+		dispatch: function(event) {
+
+			// Make a writable Y.DOM.Event from the native event object
+			event = Y.DOM.event.fix(event);
+
+			var i, j, ret, matched, handleObj,
+				handlerQueue = [],
+				args = Y.G.Slice.call(arguments),
+				handlers = (Y.DOM.data_priv.get(this, "events") || {})[event.type] || [],
+				special = Y.DOM.event.special[event.type] || {};
+
+			// Use the fix-ed Y.DOM.Event rather than the (read-only) native event
+			args[0] = event;
+			event.delegateTarget = this;
+
+			// Call the preDispatch hook for the mapped type, and let it bail if desired
+			if (special.preDispatch && special.preDispatch.call(this, event) === false) {
+				return;
+			}
+
+			// Determine handlers
+			handlerQueue = Y.DOM.event.handlers.call(this, event, handlers);
+
+			// Run delegates first; they may want to stop propagation beneath us
+			i = 0;
+			while ((matched = handlerQueue[i++]) && !event.isPropagationStopped()) {
+				event.currentTarget = matched.elem;
+
+				j = 0;
+				while ((handleObj = matched.handlers[j++]) &&
+					!event.isImmediatePropagationStopped()) {
+
+					// Triggered event must either 1) have no namespace, or 2) have namespace(s)
+					// a subset or equal to those in the bound event (both can have no namespace).
+					if (!event.rnamespace || event.rnamespace.test(handleObj.namespace)) {
+
+						event.handleObj = handleObj;
+						event.data = handleObj.data;
+
+						ret = ((Y.DOM.event.special[handleObj.origType] || {}).handle ||
+							handleObj.handler).apply(matched.elem, args);
+
+						if (ret !== undef) {
+							if ((event.result = ret) === false) {
+								event.preventDefault();
+								event.stopPropagation();
+							}
+						}
+					}
+				}
+			}
+
+			// Call the postDispatch hook for the mapped type
+			if (special.postDispatch) {
+				special.postDispatch.call(this, event);
+			}
+
+			return event.result;
+		},
+
+		handlers: function(event, handlers) {
+			var i, matches, sel, handleObj,
+				handlerQueue = [],
+				delegateCount = handlers.delegateCount,
+				cur = event.target;
+
+			// Find delegate handlers
+			// Black-hole SVG <use> instance trees (#13180)
+			// Avoid non-left-click bubbling in Firefox (#3861)
+			if (delegateCount && cur.nodeType && (!event.button || event.type !== "click")) {
+
+				for (; cur !== this; cur = cur.parentNode || this) {
+
+					// Don't process clicks on disabled elements (#6911, #8165, #11382, #11764)
+					if (cur.disabled !== true || event.type !== "click") {
+						matches = [];
+						for (i = 0; i < delegateCount; i++) {
+							handleObj = handlers[i];
+
+							// Don't conflict with Object.prototype properties (#13203)
+							sel = handleObj.selector + " ";
+
+							if (matches[sel] === undef) {
+								matches[sel] = handleObj.needsContext ?
+									Y.DOM(sel, this).index(cur) >= 0 :
+									Y.DOM.find(sel, this, null, [cur]).length;
+							}
+							if (matches[sel]) {
+								matches.push(handleObj);
+							}
+						}
+						if (matches.length) {
+							handlerQueue.push({ elem: cur, handlers: matches });
+						}
+					}
+				}
+			}
+
+			// Add the remaining (directly-bound) handlers
+			if (delegateCount < handlers.length) {
+				handlerQueue.push({ elem: this, handlers: handlers.slice(delegateCount) });
+			}
+
+			return handlerQueue;
+		},
+
+		// Includes some event props shared by KeyEvent and MouseEvent
+		props: ("altKey bubbles cancelable ctrlKey currentTarget eventPhase " +
+			"metaKey relatedTarget shiftKey target timeStamp view which").split(" "),
+
+		fixHooks: {},
+
+		keyHooks: {
+			props: "char charCode key keyCode".split(" "),
+			filter: function(event, original) {
+
+				// Add which for key events
+				if (event.which == null) {
+					event.which = original.charCode != null ? original.charCode : original.keyCode;
+				}
+
+				return event;
+			}
+		},
+
+		mouseHooks: {
+			props: ("button buttons clientX clientY offsetX offsetY pageX pageY " +
+				"screenX screenY toElement").split(" "),
+			filter: function(event, original) {
+				var eventDoc, doc, body,
+					button = original.button;
+
+				// Calculate pageX/Y if missing and clientX/Y available
+				if (event.pageX == null && original.clientX != null) {
+					eventDoc = event.target.ownerDocument || document;
+					doc = eventDoc.documentElement;
+					body = eventDoc.body;
+
+					event.pageX = original.clientX +
+						(doc && doc.scrollLeft || body && body.scrollLeft || 0) -
+						(doc && doc.clientLeft || body && body.clientLeft || 0);
+					event.pageY = original.clientY +
+						(doc && doc.scrollTop  || body && body.scrollTop  || 0) -
+						(doc && doc.clientTop  || body && body.clientTop  || 0);
+				}
+
+				// Add which for click: 1 === left; 2 === middle; 3 === right
+				// Note: button is not normalized, so don't use it
+				if (!event.which && button !== undef) {
+					event.which = (button & 1 ? 1 : (button & 2 ? 3 : (button & 4 ? 2 : 0)));
+				}
+
+				return event;
+			}
+		},
+
+		fix: function(event) {
+			if (event[Y.DOM.expando]) {
+				return event;
+			}
+
+			// Create a writable copy of the event object and normalize some properties
+			var i, prop, copy,
+				type = event.type,
+				originalEvent = event,
+				fixHook = this.fixHooks[type];
+
+			if (!fixHook) {
+				this.fixHooks[type] = fixHook =
+					rmouseEvent.test(type) ? this.mouseHooks :
+						rkeyEvent.test(type) ? this.keyHooks :
+						{};
+			}
+			copy = fixHook.props ? this.props.concat(fixHook.props) : this.props;
+
+			event = new Y.DOM.Event(originalEvent);
+
+			i = copy.length;
+			while (i--) {
+				prop = copy[i];
+				event[prop] = originalEvent[prop];
+			}
+
+			// Support: Cordova 2.5 (WebKit) (#13255)
+			// All events should have a target; Cordova deviceready doesn't
+			if (!event.target) {
+				event.target = document;
+			}
+
+			// Support: Safari 6.0+, Chrome<28
+			// Target should not be a text node (#504, #13143)
+			if (event.target.nodeType === 3) {
+				event.target = event.target.parentNode;
+			}
+
+			return fixHook.filter ? fixHook.filter(event, originalEvent) : event;
+		},
+
+		special: {
+			load: {
+				// Prevent triggered image.load events from bubbling to window.load
+				noBubble: true
+			},
+			focus: {
+				// Fire native event if possible so blur/focus sequence is correct
+				trigger: function() {
+					if (this !== safeActiveElement() && this.focus) {
+						this.focus();
+						return false;
+					}
+				},
+				delegateType: "focusin"
+			},
+			blur: {
+				trigger: function() {
+					if (this === safeActiveElement() && this.blur) {
+						this.blur();
+						return false;
+					}
+				},
+				delegateType: "focusout"
+			},
+			click: {
+				// For checkbox, fire native event so checked state will be right
+				trigger: function() {
+					if (this.type === "checkbox" && this.click && Y.DOM.nodeName(this, "input")) {
+						this.click();
+						return false;
+					}
+				},
+
+				// For cross-browser consistency, don't fire native .click() on links
+				_default: function(event) {
+					return Y.DOM.nodeName(event.target, "a");
+				}
+			},
+
+			beforeunload: {
+				postDispatch: function(event) {
+
+					// Support: Firefox 20+
+					// Firefox doesn't alert if the returnValue field is not set.
+					if (event.result !== undef && event.originalEvent) {
+						event.originalEvent.returnValue = event.result;
+					}
+				}
+			}
+		},
+
+		simulate: function(type, elem, event, bubble) {
+			// Piggyback on a donor event to simulate a different one.
+			// Fake originalEvent to avoid donor's stopPropagation, but if the
+			// simulated event prevents default then we do the same on the donor.
+			var e = Y.DOM.extend(
+				new Y.DOM.Event(),
+				event,
+				{
+					type: type,
+					isSimulated: true,
+					originalEvent: {}
+				}
+			);
+			if (bubble) {
+				Y.DOM.event.trigger(e, null, elem);
+			} else {
+				Y.DOM.event.dispatch.call(elem, e);
+			}
+			if (e.isDefaultPrevented()) {
+				event.preventDefault();
+			}
+		}
+	};
+
+	Y.DOM.removeEvent = function(elem, type, handle) {
+		if (elem.removeEventListener) {
+			elem.removeEventListener(type, handle, false);
+		}
+	};
+
+	Y.DOM.Event = function(src, props) {
+		// Allow instantiation without the 'new' keyword
+		if (!(this instanceof Y.DOM.Event)) {
+			return new Y.DOM.Event(src, props);
+		}
+
+		// Event object
+		if (src && src.type) {
+			this.originalEvent = src;
+			this.type = src.type;
+
+			// Events bubbling up the document may have been marked as prevented
+			// by a handler lower down the tree; reflect the correct value.
+			this.isDefaultPrevented = src.defaultPrevented ||
+				src.defaultPrevented === undef &&
+				// Support: Android<4.0
+				src.returnValue === false ?
+				returnTrue :
+				returnFalse;
+
+			// Event type
+		} else {
+			this.type = src;
+		}
+
+		// Put explicitly provided properties onto the event object
+		if (props) {
+			Y.DOM.extend(this, props);
+		}
+
+		// Create a timestamp if incoming event doesn't have one
+		this.timeStamp = src && src.timeStamp || Y.Lang.now;
+
+		// Mark it as fixed
+		this[Y.DOM.expando] = true;
+	};
+
+// Y.DOM.Event is based on DOM3 Events as specified by the ECMAScript Language Binding
+// http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html
+	Y.DOM.Event.prototype = {
+		constructor: Y.DOM.Event,
+		isDefaultPrevented: returnFalse,
+		isPropagationStopped: returnFalse,
+		isImmediatePropagationStopped: returnFalse,
+
+		preventDefault: function() {
+			var e = this.originalEvent;
+
+			this.isDefaultPrevented = returnTrue;
+
+			if (e && e.preventDefault) {
+				e.preventDefault();
+			}
+		},
+		stopPropagation: function() {
+			var e = this.originalEvent;
+
+			this.isPropagationStopped = returnTrue;
+
+			if (e && e.stopPropagation) {
+				e.stopPropagation();
+			}
+		},
+		stopImmediatePropagation: function() {
+			var e = this.originalEvent;
+
+			this.isImmediatePropagationStopped = returnTrue;
+
+			if (e && e.stopImmediatePropagation) {
+				e.stopImmediatePropagation();
+			}
+
+			this.stopPropagation();
+		}
+	};
+
+// Create mouseenter/leave events using mouseover/out and event-time checks
+// Support: Chrome 15+
+	Y.DOM.each({
+		mouseenter: "mouseover",
+		mouseleave: "mouseout",
+		pointerenter: "pointerover",
+		pointerleave: "pointerout"
+	}, function(orig, fix) {
+		Y.DOM.event.special[orig] = {
+			delegateType: fix,
+			bindType: fix,
+
+			handle: function(event) {
+				var ret,
+					target = this,
+					related = event.relatedTarget,
+					handleObj = event.handleObj;
+
+				// For mousenter/leave call the handler if related is outside the target.
+				// NB: No relatedTarget if the mouse left/entered the browser window
+				if (!related || (related !== target && !Y.DOM.contains(target, related))) {
+					event.type = handleObj.origType;
+					ret = handleObj.handler.apply(this, arguments);
+					event.type = fix;
+				}
+				return ret;
+			}
+		};
 	});
 
-	//---
+// Support: Firefox, Chrome, Safari
+// Create "bubbling" focus and blur events
+	if (!Y.DOM.support.focusinBubbles) {
+		Y.DOM.each({ focus: "focusin", blur: "focusout" }, function(orig, fix) {
 
-	Y.DOM.proxy = Y.DOM.Proxy = function (callback, context) {
-		var result, proxyFn, args;
-
-		args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
-
-		if (Y.Lang.isFunction(callback)) {
-
-			proxyFn = function () {
-				return callback.apply(context, args ? args.concat(Y.G.Slice.call(arguments)) : arguments);
+			// Attach a single capturing handler on the document while someone wants focusin/focusout
+			var handler = function(event) {
+				Y.DOM.event.simulate(fix, event.target, Y.DOM.event.fix(event), true);
 			};
 
-			proxyFn.YID = yID(callback);
+			Y.DOM.event.special[fix] = {
+				setup: function() {
+					var doc = this.ownerDocument || this,
+						attaches = dataPriv.access(doc, fix);
 
-			proxyFn.GUID = callback.GUID = callback.GUID || proxyFn.GUID || Y.DOM.GUID++;
-
-			result = proxyFn;
-		} else if (Y.Lang.isString(context)) {
-			//result = Y.DOM.Proxy(callback[context], callback);
-
-			if (args) {
-				args.unshift(callback[context], callback);
-				result = Y.DOM.Proxy.apply(null, args);
-			} else {
-				result = Y.DOM.Proxy.apply(callback[context], callback);
-			}
-		} else {
-			throw new TypeError('expected function');
-		}
-
-		// Y.LOG(result);
-
-		return result;
-	};
-
-	Y.DOM.Function.bind = function (eventName, data, callback) {
-		// Y.LOG(arguments);
-		// return this.on(eventName, data, callback);
-		return this.on(eventName, data, callback);
-	};
-
-	Y.DOM.Function.bindEvent = function (eventName, data, callback) {
-		// Y.LOG(arguments);
-		// return this.on(eventName, data, callback);
-		return this.on(eventName, data, callback);
-	};
-
-	Y.DOM.Function.unbind = function (event, callback) {
-		return this.off(event, callback);
-	};
-
-	Y.DOM.Function.one = function (event, selector, data, callback) {
-		return this.on(event, selector, data, callback, 1);
-	};
-
-	Y.DOM.Function.delegate = function (selector, event, callback) {
-		return this.on(event, selector, callback);
-	};
-
-	Y.DOM.Function.undelegate = function (selector, event, callback) {
-		return this.off(event, selector, callback);
-	};
-
-	Y.DOM.Function.live = function (event, callback) {
-		Y.DOM(Y.Document.body).delegate(this.selector, event, callback);
-		return this;
-	};
-
-	Y.DOM.Function.die = function (event, callback) {
-		Y.DOM(Y.Document.body).undelegate(this.selector, event, callback);
-		return this;
-	};
-
-	Y.DOM.Function.on = function (event, selector, data, callback, one) {
-		var autoRemove, delegator, $this = this;
-
-		if (event && !Y.Lang.isString(event)) {
-			Y.Each(event, function (type, func) {
-				$this.on(type, selector, data, func, one);
-			});
-
-			return $this;
-		}
-
-		if (!Y.Lang.isString(selector) && !Y.Lang.isFunction(callback) && callback !== false) {
-			callback = data;
-			data = selector;
-			selector = undef;
-		}
-
-		if (Y.Lang.isFunction(data) || data === false) {
-			callback = data;
-			data = undef;
-		}
-
-		if (callback === false) {
-			callback = returnFalse;
-		}
-
-		return $this.each(function (_, element) {
-			if (one) {
-				autoRemove = function (event) {
-					Y.DOM.Event.remove(element, event.type, callback);
-					return callback.apply(this, arguments);
-				};
-			}
-
-			if (selector) {
-				delegator = function (event) {
-					var evt,
-						match = Y.DOM(event.target).closest(selector, element).get(0);
-
-					if (match && match !== element) {
-						evt = Y.Extend(createProxy(event), {
-							currentTarget: match,
-							liveFired: element
-						});
-
-						return (autoRemove || callback).apply(match, [evt].concat(Y.G.Slice.call(arguments, 1)));
+					if (!attaches) {
+						doc.addEventListener(orig, handler, true);
 					}
-				};
-			}
+					dataPriv.access(doc, fix, (attaches || 0) + 1);
+				},
+				teardown: function() {
+					var doc = this.ownerDocument || this,
+						attaches = dataPriv.access(doc, fix) - 1;
 
-			Y.DOM.Event.add(element, event, callback, data, selector, delegator || autoRemove);
-		});
-	};
+					if (!attaches) {
+						doc.removeEventListener(orig, handler, true);
+						dataPriv.remove(doc, fix);
 
-	Y.DOM.Function.off = function (event, selector, callback) {
-		var $this = this;
-
-		if (event && !Y.Lang.isString(event)) {
-			Y.Each(event, function (type, func) {
-				$this.off(type, selector, func);
-			});
-
-			return $this;
-		}
-
-		if (!Y.Lang.isString(selector) && !Y.Lang.isFunction(callback) && callback !== false) {
-			callback = selector;
-			selector = undef;
-		}
-
-		if (callback === false) {
-			callback = returnFalse;
-		}
-
-		return $this.each(function () {
-			Y.DOM.Event.remove(this, event, callback, selector);
-		});
-	};
-
-	Y.DOM.Function.trigger = function (event, args) {
-		if (Y.Lang.isString(event) || Y.Lang.isPlainObject(event)) {
-			event = Y.DOM.Event(event);
-		} else {
-			event = compatible(event);
-		}
-
-		event._args = args;
-
-		return this.each(function () {
-			// items in the collection might not be Node elements
-			/*if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
-				this.dispatchEvent(event);
-			} else {
-				Y.DOM(this).triggerHandler(event, args);
-			}*/
-
-			if (event.type && ~inputEvents.indexOf(event.type)) {
-				this[event.type]();
-			} else if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
-				this.dispatchEvent(event);
-			} /*else {
-				Y.DOM(this).triggerHandler(event, args);
-			}*/
-		});
-	};
-
-	// triggers event handlers on current element just as if an event occurred,
-	// doesn't trigger an actual event, doesn't bubble
-	Y.DOM.Function.triggerHandler = function (event, args) {
-		var e, result = null;
-
-		this.each(function (i, element) {
-			e = createProxy(Y.Lang.isString(event) ? Y.DOM.Event(event) : event);
-			e._args = args;
-			e.target = element;
-
-			Y.Each(findHandlers(element, event.type || event), function (i, handler) {
-				result = handler.proxy(e);
-
-				if (e.isImmediatePropagationStopped()) {
-					return false;
+					} else {
+						dataPriv.access(doc, fix, attaches);
+					}
 				}
-			});
+			};
 		});
+	}
 
-		return result;
-	};
+	Y.DOM.fn.extend({
 
-	// Shortcut methods for `.bind(event, func)` for each event type
-	[
-		'focusin',
-		'focusout',
-		'load',
-		'resize',
-		'scroll',
-		'unload',
-		'click',
-		'dblclick',
-		'hashchange',
-		'mousedown',
-		'mouseup',
-		'mousemove',
-		'mouseover',
-		'mouseout',
-		'mouseenter',
-		'mouseleave',
-		'change',
-		'select',
-		'submit',
-		'keydown',
-		'keypress',
-		'keyup',
-		'error',
-		'contextmenu',
-		'mousewheel',
-		'wheel'
-	].forEach(function (event) {
-		Y.DOM.Function[event] = function (callback) {
-			return callback ?
-				this.bind(event, callback) :
-				this.trigger(event);
-		};
-	});
+		on: function(types, selector, data, fn, /*INTERNAL*/ one) {
+			var origFn, type;
 
-	Y.DOM.Function.hashchange = function (callback) {
-		return callback ? this.bind('hashchange', callback) : this.trigger('hashchange', callback);
-	};
-
-	inputEvents.forEach(function (name) {
-		Y.DOM.Function[name] = function (callback) {
-			if (callback) {
-				this.bind(name, callback);
-			} else {
-				this.each(function () {
-					try {
-						this[name]();
-					} catch (err) {
-						//...
-						Y.ERROR(err);
-					}
-				});
+			// Types can be a map of types/handlers
+			if (typeof types === "object") {
+				// (types-Object, selector, data)
+				if (typeof selector !== "string") {
+					// (types-Object, data)
+					data = data || selector;
+					selector = undef;
+				}
+				for (type in types) {
+					this.on(type, selector, data, types[type], one);
+				}
+				return this;
 			}
 
-			return this;
-		};
-	});
-
-	// Generate extended `remove` and `empty` functions
-	['remove', 'empty'].forEach(function (method) {
-		var origFn = Y.DOM.Function[method];
-
-		Y.DOM.Function[method] = function () {
-			var elements = this.find('*');
-
-			if (method === 'remove') {
-				elements = elements.add(this);
+			if (data == null && fn == null) {
+				// (types, fn)
+				fn = selector;
+				data = selector = undef;
+			} else if (fn == null) {
+				if (typeof selector === "string") {
+					// (types, selector, fn)
+					fn = data;
+					data = undef;
+				} else {
+					// (types, data, fn)
+					fn = data;
+					data = selector;
+					selector = undef;
+				}
+			}
+			if (fn === false) {
+				fn = returnFalse;
+			} else if (!fn) {
+				return this;
 			}
 
-			elements.forEach(function (element) {
-				Y.DOM.Event.remove(element);
+			if (one === 1) {
+				origFn = fn;
+				fn = function(event) {
+					// Can use an empty set, since event contains the info
+					Y.DOM().off(event);
+					return origFn.apply(this, arguments);
+				};
+				// Use same guid so caller can remove using origFn
+				fn.guid = origFn.guid || (origFn.guid = Y.DOM.guid++);
+			}
+			return this.each(function() {
+				Y.DOM.event.add(this, types, fn, data, selector);
 			});
+		},
+		one: function(types, selector, data, fn) {
+			return this.on(types, selector, data, fn, 1);
+		},
+		off: function(types, selector, fn) {
+			var handleObj, type;
+			if (types && types.preventDefault && types.handleObj) {
+				// (event)  dispatched Y.DOM.Event
+				handleObj = types.handleObj;
+				Y.DOM(types.delegateTarget).off(
+					handleObj.namespace ?
+						handleObj.origType + "." + handleObj.namespace :
+						handleObj.origType,
+					handleObj.selector,
+					handleObj.handler
+				);
+				return this;
+			}
+			if (typeof types === "object") {
+				// (types-object [, selector])
+				for (type in types) {
+					this.off(type, selector, types[type]);
+				}
+				return this;
+			}
+			if (selector === false || typeof selector === "function") {
+				// (types [, fn])
+				fn = selector;
+				selector = undef;
+			}
+			if (fn === false) {
+				fn = returnFalse;
+			}
+			return this.each(function() {
+				Y.DOM.event.remove(this, types, fn, selector);
+			});
+		},
 
-			return origFn.call(this);
-		};
+		trigger: function(type, data) {
+			return this.each(function() {
+				Y.DOM.event.trigger(type, data, this);
+			});
+		},
+		triggerHandler: function(type, data) {
+			var elem = this[0];
+			if (elem) {
+				return Y.DOM.event.trigger(type, data, elem, true);
+			}
+		}
 	});
 
 	//---
 
-//	Y.DOM.Event.prototype.isDefaultPrevented = function () {
-//		return this.defaultPrevented;
-//	};
+	Y.DOM.each(("blur focus focusin focusout load resize scroll unload click dblclick " +
+			"mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave " +
+			"change select submit keydown keypress keyup error contextmenu").split(" "),
+		function(i, name) {
 
+			// Handle event binding
+			Y.DOM.fn[name] = function(data, fn) {
+				return arguments.length > 0 ?
+					this.on(name, null, data, fn) :
+					this.trigger(name);
+			};
+		});
+
+	Y.DOM.fn.extend({
+		hover: function(fnOver, fnOut) {
+			return this.mouseenter(fnOver).mouseleave(fnOut || fnOver);
+		},
+
+		bind: function(types, data, fn) {
+			return this.on(types, null, data, fn);
+		},
+		unbind: function(types, fn) {
+			return this.off(types, null, fn);
+		},
+
+		delegate: function(selector, types, data, fn) {
+			return this.on(types, selector, data, fn);
+		},
+		undelegate: function(selector, types, fn) {
+			// (namespace) or (selector, types [, fn])
+			return arguments.length === 1 ?
+				this.off(selector, "**") :
+				this.off(types, selector || "**", fn);
+		}
+	});
+
+	// Attach a bunch of functions for handling common AJAX events
+	Y.DOM.each([
+		"ajaxStart",
+		"ajaxStop",
+		"ajaxComplete",
+		"ajaxError",
+		"ajaxSuccess",
+		"ajaxSend"
+	], function(i, type) {
+		Y.DOM.fn[type] = function(fn) {
+			return this.on(type, fn);
+		};
+	});
+	
 	//---
 
 }());
@@ -4061,22 +4858,6 @@
 	// BEGIN OF [Private Functions]
 
 	Y.DOM.AjaxActive = Y.DOM.active = 0;
-
-	function globalEval(code) {
-		var script, indirect = eval;
-
-		code = Y.Lang.trim(code);
-
-		if (code) {
-			if (code.indexOf('use strict') === 1) {
-				script = document.createElement('script');
-				script.text = code;
-				document.head.appendChild(script).parentNode.removeChild(script);
-			} else {
-				indirect(code);
-			}
-		}
-	}
 
 	// Trigger a custom event and return false if it was cancelled
 	function triggerAndReturn(context, event, data) {
@@ -4573,12 +5354,10 @@
 
 						result = xhr.responseText;
 
-						// Y.Log(dataType);
-
 						try {
 							// http://perfectionkills.com/global-eval-what-are-the-options/
 							if (dataType === 'script') {
-								globalEval(result);
+								Y.DOM.globalEval(result);
 							}
 
 							if (dataType === 'xml') {
@@ -4586,13 +5365,13 @@
 							}
 
 							if (dataType === 'json') {
-								// globalEval(result);
-								result = Y.RegEx.blankReplacement.test(result) ? null : Y.Lang.parseJSON(
-									result);
+								result = Y.RegEx.blankReplacement.test(result) ? 
+									null : 
+									Y.Lang.parseJSON(result);
 							}
 						} catch (err) {
 							error = err;
-							//							Y.ERROR(err);
+							// Y.ERROR(err);
 						}
 
 						if (error) {
@@ -4691,14 +5470,13 @@
 		}
 
 		options.success = function (response) {
-			self.html(selector ? Y.DOM('<div>').html(response.replace(Y.RegEx.scriptReplacement,
-				'')).find(selector) : response);
+			self.html(selector ? 
+				Y.DOM('<div>').html(response.replace(Y.RegEx.scriptReplacement, '')).find(selector) : 
+				response);
 
 			if (callback) {
 				callback.apply(self, arguments);
 			}
-
-			// callback && callback.apply(self, arguments);
 		};
 
 		Y.DOM.Ajax(options);
@@ -6072,7 +6850,7 @@
 
 
 /**
- * Node/DOM Compatibility
+ * DOM/DOM Compatibility
  *
  * Compatibility Module for YAX's DOM API.
  *
@@ -6097,21 +6875,21 @@
 	//---
 
 	// Map over Yax.DOM in case of overwrite
-	var _YaxDOM = Y.Window.Y.Node;
+	var _YaxDOM = Y.Window.Y.DOM;
 
 	// Map over the $ in case of overwrite
 	var _$ = Y.Window.$;
 
 	_YaxDOM.noConflict = function (deep) {
-		if (Y.Window.$ === Y.Node) {
+		if (Y.Window.$ === Y.DOM) {
 			Y.Window.$ = _$;
 		}
 
-		if (deep && Y.Window.Y.Node === Y.Node) {
-			Y.Window.Y.Node = _YaxDOM;
+		if (deep && Y.Window.Y.DOM === Y.DOM) {
+			Y.Window.Y.DOM = _YaxDOM;
 		}
 
-		return Y.Node;
+		return Y.DOM;
 	};
 
 	//---
@@ -6130,6 +6908,8 @@
 	Y.DOM.isNumeric = Y.Lang.isNumeric;
 	Y.DOM.isEmptyObject = Y.Lang.isObjectEmpty;
 	Y.DOM.noop = Y.DOM.Noop = Y.Lang.noop;
+	Y.DOM.grep = Y.Lang.grep;
+	Y.DOM.merge = Y.Lang.merge;
 
 	Y.DOM.when = Y.Lang.When;
 
@@ -6147,7 +6927,9 @@
 
 	Y.DOM.Function.ready = function (callback) {
 		// Add the callback
-		Y.DOM.ready.promise(this).done(callback);
+//		Y.DOM.ready.promise().done(callback);
+
+		Y.DOM.ready.promise().done(callback);
 
 		return this;
 	};
@@ -6208,7 +6990,7 @@
 			readyList.resolveWith(Y.Document, [Y.DOM]);
 
 			// Trigger any bound ready events
-			if (Y.DOM.fn.triggerHandler) {
+			if (Y.DOM.Function.triggerHandler) {
 				Y.DOM(Y.Document).triggerHandler('ready');
 				Y.DOM(Y.Document).off('ready');
 			}
@@ -6225,8 +7007,6 @@
 	}
 
 	Y.DOM.ready.promise = function (obj) {
-		// Y.LOG(readyList);
-
 		if (!readyList) {
 			readyList = Y.DOM.Deferred();
 
@@ -6251,14 +7031,9 @@
 	// Kick off the DOM ready check even if the user does not
 	Y.DOM.ready.promise();
 
-	if (Y.HasOwnProperty.call(Y.Window, 'Sizzle')) {
-		Y.DOM.isXMLDoc = Y.Window.Sizzle.isXML;
-		Y.DOM.text = Y.DOM.Text = Y.Window.Sizzle.getText;
-	}
-
 	//---
 
-	Y.DOM.event.simulate = function (type, elem, event, bubble) {
+	/*Y.DOM.event.simulate = function (type, elem, event, bubble) {
 		var e = Y.Extend(new Y.DOM.Event(type), event, {
 			type: type,
 			isSimulated: true,
@@ -6296,7 +7071,7 @@
 				}
 			}
 		};
-	});
+	});*/
 
 	//---
 
@@ -6308,109 +7083,6 @@
 		});
 	}
 
-
-	//---
-
-}());
-
-//---
-
-
-/**
- * YAX Node | Special Event
- *
- * Cross browser special event implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint browser: true */
-/*jslint white: true */
-/*jshint -W084 */
-/*jslint node: false */
-/*global YAX, Y */
-
-//---
-
-(function () {
-
-	'use strict';
-
-	//---
-
-	Y.DOM.Function.bind = function (eventName, data, callback) {
-		var el = this;
-		// var $this = Y.DOM(el);
-		var specialEvent;
-
-		if (!Y.Lang.isSet(callback)) {
-			callback = data;
-			data = null;
-		}
-
-		if (Y.DOM.YAXDOM) {
-			Y.DOM.each(eventName.split(/\s/), function (i, eventName) {
-				eventName = eventName.split(/\./)[0];
-
-				var tmp = Y.HasOwnProperty.call(Y.DOM.Event.special, eventName);
-
-				if (tmp) {
-					specialEvent = Y.DOM.event.special[eventName];
-
-					/// init enable special events on Y.DOM
-					if (!specialEvent._init) {
-						specialEvent._init = true;
-
-						/// intercept and replace the special event handler to add functionality
-						specialEvent.originalHandler = specialEvent.handler;
-
-						specialEvent.handler = function () {
-							/// make event argument writable, like on jQuery
-							var args = Y.G.Slice.call(arguments);
-
-							args[0] = Y.Extend({}, args[0]);
-
-							/// define the event handle, Y.DOM.event.dispatch is only for newer versions of jQuery
-							Y.DOM.Event.handle = function () {
-								/// make context of trigger the event element
-								var args_ = Y.G.Slice.call(arguments);
-								var event = args_[0];
-								var $target = Y.DOM(event.target);
-
-								$target.trigger.apply($target, arguments);
-
-							};
-
-							specialEvent.originalHandler.apply(this, args);
-						};
-					}
-
-					//Y.LOG(el);
-					//Y.LOG(data);
-					//Y.LOG(specialEvent);
-					//Y.LOG(eventName);
-					//Y.LOG(eventName);
-
-					/// setup special events on Y.DOM
-					// specialEvent.setup.apply(el, [data]);
-					specialEvent.setup.apply(el, [data]);
-				}
-			});
-		}
-
-		// Y.LOG(bindBeforeSpecialEvents);
-//		Y.LOG(callback);
-
-		// return bindBeforeSpecialEvents.apply(this, [eventName, callback]);
-		// return Y.Window.bindBeforeSpecialEvents.apply(this, [eventName, callback]);
-		// return Y.DOM.Function.bindEvent.apply(this, [eventName, callback]);
-		return Y.DOM.Function.bindEvent.apply(this, [eventName, callback]);
-	};
 
 	//---
 

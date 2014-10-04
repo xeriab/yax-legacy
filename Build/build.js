@@ -102,9 +102,9 @@ exports.build = function (callback, compsBase32, buildName) {
 
 	var newSrc = copy + combineFiles(files);
 
-	var pathPart = 'Dist/yax' + (buildName ? '.' + buildName : '');
+	var pathPart = 'Distribution/yax' + (buildName ? '.' + buildName : '');
 
-	var srcPath = pathPart + '.src.js';
+	var srcPath = pathPart + '-src.js';
 
 	var oldSrc = loadSilently(srcPath);
 
@@ -117,7 +117,7 @@ exports.build = function (callback, compsBase32, buildName) {
 		console.log('   Saved to ' + srcPath);
 	}
 
-	var path = pathPart + '.js';
+	var path = pathPart + '.min.js';
 
 	var oldCompressed = loadSilently(path);
 

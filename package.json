@@ -9,16 +9,18 @@
 		"uglify-js": "~2.4.8"
 	},
 	
-	"main": "Dist/yax.src.js",
+	"main": "Distribution/yax.core-src.js",
+	"style": "Distribution/yax.core-src.css",
 	
 	"scripts": {
 		"test": "jake test",
-		"prepublish": "jake build"
+		"prepublish": "jake build",
+		"publish": "./Build/publish.sh"
 	},
 	
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/KodeBurner/YAX.JS"
+		"url": ""
 	},
 	
 	"keywords": [

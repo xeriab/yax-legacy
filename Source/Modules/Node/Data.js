@@ -51,7 +51,8 @@
 		//  -
 		//    - Any
 		return owner.nodeType ?
-			owner.nodeType === 1 || owner.nodeType === 9 : true;
+			owner.nodeType === 1 || owner.nodeType === 9 : 
+			true;
 	};
 
 	Data.prototype = {
@@ -197,6 +198,7 @@
 				}
 
 				i = name.length;
+
 				while (i--) {
 					delete cache[name[i]];
 				}
@@ -241,10 +243,6 @@
 	function dataAttribute(elem, key, data) {
 		var name;
 
-//		console.log(elem)
-//		console.log(key)
-//		console.log(data)
-
 		// If nothing was found internally, try to fetch any
 		// data from the HTML5 data-* attribute
 		if (data === undef && elem.nodeType === 1) {
@@ -270,6 +268,7 @@
 				data = undef;
 			}
 		}
+
 		return data;
 	}
 
@@ -305,9 +304,6 @@
 			store = data[id];
 		}
 
-		//id = node[exp] || (node[exp] = ++Y.DOM.UUID);
-		//store = data[id] || (data[id] = attributeData(node));
-
 		if (name !== undef) {
 			store[Y.Lang.camelise(name)] = value;
 		}
@@ -319,7 +315,6 @@
 	// 1. first try key as given,
 	// 2. then try Camelised key,
 	// 3. fall back to reading "data-*" attribute.
-
 	function getData(node, name) {
 		var id = node[exp],
 			store = id && data[id],
@@ -473,21 +468,6 @@
 		}
 
 		return result;
-
-//		return value === undef ?
-//			// set multiple values via object
-//			Y.Lang.isPlainObject(name) ?
-//				this.each(function (i, node) {
-//					Y.Each(name, function (key, value) {
-//						setData(node, key, value);
-//					});
-//				}) :
-//				// get value from first element
-//					this.length === 0 ? undef : getData(this[0], name) :
-//			// set value on all elements
-//			this.each(function () {
-//				setData(this, name, value);
-//			});
 	};
 
 	Y.DOM.Function.removeData = function (names) {

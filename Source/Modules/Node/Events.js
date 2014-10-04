@@ -203,7 +203,8 @@
 
 	//---
 
-	Y.DOM.Event = Y.DOM.event = function (type, props) {
+
+	Y.DOM.Event = function (type, props) {
 		var event, name, bubbles;
 
 		// Allow instantiation without the 'new' keyword
@@ -238,7 +239,7 @@
 
 		event.initEvent(type, bubbles, true);
 
-		// this.timeStamp = type && type.timeStamp || Y.Lang.now();
+		this.timeStamp = type && type.timeStamp || Y.Lang.now;
 
 		// Mark it as fixed
 		this[Y.DOM.expando] = true;
@@ -257,10 +258,6 @@
 	Y.Extend(Y.DOM.Event, {
 		on: function (object, types, func, context) {
 			var type, x, len;
-
-			//console.log(object);
-			//console.log(types);
-			//console.log(func);
 
 			if (Y.Lang.isObject(types)) {
 				for (type in types) {
@@ -515,7 +512,11 @@
 
 	//---
 
-	Y.Extend(Y.DOM.Event, {
+	Y.DOM.event = Object.create({});
+
+	//---
+
+	Y.Extend(Y.DOM.event, {
 		add: function (element, events, func, data, selector, delegator, capture) {
 			var set = eventHandlers(element);
 			var callback;
@@ -532,6 +533,7 @@
 
 				// Emulate mouseenter, mouseleave
 				if (Y.HasOwnProperty.call(hover, handler.e)) {
+				//if (handler.e in hover) {
 					func = function (e) {
 						var related = e.relatedTarget;
 
@@ -568,9 +570,9 @@
 
 				set.push(handler);
 
-				if (Y.Lang.hasProperty(element, 'addEventListener')) {
-					Y.DOM.Event.addListener(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
-				}
+//				if (Y.Lang.hasProperty(element, 'addEventListener')) {
+				Y.DOM.Event.on(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+//				}
 			});
 		},
 
@@ -579,9 +581,9 @@
 				findHandlers(element, event, func, selector).forEach(function (handler) {
 					delete eventHandlers(element)[handler.i];
 
-					if (Y.Lang.hasProperty(element, 'removeEventListener')) {
-						Y.DOM.Event.removeListener(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
-					}
+//					if (Y.Lang.hasProperty(element, 'removeEventListener')) {
+					Y.DOM.Event.off(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+//					}
 				});
 			});
 		},
@@ -692,7 +694,7 @@
 		return $this.each(function (_, element) {
 			if (one) {
 				autoRemove = function (event) {
-					Y.DOM.Event.remove(element, event.type, callback);
+					Y.DOM.event.remove(element, event.type, callback);
 					return callback.apply(this, arguments);
 				};
 			}
@@ -713,7 +715,7 @@
 				};
 			}
 
-			Y.DOM.Event.add(element, event, callback, data, selector, delegator || autoRemove);
+			Y.DOM.event.add(element, event, callback, data, selector, delegator || autoRemove);
 		});
 	};
 
@@ -738,7 +740,7 @@
 		}
 
 		return $this.each(function () {
-			Y.DOM.Event.remove(this, event, callback, selector);
+			Y.DOM.event.remove(this, event, callback, selector);
 		});
 	};
 
@@ -763,7 +765,7 @@
 				this[event.type]();
 			} else if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
 				this.dispatchEvent(event);
-			} /*else {
+			}/* else {
 				Y.DOM(this).triggerHandler(event, args);
 			}*/
 		});
@@ -831,6 +833,10 @@
 		return callback ? this.bind('hashchange', callback) : this.trigger('hashchange', callback);
 	};
 
+	Y.DOM.Function.hover = function(over, out) {
+		return this.mouseenter(over).mouseleave(out || over);
+	};
+
 	inputEvents.forEach(function (name) {
 		Y.DOM.Function[name] = function (callback) {
 			if (callback) {
@@ -851,7 +857,7 @@
 	});
 
 	// Generate extended `remove` and `empty` functions
-	['remove', 'empty'].forEach(function (method) {
+	/*['remove', 'empty'].forEach(function (method) {
 		var origFn = Y.DOM.Function[method];
 
 		Y.DOM.Function[method] = function () {
@@ -862,18 +868,18 @@
 			}
 
 			elements.forEach(function (element) {
-				Y.DOM.Event.remove(element);
+				Y.DOM.event.remove(element);
 			});
 
 			return origFn.call(this);
 		};
-	});
+	});*/
 
 	//---
 
-//	Y.DOM.Event.prototype.isDefaultPrevented = function () {
-//		return this.defaultPrevented;
-//	};
+	Y.DOM.Event.prototype.isDefaultPrevented = function () {
+		return this.defaultPrevented;
+	};
 
 	//---
 

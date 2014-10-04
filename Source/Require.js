@@ -14,26 +14,32 @@
 	var root = this;
 
 	(function () {
-		var modules = {},
-			// Stack of moduleIds currently being built.
-			requireStack = [],
-			// Map of module ID -> index into requireStack of modules currently being built.
-			inProgressModules = {},
-			SEPARATOR = '.';
+		var modules = {};
+
+		// Stack of moduleIds currently being built.
+		var requireStack = [];
+
+		// Map of module ID -> index into requireStack of modules currently being built.
+		var inProgressModules = {};
+
+		var SEPARATOR = '.';
 
 		function build(module) {
-			var factory = module.factory,
-				localRequire = function (id) {
-					var resultantId = id;
-					//Its a relative path, so lop off the last portion and add the id (minus './')
-					if (id.charAt(0) === '.') {
-						resultantId = module.id.slice(0, module.id.lastIndexOf(SEPARATOR)) +
-							SEPARATOR + id.slice(2);
-					}
-					return require(resultantId);
-				};
+			var factory = module.factory;
 
-			module.exports = {};
+			var localRequire = function (id) {
+				var resultantId = id;
+
+				//Its a relative path, so lop off the last portion and add the id (minus './')
+				if (id.charAt(0) === '.') {
+					resultantId = module.id.slice(0, module.id.lastIndexOf(SEPARATOR)) +
+						SEPARATOR + id.slice(2);
+				}
+
+				return require(resultantId);
+			};
+
+			module.exports = Object.create({});
 
 			delete module.factory;
 
@@ -48,8 +54,9 @@
 			}
 
 			if (inProgressModules.hasOwnProperty(id)) {
-				var cycle = requireStack.slice(inProgressModules[id]).join('->') + '->' +
-					id;
+				var cycle = requireStack.slice(inProgressModules[id])
+					.join('->') + '->' + id;
+
 				throw 'Cycle in require graph: ' + cycle;
 			}
 
@@ -57,9 +64,11 @@
 				try {
 					inProgressModules[id] = requireStack.length;
 					requireStack.push(id);
+
 					return build(modules[id]);
 				} finally {
 					delete inProgressModules[id];
+
 					requireStack.pop();
 				}
 			}

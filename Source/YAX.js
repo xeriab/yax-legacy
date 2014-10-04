@@ -207,6 +207,8 @@
 	Y.G.FuncProto = FuncProto;
 	Y.G.ArrayProto = ArrayProto;
 	Y.G.ObjProto = ObjProto;
+	Y.G.IndexOf = ArrayProto.indexOf;
+	Y.G.Push = ArrayProto.push;
 
 	/** @namespace root.R */
 	/** @namespace root.D */

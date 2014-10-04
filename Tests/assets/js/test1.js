@@ -14,8 +14,6 @@ Y.DOM(Y.Document).ready(function () {
 
 	TestOneImage.css({
 		marginTop: -13
-		//marginLeft: -9,
-		//maxWidth: 100
 	});
 
 	TestOneImage.Tooltip({
@@ -25,12 +23,13 @@ Y.DOM(Y.Document).ready(function () {
 		Animation: 'flipIn'
 	});
 
-	Y.DOM('.btn').removeData('toggle');
+//	Y.DOM('.btn').removeData('toggle');
 
 //	ButtonOne.button('toggle');
-	Y.DOM('.dropdown-toggle').dropdown();
+//	Y.DOM('.dropdown-toggle').dropdown();
 
 	// Wrapper.WaitForMe({Effect: 'orbit'});
 
 	Y.LOG('');
+//	Y.LOG(Y);
 });

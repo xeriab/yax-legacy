@@ -26,8 +26,6 @@
 	var cache = [], timeout;
 
 	Y.DOM.Function.remove = function () {
-		// var self = this;
-
 		return this.each(function () {
 			if (this.parentNode) {
 				if (this.tagName === 'IMG') {

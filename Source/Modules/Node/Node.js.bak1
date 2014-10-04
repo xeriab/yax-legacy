@@ -512,6 +512,31 @@
 		}
 	}
 
+	// Given a selector, splits it into groups. Necessary because naively
+	// splitting on commas will do the wrong thing.
+	//
+	// Examples:
+	// "div.foo" -> ["div.foo"]
+	// "div, p" -> ["div", "p"]
+	// "div[title='foo, bar'], p" -> ["div[title='foo, bar']", "p"]
+	function splitSelector(selector) {
+		var results = [];
+
+		selector.replace(Y.RegEx.SelectorGroupReplacement, function (m, unit) {
+			results.push(unit.trim());
+		});
+
+		return results;
+	}
+
+	// Checks whether the selector has a combinator in it. If not, it's a
+	// "simple selector" and can be optimized in some cases.
+	// This logic isn't exhaustive, but it doesn't have to be. False
+	// positives are OK.
+	function hasCombinator(selector) {
+		return selector.match(/[\s>~+]/);
+	}
+
 	// END OF [Private Functions]
 
 	//---
@@ -565,7 +590,7 @@
 		},
 
 		// `YAXDOM.Fragment` takes a html string and an optional tag name
-		// to generate DOM nodes from the given html string.
+		// to generate DOM nodes nodes from the given html string.
 		// The generated DOM nodes are returned as an array.
 		// This function can be overriden in plugins for example to make
 		// it compatible with browsers that don't support the DOM fully.
@@ -742,25 +767,30 @@
 		Y: function (dom, selector) {
 			var result;
 
-			result = dom || [];
-			// result = dom || Object.create({});
+			// result = dom || [];
+			result = dom || Object.create({});
 			/* jshint -W103 */
 			// result.__proto__ = Y.DOM.Function;
 			result.__proto__ = Y.DOM.Function;
-			// Y.Extend(result.__proto__, Y.DOM.Function);
 			result.selector = selector || Y.Lang.empty();
 
 			return result;
 		},
 
 		/**
-		 * YAXDOM.isY` should return `true` if the given object is
-		 * a YAX.DOM collection. This method can be overriden in plugins.
+		 * Y.DOM.isY` should return `true` if the given object is
+		 * a YAX collection. This method can be overriden in plugins.
 		 */
 		isY: function (object) {
 			return object instanceof this.Y;
 		}
 	});
+
+	//---
+
+	/*Y.DOM = function (selector, context) {
+		return YAXDOM.init(selector, context);
+	};*/
 
 	//---
 
@@ -785,9 +815,9 @@
 	Y.DomNode = Y.Class.Extend({
 		CLASS_NAME: 'DOM',
 
-		// initialise: function (selector, context) {
-		// 	return YAXDOM.init(selector, context);
-		// },
+		initialise: function (selector, context) {
+			return YAXDOM.init(selector, context);
+		},
 
 		getStyle: function (el, style) {
 			var value, css;
@@ -809,7 +839,6 @@
 		},
 
 		'Function': {
-			'YAX.DOM': '0.10',
 			// Because a collection acts like an array
 			// copy over these useful array functions.
 			forEach: Y.G.ArrayProto.forEach,
@@ -955,6 +984,86 @@
 					result = this.map(function () {
 						return YAXDOM.QSA(this, selector);
 					});
+				}
+
+				return result;
+			},
+
+			find_: function (selector) {
+				var result;
+				var self = this;
+				var error = false;
+
+				if (Y.Lang.isObject(selector)) {
+					result = Y.DOM(selector).filter(function () {
+						var node = this;
+
+						return Y.G.ArrayProto.some.call(self, function (parent) {
+							return Y.DOM.contains(parent, node);
+						});
+					});
+				} else {
+					var slow = false;
+
+					selector = splitSelector(selector).map(function (unit) {
+						if (hasCombinator(selector)) {
+							slow = true;
+							return '.' + Y.DOM.ClassTag + ' ' + unit;
+						}
+
+						return unit;
+					}).join(', ');
+
+					var findBySelector = function (elem, selector, slow) {
+
+						if (elem.length == 1) {
+							if (slow) {
+								elem.addClass(Y.DOM.ClassTag);
+							}
+
+							result = Y.DOM(YAXDOM.QSA(elem[0], selector));
+
+							if (slow) {
+								elem.removeClass(Y.DOM.ClassTag);
+							}
+						} else {
+							result = elem.map(function () {
+								if (slow) {
+									Y.DOM(this).addClass(Y.DOM.ClassTag);
+								}
+
+								var result = YAXDOM.QSA(this, selector);
+
+								if (slow) {
+									Y.DOM(this).removeClass(Y.DOM.ClassTag);
+								}
+
+								return result;
+							});
+						}
+
+						return result;
+					};
+
+					// Y.LOG(selector)
+
+					if (slow) {
+						try {
+							result = findBySelector(this, selector, slow);
+						} catch (e) {
+							Y.ERROR('Error performing selector: %o', selector);
+							error = true;
+							throw e;
+						} finally {
+							// If an error was thrown, we should assume that the class name
+							// cleanup didn't happen, and do it ourselves.
+							if (error) {
+								Y.DOM('.' + Y.DOM.ClassTag).removeClass(Y.DOM.ClassTag);
+							}
+						}
+					} else {
+						result = findBySelector(this, selector, slow);
+					}
 				}
 
 				return result;
@@ -1766,13 +1875,7 @@
 			return ret;
 		},
 		nodeName: function (element, name) {
-			if (Y.Lang.isSet(element) && !Y.Lang.isSet(name)) {
-				return element.nodeName;
-			}
-
-			if (Y.Lang.isSet(element) && Y.Lang.isSet(name)) {
-				return element.nodeName && element.nodeName.toLowerCase() === name.toLowerCase();
-			}
+			return element.nodeName && element.nodeName.toLowerCase() === name.toLowerCase();
 		},
 		// Add in style property hooks for overriding the default
 		// behavior of getting and setting a style property
@@ -2194,11 +2297,14 @@
 				parentInDocument = docElement.contains(parent);
 
 				nodes.forEach(function (node) {
+
 					if (copyByClone) {
 						node = node.cloneNode(true);
 					} else if (!parent) {
 						return Y.DOM(node).remove();
 					}
+
+
 
 					if (parentInDocument) {
 						return parent.insertBefore(node, target);

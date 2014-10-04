@@ -254,8 +254,8 @@
 	 * @return    boolean TRUE|FALSE
 	 */
 	function likeArray(object) {
-		// return type(object.length) === 'number';
-		return isNumber(object.length);
+		return type(object.length) === 'number';
+		// return isNumber(object.length);
 	}
 
 	/**
@@ -268,8 +268,9 @@
 	 */
 	function isArraylike(object) {
 		var len = object.length;
+		var _type = type(object);
 
-		if (isWindow(object)) {
+		if (_type === 'function' || isWindow(obj)) {
 			return false;
 		}
 
@@ -277,8 +278,9 @@
 			return true;
 		}
 
-		return isArray(object) || !(isFunction(object) || !((len === 0 || isNumber(
-			len)) && len > 0 && object.hasOwnProperty(len - 1)));
+		return _type === 'array' || len === 0 ||
+			typeof len === 'number' && len > 0 && 
+			(len - 1) in object;
 	}
 
 	/**

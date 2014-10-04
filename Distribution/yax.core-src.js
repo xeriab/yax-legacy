@@ -17,26 +17,32 @@
 	var root = this;
 
 	(function () {
-		var modules = {},
-			// Stack of moduleIds currently being built.
-			requireStack = [],
-			// Map of module ID -> index into requireStack of modules currently being built.
-			inProgressModules = {},
-			SEPARATOR = '.';
+		var modules = {};
+
+		// Stack of moduleIds currently being built.
+		var requireStack = [];
+
+		// Map of module ID -> index into requireStack of modules currently being built.
+		var inProgressModules = {};
+
+		var SEPARATOR = '.';
 
 		function build(module) {
-			var factory = module.factory,
-				localRequire = function (id) {
-					var resultantId = id;
-					//Its a relative path, so lop off the last portion and add the id (minus './')
-					if (id.charAt(0) === '.') {
-						resultantId = module.id.slice(0, module.id.lastIndexOf(SEPARATOR)) +
-							SEPARATOR + id.slice(2);
-					}
-					return require(resultantId);
-				};
+			var factory = module.factory;
 
-			module.exports = {};
+			var localRequire = function (id) {
+				var resultantId = id;
+
+				//Its a relative path, so lop off the last portion and add the id (minus './')
+				if (id.charAt(0) === '.') {
+					resultantId = module.id.slice(0, module.id.lastIndexOf(SEPARATOR)) +
+						SEPARATOR + id.slice(2);
+				}
+
+				return require(resultantId);
+			};
+
+			module.exports = Object.create({});
 
 			delete module.factory;
 
@@ -51,8 +57,9 @@
 			}
 
 			if (inProgressModules.hasOwnProperty(id)) {
-				var cycle = requireStack.slice(inProgressModules[id]).join('->') + '->' +
-					id;
+				var cycle = requireStack.slice(inProgressModules[id])
+					.join('->') + '->' + id;
+
 				throw 'Cycle in require graph: ' + cycle;
 			}
 
@@ -60,9 +67,11 @@
 				try {
 					inProgressModules[id] = requireStack.length;
 					requireStack.push(id);
+
 					return build(modules[id]);
 				} finally {
 					delete inProgressModules[id];
+
 					requireStack.pop();
 				}
 			}
@@ -315,6 +324,8 @@
 	Y.G.FuncProto = FuncProto;
 	Y.G.ArrayProto = ArrayProto;
 	Y.G.ObjProto = ObjProto;
+	Y.G.IndexOf = ArrayProto.indexOf;
+	Y.G.Push = ArrayProto.push;
 
 	/** @namespace root.R */
 	/** @namespace root.D */
@@ -607,8 +618,8 @@
 	 * @return    boolean TRUE|FALSE
 	 */
 	function likeArray(object) {
-		// return type(object.length) === 'number';
-		return isNumber(object.length);
+		return type(object.length) === 'number';
+		// return isNumber(object.length);
 	}
 
 	/**
@@ -621,8 +632,9 @@
 	 */
 	function isArraylike(object) {
 		var len = object.length;
+		var _type = type(object);
 
-		if (isWindow(object)) {
+		if (_type === 'function' || isWindow(obj)) {
 			return false;
 		}
 
@@ -630,8 +642,9 @@
 			return true;
 		}
 
-		return isArray(object) || !(isFunction(object) || !((len === 0 || isNumber(
-			len)) && len > 0 && object.hasOwnProperty(len - 1)));
+		return _type === 'array' || len === 0 ||
+			typeof len === 'number' && len > 0 && 
+			(len - 1) in object;
 	}
 
 	/**
@@ -1826,15 +1839,55 @@
 
 		ReadyReplacement: /complete|loaded|interactive/,
 
-		//SimpleSelectorReplacement = /^[\w-]*$/,
 		SimpleSelectorReplacement: /^[\w\-]*$/,
 
-		RootNodeReplacement: /^(?:body|html)$/i
+		RootNodeReplacement: /^(?:body|html)$/i,
+
+		SelectorGroupReplacement: /(([\w#:.~>+()\s\-]+|\*|\[.*?\])+)\s*(,|$)/g,
+
+		FilterReplacement: new RegExp('(.*):(\\w+)(?:\\(([^)]+)\\))?$\\s*'),
+
+		ChildReplacement: /^\s*>/,
+
+		// Matching numbers
+		pnum: /[+\-]?(?:\d*\.|)\d+(?:[eE][+\-]?\d+|)/.source,
+
+		// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
+		// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
+		rdisplayswap: /^(none|table(?!-c[ea]).+)/,
+
+		rmargin: /^margin/,
+
+		rquickExpr: /^(?:\s*(<[\w\W]+>)[^>]*|#([\w\-]*))$/,
+
+		rsingleTag: (/^<(\w+)\s*\/?>(?:<\/\1>|)$/),
+
+		rhtml: /<|&#?\w+;/,
+
+		rtagName: /<([\w:]+)/,
+
+		rnoInnerhtml: /<(?:script|style|link)/i,
+
+		rxhtmlTag: /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
+
+		rscriptType: /^$|\/(?:java|ecma)script/i,
+
+		rcheckableType: (/^(?:checkbox|radio)$/i),
+
+		risSimple: /^.[^:#\[\.,]*$/,
+
+		rchecked: /checked\s*(?:[^=]|=\s*.checked.)/i,
+
+		rcleanScript: /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g
 	};
 
-	Y.RegEx.toString = function () {
-		return '[YAX.js RegEx]';
-	};
+	Y.Extend(Y.RegEx, {
+		rnumsplit: new RegExp('^(' + Y.RegEx.pnum + ')(.*)$', 'i'),
+
+		rnumnonpx: new RegExp('^(' + Y.RegEx.pnum + ')(?!px)[a-z%]+$', 'i'),
+
+		rrelNum: new RegExp('^([+-])=(' + Y.RegEx.pnum + ')', 'i')
+	});
 
 	//---
 
@@ -2422,43 +2475,6 @@
 
 
 /**
- * Y Core | Tools
- *
- * Another Y's tools and shortcuts [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility, Class
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint white: true */
-/*jshint eqeqeq: false */
-/*jshint strict: false */
-/*global Y, YAX */
-
-(function () {
-
-	'use strict';
-
-	Y.ToolsClass = Y.Class.Extend({
-		CLASS_NAME: 'Tools'
-	});
-
-	//---
-
-	Y.Tools = Y.ToolsClass.prototype;
-
-	//---
-
-}());
-
-//---
-
-
-/**
  * Y Core | Events
  *
  * Events implementation using Y [CORE]
@@ -2497,7 +2513,7 @@
 					if (Y.HasOwnProperty.call(types, type)) {
 						// We don't process space-separated events here for performance;
 						// It's a hot path since Layer uses the on(obj) syntax
-						this.eventOn(type, types[type], callback);
+						this._On(type, types[type], callback);
 					}
 				}
 
@@ -2506,7 +2522,7 @@
 				types = Y.Utility.splitWords(types);
 
 				for (i = 0, len = types.length; i < len; i++) {
-					this.eventOn(types[i], callback, context);
+					this._On(types[i], callback, context);
 				}
 			}
 
@@ -2521,14 +2537,14 @@
 			} else if (Y.Lang.isObject(types)) {
 				for (type in types) {
 					if (Y.HasOwnProperty.call(types, type)) {
-						this.eventOff(type, types[type], callback);
+						this._Off(type, types[type], callback);
 					}
 				}
 			} else {
 				types = Y.Utility.splitWords(types);
 
 				for (i = 0, len = types.length; i < len; i++) {
-					this.eventOff(types[i], callback, context);
+					this._Off(types[i], callback, context);
 				}
 			}
 
@@ -2536,7 +2552,7 @@
 		},
 
 		// Attach listener (without syntactic sugar now)
-		eventOn: function (type, callback, context) {
+		_On: function (type, callback, context) {
 			// var events = this.eventsArray = this.eventsArray || {},
 			var events = this.eventsArray || {},
 				contextId = context && context !== this && Y.Stamp(context),
@@ -2572,7 +2588,7 @@
 			}
 		},
 
-		eventOff: function (type, callback, context) {
+		_Off: function (type, callback, context) {
 			var events = this.eventsArray,
 				indexKey = type + '_idx',
 				indexLenKey = type + '_len',
@@ -3061,7 +3077,13 @@
 			},
 
 			promise: function (obj) {
-				return obj !== null ? Y.Extend(obj, promise) : promise;
+				if (Y.Lang.isSet(obj)) {
+					return Y.Extend(obj, promise);
+				}
+
+				return promise;
+
+				// return obj !== null ? Y.Extend(obj, promise) : promise;
 			}
 		};
 

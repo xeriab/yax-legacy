@@ -39,7 +39,7 @@
 			Y.DOM.each(eventName.split(/\s/), function (i, eventName) {
 				eventName = eventName.split(/\./)[0];
 
-				var tmp = Y.HasOwnProperty.call(Y.DOM.Event.special, eventName);
+				var tmp = Y.HasOwnProperty.call(Y.DOM.event.special, eventName);
 
 				if (tmp) {
 					specialEvent = Y.DOM.event.special[eventName];

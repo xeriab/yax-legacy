@@ -44,15 +44,55 @@
 
 		ReadyReplacement: /complete|loaded|interactive/,
 
-		//SimpleSelectorReplacement = /^[\w-]*$/,
 		SimpleSelectorReplacement: /^[\w\-]*$/,
 
-		RootNodeReplacement: /^(?:body|html)$/i
+		RootNodeReplacement: /^(?:body|html)$/i,
+
+		SelectorGroupReplacement: /(([\w#:.~>+()\s\-]+|\*|\[.*?\])+)\s*(,|$)/g,
+
+		FilterReplacement: new RegExp('(.*):(\\w+)(?:\\(([^)]+)\\))?$\\s*'),
+
+		ChildReplacement: /^\s*>/,
+
+		// Matching numbers
+		pnum: /[+\-]?(?:\d*\.|)\d+(?:[eE][+\-]?\d+|)/.source,
+
+		// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
+		// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
+		rdisplayswap: /^(none|table(?!-c[ea]).+)/,
+
+		rmargin: /^margin/,
+
+		rquickExpr: /^(?:\s*(<[\w\W]+>)[^>]*|#([\w\-]*))$/,
+
+		rsingleTag: (/^<(\w+)\s*\/?>(?:<\/\1>|)$/),
+
+		rhtml: /<|&#?\w+;/,
+
+		rtagName: /<([\w:]+)/,
+
+		rnoInnerhtml: /<(?:script|style|link)/i,
+
+		rxhtmlTag: /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
+
+		rscriptType: /^$|\/(?:java|ecma)script/i,
+
+		rcheckableType: (/^(?:checkbox|radio)$/i),
+
+		risSimple: /^.[^:#\[\.,]*$/,
+
+		rchecked: /checked\s*(?:[^=]|=\s*.checked.)/i,
+
+		rcleanScript: /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g
 	};
 
-	Y.RegEx.toString = function () {
-		return '[YAX.js RegEx]';
-	};
+	Y.Extend(Y.RegEx, {
+		rnumsplit: new RegExp('^(' + Y.RegEx.pnum + ')(.*)$', 'i'),
+
+		rnumnonpx: new RegExp('^(' + Y.RegEx.pnum + ')(?!px)[a-z%]+$', 'i'),
+
+		rrelNum: new RegExp('^([+-])=(' + Y.RegEx.pnum + ')', 'i')
+	});
 
 	//---
 

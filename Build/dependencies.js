@@ -5,7 +5,7 @@
 /*global Y, YAX, exports */
 
 var Dependencies = {
-	Core: {
+	'Core': {
 		src: [
 			'Require.js',
 			'YAX.js',
@@ -15,7 +15,6 @@ var Dependencies = {
 			'Core/Strings.js',
 			'Core/Utility.js',
 			'Core/Class.js',
-			'Core/Tools.js',
 			'Core/Events.js',
 
 			'Core/Callbacks.js',
@@ -23,22 +22,22 @@ var Dependencies = {
 			'Core/Store.js',
 			'Core/Parser.js'
 
-//			'Core/Locale.js'
-
- //			'Core/Console.js'
+			// 'Core/Locale.js'
+			// 'Core/Console.js'
 		],
 
-		desc: 'YAX.JS Core Library.',
+		desc: 'YAX.js Core Library.',
 
 		extended_desc: ''
 	},
 
-	'Node': {
+	'Fast DOM': {
 		src: [
 			'Modules/Utility.js',
 
 			'Modules/Node/Node.js',
-			'Modules/Node/Selector.js',
+			'Modules/Node/SimpleSelector.js',
+			// 'Modules/Node/SizzleSelector.js',
 			'Modules/Node/Data.js',
 			'Modules/Node/Events.js',
 			'Modules/Node/Ajax.js',
@@ -48,28 +47,40 @@ var Dependencies = {
 
 			'Modules/UserAgentDetector.js',
 
+
+			// These file are not part of Node but you can
+			// add them to empower YAX.Node with some useful stuff :)
+
+			// 'Modules/Node/EventPress.js',
+			// 'Modules/Node/EventTouch.js',
+			// 'Modules/Node/EventShake.js',
+			// 'Modules/Node/EventGesture.js',
+			// 'Modules/Node/Assets.js',
+			// 'Modules/Node/Stack.js',
+
 			'Modules/Node/Extra.js',
 
 			'Modules/Node/EventLogger.js',
 
 			'Support/Compatibility.js',
 
-			'Modules/Node/EventSpecial.js'
+			// 'Modules/Node/EventSpecial.js'
 		],
 
-		desc: 'YAX.JS Node/DOM Module.',
+		desc: 'YAX.js Node/DOM module with extra functionalities.',
 
 		extended_desc: ''
 	},
 
-	'Node Full': {
+	'Full DOM': {
 		src: [
 			'Modules/Utility.js',
 
 			'Modules/Node/Node.js',
-			'Modules/Node/Selector.js',
+			// 'Modules/Node/SimpleSelector.js',
+			'Modules/Node/SizzleSelector.js',
 			'Modules/Node/Data.js',
-			'Modules/Node/Events.js',
+			'Modules/Node/TestEvents.js',
 			'Modules/Node/Ajax.js',
 			'Modules/Node/Fx.js',
 			'Modules/Node/FxMethods.js',
@@ -80,12 +91,12 @@ var Dependencies = {
 			// These file are not part of Node but you can
 			// add them to empower YAX.Node with some useful stuff :)
 
-			'Modules/Node/EventPress.js',
-			'Modules/Node/EventTouch.js',
-			'Modules/Node/EventShake.js',
-			'Modules/Node/EventGesture.js',
-			'Modules/Node/Assets.js',
-			'Modules/Node/Stack.js',
+			// 'Modules/Node/EventPress.js',
+			// 'Modules/Node/EventTouch.js',
+			// 'Modules/Node/EventShake.js',
+			// 'Modules/Node/EventGesture.js',
+			// 'Modules/Node/Assets.js',
+			// 'Modules/Node/Stack.js',
 
 			'Modules/Node/Extra.js',
 
@@ -93,31 +104,25 @@ var Dependencies = {
 
 			'Support/Compatibility.js',
 
-			'Modules/Node/EventSpecial.js'
+			// 'Modules/Node/EventSpecial.js'
 		],
 
-		desc: 'YAX.JS Node/DOM module with extra functionalities.',
+		desc: 'YAX.js Node/DOM module with jQuery compatibility.',
 
 		extended_desc: ''
 	},
 
-	Bootstrap: {
+	'Bootstrap': {
 		src: [
-			'Plugins/Bootstrap/Transition.js',
-			'Plugins/Bootstrap/Affix.js',
-			'Plugins/Bootstrap/Button.js',
 			'Plugins/Bootstrap/ProgressBar.js',
-			'Plugins/Bootstrap/Dropdown.js',
-			'Plugins/Bootstrap/Collapse.js'
-
 		],
 
-		desc: 'YAX.JS Bootstrap Plugins.',
+		desc: 'YAX.js Bootstrap Plugins.',
 
 		extended_desc: ''
 	},
 
-	Plugins: {
+	'Extra Plugins': {
 		src: [
 			'Plugins/LocalStorage.js',
 			'Plugins/Cookies.js',
@@ -128,7 +133,7 @@ var Dependencies = {
 			'Plugins/Router.js'
 		],
 
-		desc: 'YAX.JS Various Plugins.',
+		desc: 'YAX.js Various Plugins.',
 
 		extended_desc: ''
 	}
@@ -141,7 +146,7 @@ var Dependencies = {
 			'Plugins/AutoFix/AutoFix.css'
 		],
 
-		desc: 'YAX.JS Plugins stylesheets.',
+		desc: 'YAX.js Plugins stylesheets.',
 
 		extended_desc: ''
 	},*/

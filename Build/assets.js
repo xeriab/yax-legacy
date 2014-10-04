@@ -55,7 +55,7 @@
 				break;
 
 			case '00100':
-				type = 'dom_full';
+				type = 'dom-full';
 				break;
 
 			case '01000':
@@ -67,6 +67,7 @@
 				break;
 		}
 
+		// commandInput.value = 'jake \'build[' + parseInt(compsStr, 2).toString(32) + ',' + type + ']\'';
 		commandInput.value = 'jake \'build[' + parseInt(compsStr, 2).toString(32) + ',' + type + ']\'';
 	}
 
