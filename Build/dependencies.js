@@ -9,29 +9,55 @@ var Dependencies = {
 		src: [
 			'Require.js',
 			'YAX.js',
+
 			'Core/Core.js',
 			'Core/Regex.js',
 			'Core/Global.js',
-			'Core/Strings.js',
 			'Core/Utility.js',
 			'Core/Class.js',
-			'Core/Events.js',
+			'Core/Evented.js'
 
-			'Core/Callbacks.js',
-			'Core/Deferred.js',
-			'Core/Store.js',
-			'Core/Parser.js'
+			// 'Core/Contrib/Callbacks.js',
+			// 'Core/Contrib/Deferred.js',
+			// 'Core/Contrib/Store.js',
+			// 'Core/Contrib/Parser.js'
 
-			// 'Core/Locale.js'
-			// 'Core/Console.js'
+			// 'Core/Contrib/Locale.js'
+			// 'Core/Contrib/Console.js'
 		],
 
-		desc: 'YAX.js Core Library.',
+		desc: 'Core Library.',
 
 		extended_desc: ''
 	},
 
-	'Fast DOM': {
+	'Extended Core': {
+		src: [
+			'Require.js',
+			'YAX.js',
+
+			'Core/Core.js',
+			'Core/Regex.js',
+			'Core/Global.js',
+			'Core/Utility.js',
+			'Core/Class.js',
+			'Core/Evented.js',
+
+			'Core/Contrib/Callbacks.js',
+			'Core/Contrib/Deferred.js',
+			'Core/Contrib/Store.js',
+			'Core/Contrib/Parser.js'
+
+			// 'Core/Contrib/Locale.js'
+			// 'Core/Contrib/Console.js'
+		],
+
+		desc: 'Core Library.',
+
+		extended_desc: ''
+	},
+
+	'Node': {
 		src: [
 			'Modules/Utility.js',
 
@@ -51,28 +77,28 @@ var Dependencies = {
 			// These file are not part of Node but you can
 			// add them to empower YAX.Node with some useful stuff :)
 
-			// 'Modules/Node/EventPress.js',
-			// 'Modules/Node/EventTouch.js',
-			// 'Modules/Node/EventShake.js',
-			// 'Modules/Node/EventGesture.js',
-			// 'Modules/Node/Assets.js',
-			// 'Modules/Node/Stack.js',
+			// 'Modules/Node/Contrib/EventPress.js',
+			// 'Modules/Node/Contrib/EventTouch.js',
+			// 'Modules/Node/Contrib/EventShake.js',
+			// 'Modules/Node/Contrib/EventGesture.js',
+			// 'Modules/Node/Contrib/Assets.js',
+			// 'Modules/Node/Contrib/Stack.js',
 
 			'Modules/Node/Extra.js',
 
-			'Modules/Node/EventLogger.js',
+			// 'Modules/Node/Contrib/EventLogger.js',
 
-			'Support/Compatibility.js',
+			'Support/Compatibility.js'
 
-			// 'Modules/Node/EventSpecial.js'
+			// 'Modules/Node/Contrib/EventSpecial.js'
 		],
 
-		desc: 'YAX.js Node/DOM module with extra functionalities.',
+		desc: 'Node/DOM module.',
 
 		extended_desc: ''
 	},
 
-	'Full DOM': {
+	'Extended Node': {
 		src: [
 			'Modules/Utility.js',
 
@@ -91,33 +117,104 @@ var Dependencies = {
 			// These file are not part of Node but you can
 			// add them to empower YAX.Node with some useful stuff :)
 
-			// 'Modules/Node/EventPress.js',
-			// 'Modules/Node/EventTouch.js',
-			// 'Modules/Node/EventShake.js',
-			// 'Modules/Node/EventGesture.js',
-			// 'Modules/Node/Assets.js',
-			// 'Modules/Node/Stack.js',
+			// 'Modules/Node/Contrib/EventPress.js',
+			// 'Modules/Node/Contrib/EventTouch.js',
+			// 'Modules/Node/Contrib/EventShake.js',
+			// 'Modules/Node/Contrib/EventGesture.js',
+			// 'Modules/Node/Contrib/Assets.js',
+			// 'Modules/Node/Contrib/Stack.js',
 
 			'Modules/Node/Extra.js',
 
-			'Modules/Node/EventLogger.js',
+			'Modules/Node/Contrib/EventLogger.js',
 
-			'Support/Compatibility.js',
+			'Support/Compatibility.js'
 
-			// 'Modules/Node/EventSpecial.js'
+			// 'Modules/Node/Contrib/EventSpecial.js'
 		],
 
-		desc: 'YAX.js Node/DOM module with jQuery compatibility.',
+		desc: 'Node/DOM module.',
 
 		extended_desc: ''
 	},
 
-	'Bootstrap': {
+	'LocalStorage': {
+		src: [
+			'Plugins/LocalStorage.js'
+		],
+
+		desc: 'LocalStorage Plugin.',
+
+		extended_desc: ''
+	},
+
+	'Cookies': {
+		src: [
+			'Plugins/Cookies.js'
+		],
+
+		desc: 'Cookies Plugin.',
+
+		extended_desc: ''
+	},
+
+	'CSV Parser': {
+		src: [
+			'Plugins/CSV.js'
+		],
+
+		desc: 'CSV Parser Plugin.',
+
+		extended_desc: ''
+	},
+
+	'Router': {
+		src: [
+			'Plugins/Router.js'
+		],
+
+		desc: 'Router Plugin.',
+
+		extended_desc: ''
+	},
+
+	'AutoFix': {
+		src: [
+			'Plugins/AutoFix/AutoFix.js'
+		],
+
+		desc: 'AutoFix Plugin.',
+
+		extended_desc: ''
+	},
+
+	'Tooltip': {
+		src: [
+			'Plugins/Tooltip/Tooltip.js'
+		],
+
+		desc: 'Tooltip Plugin.',
+
+		extended_desc: ''
+	},
+
+	'WaitForMe': {
+		src: [
+			'Plugins/WaitForMe/WaitForMe.js'
+		],
+
+		desc: 'WaitForMe Plugin.',
+
+		extended_desc: ''
+	},
+
+
+	/*'Bootstrap': {
 		src: [
 			'Plugins/Bootstrap/ProgressBar.js',
 		],
 
-		desc: 'YAX.js Bootstrap Plugins.',
+		desc: 'Bootstrap Plugins.',
 
 		extended_desc: ''
 	},
@@ -133,10 +230,10 @@ var Dependencies = {
 			'Plugins/Router.js'
 		],
 
-		desc: 'YAX.js Various Plugins.',
+		desc: 'Various Plugins.',
 
 		extended_desc: ''
-	}
+	}*/
 
 	/*'Stylesheets': {
 		src: [
@@ -146,7 +243,7 @@ var Dependencies = {
 			'Plugins/AutoFix/AutoFix.css'
 		],
 
-		desc: 'YAX.js Plugins stylesheets.',
+		desc: 'Plugins stylesheets.',
 
 		extended_desc: ''
 	},*/

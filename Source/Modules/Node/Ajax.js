@@ -273,7 +273,7 @@
 				this.push(escape(key) + '=' + escape(value));
 			};
 
-			Y.Utility.Serialise(params, object, traditional);
+			Y.Util.Serialise(params, object, traditional);
 
 			return params.join('&').replace(/%20/g, '+');
 		}

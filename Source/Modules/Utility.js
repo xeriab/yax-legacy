@@ -53,7 +53,7 @@
 			Y.Window.clearTimeout(id);
 		};
 
-	Y.Utility.requestAnimationFrame = function (func, context, immediate, element) {
+	Y.Util.requestAnimationFrame = function (func, context, immediate, element) {
 		if (immediate && requestFunction === timeoutDefer) {
 			func.call(context);
 		} else {
@@ -61,7 +61,7 @@
 		}
 	};
 
-	Y.Utility.cancelAnimationFrame = function (id) {
+	Y.Util.cancelAnimationFrame = function (id) {
 		if (id) {
 			cancelFunction.call(Y.Window, id);
 		}

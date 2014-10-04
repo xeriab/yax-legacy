@@ -31,7 +31,7 @@
 				if (this.tagName === 'IMG') {
 					cache.push(this);
 
-					this.src = Y.Utility.emptyImageUrl;
+					this.src = Y.Util.emptyImageUrl;
 
 					if (timeout) {
 						clearTimeout(timeout);

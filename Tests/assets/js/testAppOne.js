@@ -26,29 +26,6 @@ Y.DOM(document).ready(function () {
 
 
 	Y.LOG('');
-	Y.LOG(Y.DOM.Function['YAX.DOM']);
-	// Y.LOG(TestOneImage.size());
-	// Y.LOG(Y.DOM.Function);
-	// Y.LOG(Y.DOM);
-	// Y.LOG(Y.DOM('<div><span>Test</span></div>').insertBefore('#TestOne'));
-	// Y.LOG(ButtonOne);
-	// Y.DOM('#TestOne').append('<br/><strong>T</strong>');
-	// Y.LOG(Y.DOM('body'));
-	// Y.LOG(jQuery('body'));
-	// Y.LOG(Sizzle('#ButtonOne'));
-	// Y.LOG(TestOneImage);
-	// Y.LOG(TestOneImage1);
-	// Y.LOG(Y.DOM('.nav-tabs'));
-	// Y.LOG(Y.DOM('.nav-tabs').find('.active:last a'));
-	// Y.LOG(jQuery('.nav-tabs').find('.active:last a'));
-	// Y.LOG(Y.DOM('#ButtonOne'));
-	// Y.LOG(Y.DOM.find('.active:last'));
-	// Y.LOG(Y.DOM('li:last a'));
-	// Y.LOG(document.querySelectorAll('li:last a'));
-	// Y.LOG(Y.DOM.prototype);
-
-
-	// Y.LOG(Y.DOM.event);
-	// Y.LOG(Y.Lang.Keys(Y.DOM.event));
+	Y.LOG(Y);
 
 });

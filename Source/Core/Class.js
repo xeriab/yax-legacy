@@ -61,7 +61,7 @@
 
 		// jshint camelcase: false
 		var parentProto = newClass.__super__ = this.prototype;
-		var proto = Y.Utility.Create(parentProto);
+		var proto = Y.Util.Create(parentProto);
 
 		proto.constructor = newClass;
 
@@ -100,7 +100,7 @@
 
 		//  OPTIONS
 		if (proto.OPTIONS) {
-			properties.OPTIONS = Y.Extend(Y.Utility.Create(proto.OPTIONS), properties.OPTIONS);
+			properties.OPTIONS = Y.Extend(Y.Util.Create(proto.OPTIONS), properties.OPTIONS);
 		}
 
 		// Mix given properties into the prototype

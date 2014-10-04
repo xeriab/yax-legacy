@@ -34,7 +34,7 @@
 
 	Y.Extend(Y.Lang, {
 		//now: new Date().getTime(),
-		now: new Date().getTime(),
+		now: new Date().getTime,
 
 		date: new Date(),
 
@@ -92,6 +92,30 @@
 	}
 
 	Y.Lang.Now = Y.Lang.now;
+
+	Y.Extend(Y.Lang, {
+		lowerCaseFirst: function (string) {
+			string += this.empty();
+
+			var t = string.charAt(0).toLowerCase();
+
+			return t + string.substr(1);
+		},
+
+		upperCaseFirst: function (string) {
+			string += this.empty();
+
+			var t = string.charAt(0).toUpperCase();
+
+			return t + string.substr(1);
+		},
+
+		upperCaseWords: function (string) {
+			return (string + this.empty()).replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function ($1) {
+				return $1.toUpperCase();
+			});
+		}
+	});
 
 }());
 

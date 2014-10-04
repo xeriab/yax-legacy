@@ -1,7 +1,4 @@
 /**
- * YAX.JS 0.19-dev, Yet another extensible Javascript Library.
- * (C) 2013-2014 Xeriab Nabil
- *//**
  * YAX Core | Utility
  *
  * Another YAX's utilities and shortcuts [CORE]
@@ -56,7 +53,7 @@
 			Y.Window.clearTimeout(id);
 		};
 
-	Y.Utility.requestAnimationFrame = function (func, context, immediate, element) {
+	Y.Util.requestAnimationFrame = function (func, context, immediate, element) {
 		if (immediate && requestFunction === timeoutDefer) {
 			func.call(context);
 		} else {
@@ -64,7 +61,7 @@
 		}
 	};
 
-	Y.Utility.cancelAnimationFrame = function (id) {
+	Y.Util.cancelAnimationFrame = function (id) {
 		if (id) {
 			cancelFunction.call(Y.Window, id);
 		}
@@ -3285,7 +3282,7 @@
 					}
 				}
 			} else {
-				types = Y.Utility.splitWords(types);
+				types = Y.Util.splitWords(types);
 
 				for (x = 0, len = types.length; x < len; x++) {
 					this.addListener(object, types[x], func, context);
@@ -3361,7 +3358,7 @@
 					}
 				}
 			} else {
-				types = Y.Utility.splitWords(types);
+				types = Y.Util.splitWords(types);
 
 				for (x = 0, len = types.length; x < len; x++) {
 					this.removeListener(object, types[x], func, context);
@@ -4182,7 +4179,7 @@
 				this.push(escape(key) + '=' + escape(value));
 			};
 
-			Y.Utility.Serialise(params, object, traditional);
+			Y.Util.Serialise(params, object, traditional);
 
 			return params.join('&').replace(/%20/g, '+');
 		}
@@ -5840,96 +5837,6 @@
 }());
 
 //---
-
-/**
- * YAX Node | Event Logger
- *
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint browser: true */
-/*jslint white: true */
-/*jshint -W084 */
-/*jshint -W040 */
-/*jslint node: false */
-/*global YAX, Y */
-
-//---
-
-(function () {
-
-	'use strict';
-
-	//---
-	function consoleOutput(e) {
-		if (e.data.color) {
-			var style = 'color:' + e.data.color;
-			Y.LOG('%c' + e.type + ' on ' + this.tagName, style);
-		} else {
-			Y.LOG(e.type + ' on ' + this.tagName);
-		}
-	}
-
-	function getCollectionObj(selector) {
-		var obj = {};
-		switch (typeof selector) {
-			case 'string':
-				obj = Y.DOM(selector);
-				break;
-			case 'object':
-				obj = selector;
-				break;
-		}
-		return obj;
-	}
-
-	Y.DOM.Function.EventLoggerStart = function (event, color) {
-		var fontColor = Y.Lang.isString(color) ? color : '';
-
-		this.on(event, {color: fontColor}, consoleOutput);
-
-		return this;
-	};
-
-	Y.DOM.Function.EventLoggerEnd = function (event) {
-		this.off(event, consoleOutput);
-
-		return this;
-	};
-
-	Y.Window.EventLogger = {
-		start: function (selector, event, color) {
-			var fontColor = Y.Lang.isString(color) ? color : '';
-
-			var obj = getCollectionObj(selector);
-
-			obj.on(event, {
-				color: fontColor
-			}, consoleOutput);
-
-			return obj;
-		},
-		end: function (selector, event) {
-			var obj = getCollectionObj(selector);
-
-			obj.off(event, consoleOutput);
-
-			return obj;
-		}
-	};
-
-	//---
-
-}());
-
-//---
-
 
 /**
  * DOM/DOM Compatibility

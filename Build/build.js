@@ -94,17 +94,20 @@ exports.build = function (callback, compsBase32, buildName) {
 
 	var copy = fs.readFileSync('Source/Copyright.js', 'utf8');
 
-	var intro = '\n\n(function (global) {\n\n';
+	var intro = '\n\n(function () {\n\n';
 
-	var outro = '\n}(this));\n\n// END\n';
+	var outro = '\n}());\n\n// END\n';
 
 //	var newSrc = copy + intro + combineFiles(files) + outro;
 
-	var newSrc = copy + combineFiles(files);
+//	var newSrc = copy + combineFiles(files);
+
+	var newSrc = combineFiles(files);
 
 	var pathPart = 'Distribution/yax' + (buildName ? '.' + buildName : '');
 
-	var srcPath = pathPart + '-src.js';
+	// var srcPath = pathPart + '-src.js';
+	var srcPath = pathPart + '.js';
 
 	var oldSrc = loadSilently(srcPath);
 
@@ -121,7 +124,8 @@ exports.build = function (callback, compsBase32, buildName) {
 
 	var oldCompressed = loadSilently(path);
 
-	var newCompressed = copy + UglifyJS.minify(newSrc, {
+//	var newCompressed = copy + UglifyJS.minify(newSrc, {
+	var newCompressed = UglifyJS.minify(newSrc, {
 		warnings: true,
 		fromString: true
 	}).code;

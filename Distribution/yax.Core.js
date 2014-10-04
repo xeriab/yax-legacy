@@ -1,7 +1,4 @@
-/**
- * YAX.JS 0.19-dev, Yet another extensible Javascript Library.
- * (C) 2013-2014 Xeriab Nabil
- *//*jslint indent: 4 */
+/*jslint indent: 4 */
 /*jslint white: true */
 /*jshint eqeqeq: false */
 /*jshint strict: false */
@@ -244,8 +241,11 @@
 	};
 
 	String.prototype.toCamel = function () {
-		return this.replace(/(\-[a-z])/g, function ($1) {
-			return $1.toUpperCase().replace('-', '');
+		return this.replace(/(\-[a-z])|(\_[a-z])|(\s[a-z])/g, function ($1) {
+			return $1.toUpperCase()
+				.replace('-', '')
+				.replace('_', '')
+				.replace(' ', '');
 		});
 	};
 
@@ -278,7 +278,7 @@
 
 	//---
 
-	Y.VERSION = Y._INFO.VERSION = 0.18;
+	Y.VERSION = Y._INFO.VERSION = 0.19;
 	Y._INFO.BUILD = 4352;
 	Y._INFO.STATUS = 'dev';
 	Y._INFO.CODENAME = 'Raghda';
@@ -380,7 +380,7 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-(function (undef) {
+(function(undef) {
 
 	'use strict';
 
@@ -411,7 +411,7 @@
 	function getType(variable) {
 		var str = typeof variable,
 			name,
-			getFuncName = function (func) {
+			getFuncName = function(func) {
 				name = (/\W*function\s+([\w\$]+)\s*\(/).exec(func);
 
 				if (!name) {
@@ -425,7 +425,7 @@
 			if (variable !== null) {
 				// From: http://javascript.crockford.com/remedial.html
 				if (typeof variable.length === 'number' && !(variable.propertyIsEnumerable(
-					'length')) && typeof variable.splice === 'function') {
+						'length')) && typeof variable.splice === 'function') {
 					str = 'array';
 				} else if (variable.constructor && getFuncName(variable.constructor)) {
 					name = getFuncName(variable.constructor);
@@ -525,7 +525,8 @@
 	 * @return    boolean TRUE|FALSE
 	 */
 	function isPlainObject(object) {
-		return isObject(object) && !isWindow(object) && Object.getPrototypeOf(object) === Object.prototype;
+		return isObject(object) && !isWindow(object) && 
+			Object.getPrototypeOf(object) === Object.prototype;
 	}
 
 	/**
@@ -643,7 +644,7 @@
 		}
 
 		return _type === 'array' || len === 0 ||
-			typeof len === 'number' && len > 0 && 
+			typeof len === 'number' && len > 0 &&
 			(len - 1) in object;
 	}
 
@@ -946,12 +947,13 @@
 	}
 
 	function arrayToObject(array, type, data) {
-		var tmp = {}, x, n;
+		var tmp = {},
+			x, n;
 
 		if (type && isNumber(type) && type === 1 && !data) {
 			for (x = 0; x < array.length; ++x) {
 				if (!isUndefined(array[x]) && !isUndefined(array[x][0]) && !isUndefined(
-					array[x][1])) {
+						array[x][1])) {
 					tmp[(array[x][0]).toString()] = array[x][1];
 				}
 			}
@@ -1012,7 +1014,8 @@
 	}
 
 	function toObject(array) {
-		var temp = {}, x;
+		var temp = {},
+			x;
 
 		// temp['__proto__'] = array['__proto__'];
 
@@ -1093,7 +1096,7 @@
 			item,
 			j,
 			value,
-		// The padding given at the beginning of the line.
+			// The padding given at the beginning of the line.
 			levelPadding = '';
 
 		if (!level) {
@@ -1129,7 +1132,7 @@
 	}
 
 	function compact(array) {
-		return Y.G.Filter.call(array, function (item) {
+		return Y.G.Filter.call(array, function(item) {
 			return item !== null;
 		});
 	}
@@ -1155,7 +1158,7 @@
 	}
 
 	function unique(array) {
-		return Y.G.Filter.call(array, function (item, index) {
+		return Y.G.Filter.call(array, function(item, index) {
 			return array.indexOf(item) === index;
 		});
 	}
@@ -1185,7 +1188,7 @@
 	}
 
 	function foreach(array, func) {
-		every(array, function (element) {
+		every(array, function(element) {
 			return !func(element);
 		});
 	}
@@ -1246,7 +1249,7 @@
 
 		oldValue = Y._CONFIG_STORAGE[varName].LOCAL_VALUE;
 
-		setArray = function (_oldValue, _newValue) {
+		setArray = function(_oldValue, _newValue) {
 			// Although these are set individually, they are all accumulated
 			if (isUndefined(_oldValue)) {
 				self._CONFIG_STORAGE[varName].LOCAL_VALUE = [];
@@ -1307,7 +1310,7 @@
 		'Error',
 		'global',
 		'HTMLDocument'
-	], function (index, name) {
+	], function(index, name) {
 		classToType['[object ' + name + ']'] = name.toLowerCase();
 	});
 
@@ -1332,12 +1335,13 @@
 
 		ClassToType: classToType,
 
-		Extend: function (object) {
+		Extend: function(object) {
 			if (!isObject(object) && !isFunction(object)) {
 				return object;
 			}
 
-			var source, prop, x = 1, length = arguments.length;
+			var source, prop, x = 1,
+				length = arguments.length;
 
 			// Extend Y itself if only one argument is passed
 			if (length === x) {
@@ -1460,7 +1464,7 @@
 
 		isSet: isSet,
 
-		makeArray: function (arrayLikeThing) {
+		makeArray: function(arrayLikeThing) {
 			return Y.G.Slice.call(arrayLikeThing);
 		},
 
@@ -1483,11 +1487,6 @@
 		Y.ERROR = Function.prototype.bind.call(error, Console);
 		Y.INFO = Function.prototype.bind.call(info, Console);
 		Y.TRACE = Function.prototype.bind.call(trace, Console);
-
-		// Console.warn = undef;
-		// Console.log = undef;
-		// Console.error = undef;
-		// Console.info = undef;
 	} else {
 		Y.WARN = Y.Lang.Noop;
 		Y.LOG = Y.Lang.Noop;
@@ -1496,23 +1495,23 @@
 		Y.TRACE = Y.Lang.Noop;
 	}
 
-	Y.WARN.toString = function () {
+	Y.WARN.toString = function() {
 		return '[YAX::Console::Warn]';
 	};
 
-	Y.LOG.toString = function () {
+	Y.LOG.toString = function() {
 		return '[YAX::Console::Log]';
 	};
 
-	Y.ERROR.toString = function () {
+	Y.ERROR.toString = function() {
 		return '[YAX::Console::Error]';
 	};
 
-	Y.INFO.toString = function () {
+	Y.INFO.toString = function() {
 		return '[YAX::Console::Info]';
 	};
 
-	Y.TRACE.toString = function () {
+	Y.TRACE.toString = function() {
 		return '[YAX::Console::Trace]';
 	};
 
@@ -1520,14 +1519,14 @@
 
 	// Shortcut function for checking if an object has a given property directly
 	// on itself (in other words, not on a prototype).
-	Y.Lang.Has = function (obj, key) {
+	Y.Lang.Has = function(obj, key) {
 		return obj !== null && Y.HasOwnProperty.call(obj, key);
 		// return obj !== null && obj.hasOwnProperty(key);
 	};
 
 	// Retrieve the names of an object's properties.
 	// Delegates to **ECMAScript 5**'s native `.keys`
-	Y.Lang.Keys = function (obj) {
+	Y.Lang.Keys = function(obj) {
 		var key;
 
 		if (!isObject(obj) && !isFunction(obj)) {
@@ -1555,7 +1554,7 @@
 	};
 
 	// Retrieve the values of an object's properties.
-	Y.Lang.Values = function (obj) {
+	Y.Lang.Values = function(obj) {
 		var keys = Y.Lang.Keys(obj);
 		var length = keys.length;
 		var values = new Array(length);
@@ -1569,7 +1568,7 @@
 	};
 
 	// Convert an object into a list of `[key, value]` pairs.
-	Y.Lang.Pairs = function (obj) {
+	Y.Lang.Pairs = function(obj) {
 		var keys = Y.Lang.Keys(obj);
 		var length = keys.length;
 		var pairs = new Array(length);
@@ -1583,7 +1582,7 @@
 	};
 
 	// Invert the keys and values of an object. The values must be serializable.
-	Y.Lang.Invert = function (obj) {
+	Y.Lang.Invert = function(obj) {
 		var result = {};
 		var keys = Y.Lang.Keys(obj);
 		var x;
@@ -1598,7 +1597,7 @@
 
 	// Return a sorted list of the function names available on the object.
 	// Aliased as `methods`
-	Y.Lang.Functions = Y.Lang.Methods = function (obj) {
+	Y.Lang.Functions = Y.Lang.Methods = function(obj) {
 		var names = [];
 		var key;
 
@@ -1626,8 +1625,8 @@
 	var unescapeMap = Y.Lang.Invert(escapeMap);
 
 	// Functions for escaping and unescaping strings to/from HTML interpolation.
-	var createEscaper = function (map) {
-		var escaper = function (match) {
+	var createEscaper = function(map) {
+		var escaper = function(match) {
 			return map[match];
 		};
 
@@ -1636,7 +1635,7 @@
 		var testRegexp = new RegExp(source);
 		var replaceRegexp = new RegExp(source, 'g');
 
-		return function (string) {
+		return function(string) {
 			string = string === null ? '' : Y.Lang.empty() + string;
 			return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
 		};
@@ -1648,7 +1647,7 @@
 	//---
 
 	// Fill in a given object with default properties.
-	Y.Lang.Defaults = function (obj) {
+	Y.Lang.Defaults = function(obj) {
 		var x;
 		var length;
 		var source;
@@ -1701,7 +1700,7 @@
 
 	var escaper = /\\|'|\r|\n|\u2028|\u2029/g;
 
-	var escapeChar = function (match) {
+	var escapeChar = function(match) {
 		return '\\' + escapes[match];
 	};
 
@@ -1709,7 +1708,7 @@
 	// Underscore templating handles arbitrary delimiters, preserves whitespace,
 	// and correctly escapes quotes within interpolated code.
 	// NB: `oldSettings` only exists for backwards compatibility.
-	Y.Lang.Template = function (text, settings, oldSettings) {
+	Y.Lang.Template = function(text, settings, oldSettings) {
 		if (!settings && oldSettings) {
 			settings = oldSettings;
 		}
@@ -1718,16 +1717,14 @@
 
 		// Combine delimiters into one regular expression via alternation.
 		var matcher = new RegExp([
-			(settings.escape || noMatch).source,
-			(settings.interpolate || noMatch).source,
-			(settings.evaluate || noMatch).source
+			(settings.escape || noMatch).source, (settings.interpolate || noMatch).source, (settings.evaluate || noMatch).source
 		].join('|') + '|$', 'g');
 
 		// Compile the template source, escaping string literals appropriately.
 		var index = 0;
 		var source = '__p += \'';
 
-		text.replace(matcher, function (match, escape, interpolate, evaluate, offset) {
+		text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
 			source += text.slice(index, offset).replace(escaper, escapeChar);
 			index = offset + match.length;
 
@@ -1766,7 +1763,7 @@
 
 		var template;
 
-		template = function (data) {
+		template = function(data) {
 			return render.call(this, data, Y);
 		};
 
@@ -1932,7 +1929,7 @@
 
 	Y.Extend(Y.Lang, {
 		//now: new Date().getTime(),
-		now: new Date().getTime(),
+		now: new Date().getTime,
 
 		date: new Date(),
 
@@ -1991,33 +1988,6 @@
 
 	Y.Lang.Now = Y.Lang.now;
 
-}());
-
-//---
-
-
-/**
- * Y Core | Store
- *
- * Powers Y's with store capability [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint white: true */
-/*jshint eqeqeq: false */
-/*jshint strict: false */
-/*global Y, YAX */
-
-(function () {
-
-	'use strict';
-
 	Y.Extend(Y.Lang, {
 		lowerCaseFirst: function (string) {
 			string += this.empty();
@@ -2041,8 +2011,6 @@
 			});
 		}
 	});
-
-	//---
 
 }());
 
@@ -2082,9 +2050,9 @@
 	// END OF [Private Functions]
 
 	/**
-	 * Y.Utility contains various utility functions used throughout Y code.
+	 * Y.Util contains various utility functions used throughout Y code.
 	 */
-	Y.Utility = {
+	Y.Util = {
 		LastUID: 0,
 
 		// Create an object from a given prototype
@@ -2107,7 +2075,7 @@
 		// Return unique ID of an object
 		Stamp: function (object) {
 			// jshint camelcase: false
-			object.YID = object.YID || ++Y.Utility.LastUID;
+			object.YID = object.YID || ++Y.Util.LastUID;
 
 			return object.YID;
 		},
@@ -2192,7 +2160,7 @@
 
 		// Split a string into words
 		splitWords: function (string) {
-			return Y.Utility.Trim(string).split(/\s+/);
+			return Y.Util.Trim(string).split(/\s+/);
 		},
 
 		// Set options to an object, inheriting parent's options as well
@@ -2200,7 +2168,7 @@
 			var x;
 
 			if (!object.hasOwnProperty('Options')) {
-				object.Options = object.Options ? Y.Utility.Create(object.Options) : {};
+				object.Options = object.Options ? Y.Util.Create(object.Options) : {};
 			}
 
 			for (x in options) {
@@ -2240,7 +2208,7 @@
 				}
 				// Recurse into nested objects
 				else if (Y.Lang.isArray(type) || (!traditional && Y.Lang.isObject(type))) {
-					Y.Utility.Serialise(parameters, value, traditional, key);
+					Y.Util.Serialise(parameters, value, traditional, key);
 				} else {
 					parameters.add(key, value);
 				}
@@ -2257,28 +2225,26 @@
 				this.push(escape(key) + '=' + escape(value));
 			};
 
-			Y.Utility.Serialise(params, object, traditional);
+			Y.Util.Serialise(params, object, traditional);
 
 			return params.join('&').replace(/%20/g, '+');
 		}
-	}; // END OF Y.Utility OBJECT
+	}; // END OF Y.Util OBJECT
 
 	//---
 
-	Y.Util = Y.Utility;
-
 	// Shortcuts for most used Utility functions
-	Y.Bind = Y.Utility.Bind;
-	Y.Stamp = Y.Utility.Stamp;
-	// Y.SetOptions = Y.Utility.setOptions;
+	Y.Bind = Y.Util.Bind;
+	Y.Stamp = Y.Util.Stamp;
+	// Y.SetOptions = Y.Util.setOptions;
 
-	Y.Lang.noop = Y.Lang.Noop = Y.Utility.Noop;
-	Y.Lang.trim = Y.Utility.Trim;
+	Y.Lang.noop = Y.Lang.Noop = Y.Util.Noop;
+	Y.Lang.trim = Y.Util.Trim;
 
-	Y.Lang.reReplace = Y.Utility.reStringReplace;
-	Y.Lang.strReplace = Y.Utility.stringReplace;
-	Y.Lang.throttle = Y.Utility.Throttle;
-	Y.Lang.parameters = Y.Utility.Parameters;
+	Y.Lang.reReplace = Y.Util.reStringReplace;
+	Y.Lang.strReplace = Y.Util.stringReplace;
+	Y.Lang.throttle = Y.Util.Throttle;
+	Y.Lang.parameters = Y.Util.Parameters;
 
 	//---
 
@@ -2349,7 +2315,7 @@
 
 		// jshint camelcase: false
 		var parentProto = newClass.__super__ = this.prototype;
-		var proto = Y.Utility.Create(parentProto);
+		var proto = Y.Util.Create(parentProto);
 
 		proto.constructor = newClass;
 
@@ -2388,7 +2354,7 @@
 
 		//  OPTIONS
 		if (proto.OPTIONS) {
-			properties.OPTIONS = Y.Extend(Y.Utility.Create(proto.OPTIONS), properties.OPTIONS);
+			properties.OPTIONS = Y.Extend(Y.Util.Create(proto.OPTIONS), properties.OPTIONS);
 		}
 
 		// Mix given properties into the prototype
@@ -2500,8 +2466,8 @@
 	 * Y.Events is a base class that YAEX classes inherit from to
 	 * handle custom events.
 	 */
-	Y.Events = Y.Class.Extend({
-		CLASS_NAME: 'Events',
+	Y.Evented = Y.Class.Extend({
+		CLASS_NAME: 'Evented',
 
 		eventsArray: [],
 
@@ -2519,7 +2485,7 @@
 
 			} else {
 				// types can be a string of space-separated words
-				types = Y.Utility.splitWords(types);
+				types = Y.Util.splitWords(types);
 
 				for (i = 0, len = types.length; i < len; i++) {
 					this._On(types[i], callback, context);
@@ -2541,7 +2507,7 @@
 					}
 				}
 			} else {
-				types = Y.Utility.splitWords(types);
+				types = Y.Util.splitWords(types);
 
 				for (i = 0, len = types.length; i < len; i++) {
 					this._Off(types[i], callback, context);
@@ -2753,7 +2719,7 @@
 
 	//---
 
-	var prototype = Y.Events.prototype;
+	var prototype = Y.Evented.prototype;
 
 	// Aliases; we should ditch those eventually
 	prototype.addEventListener = prototype.on;
@@ -2763,803 +2729,6 @@
 	prototype.hasEventListeners = prototype.listens;
 
 	Y.Mixin.Events = prototype;
-
-	//---
-
-}());
-
-//---
-
-
-/**
- * Y Core | Callbacks
- *
- * Callbacks implementation using Y's [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility, Class
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint white: true */
-/*jshint eqeqeq: false */
-/*jshint strict: false */
-/*global Y, YAX */
-
-(function (undef) {
-
-	'use strict';
-
-	var rnotwhite = (/\S+/g);
-
-	// String to Object options format cache
-	var optionsCache = Object.create({});
-
-	// Convert String-formatted options into Object-formatted ones and store in cache
-	function createOptions (options) {
-		var object = optionsCache[options] = {};
-
-		Y.Each(options.match(rnotwhite) || [], function(_, flag) {
-			object[flag] = true;
-		});
-
-		return object;
-	}
-
-	// Create a collection of callbacks to be fired in a sequence, with configurable behaviour
-	// Option flags:
-	//   - once: Callbacks fired at most one time.
-	//   - memory: Remember the most recent context and arguments
-	//   - stopOnFalse: Cease iterating over callback list
-	//   - unique: Permit adding at most one instance of the same callback
-
-	/**
-	 * Y.Callbacks
-	 */
-	Y.G.Callbacks = function (options) {
-
-		// options = Y.Extend({}, options || {});
-
-		if (Y.Lang.isString(options)) {
-			options = optionsCache[options] || createOptions(options);
-		} else {
-			options = Y.Extend({}, options);
-		}
-
-		// Y.LOG(options);
-
-		// Last fire value (for non-forgettable lists)
-		var memory,
-			// Flag to know if list was already fired
-			fired,
-
-			// Flag to know if list is currently firing
-			firing,
-
-			// First callback to fire (used internally by add and fireWith)
-			firingStart,
-
-			// End of the loop when firing
-			firingLength,
-
-			// Index of currently firing callback (modified by remove if needed)
-			firingIndex,
-
-			// Actual callback list
-			list = [],
-
-			// Stack of fire calls for repeatable lists
-			stack = !options.once && [],
-
-			fire,
-
-			Callbacks;
-
-		fire = function (data) {
-			memory = options.memory && data;
-			fired = true;
-			firingIndex = firingStart || 0;
-			firingStart = 0;
-			firingLength = list.length;
-			/*jshint unused: true */
-			firing = true;
-
-			for (list; list && firingIndex < firingLength; ++firingIndex) {
-				if (list[firingIndex].apply(data[0], data[1]) === false && options.stopOnFalse) {
-					memory = false;
-					break;
-				}
-			}
-
-			firing = false;
-
-			if (list) {
-				if (stack) {
-					// stack.length && fire(stack.shift());
-					if (stack.length) {
-						fire(stack.shift());
-					}
-				} else if (memory) {
-					list.length = 0;
-				} else {
-					Callbacks.disable();
-				}
-			}
-		};
-
-		Callbacks = {
-			add: function () {
-				if (list) {
-					var start = list.length,
-						add;
-					add = function (args) {
-						Y.Each(args, function (_, arg) {
-							if (Y.Lang.isFunction(arg)) {
-								if (!options.unique || !Callbacks.has(arg)) {
-									list.push(arg);
-								}
-							} else if (arg && arg.length && !Y.Lang.isString(arg)) {
-								add(arg);
-							}
-						});
-					};
-
-					add(arguments);
-
-					if (firing) {
-						firingLength = list.length;
-					} else if (memory) {
-						firingStart = start;
-						fire(memory);
-					}
-				}
-
-				return this;
-			},
-			remove: function () {
-				if (list) {
-					Y.Each(arguments, function (_, arg) {
-						var index = 0;
-						while ((index = Y.Lang.inArray(arg, list, index)) > -1) {
-							list.splice(index, 1);
-							// Handle firing indexes
-							if (firing) {
-								if (index <= firingLength) {
-									--firingLength;
-								}
-
-								if (index <= firingIndex) {
-									--firingIndex;
-								}
-							}
-						}
-					});
-				}
-				return this;
-			},
-			has: function (fn) {
-				return !!(list && (fn ? Y.Lang.inArray(fn, list) > -1 : list.length));
-			},
-			empty: function () {
-				firingLength = list.length = 0;
-				return this;
-			},
-			disable: function () {
-				list = stack = memory = undef;
-				return this;
-			},
-			disabled: function () {
-				return !list;
-			},
-			lock: function () {
-				stack = undef;
-
-				if (!memory) {
-					Callbacks.disable();
-				}
-
-				return this;
-			},
-			locked: function () {
-				return !stack;
-			},
-			fireWith: function (context, args) {
-				if (list && (!fired || stack)) {
-					args = args || [];
-					args = [context, args.slice ? args.slice() : args];
-
-					if (firing) {
-						stack.push(args);
-					} else {
-						fire(args);
-					}
-				}
-				return this;
-			},
-			fire: function () {
-				return Callbacks.fireWith(this, arguments);
-			},
-			fired: function () {
-				return !!fired;
-			}
-		};
-
-		return Callbacks;
-	}; // END OF Y.Callbacks FUNCTION
-
-	//---
-
-}());
-
-//---
-
-
-/**
- * Y Core | Deferred
- *
- * Deferred implementation using Y's [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility, Class
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint white: true */
-/*jshint eqeqeq: false */
-/*jshint strict: false */
-/*global Y, YAX */
-
-(function () {
-
-	'use strict';
-
-	function newDeferred(callback) {
-		var tuples = [
-			// action, add listener, listener list, final state
-			['resolve', 'done', Y.G.Callbacks({
-				once: 1,
-				memory: 1
-			}), 'resolved'],
-			//['resolve', 'done', Y.G.Callbacks('once memory'), 'resolved'],
-			['reject', 'fail', Y.G.Callbacks({
-				once: 1,
-				memory: 1
-			}), 'rejected'],
-			['notify', 'progress', Y.G.Callbacks({
-				memory: 1
-			})]
-		];
-
-		var state = 'pending';
-
-		var deferred = Object.create({});
-
-		var promise = {
-			state: function () {
-				return state;
-			},
-
-			always: function () {
-				deferred.done(arguments).fail(arguments);
-				return this;
-			},
-
-			then: function () {
-				var fns = arguments, context, values;
-
-				return newDeferred(function (defer) {
-					Y.Each(tuples, function (x, tuple) {
-						var fn = Y.Lang.isFunction(fns[x]) && fns[x];
-						deferred[tuple[1]](function () {
-							var returned = fn && fn.apply(this, arguments);
-							if (returned && Y.Lang.isFunction(returned.promise)) {
-								returned.promise()
-									.done(defer.resolve)
-									.fail(defer.reject)
-									.progress(defer.notify);
-							} else {
-								context = this === promise ? defer.promise() : this;
-								values = fn ? [returned] : arguments;
-								defer[tuple[0] + 'With'](context, values);
-							}
-						});
-					});
-
-					fns = null;
-
-				}).promise();
-			},
-
-			promise: function (obj) {
-				if (Y.Lang.isSet(obj)) {
-					return Y.Extend(obj, promise);
-				}
-
-				return promise;
-
-				// return obj !== null ? Y.Extend(obj, promise) : promise;
-			}
-		};
-
-		// Keep pipe for back-compat
-		promise.pipe = promise.then;
-
-		Y.Each(tuples, function (x, tuple) {
-			var list = tuple[2],
-				stateString = tuple[3];
-
-			promise[tuple[1]] = list.add;
-
-			if (stateString) {
-				list.add(function () {
-					state = stateString;
-					/* jshint -W016 */
-				}, tuples[x ^ 1][2].disable, tuples[2][2].lock);
-			}
-
-			deferred[tuple[0]] = function () {
-				deferred[tuple[0] + 'With'](this === deferred ? promise : this, arguments);
-				return this;
-			};
-
-			deferred[tuple[0] + 'With'] = list.fireWith;
-		});
-
-		promise.promise(deferred);
-
-		if (callback) {
-			callback.call(deferred, deferred);
-		}
-
-		return deferred;
-	}
-
-	//---
-
-	Y.Lang.When = function (sub) {
-		var resolveValues = Y.G.Slice.call(arguments),
-			len = resolveValues.length,
-			x = 0,
-			remain = len !== 1 || (sub && Y.Lang.isFunction(sub.promise)) ? len : 0,
-			deferred = remain === 1 ? sub : newDeferred(),
-			progressValues, progressContexts, resolveContexts,
-			updateFn = function (x, ctx, val) {
-				return function (value) {
-					ctx[x] = this;
-
-					val[x] = arguments.length > 1 ? Y.G.Slice.call(arguments) : value;
-
-					var tmp = --remain;
-
-					if (val === progressValues) {
-						deferred.notifyWith(ctx, val);
-					} else if (!tmp) {
-						deferred.resolveWith(ctx, val);
-					}
-				};
-			};
-
-		if (len > 1) {
-			progressValues = [len];
-			progressContexts = [len];
-			resolveContexts = [len];
-
-			for (x; x < len; ++x) {
-				if (resolveValues[x] && Y.Lang.isFunction(resolveValues[x].promise)) {
-					resolveValues[x].promise()
-						.done(updateFn(x, resolveContexts, resolveValues))
-						.fail(deferred.reject)
-						.progress(updateFn(x, progressContexts, progressValues));
-				} else {
-					--remain;
-				}
-			}
-		}
-
-		if (!remain) {
-			deferred.resolveWith(resolveContexts, resolveValues);
-		}
-
-		return deferred.promise();
-	};
-
-	Y.G.Deferred = newDeferred;
-
-	//---
-
-}());
-
-//---
-
-
-/**
- * Y Core | Store
- *
- * Powers Y's with store capability [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint white: true */
-/*jshint eqeqeq: false */
-/*jshint strict: false */
-/*global Y, Y, XMLSerializer, DOMParser, ActiveX */
-
-(function (global, undef) {
-
-	'use strict';
-
-	Y.Store = Y.Class.Extend({
-		STATICS: {
-			// FOO: 'FOOED!!'
-		},
-
-		CLASS_NAME: 'Store',
-
-		Serialisers: {
-			JSON: {
-				ID: 'Y.Store.Serialisers.JSON',
-
-				'Initialise': function (encoders, decoders) {
-					encoders.push('JSON');
-					decoders.push('JSON');
-				},
-
-				Encode: JSON.stringify,
-
-				Decode: JSON.parse
-			},
-
-			XML: {
-				ID: 'Y.Store.Serialisers.XML',
-
-				'Initialise': function (encoders, decoders) {
-					encoders.push('XML');
-					decoders.push('XML');
-				},
-
-				isXML: function (value) {
-					var docElement = (value ? value.ownerDocument || value : 0 ).documentElement;
-					return docElement ? docElement.nodeName.toLowerCase() !== 'html' : false;
-				},
-
-				// Encodes a XML node to string (taken from $.jStorage, MIT License)
-				Encode: function (value) {
-					if (!value || value._serialised || !this.isXML(value)) {
-						return value;
-					}
-
-					var _value = {
-						_serialised: this.ID,
-						value: value
-					};
-
-					try {
-						// Mozilla, Webkit, Opera
-						_value.value = new XMLSerializer().serializeToString(value);
-
-						return _value;
-					} catch (err) {
-						try {
-							// Internet Explorer
-							_value.value = value.xml;
-
-							return _value;
-						} catch (er) {
-							console.error(er);
-						}
-
-						console.error(err);
-					}
-
-					return value;
-				},
-
-				// Decodes a XML node from string (taken from $.jStorage, MIT License)
-				Decode: function (value) {
-					if (!value || value._serialised || value._serialised !== this.ID) {
-						return value;
-					}
-
-					var domParser = (Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser()).parseFromString);
-
-					/** @namespace global.ActiveX */
-					if (!domParser && global.ActiveX) {
-						domParser = function (xmlString) {
-							var xmlDoc = new ActiveX('Microsoft.XMLDOM');
-
-							xmlDoc.async = 'false';
-							xmlDoc.loadXML(xmlString);
-
-							return xmlDoc;
-						};
-					}
-
-					if (!domParser) {
-						return undef;
-					}
-
-					value.value = domParser.call(
-						(Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser())) || Y.Window,
-						value.value,
-						'text/xml'
-					);
-
-					return this.isXML( value.value ) ? value.value : undef;
-				}
-			}
-		},
-
-		Drivers: {
-			WindowName: {
-				ID: 'Y.Store.Drivers.WindowName',
-
-				Scope: 'Window',
-
-				Cache: {
-
-				},
-
-				Encodes: true,
-
-				/**
-				 *
-				 * @returns {boolean}
-				 * @constructor
-				 */
-				Available: function () {
-					return true;
-				},
-
-				Initialise: function () {
-					this.Load();
-				},
-
-				Save: function () {
-					global.name = Y.Store.prototype.Serialisers.JSON.Encode(this.Cache);
-				},
-
-				Load: function () {
-					try {
-						this.Cache = Y.Store.prototype.Serialisers.JSON.Decode(global.name + Y.Lang.empty);
-
-						if (!Y.Lang.isObject(this.Cache)) {
-							this.Cache = {};
-						}
-					} catch (e) {
-						this.Cache = {};
-						global.name = '{}';
-					}
-				},
-
-				Set: function (key, value) {
-					this.Cache[key] = value;
-					this.Save();
-				},
-
-				Get: function (key) {
-					return this.Cache[key];
-				},
-
-				Delete: function (key) {
-					try {
-						delete this.Cache[key];
-					} catch (e) {
-						this.Cache[key] = undef;
-					}
-
-					this.Save();
-				},
-
-				Flush: function () {
-					global.name = '{}';
-				}
-			}
-		},
-
-		construct: function () {
-			var args = Y.G.Slice.call(arguments),
-				len = args.length,
-				x = 0;
-//				tmpFunc;
-
-//			tmpFunc = function (variable) {
-//				var t = Y.Lang.strReplace('-', ' ', variable);
-//
-//				t = Y.Lang.upperCaseWords(t);
-//				t = Y.Lang.strReplace(' ', '', t);
-//
-//				return t;
-//			};
-
-//			for (x; x < len; x++) {
-//				this.loaded_driver = this.Drivers[tmpFunc(args[x])];
-//			}
-
-			if (len === 1) {
-				// this[args[0]] = this.Drivers[args[0]];
-				Y.Extend(this, this.Drivers[args[0]]);
-
-				// delete this.Drivers[args[0]];
-			} else if (len > 1) {
-				for (x; x < len; x++) {
-					this[args[x]] = this.Drivers[args[x]];
-					// delete this.Drivers[args[x]];
-				}
-			} else {
-				Y.Extend(this, this.Drivers);
-				// delete this.Drivers;
-			}
-		}
-	});
-
-	//---
-
-	// Y.Data = Y.Store.prototype.Serialisers;
-
-	//---
-
-}());
-
-//---
-
-
-/**
- * Y Core | Parsers
- *
- * Powers Y's with Parsers capability [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility
- * @license     Dual licensed under the MIT and GPL licenses.
- */
-
-//---
-
-/*jslint indent: 4 */
-/*jslint white: true */
-/*jshint eqeqeq: false */
-/*jshint strict: false */
-/*global Y, Y, XMLSerializer, DOMParser, ActiveX */
-
-(function (global, undef) {
-
-	'use strict';
-
-	Y.Parser = Y.Class.Extend({
-		STATICS: {
-			// FOO: 'FOOED!!'
-		},
-
-		CLASS_NAME: 'Parser',
-
-		Serialisers: {
-			JSON: {
-				ID: 'Y.Store.Serialisers.JSON',
-
-				'Initialise': function (encoders, decoders) {
-					encoders.push('JSON');
-					decoders.push('JSON');
-				},
-
-				Encode: JSON.stringify,
-
-				Decode: JSON.parse
-			},
-
-			XML: {
-				ID: 'Y.Store.Serialisers.XML',
-
-				'Initialise': function (encoders, decoders) {
-					encoders.push('XML');
-					decoders.push('XML');
-				},
-
-				isXML: function (value) {
-					var docElement = (value ? value.ownerDocument || value : 0 ).documentElement;
-					return docElement ? docElement.nodeName.toLowerCase() !== 'html' : false;
-				},
-
-				// Encodes a XML node to string (taken from $.jStorage, MIT License)
-				Encode: function (value) {
-					if (!value || value._serialised || !this.isXML(value)) {
-						return value;
-					}
-
-					var _value = {
-						_serialised: this.ID,
-						value: value
-					};
-
-					try {
-						// Mozilla, Webkit, Opera
-						_value.value = new XMLSerializer().serializeToString(value);
-
-						return _value;
-					} catch (err) {
-						try {
-							// Internet Explorer
-							_value.value = value.xml;
-
-							return _value;
-						} catch (er) {
-							console.error(er);
-						}
-
-						console.error(err);
-					}
-
-					return value;
-				},
-
-				// Decodes a XML node from string (taken from $.jStorage, MIT License)
-				Decode: function (value) {
-					if (!value || value._serialised || value._serialised !== this.ID) {
-						return value;
-					}
-
-					var domParser = (Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser()).parseFromString);
-
-					/** @namespace global.ActiveX */
-					if (!domParser && global.ActiveX) {
-						domParser = function (xmlString) {
-							var xmlDoc = new ActiveX('Microsoft.XMLDOM');
-
-							xmlDoc.async = 'false';
-							xmlDoc.loadXML(xmlString);
-
-							return xmlDoc;
-						};
-					}
-
-					if (!domParser) {
-						return undef;
-					}
-
-					value.value = domParser.call(
-							(Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser())) || Y.Window,
-						value.value,
-						'text/xml'
-					);
-
-					return this.isXML( value.value ) ? value.value : undef;
-				}
-			}
-		},
-
-		Drivers: {},
-
-		construct: function () {
-			var args = Y.G.Slice.call(arguments),
-				len = args.length,
-				x = 0;
-
-			if (len === 1) {
-				Y.Extend(this, this.Drivers[args[0]]);
-			} else if (len > 1) {
-				for (x; x < len; x++) {
-					this[args[x]] = this.Drivers[args[x]];
-				}
-			} else {
-				Y.Extend(this, this.Drivers);
-			}
-		}
-	});
-
-	//---
-
-	//	Y.Parsers = Y.Parser.prototype.Drivers;
 
 	//---
 

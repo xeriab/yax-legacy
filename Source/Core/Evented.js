@@ -24,8 +24,8 @@
 	 * Y.Events is a base class that YAEX classes inherit from to
 	 * handle custom events.
 	 */
-	Y.Events = Y.Class.Extend({
-		CLASS_NAME: 'Events',
+	Y.Evented = Y.Class.Extend({
+		CLASS_NAME: 'Evented',
 
 		eventsArray: [],
 
@@ -43,7 +43,7 @@
 
 			} else {
 				// types can be a string of space-separated words
-				types = Y.Utility.splitWords(types);
+				types = Y.Util.splitWords(types);
 
 				for (i = 0, len = types.length; i < len; i++) {
 					this._On(types[i], callback, context);
@@ -65,7 +65,7 @@
 					}
 				}
 			} else {
-				types = Y.Utility.splitWords(types);
+				types = Y.Util.splitWords(types);
 
 				for (i = 0, len = types.length; i < len; i++) {
 					this._Off(types[i], callback, context);
@@ -277,7 +277,7 @@
 
 	//---
 
-	var prototype = Y.Events.prototype;
+	var prototype = Y.Evented.prototype;
 
 	// Aliases; we should ditch those eventually
 	prototype.addEventListener = prototype.on;

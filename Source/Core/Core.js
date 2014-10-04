@@ -161,7 +161,8 @@
 	 * @return    boolean TRUE|FALSE
 	 */
 	function isPlainObject(object) {
-		return isObject(object) && !isWindow(object) && Object.getPrototypeOf(object) === Object.prototype;
+		return isObject(object) && !isWindow(object) && 
+			Object.getPrototypeOf(object) === Object.prototype;
 	}
 
 	/**
@@ -1122,11 +1123,6 @@
 		Y.ERROR = Function.prototype.bind.call(error, Console);
 		Y.INFO = Function.prototype.bind.call(info, Console);
 		Y.TRACE = Function.prototype.bind.call(trace, Console);
-
-		// Console.warn = undef;
-		// Console.log = undef;
-		// Console.error = undef;
-		// Console.info = undef;
 	} else {
 		Y.WARN = Y.Lang.Noop;
 		Y.LOG = Y.Lang.Noop;

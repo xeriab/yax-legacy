@@ -31,9 +31,9 @@
 	// END OF [Private Functions]
 
 	/**
-	 * Y.Utility contains various utility functions used throughout Y code.
+	 * Y.Util contains various utility functions used throughout Y code.
 	 */
-	Y.Utility = {
+	Y.Util = {
 		LastUID: 0,
 
 		// Create an object from a given prototype
@@ -56,7 +56,7 @@
 		// Return unique ID of an object
 		Stamp: function (object) {
 			// jshint camelcase: false
-			object.YID = object.YID || ++Y.Utility.LastUID;
+			object.YID = object.YID || ++Y.Util.LastUID;
 
 			return object.YID;
 		},
@@ -141,7 +141,7 @@
 
 		// Split a string into words
 		splitWords: function (string) {
-			return Y.Utility.Trim(string).split(/\s+/);
+			return Y.Util.Trim(string).split(/\s+/);
 		},
 
 		// Set options to an object, inheriting parent's options as well
@@ -149,7 +149,7 @@
 			var x;
 
 			if (!object.hasOwnProperty('Options')) {
-				object.Options = object.Options ? Y.Utility.Create(object.Options) : {};
+				object.Options = object.Options ? Y.Util.Create(object.Options) : {};
 			}
 
 			for (x in options) {
@@ -189,7 +189,7 @@
 				}
 				// Recurse into nested objects
 				else if (Y.Lang.isArray(type) || (!traditional && Y.Lang.isObject(type))) {
-					Y.Utility.Serialise(parameters, value, traditional, key);
+					Y.Util.Serialise(parameters, value, traditional, key);
 				} else {
 					parameters.add(key, value);
 				}
@@ -206,28 +206,26 @@
 				this.push(escape(key) + '=' + escape(value));
 			};
 
-			Y.Utility.Serialise(params, object, traditional);
+			Y.Util.Serialise(params, object, traditional);
 
 			return params.join('&').replace(/%20/g, '+');
 		}
-	}; // END OF Y.Utility OBJECT
+	}; // END OF Y.Util OBJECT
 
 	//---
 
-	Y.Util = Y.Utility;
-
 	// Shortcuts for most used Utility functions
-	Y.Bind = Y.Utility.Bind;
-	Y.Stamp = Y.Utility.Stamp;
-	// Y.SetOptions = Y.Utility.setOptions;
+	Y.Bind = Y.Util.Bind;
+	Y.Stamp = Y.Util.Stamp;
+	// Y.SetOptions = Y.Util.setOptions;
 
-	Y.Lang.noop = Y.Lang.Noop = Y.Utility.Noop;
-	Y.Lang.trim = Y.Utility.Trim;
+	Y.Lang.noop = Y.Lang.Noop = Y.Util.Noop;
+	Y.Lang.trim = Y.Util.Trim;
 
-	Y.Lang.reReplace = Y.Utility.reStringReplace;
-	Y.Lang.strReplace = Y.Utility.stringReplace;
-	Y.Lang.throttle = Y.Utility.Throttle;
-	Y.Lang.parameters = Y.Utility.Parameters;
+	Y.Lang.reReplace = Y.Util.reStringReplace;
+	Y.Lang.strReplace = Y.Util.stringReplace;
+	Y.Lang.throttle = Y.Util.Throttle;
+	Y.Lang.parameters = Y.Util.Parameters;
 
 	//---
 

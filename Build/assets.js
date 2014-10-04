@@ -13,6 +13,7 @@
 	var dependenciesList = $('dependencies-list');
 
 	var commandInput = $('command');
+	var commandInput2 = $('command2');
 
 	function updateCommand () {
 		var files = {};
@@ -39,36 +40,61 @@
 			}
 		}
 
-		console.log(compsStr);
+//		console.log(compsStr);
 
 		switch (compsStr) {
-			case '00000':
-				type = 'core';
+			case '00000000000':
+				type = 'Core';
 				break;
 
-			case '00001':
-				type = 'core';
+			case '00000000001':
+				type = 'Core';
 				break;
 
-			case '00010':
-				type = 'dom';
+			case '00000000010':
+				type = 'ExtendedCore';
 				break;
 
-			case '00100':
-				type = 'dom-full';
+			case '00000000100':
+				type = 'Node';
 				break;
 
-			case '01000':
-				type = 'bootstrap';
+			case '00000001000':
+				type = 'ExtendedNode';
 				break;
 
-			case '10000':
-				type = 'plugins';
+			case '00000010000':
+				type = 'LocalStorage';
+				break;
+
+			case '00000100000':
+				type = 'Cookies';
+				break;
+
+			case '00001000000':
+				type = 'CSV.Parser';
+				break;
+
+			case '00010000000':
+				type = 'Router';
+				break;
+
+			case '00100000000':
+				type = 'AutoFix';
+				break;
+
+			case '01000000000':
+				type = 'Tooltip';
+				break;
+
+			case '10000000000':
+				type = 'WaitForMe';
 				break;
 		}
 
 		// commandInput.value = 'jake \'build[' + parseInt(compsStr, 2).toString(32) + ',' + type + ']\'';
 		commandInput.value = 'jake \'build[' + parseInt(compsStr, 2).toString(32) + ',' + type + ']\'';
+		commandInput2.value = 'jake \'build[' + parseInt(compsStr, 2).toString(32) + ',' + type + ']\'';
 	}
 
 	function inputSelect () {
@@ -146,7 +172,22 @@
 		updateCommand();
 	}
 
+	function onLiClick (e) {
+		var self = this.firstChild.firstChild;
+
+		if (self.checked) {
+			self.checked = false;
+			self.onchange = onCheckboxChange;
+			updateCommand();
+		} else {
+			self.checked = true;
+			self.onchange = onCheckboxChange;
+			updateCommand();
+		}
+	}
+
 	commandInput.onclick = inputSelect;
+	commandInput2.onclick = inputSelect;
 
 	var name;
 	var li;
@@ -180,6 +221,8 @@
 		check.id = name;
 		label.appendChild(check);
 		check.onchange = onCheckboxChange;
+
+		li.onclick = onLiClick;
 
 //		if (name == 'Core') {
 //			check.checked = true;
@@ -217,7 +260,7 @@
 		}
 
 		div.appendChild(desc);
-		div.appendChild(document.createElement('br'));
+//		div.appendChild(document.createElement('br'));
 		div.appendChild(xdesc);
 		// div.appendChild(document.createElement('br'));
 

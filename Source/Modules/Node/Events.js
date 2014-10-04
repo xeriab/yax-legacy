@@ -266,7 +266,7 @@
 					}
 				}
 			} else {
-				types = Y.Utility.splitWords(types);
+				types = Y.Util.splitWords(types);
 
 				for (x = 0, len = types.length; x < len; x++) {
 					this.addListener(object, types[x], func, context);
@@ -342,7 +342,7 @@
 					}
 				}
 			} else {
-				types = Y.Utility.splitWords(types);
+				types = Y.Util.splitWords(types);
 
 				for (x = 0, len = types.length; x < len; x++) {
 					this.removeListener(object, types[x], func, context);
