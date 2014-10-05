@@ -31,7 +31,7 @@
 
 	var version = '0.10';
 
-	var ClassTag = 'YAX' + Y.Lang.now;
+	var ClassTag = 'YAX' + Y.Lang.now();
 
 	//---
 
@@ -41,7 +41,7 @@
 
 	//---
 
-	Y.Extend(Y.DOM, tmpYaxDom);
+	Y.extend(Y.DOM, tmpYaxDom);
 
 	//---
 
@@ -87,7 +87,7 @@
 	Y.DOM.find = Sizzle;
 	Y.DOM.expr = Y.DOM.Expr = Sizzle.selectors;
 	Y.DOM.expr[':'] = Y.DOM.Expr[':'] = Y.DOM.expr.pseudos;
-	Y.DOM.expr[':'] = Y.Extend(Y.DOM.expr[':'], tmp_);
+	Y.DOM.expr[':'] = Y.extend(Y.DOM.expr[':'], tmp_);
 	Y.DOM.unique = Sizzle.uniqueSort;
 	Y.DOM.text = Sizzle.getText;
 	Y.DOM.isXMLDoc = Sizzle.isXML;
@@ -112,7 +112,7 @@
 	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
 	wrapMap.th = wrapMap.td;
 
-	Y.Extend(Y.DOM.Function, tmpYaxDom.Function);
+	Y.extend(Y.DOM.Function, tmpYaxDom.Function);
 
 	// data: string of html
 	// context (optional): If specified, the fragment will be created in this context, defaults to Y.Document
@@ -342,7 +342,7 @@
 	// Initialize central reference
 	rootYaxDom = Y.DOM(Y.Document);
 
-	Y.DOM.Support = Y.DOM.support = Object.create({});
+	Y.DOM.Support = Y.DOM.support = {};
 
 	Y.DOM.Support = tmpYaxDom.Support;
 	Y.DOM.support = tmpYaxDom.Support;

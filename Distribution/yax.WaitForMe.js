@@ -22,35 +22,35 @@
 
 	//---
 
-	Y.Extend(Y.Settings.DOM, {
-		WaitForMe: {
-			Opacity: 1.0,
-			Effect: 'bounce',
-			Content: '',
-			Background: 'rgba(245, 245, 245, .75)',
-			Color: 'rgba(10, 20, 30, .9)',
-			Width: 0,
-			Height: 0,
-			Container: 'body',
-			Trigger: 'yax.waitformeclose'
+	Y.extend(Y.Settings.DOM, {
+		waitForMe: {
+			opacity: 1.0,
+			effect: 'bounce',
+			content: '',
+			background: 'rgba(245, 245, 245, .75)',
+			color: 'rgba(10, 20, 30, .9)',
+			width: 0,
+			height: 0,
+			container: 'body',
+			trigger: 'close.yax.waitforme'
 		}
 	});
 
-	var PluginOptions = Y.Settings.DOM.WaitForMe;
+	var pluginOptions = Y.Settings.DOM.waitForMe;
 
 	function WaitForMe(element, option) {
-		this.Element = element;
-		this.Options = option;
-		this.CSS_Class = 'yax-waitforme';
-		this.Effects = null;
-		this.EffectElementCount = null;
-		this.CreateSubElement = false;
-		this.SpecificAttr = 'background-color';
-		this.EffectElementHTML = '';
-		this.ContainerSize = null;
-		this.ElementSize = null;
-		this.Div = null;
-		this.Content = null;
+		this.element = element;
+		this.options = option;
+		this.cssClass = 'js-waitforme';
+		this.effects = null;
+		this.effectElementCount = null;
+		this.createSubElement = false;
+		this.specificAttr = 'background-color';
+		this.effectElementHTML = '';
+		this.containerSize = null;
+		this.elementSize = null;
+		this.div = null;
+		this.content = null;
 
 		this.init();
 	}
@@ -61,7 +61,7 @@
 
 			this._init_();
 
-			//			if (this.Content) {
+			//			if (this.content) {
 			//				this.setEvents();
 			//			}
 
@@ -69,10 +69,10 @@
 		},
 
 		Show: function () {
-			// Y.DOM(this.Element).css('cursor', 'none');
+			// Y.DOM(this.element).css('cursor', 'none');
 
 			// Close all other WaitForMe
-			Y.DOM('div.yax-waitforme').hide();
+			Y.DOM('div.js-waitforme').hide();
 			this.WaitForMe.css('display', 'block');
 		},
 
@@ -92,249 +92,249 @@
 		_init_: function () {
 			var x;
 
-			switch (this.Options.Effect) {
+			switch (this.options.effect) {
 			case 'none':
-				this.EffectElementCount = 0;
+				this.effectElementCount = 0;
 				break;
 
 			case 'bounce':
-				this.EffectElementCount = 3;
-				this.ContainerSize = '';
+				this.effectElementCount = 3;
+				this.containerSize = '';
 
-				this.ElementSize = {
-					width: this.Options.Width.toString() + 'px',
-					height: this.Options.Height.toString() + 'px'
+				this.elementSize = {
+					width: this.options.width.toString() + 'px',
+					height: this.options.height.toString() + 'px'
 				};
 
 				break;
 
 			case 'rotateplane':
-				this.EffectElementCount = 1;
-				this.ContainerSize = '';
+				this.effectElementCount = 1;
+				this.containerSize = '';
 
-				this.ElementSize = {
-					width: this.Options.Width.toString() + 'px',
-					height: this.Options.Height.toString() + 'px'
+				this.elementSize = {
+					width: this.options.width.toString() + 'px',
+					height: this.options.height.toString() + 'px'
 				};
 
 				break;
 
 			case 'stretch':
-				this.EffectElementCount = 5;
-				this.ContainerSize = '';
+				this.effectElementCount = 5;
+				this.containerSize = '';
 
-				this.ElementSize = {
-					width: this.Options.Width.toString() + 'px',
-					height: this.Options.Height.toString() + 'px'
+				this.elementSize = {
+					width: this.options.width.toString() + 'px',
+					height: this.options.height.toString() + 'px'
 				};
 
 				break;
 
 			case 'orbit':
-				this.EffectElementCount = 2;
+				this.effectElementCount = 2;
 
-				this.ContainerSize = {
-					width: this.Options.Width.toString() + 'px',
-					height: this.Options.Height.toString() + 'px'
+				this.containerSize = {
+					width: this.options.width.toString() + 'px',
+					height: this.options.height.toString() + 'px'
 				};
 
-				this.ElementSize = '';
+				this.elementSize = '';
 
 				break;
 
 			case 'roundBounce':
-				this.EffectElementCount = 12;
+				this.effectElementCount = 12;
 
-				this.ContainerSize = {
-					width: this.Options.Width.toString() + 'px',
-					height: this.Options.Height.toString() + 'px'
+				this.containerSize = {
+					width: this.options.width.toString() + 'px',
+					height: this.options.height.toString() + 'px'
 				};
 
-				this.ElementSize = '';
+				this.elementSize = '';
 
 				break;
 
 			case 'win8':
-				this.EffectElementCount = 5;
-				this.CreateSubElement = true;
+				this.effectElementCount = 5;
+				this.createSubElement = true;
 
-				// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
-				// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.containerSize = 'width:' + this.options.width + '; height:' + this.options.height;
+				// this.elementSize = 'width:' + this.options.width + '; height:' + this.options.height;
 
-				this.ContainerSize = {
-					width: this.Options.Width.toString() + 'px',
-					height: this.Options.Height.toString() + 'px'
+				this.containerSize = {
+					width: this.options.width.toString() + 'px',
+					height: this.options.height.toString() + 'px'
 				};
 
-				this.ElementSize = {
-					width: this.Options.Width.toString() + 'px',
-					height: this.Options.Height.toString() + 'px'
+				this.elementSize = {
+					width: this.options.width.toString() + 'px',
+					height: this.options.height.toString() + 'px'
 				};
 
 				break;
 
 			case 'win8_linear':
-				this.EffectElementCount = 5;
-				this.CreateSubElement = true;
+				this.effectElementCount = 5;
+				this.createSubElement = true;
 
-				// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.containerSize = 'width:' + this.options.width + '; height:' + this.options.height;
 
-				this.ContainerSize = {
-					width: this.Options.Width.toString() + 'px',
-					height: this.Options.Height.toString() + 'px'
+				this.containerSize = {
+					width: this.options.width.toString() + 'px',
+					height: this.options.height.toString() + 'px'
 				};
 
-				this.ElementSize = '';
+				this.elementSize = '';
 
 				break;
 
 			case 'ios':
-				this.EffectElementCount = 12;
+				this.effectElementCount = 12;
 
-				// this.ContainerSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.containerSize = 'width:' + this.options.width + '; height:' + this.options.height;
 
-				this.ContainerSize = {
-					width: this.Options.Width.toString() + 'px',
-					height: this.Options.Height.toString() + 'px'
+				this.containerSize = {
+					width: this.options.width.toString() + 'px',
+					height: this.options.height.toString() + 'px'
 				};
 
-				this.ElementSize = '';
+				this.elementSize = '';
 
 				break;
 
 			case 'facebook':
-				this.EffectElementCount = 3;
-				this.ContainerSize = '';
+				this.effectElementCount = 3;
+				this.containerSize = '';
 
-				// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.elementSize = 'width:' + this.options.width + '; height:' + this.options.height;
 
-				this.ElementSize = {
-					width: this.Options.Width.toString() + 'px',
-					height: this.Options.Height.toString() + 'px'
+				this.elementSize = {
+					width: this.options.width.toString() + 'px',
+					height: this.options.height.toString() + 'px'
 				};
 
 				break;
 
 			case 'rotation':
-				this.EffectElementCount = 1;
-				this.SpecificAttr = 'border-color';
-				this.ContainerSize = '';
+				this.effectElementCount = 1;
+				this.specificAttr = 'border-color';
+				this.containerSize = '';
 
-				// this.ElementSize = 'width:' + this.Options.Width + '; height:' + this.Options.Height;
+				// this.elementSize = 'width:' + this.options.width + '; height:' + this.options.height;
 
-				this.ElementSize = {
-					width: this.Options.Width.toString() + 'px',
-					height: this.Options.Height.toString() + 'px'
+				this.elementSize = {
+					width: this.options.width.toString() + 'px',
+					height: this.options.height.toString() + 'px'
 				};
 
 				break;
 			}
 
-			this.ElementSize = 'width: ' + this.ElementSize.width + '; height: ' + this
-				.ElementSize.height;
-			this.ContainerSize = 'width: ' + this.ContainerSize.width + '; height: ' +
-				this.ContainerSize.height;
+			this.elementSize = 'width: ' + this.elementSize.width + '; height: ' + this
+				.elementSize.height;
+			this.containerSize = 'width: ' + this.containerSize.width + '; height: ' +
+				this.containerSize.height;
 
-			if (Y.Lang.isEmpty(this.Options.Width) && Y.Lang.isEmpty(this.Options.Height)) {
-				this.ElementSize = Y.Lang.empty();
-				this.ContainerSize = Y.Lang.empty();
+			if (Y.Lang.isEmpty(this.options.width) && Y.Lang.isEmpty(this.options.height)) {
+				this.elementSize = Y.Lang.empty();
+				this.containerSize = Y.Lang.empty();
 			}
 
-			this.Effects = Y.DOM('<div class="' + this.CSS_Class + '-progress ' + this
-				.Options.Effect + '"></div>');
+			this.effects = Y.DOM('<div class="' + this.cssClass + '-progress ' + this
+				.options.effect + '"></div>');
 
-			if (this.EffectElementCount > 0) {
+			if (this.effectElementCount > 0) {
 
 
-				for (x = 1; x <= this.EffectElementCount; ++x) {
-					if (this.CreateSubElement) {
-						this.EffectElementHTML += '<div class="' + this.CSS_Class +
-							'-progress-element' + x + '" style="' + this.ElementSize +
-							'"><div style="' + this.SpecificAttr + ': ' +
-							this.Options.Color + '"></div></div>';
+				for (x = 1; x <= this.effectElementCount; ++x) {
+					if (this.createSubElement) {
+						this.effectElementHTML += '<div class="' + this.cssClass +
+							'-progress-element' + x + '" style="' + this.elementSize +
+							'"><div style="' + this.specificAttr + ': ' +
+							this.options.color + '"></div></div>';
 					} else {
-						this.EffectElementHTML += '<div class="' + this.CSS_Class +
-							'-progress-element' + x + '" style="' + this.SpecificAttr +
-							': ' + this.Options.Color + '; ' + this.ElementSize + '"></div>';
+						this.effectElementHTML += '<div class="' + this.cssClass +
+							'-progress-element' + x + '" style="' + this.specificAttr +
+							': ' + this.options.color + '; ' + this.elementSize + '"></div>';
 					}
 
 				}
 
-				this.Effects = Y.DOM('<div class="' + this.CSS_Class + '-progress ' +
-					this.Options.Effect + '" style="' + this.ContainerSize + '">' + this.EffectElementHTML +
+				this.effects = Y.DOM('<div class="' + this.cssClass + '-progress ' +
+					this.options.effect + '" style="' + this.containerSize + '">' + this.effectElementHTML +
 					'</div>');
 
-				//				this.Effects = Y.DOM('<div></div>').addClass(this.CSS_Class + '-progress ' + this.Options.Effect).css(this.ContainerSize);
-				//				this.Effects.append(this.EffectElementHTML);
+				//				this.effects = Y.DOM('<div></div>').addClass(this.cssClass + '-progress ' + this.options.effect).css(this.containerSize);
+				//				this.effects.append(this.effectElementHTML);
 			}
 
-			if (this.Options.Content) {
-				this.Content = Y.DOM('<div class="' + this.CSS_Class +
-					'-text" style="color: ' + this.Options.Color + ';">' + this.Options.Content +
+			if (this.options.content) {
+				this.content = Y.DOM('<div class="' + this.cssClass +
+					'-text" style="color: ' + this.options.color + ';">' + this.options.content +
 					'</div>');
 			}
 
-			if (this.Element.find('> .' + this.CSS_Class)) {
-				this.Element.find('> .' + this.CSS_Class).remove();
+			if (this.element.find('> .' + this.cssClass)) {
+				this.element.find('> .' + this.cssClass).remove();
 			}
 
-			this.Div = Y.DOM('<div class="' + this.CSS_Class + '-content"></div>');
+			this.div = Y.DOM('<div class="' + this.cssClass + '-content"></div>');
 
-			this.Div.append(this.Effects, this.Content);
+			this.div.append(this.effects, this.content);
 
-			this.Div.appendTo(this.WaitForMe);
+			this.div.appendTo(this.WaitForMe);
 
-			if (this.Element[0].tagName === 'HTML') {
-				this.Element = Y.DOM('body');
+			if (this.element[0].tagName === 'HTML') {
+				this.element = Y.DOM('body');
 			}
 
-			this.Element.addClass(this.CSS_Class + '-container').append(this.WaitForMe);
+			this.element.addClass(this.cssClass + '-container').append(this.WaitForMe);
 
-			this.Element.find('> .' + this.CSS_Class).css({
-				background: this.Options.Background
+			this.element.find('> .' + this.cssClass).css({
+				background: this.options.background
 			});
 
-			this.Element.find('.' + this.CSS_Class + '-content').css({
-				marginTop: -this.Element.find('.' + this.CSS_Class + '-content').outerHeight() /
+			this.element.find('.' + this.cssClass + '-content').css({
+				marginTop: -this.element.find('.' + this.cssClass + '-content').outerHeight() /
 					2 + 'px'
 			});
 		},
 
 		Close: function () {
-			this.Element.removeClass(this.CSS_Class + '-container');
-			this.Element.find('.' + this.CSS_Class).remove();
+			this.element.removeClass(this.cssClass + '-container');
+			this.element.find('.' + this.cssClass).remove();
 		},
 
 		setContent: function () {
 			// Get WaitForMe content
-			if (this.Options.Content) {
-				this.Content = this.Options.Content;
-			} else if (this.Element.data('YAX-WaitForMe')) {
-				this.Content = this.Element.data('YAX-WaitForMe');
-			} else if (Y.Lang.isEmpty(this.Options.Content)) {
-				this.Content = Y.Lang.empty();
-			} else if (Y.Lang.isNull(this.Options.Content)) {
-				this.Content = Y.Lang.empty();
+			if (this.options.content) {
+				this.content = this.options.content;
+			} else if (this.element.data('YAX-WaitForMe')) {
+				this.content = this.element.data('YAX-WaitForMe');
+			} else if (Y.Lang.isEmpty(this.options.content)) {
+				this.content = Y.Lang.empty();
+			} else if (Y.Lang.isNull(this.options.content)) {
+				this.content = Y.Lang.empty();
 			} else {
-				Y.ERROR('No content for WaitForMe: ' + this.Element.selector);
+				Y.ERROR('No content for WaitForMe: ' + this.element.selector);
 				return;
 			}
 
-			if (this.Content.charAt(0) === '#') {
-				Y.DOM(this.Content).hide();
-				this.Content = Y.DOM(this.Content).html();
+			if (this.content.charAt(0) === '#') {
+				Y.DOM(this.content).hide();
+				this.content = Y.DOM(this.content).html();
 				this.contentType = 'html';
 			} else {
 				this.contentType = 'text';
 			}
 
 			// Create WaitForMe container
-			this.WaitForMe = Y.DOM('<div></div>').addClass(this.CSS_Class);
+			this.WaitForMe = Y.DOM('<div></div>').addClass(this.cssClass);
 
-			if (this.Options.Container) {
-				this.WaitForMe.prependTo(this.Options.Container);
+			if (this.options.container) {
+				this.WaitForMe.prependTo(this.options.container);
 			} else {
-				this.WaitForMe.insertAfter(this.Element.parent());
+				this.WaitForMe.insertAfter(this.element.parent());
 			}
 
 			// Adjust size for html WaitForMe
@@ -342,26 +342,26 @@
 				this.WaitForMe.css('max-width', 'none');
 			}
 
-			this.WaitForMe.css('opacity', this.Options.Opacity);
+			this.WaitForMe.css('opacity', this.options.opacity);
 		},
 
 		setEvents: function () {
 			var self = this;
 
-			if (this.Options.Trigger === 'yax.waitformeclose') {
-				this.WaitForMe.on('yax.waitformeclose', function () {
+			if (this.options.trigger === 'close.yax.waitforme') {
+				this.WaitForMe.on('close.yax.waitforme', function () {
 					self.Close();
 				});
 
-				this.Element.on('yax.waitformeclose', function () {
+				this.element.on('close.yax.waitforme', function () {
 					self.Close();
 				});
 			}
 		}
 	};
 
-	Y.DOM.Function.WaitForMe = function (option) {
-		var options = Y.Extend({}, PluginOptions, option);
+	Y.DOM.Function.waitForMe = function (option) {
+		var options = Y.extend({}, pluginOptions, option);
 
 		if (option === 'close') {
 			return new WaitForMe(Y.DOM(this), options).Close();

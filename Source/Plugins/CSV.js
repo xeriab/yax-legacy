@@ -71,25 +71,25 @@
 			code = code.slice(0, -1) + "]";
 		}
 
-		/** jshint evil: true */
+		/* jshint evil: true */
 		return new Function("values", code);
 	};
 
 	//---
 
-	Y.Parser.MergeObject('Drivers', {
+	Y.Parser.mergeObject('drivers', {
 		CSV: {
-			ID: 'Y.Parser.Drivers.CSV',
+			id: 'Y.Parser.drivers.CSV',
 
-			Options: null,
-			Data: null,
+			options: null,
+			data: null,
 
 			dataSource: function (data, set) {
 				var _i, _dataChar, _lineChar;
 
 				set = PRESENT(set) ? set : {};
 
-				this.Options = {
+				this.options = {
 					async: PRESENT(set.async) ? set.async : false,
 					cast: PRESENT(set.cast) ? set.cast : true,
 					line: PRESENT(set.line) ? set.line : '\r\n',
@@ -98,26 +98,26 @@
 					done: PRESENT(set.done) ? set.done : undefined
 				};
 
-				this.Data = data;
+				this.data = data;
 
-				if (this.Data instanceof Array) {
+				if (this.data instanceof Array) {
 					return this;
 				}
 
-				for (_i = 0; _i < this.Options.line.length; _i++) {
-					_dataChar = data.charCodeAt(data.length - this.Options.line.length + _i);
+				for (_i = 0; _i < this.options.line.length; _i++) {
+					_dataChar = data.charCodeAt(data.length - this.options.line.length + _i);
 
-					_lineChar = this.Options.line.charCodeAt(_i);
+					_lineChar = this.options.line.charCodeAt(_i);
 
 					if (_dataChar !== _lineChar) {
-						this.Data += this.Options.line.charAt(_i);
+						this.data += this.options.line.charAt(_i);
 					}
 				}
 
-				// this.Parse = Y.Parser.prototype.Drivers.CSV.Parse;
-				// this.forEach = Y.Parser.prototype.Drivers.CSV.forEach;
-				// this.Set = Y.Parser.prototype.Drivers.CSV.Set;
-				// this.Encode = Y.Parser.prototype.Drivers.CSV.Encode;
+				// this.Parse = Y.Parser.prototype.drivers.CSV.Parse;
+				// this.forEach = Y.Parser.prototype.drivers.CSV.forEach;
+				// this.Set = Y.Parser.prototype.drivers.CSV.Set;
+				// this.Encode = Y.Parser.prototype.drivers.CSV.Encode;
 
 				return this;
 			},
@@ -126,7 +126,7 @@
 			 * @return {object}
 			 */
 			set: function (option, value) {
-				this.Options[option] = value;
+				this.options[option] = value;
 				return this;
 			},
 
@@ -134,16 +134,16 @@
 			 * @return {Array}
 			 */
 			encode: function (stream) {
-				if (this.Data.length === 0) {
+				if (this.data.length === 0) {
 					return Y.Lang.empty();
 				}
 
-				var data = this.Data,
+				var data = this.data,
 					response = [],
-					delimiter = this.Options.delimiter,
+					delimiter = this.options.delimiter,
 					kind = data[0] instanceof Array ? 'array' : 'object',
-					header = this.Options.header,
-					complete = this.Options.done,
+					header = this.options.header,
+					complete = this.options.done,
 
 					stringify = function (value) {
 						if (!value) {
@@ -199,7 +199,7 @@
 				}
 
 				// Return as appropriate
-				response = response.join(this.Options.line);
+				response = response.join(this.options.line);
 
 				if (complete) {
 					complete(response);
@@ -212,23 +212,23 @@
 			 * @return {Array}
 			 */
 			forEach: function (stream) {
-				return this.Data instanceof Array ? this.encode(stream) : this.parse(
+				return this.data instanceof Array ? this.encode(stream) : this.parse(
 					stream);
 			},
 
 			parse: function (stream) {
-				if (this.Data.trim().length === 0) {
+				if (this.data.trim().length === 0) {
 					return [];
 				}
 
-				var data = this.Data,
+				var data = this.data,
 					response = [],
-					complete = this.Options.done,
-					shouldCast = this.Options.cast,
-					header = this.Options.header,
+					complete = this.options.done,
+					shouldCast = this.options.cast,
+					header = this.options.header,
 					fields = header instanceof Array ? header : [],
 
-					_line = this.Options.line,
+					_line = this.options.line,
 					_fieldsLength = fields.length,
 
 					current = {
@@ -287,7 +287,7 @@
 					_index,
 					_dataLength = data.length,
 					_lineDelim = _line.charCodeAt(_line.length - 1),
-					_cellDelim = this.Options.delimiter.charCodeAt(0),
+					_cellDelim = this.options.delimiter.charCodeAt(0),
 					currentChar;
 
 				for (start = 0, _index = 0; _index <= _dataLength; ++_index) {

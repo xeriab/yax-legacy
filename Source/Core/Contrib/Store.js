@@ -20,31 +20,31 @@
 
 	'use strict';
 
-	Y.Store = Y.Class.Extend({
+	Y.Store = Y.Class.extend({
 		STATICS: {
 			// FOO: 'FOOED!!'
 		},
 
 		CLASS_NAME: 'Store',
 
-		Serialisers: {
+		serialisers: {
 			JSON: {
-				ID: 'Y.Store.Serialisers.JSON',
+				id: 'Y.Store.serialisers.JSON',
 
-				'Initialise': function (encoders, decoders) {
+				'initialise': function (encoders, decoders) {
 					encoders.push('JSON');
 					decoders.push('JSON');
 				},
 
-				Encode: JSON.stringify,
+				encode: JSON.stringify,
 
-				Decode: JSON.parse
+				decode: JSON.parse
 			},
 
 			XML: {
-				ID: 'Y.Store.Serialisers.XML',
+				id: 'Y.Store.serialisers.XML',
 
-				'Initialise': function (encoders, decoders) {
+				'initialise': function (encoders, decoders) {
 					encoders.push('XML');
 					decoders.push('XML');
 				},
@@ -55,7 +55,7 @@
 				},
 
 				// Encodes a XML node to string (taken from $.jStorage, MIT License)
-				Encode: function (value) {
+				encode: function (value) {
 					if (!value || value._serialised || !this.isXML(value)) {
 						return value;
 					}
@@ -77,22 +77,22 @@
 
 							return _value;
 						} catch (er) {
-							console.error(er);
+							Y.ERROR(er);
 						}
 
-						console.error(err);
+						Y.ERROR(err);
 					}
 
 					return value;
 				},
 
 				// Decodes a XML node from string (taken from $.jStorage, MIT License)
-				Decode: function (value) {
+				decode: function (value) {
 					if (!value || value._serialised || value._serialised !== this.ID) {
 						return value;
 					}
 
-					var domParser = (Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser()).parseFromString);
+					var domParser = (Y.hasOwn.call(global, 'DOMParser') && (new DOMParser()).parseFromString);
 
 					/** @namespace global.ActiveX */
 					if (!domParser && global.ActiveX) {
@@ -111,7 +111,7 @@
 					}
 
 					value.value = domParser.call(
-						(Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser())) || Y.Window,
+						(Y.hasOwn.call(global, 'DOMParser') && (new DOMParser())) || Y.Window,
 						value.value,
 						'text/xml'
 					);
@@ -121,68 +121,68 @@
 			}
 		},
 
-		Drivers: {
-			WindowName: {
-				ID: 'Y.Store.Drivers.WindowName',
+		drivers: {
+			windowName: {
+				id: 'Y.Store.drivers.windowName',
 
-				Scope: 'Window',
+				scope: 'Window',
 
-				Cache: {
+				sache: {
 
 				},
 
-				Encodes: true,
+				encodes: true,
 
 				/**
 				 *
 				 * @returns {boolean}
 				 * @constructor
 				 */
-				Available: function () {
+				available: function () {
 					return true;
 				},
 
-				Initialise: function () {
+				initialise: function () {
 					this.Load();
 				},
 
-				Save: function () {
-					global.name = Y.Store.prototype.Serialisers.JSON.Encode(this.Cache);
+				save: function () {
+					global.name = Y.Store.prototype.serialisers.JSON.encode(this.cache);
 				},
 
-				Load: function () {
+				load: function () {
 					try {
-						this.Cache = Y.Store.prototype.Serialisers.JSON.Decode(global.name + Y.Lang.empty);
+						this.cache = Y.Store.prototype.serialisers.JSON.decode(global.name + Y.Lang.empty);
 
-						if (!Y.Lang.isObject(this.Cache)) {
-							this.Cache = {};
+						if (!Y.Lang.isObject(this.cache)) {
+							this.cache = {};
 						}
 					} catch (e) {
-						this.Cache = {};
+						this.cache = {};
 						global.name = '{}';
 					}
 				},
 
-				Set: function (key, value) {
-					this.Cache[key] = value;
+				set: function (key, value) {
+					this.cache[key] = value;
 					this.Save();
 				},
 
-				Get: function (key) {
-					return this.Cache[key];
+				get: function (key) {
+					return this.cache[key];
 				},
 
-				Delete: function (key) {
+				delete: function (key) {
 					try {
-						delete this.Cache[key];
+						delete this.cache[key];
 					} catch (e) {
-						this.Cache[key] = undef;
+						this.cache[key] = undef;
 					}
 
 					this.Save();
 				},
 
-				Flush: function () {
+				flush: function () {
 					global.name = '{}';
 				}
 			}
@@ -204,29 +204,29 @@
 //			};
 
 //			for (x; x < len; x++) {
-//				this.loaded_driver = this.Drivers[tmpFunc(args[x])];
+//				this.loaded_driver = this.drivers[tmpFunc(args[x])];
 //			}
 
 			if (len === 1) {
-				// this[args[0]] = this.Drivers[args[0]];
-				Y.Extend(this, this.Drivers[args[0]]);
+				// this[args[0]] = this.drivers[args[0]];
+				Y.extend(this, this.drivers[args[0]]);
 
-				// delete this.Drivers[args[0]];
+				// delete this.drivers[args[0]];
 			} else if (len > 1) {
 				for (x; x < len; x++) {
-					this[args[x]] = this.Drivers[args[x]];
-					// delete this.Drivers[args[x]];
+					this[args[x]] = this.drivers[args[x]];
+					// delete this.drivers[args[x]];
 				}
 			} else {
-				Y.Extend(this, this.Drivers);
-				// delete this.Drivers;
+				Y.extend(this, this.drivers);
+				// delete this.drivers;
 			}
 		}
 	});
 
 	//---
 
-	// Y.Data = Y.Store.prototype.Serialisers;
+	// Y.Data = Y.Store.prototype.serialisers;
 
 	//---
 

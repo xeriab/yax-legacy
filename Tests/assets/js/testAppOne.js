@@ -9,7 +9,7 @@ Y.DOM(document).ready(function () {
 	var TestOneImage = Y.DOM('#TestOneImage');
 	var ButtonOne = Y.DOM('#ButtonOne');
 
-	TestOneImage.attr('src', 'http://0.0.0.0:8000/Media/yax_js_logo_01-o.svg');
+	TestOneImage.attr('src', '../../../../Media/yax_js_logo_01-o.svg');
 
 	TestOneImage.width(115);
 
@@ -17,15 +17,34 @@ Y.DOM(document).ready(function () {
 		marginTop: -13
 	});
 
-	TestOneImage.Tooltip({
-		Content: 'Testing Tooltips!',
-		Gravity: 'west',
-		Theme: 'dark',
-		Animation: 'flipIn'
+	TestOneImage.tooltip({
+		content: 'Testing Tooltips!',
+		gravity: 'west',
+		theme: 'dark',
+		animation: 'flipIn'
 	});
 
+//	Wrapper.waitForMe();
+//
+//	var closeWaitForMe = function closeWaitForMe () {
+//		Wrapper.waitForMe('close');
+//	};
 
-	Y.LOG('');
+//	Wrapper.oneTime(3000, 'closeWaitForMe', closeWaitForMe);
+
+//	Wrapper.stopTranAnim(false, false);
+
+//	var localStorage = new Y.Store('localStorage');
+//	var cookies = new Y.Store('cookies');
+//	var csv = new Y.Parser('CSV');
+
+
+
+//	Y.LOG('');
 	Y.LOG(Y);
+//	Y.LOG(localStorage);
+//	Y.LOG(cookies);
+//	Y.LOG(csv);
+	Y.LOG(Wrapper);
 
 });

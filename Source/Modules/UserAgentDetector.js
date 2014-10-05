@@ -28,24 +28,24 @@
 		gecko3d = Y.Document.documentElement.style.hasOwnProperty('MozPerspective'),
 		opera3d = Y.Document.documentElement.style.hasOwnProperty('OTransition');
 
-	retina = (Y.HasOwnProperty.call(Y.Window, 'devicePixelRatio') && Y.CallProperty(Y.Window, 'devicePixelRatio') > 1);
+	retina = (Y.hasOwn.call(Y.Window, 'devicePixelRatio') && Y.callProperty(Y.Window, 'devicePixelRatio') > 1);
 
-	if (!retina && Y.HasOwnProperty.call(Y.Window, 'matchMedia')) {
-		matches = Y.CallProperty(Y.Window, 'matchMedia');
-		retina = (Y.Lang.isSet(matches) && Y.CallProperty(matches, 'matches'));
+	if (!retina && Y.hasOwn.call(Y.Window, 'matchMedia')) {
+		matches = Y.callProperty(Y.Window, 'matchMedia');
+		retina = (Y.Lang.isSet(matches) && Y.callProperty(matches, 'matches'));
 	}
 
-	msPointer = (Y.HasOwnProperty.call(navigator, 'msPointerEnabled') &&
-		Y.HasOwnProperty.call(navigator, 'msMaxTouchPoints') &&
-		!Y.HasOwnProperty.call(Y.Window, 'PointerEvent'));
+	msPointer = (Y.hasOwn.call(navigator, 'msPointerEnabled') &&
+		Y.hasOwn.call(navigator, 'msMaxTouchPoints') &&
+		!Y.hasOwn.call(Y.Window, 'PointerEvent'));
 
-	pointer = (Y.HasOwnProperty.call(Y.Window, 'PointerEvent') &&
-		Y.HasOwnProperty.call(navigator, 'pointerEnabled') &&
-		!Y.HasOwnProperty.call(navigator, 'maxTouchPoints')) || msPointer;
+	pointer = (Y.hasOwn.call(Y.Window, 'PointerEvent') &&
+		Y.hasOwn.call(navigator, 'pointerEnabled') &&
+		!Y.hasOwn.call(navigator, 'maxTouchPoints')) || msPointer;
 
 	//---
 
-	Y.UA = Y.Class.Extend({
+	Y.UA = Y.Class.extend({
 		CLASS_NAME: 'UA',
 
 		initialise: function () {
@@ -222,9 +222,9 @@
 			// OS.Platform = navigator.platform;
 
 			Browser.Language = navigator.language;
-			Browser.Vendor = Y.CallProperty(navigator, 'vendor');
+			Browser.Vendor = Y.callProperty(navigator, 'vendor');
 
-			Y.Extend(OS, {
+			Y.extend(OS, {
 				Name: navigator.appVersion.indexOf('Linux') !== -1 ? osNames[0] : osNames[6] ||
 					navigator.appVersion.indexOf('Mac') !== -1 ? osNames[2] : osNames[6] ||
 					navigator.appVersion.indexOf('X11') !== -1 ? osNames[3] : osNames[6] ||
@@ -239,7 +239,7 @@
 			//
 
 			/** @namespace Y.Window.YAX_DISABLE_3D */
-			Y.Extend(features, {
+			Y.extend(features, {
 				// Elements
 				Audio: Y.Lang.isSet(document.createElement('audio').canPlayType),
 				Canvas: Y.Lang.isSet(document.createElement('canvas').getContext),
@@ -249,7 +249,7 @@
 
 				// Features and Attributes
 				Offline: navigator.hasOwnProperty('onLine') && navigator.onLine,
-				ApplicationCache: Y.Lang.isSet(Y.CallProperty(window, 'applicationCache')),
+				ApplicationCache: Y.Lang.isSet(Y.callProperty(window, 'applicationCache')),
 				ContentEditable: document.createElement('span').hasOwnProperty('isContentEditable'),
 				DragDrop: document.createElement('span').hasOwnProperty('draggable'),
 				Geolocation: Y.Lang.isSet(navigator.geolocation),
@@ -271,7 +271,7 @@
 				InputTypeUrl: testInput('url'),
 
 				// Storage
-				IndexDB: Y.Lang.isSet(Y.CallProperty(window, 'indexedDB')),
+				IndexDB: Y.Lang.isSet(Y.callProperty(window, 'indexedDB')),
 				LocalStorage: (window.window.hasOwnProperty('localStorage') && window.localStorage !== null),
 				WebSQL: Y.Lang.isSet(window.openDatabase),
 
@@ -282,7 +282,7 @@
 
 				// Propietary features
 				// Standalone: ((window.navigator.hasOwnProperty('standalone')) && (window.navigator.standalone))
-				Standalone: Y.Lang.isSet(Y.CallProperty(navigator, 'standalone')),
+				Standalone: Y.Lang.isSet(Y.callProperty(navigator, 'standalone')),
 
 				Any3D: !Y.Window.YAX_DISABLE_3D && (ie3d || webkit3d || gecko3d || opera3d),
 
@@ -291,7 +291,7 @@
 			});
 
 			// Return (boolean) of likely client device classifications.
-			Y.Extend(type, {
+			Y.extend(type, {
 				Mobile: (screen.width < 768),
 				Tablet: (screen.width >= 768 && features.Orientation),
 				Desktop: (screen.width >= 800 && !features.Orientation)

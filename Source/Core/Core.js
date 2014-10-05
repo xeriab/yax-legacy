@@ -20,7 +20,7 @@
 
 	'use strict';
 
-	var classToType = Object.create({});
+	var classToType = {};
 	var False = false;
 	var obj = Object.prototype;
 	var hasOwn = obj.hasOwnProperty;
@@ -255,8 +255,8 @@
 	 * @return    boolean TRUE|FALSE
 	 */
 	function likeArray(object) {
-		return type(object.length) === 'number';
-		// return isNumber(object.length);
+		// return type(object.length) === 'number';
+		return isNumber(object.length);
 	}
 
 	/**
@@ -280,8 +280,7 @@
 		}
 
 		return _type === 'array' || len === 0 ||
-			typeof len === 'number' && len > 0 &&
-			(len - 1) in object;
+			(typeof len === 'number' && len > 0) && (len - 1) in object;
 	}
 
 	/**
@@ -632,14 +631,14 @@
 
 		if (type && isNumber(type) && type === 1) {
 			for (x in object) {
-				// if (Y.HasOwnProperty.call(object, x)) {
+				// if (Y.hasOwn.call(object, x)) {
 				if (object.hasOwnProperty(x)) {
 					tmp.push([x, object[x]]);
 				}
 			}
 		} else {
 			for (n in object) {
-				// if (Y.HasOwnProperty.call(object, n)) {
+				// if (Y.hasOwn.call(object, n)) {
 				if (object.hasOwnProperty(n)) {
 					tmp.push(object[n]);
 				}
@@ -862,7 +861,7 @@
 			source = arguments[x];
 
 			for (prop in source) {
-				//if (Y.HasOwnProperty.call(source, prop)) {
+				//if (Y.hasOwn.call(source, prop)) {
 				if (source.hasOwnProperty(prop)) {
 					object[prop] = source[prop];
 				}
@@ -881,7 +880,7 @@
 		var self = Y;
 		var setArray;
 
-		Y._CONFIG_STORAGE[varName] = Y._CONFIG_STORAGE[varName] || Object.create({});
+		Y._CONFIG_STORAGE[varName] = Y._CONFIG_STORAGE[varName] || {};
 
 		oldValue = Y._CONFIG_STORAGE[varName].LOCAL_VALUE;
 
@@ -961,17 +960,18 @@
 
 	extend(Y, {
 		setConfig: configSet,
+
 		getConfig: configGet,
 
-		Each: each,
+		each: each,
 
-		Foreach: foreach,
+		foreach: foreach,
 
-		Every: every,
+		every: every,
 
-		ClassToType: classToType,
+		classToType: classToType,
 
-		Extend: function(object) {
+		extend: function(object) {
 			if (!isObject(object) && !isFunction(object)) {
 				return object;
 			}
@@ -1000,11 +1000,7 @@
 			return object;
 		},
 
-		// ObjectHasProperty: hasProperty,
-
-		// HasProperty: hasProp,
-
-		CallProperty: getOwn
+		callProperty: getOwn
 	});
 
 	//---
@@ -1156,7 +1152,7 @@
 	// Shortcut function for checking if an object has a given property directly
 	// on itself (in other words, not on a prototype).
 	Y.Lang.Has = function(obj, key) {
-		return obj !== null && Y.HasOwnProperty.call(obj, key);
+		return obj !== null && Y.hasOwn.call(obj, key);
 		// return obj !== null && obj.hasOwnProperty(key);
 	};
 

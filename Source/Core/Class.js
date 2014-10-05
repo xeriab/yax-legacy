@@ -32,7 +32,7 @@
 
 	//---
 
-	Y.Class.Extend = Y.Class.extend = function (properties) {
+	Y.Class.extend = function (properties) {
 		// Extended class with the new prototype
 		var newClass = function () {
 			// Call the initialise constructor
@@ -77,7 +77,7 @@
 		// Y.Log(properties.CLASS_NAME);
 
 		if (properties.CLASS_NAME) {
-			Y.Extend(newClass, {
+			Y.extend(newClass, {
 				CLASS_NAME: properties.CLASS_NAME.toString()
 			});
 
@@ -86,25 +86,25 @@
 
 		// Mix static properties into the class
 		if (properties.STATICS) {
-			Y.Extend(newClass, properties.STATICS);
+			Y.extend(newClass, properties.STATICS);
 			delete properties.STATICS;
 		}
 
 		// Mix includes into the prototype
 		/** @namespace properties.INCLUDES */
 		if (properties.INCLUDES) {
-			Y.Extend.apply(null, [proto].concat(properties.INCLUDES));
+			Y.extend.apply(null, [proto].concat(properties.INCLUDES));
 			/** @namespace properties.Includes */
 			delete properties.INCLUDES;
 		}
 
 		//  OPTIONS
 		if (proto.OPTIONS) {
-			properties.OPTIONS = Y.Extend(Y.Util.Create(proto.OPTIONS), properties.OPTIONS);
+			properties.OPTIONS = Y.extend(Y.Util.Create(proto.OPTIONS), properties.OPTIONS);
 		}
 
 		// Mix given properties into the prototype
-		Y.Extend(proto, properties);
+		Y.extend(proto, properties);
 
 		proto.initialHooks = [];
 
@@ -131,22 +131,22 @@
 	//---
 
 	// Method for adding properties to prototype
-	Y.Class.Include = Y.Class.include = function (properties) {
-		Y.Extend(this.prototype, properties);
+	Y.Class.include = function (properties) {
+		Y.extend(this.prototype, properties);
 	};
 
 	//---
 
 	//  new default options to the Class
-	Y.Class.Options = Y.Class.options = function (options) {
-		Y.Extend(this.prototype.OPTIONS, options);
+	Y.Class.options = function (options) {
+		Y.extend(this.prototype.OPTIONS, options);
 	};
 
 	//---
 
 	//  new default object to the Class
-	Y.Class.MergeObject = Y.Class.mergeObject = function (name, object) {
-		Y.Extend(this.prototype[name], object);
+	Y.Class.mergeObject = function (name, object) {
+		Y.extend(this.prototype[name], object);
 	};
 
 	//---

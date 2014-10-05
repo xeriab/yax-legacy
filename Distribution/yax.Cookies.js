@@ -1,7 +1,7 @@
 /**
- * YAX Plugins | Cookies
+ * YAX Plugins | cookies
  *
- * Cross browser Cookies implementation using YAX's API [CORE, Node]
+ * Cross browser cookies implementation using YAX's API [CORE, Node]
  *
  * @version     0.15
  * @depends:    Core, Node
@@ -23,30 +23,30 @@
 
 	//---
 
-	Y.Store.MergeObject('Drivers', {
-		Cookies: {
-			ID: 'Y.Store.Drivers.Cookies',
+	Y.Store.mergeObject('drivers', {
+		cookies: {
+			id: 'Y.Store.drivers.cookies',
 
-			Scope: 'Browser',
+			scope: 'Browser',
 
 			/**
 			 * @return {boolean}
 			 */
-			Available: function () {
+			available: function () {
 				try {
-					return !!Y.UserAgent.Features.Cookies;
+					return !!Y.UserAgent.Features.cookies;
 				} catch (e) {
 					Y.ERROR(e);
 					return false;
 				}
 			},
 
-			Initialise: Y.Lang.noop,
+			initialise: Y.Lang.noop,
 
 			/**
 			 * @return {boolean}
 			 */
-			Set: function (name, value) {
+			set: function (name, value) {
 				var date, expire, key;
 
 				date = new Date();
@@ -76,7 +76,7 @@
 			/**
 			 * @return {string}
 			 */
-			Get: function (name) {
+			get: function (name) {
 				var newName, cookieArray, x, cookie;
 
 				newName = name + '=';
@@ -97,8 +97,8 @@
 				return null;
 			},
 
-			Delete: function (name) {
-				this.Set(name, '', -1);
+			delete: function (name) {
+				this.set(name, '', -1);
 			}
 		}
 	});

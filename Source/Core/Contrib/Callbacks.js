@@ -23,13 +23,13 @@
 	var rnotwhite = (/\S+/g);
 
 	// String to Object options format cache
-	var optionsCache = Object.create({});
+	var optionsCache = {};
 
 	// Convert String-formatted options into Object-formatted ones and store in cache
 	function createOptions (options) {
 		var object = optionsCache[options] = {};
 
-		Y.Each(options.match(rnotwhite) || [], function(_, flag) {
+		Y.each(options.match(rnotwhite) || [], function(_, flag) {
 			object[flag] = true;
 		});
 
@@ -48,12 +48,12 @@
 	 */
 	Y.G.Callbacks = function (options) {
 
-		// options = Y.Extend({}, options || {});
+		// options = Y.extend({}, options || {});
 
 		if (Y.Lang.isString(options)) {
 			options = optionsCache[options] || createOptions(options);
 		} else {
-			options = Y.Extend({}, options);
+			options = Y.extend({}, options);
 		}
 
 		// Y.LOG(options);
@@ -123,7 +123,7 @@
 					var start = list.length,
 						add;
 					add = function (args) {
-						Y.Each(args, function (_, arg) {
+						Y.each(args, function (_, arg) {
 							if (Y.Lang.isFunction(arg)) {
 								if (!options.unique || !Callbacks.has(arg)) {
 									list.push(arg);
@@ -148,7 +148,7 @@
 			},
 			remove: function () {
 				if (list) {
-					Y.Each(arguments, function (_, arg) {
+					Y.each(arguments, function (_, arg) {
 						var index = 0;
 						while ((index = Y.Lang.inArray(arg, list, index)) > -1) {
 							list.splice(index, 1);

@@ -21,7 +21,7 @@
 
 	'use strict';
 
-	var YAXDOM = Object.create({});
+	var YAXDOM = {};
 
 	var ClassList;
 
@@ -29,11 +29,11 @@
 
 	var docElement = Y.Document.documentElement;
 
-	var elementDisplay = Object.create({});
+	var elementDisplay = {};
 
-	var ClassCache = Object.create({});
+	var ClassCache = {};
 
-	var IDsCache = Object.create({});
+	var IDsCache = {};
 
 	// Special attributes that should be get/set via method calls
 	var MethodAttributes = [
@@ -119,7 +119,7 @@
 
 	var DomNode;
 
-	var ClassTag = 'YAX' + Y.Lang.now;
+	var ClassTag = 'YAX' + Y.Lang.now();
 
 	//---
 
@@ -137,7 +137,7 @@
 	function classReplacement(name) {
 		var result;
 
-		if (Y.HasOwnProperty.call(ClassCache, name)) {
+		if (Y.hasOwn.call(ClassCache, name)) {
 			result = ClassCache[name];
 		} else {
 			ClassCache[name] = new RegExp('(^|\\s)' + name + '(\\s|)');
@@ -150,7 +150,7 @@
 	function idReplacement(name) {
 		var result;
 
-		if (Y.HasOwnProperty.call(IDsCache, name)) {
+		if (Y.hasOwn.call(IDsCache, name)) {
 			result = IDsCache[name];
 		} else {
 			IDsCache[name] = new RegExp('(^|\\s)' + name + '(\\s|)');
@@ -166,7 +166,7 @@
 		func(node);
 
 		for (key in node.childNodes) {
-			// if (Y.HasOwnProperty.call(node.childNodes, key)) {
+			// if (Y.hasOwn.call(node.childNodes, key)) {
 			if (node.childNodes.hasOwnProperty(key)) {
 				traverseNode(node.childNodes[key], func);
 			}
@@ -275,11 +275,11 @@
 		Class = node.className || '';
 
 		//svg = Class && Class.baseVal !== undef;
-		svg = Class && Y.CallProperty(Class, 'baseVal') !== undef;
+		svg = Class && Y.callProperty(Class, 'baseVal') !== undef;
 
 		if (value === undef) {
 			// result = svg ? Class.baseVal : Class;
-			return svg ? Y.CallProperty(Class, 'baseVal') : Class;
+			return svg ? Y.callProperty(Class, 'baseVal') : Class;
 		}
 
 		// result = svg ? Y.Inject(Class, 'baseVal', value) : (node.className = value);
@@ -302,11 +302,11 @@
 		ID = node.id || '';
 
 		// svg = ID && ID.baseVal !== undef;
-		svg = ID && Y.CallProperty(ID, 'baseVal') !== undef;
+		svg = ID && Y.callProperty(ID, 'baseVal') !== undef;
 
 		if (value === undef) {
 			// return svg ? ID.baseVal : ID;
-			return svg ? Y.CallProperty(ID, 'baseVal') : ID;
+			return svg ? Y.callProperty(ID, 'baseVal') : ID;
 		}
 
 		if (svg) {
@@ -516,7 +516,7 @@
 
 	//---
 
-	Y.Extend(YAXDOM, {
+	Y.extend(YAXDOM, {
 		/**
 		 *
 		 * @param element
@@ -531,10 +531,10 @@
 				return false;
 			}
 
-			matchesSelector = Y.CallProperty(element, 'webkitMatchesSelector') ||
-				Y.CallProperty(element, 'mozMatchesSelector') ||
-				Y.CallProperty(element, 'oMatchesSelector') ||
-				Y.CallProperty(element, 'matchesSelector');
+			matchesSelector = Y.callProperty(element, 'webkitMatchesSelector') ||
+				Y.callProperty(element, 'mozMatchesSelector') ||
+				Y.callProperty(element, 'oMatchesSelector') ||
+				Y.callProperty(element, 'matchesSelector');
 
 			if (matchesSelector) {
 				return matchesSelector.call(element, selector);
@@ -586,7 +586,7 @@
 					name = Y.RegEx.FragmentReplacement.test(html) && RegExp.$1;
 				}
 
-				if (!(Y.HasOwnProperty.call(Containers, name))) {
+				if (!(Y.hasOwn.call(Containers, name))) {
 					name = '*';
 				}
 
@@ -594,7 +594,7 @@
 
 				container.innerHTML = Y.Lang.empty() + html;
 
-				dom = Y.Each(Y.G.Slice.call(container.childNodes), function() {
+				dom = Y.each(Y.G.Slice.call(container.childNodes), function() {
 					self = this;
 					// container.removeChild(this);
 					container.removeChild(self);
@@ -604,7 +604,7 @@
 			if (Y.Lang.isPlainObject(properties)) {
 				nodes = Y.DOM(dom);
 
-				Y.Each(properties, function(key, value) {
+				Y.each(properties, function(key, value) {
 					if (MethodAttributes.indexOf(key) > -1) {
 						nodes[key](value);
 					} else {
@@ -715,12 +715,12 @@
 					// result = {'res': found};
 					result = [found];
 				} else {
-					// result = Object.create({});
+					// result = {};
 					result = [];
 				}
 			} else {
 				result = (!Y.Lang.isUndefined(element) && element.nodeType !== 1 &&
-						element.nodeType !== 9) ? Object.create({}) :
+						element.nodeType !== 9) ? [] :
 					Y.G.Slice.call(
 						isSimple && !maybeID ?
 						// If it's simple, it could be a class
@@ -743,11 +743,14 @@
 			var result;
 
 			result = dom || [];
-			// result = dom || Object.create({});
+			// result = dom || {};
+
 			/* jshint -W103 */
 			// result.__proto__ = Y.DOM.Function;
-			result.__proto__ = Y.DOM.Function;
-			// Y.Extend(result.__proto__, Y.DOM.Function);
+
+			/** @namespace Object.setPrototypeOf */
+			Object.setPrototypeOf(result, Y.DOM.Function);
+
 			result.selector = selector || Y.Lang.empty();
 
 			return result;
@@ -782,12 +785,8 @@
 	/**
 	 * Y.DomNode is a DOM class that Y.DOM classes inherit from.
 	 */
-	Y.DomNode = Y.Class.Extend({
+	Y.DomNode = Y.Class.extend({
 		CLASS_NAME: 'DOM',
-
-		// initialise: function (selector, context) {
-		// 	return YAXDOM.init(selector, context);
-		// },
 
 		getStyle: function(el, style) {
 			var value, css;
@@ -818,7 +817,7 @@
 			sort: Y.G.ArrayProto.sort,
 			indexOf: Y.G.IndexOf,
 			concat: Y.G.Concat,
-			extend: Y.Extend,
+			extend: Y.extend,
 			// `map` and `slice` in the jQuery API work differently
 			// from their array counterparts
 			map: function(callback) {
@@ -833,7 +832,7 @@
 			ready: function(callback) {
 				// need to check if Y.Document.body exists for IE as that browser reports
 				// Y.Document ready when it hasn't yet created the body element
-				if (Y.RegEx.ReadyReplacement.test(Y.CallProperty(Y.Document, 'readyState')) &&
+				if (Y.RegEx.ReadyReplacement.test(Y.callProperty(Y.Document, 'readyState')) &&
 					Y.Document.body) {
 					callback(Y.DOM);
 				} else {
@@ -1354,9 +1353,9 @@
 					}
 
 					if (Y.Lang.isArray(name)) {
-						props = Object.create({});
+						props = {};
 
-						Y.Each(Y.Lang.isArray(name) ? name : [name], function(tmp, prop) {
+						Y.each(Y.Lang.isArray(name) ? name : [name], function(tmp, prop) {
 							props[prop] = (element.style[Y.Lang.camelise(prop)] || computedStyle.getPropertyValue(
 								prop));
 						});
@@ -1374,7 +1373,7 @@
 				}
 
 				return Y.DOM.Access(this, function(element, name, value) {
-					var styles, len, mapo = Object.create({}),
+					var styles, len, mapo = {},
 						i = 0;
 
 					if (Y.Lang.isArray(name)) {
@@ -1392,10 +1391,6 @@
 						Y.DOM.Style(element, name, value) :
 						Y.DOM.CSS(element, name);
 				}, name, value, arguments.length > 1);
-			},
-
-			prevAll: function(elem) {
-				return Y.DOM.dir(elem, "previousSibling");
 			},
 
 			index: function(element) {
@@ -1731,7 +1726,7 @@
 		// If support gets modularized, this method should be moved back to the css module.
 		Swap: function(element, options, callback, args) {
 			var ret, name,
-				old = Object.create({});
+				old = {};
 
 			// Remember the old values, and insert the new ones
 			for (name in options) {
@@ -1924,14 +1919,14 @@
 
 	//---
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		offset: {
 			setOffset: function(element, options, i) {
 				var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft,
 					calculatePosition,
 					position = Y.DOM.CSS(element, "position"),
 					curElem = Y.DOM(element),
-					props = Object.create({});
+					props = {};
 
 				// Set position first, in-case top/left are set even on static element
 				if (position === "static") {
@@ -1976,9 +1971,7 @@
 
 		isLTR: DomNode.documentIsLtr,
 
-		// EC: 0,
-
-		each: Y.Each,
+		each: Y.each,
 
 		vardump: Y.Lang.variableDump,
 
@@ -1989,8 +1982,6 @@
 		pushStack: DomNode.pushStack,
 
 		Swap: DomNode.Swap,
-
-		dir: DomNode.dir,
 
 		swap: DomNode.Swap,
 
@@ -2029,8 +2020,8 @@
 		parseJSON: Y.Lang.parseJSON
 	});
 
-	Y.DOM.Support = Y.DOM.support = Object.create({});
-	Y.DOM.Expr = Y.DOM.expr = Object.create({});
+	Y.DOM.Support = Y.DOM.support = {};
+	Y.DOM.Expr = Y.DOM.expr = {};
 	Y.DOM.Map = Y.DOM.map = map;
 
 	//---
@@ -2043,7 +2034,7 @@
 	//---
 
 	// Create scrollLeft and scrollTop methods
-	Y.Each({
+	Y.each({
 		scrollLeft: 'pageXOffset',
 		scrollTop: 'pageYOffset'
 	}, function(method, prop) {
@@ -2073,7 +2064,7 @@
 
 	//---
 
-	Y.Each(['height', 'width'], function(i, name) {
+	Y.each(['height', 'width'], function(i, name) {
 		Y.DOM.CSS_Hooks[name] = {
 			get: function(element, computed, extra) {
 				if (computed) {
@@ -2105,11 +2096,11 @@
 
 	//---
 
-	Y.Each({
+	Y.each({
 		Height: 'height',
 		Width: 'width'
 	}, function(name, type) {
-		Y.Each({
+		Y.each({
 			padding: 'inner' + name,
 			content: type,
 			'': 'outer' + name
@@ -2156,8 +2147,8 @@
 
 	//---
 
-	Y.DOM.Extend = Y.DOM.extend = Y.Extend;
-	Y.DOM.Function.extend = Y.Extend;
+	Y.DOM.Extend = Y.DOM.extend = Y.extend;
+	Y.DOM.Function.extend = Y.extend;
 
 	//---
 
@@ -2211,7 +2202,7 @@
 							'SCRIPT' && (!el.type || el.type === 'text/javascript')) {
 							if (!el.src) {
 								// window['eval'].call(window, el.innerHTML);
-								globalEval(window, el.innerHTML);
+								globalEval(Y.Window, el.innerHTML);
 							}
 						}
 					});
@@ -2236,7 +2227,7 @@
 
 	//---
 
-	//Y.Extend(YAXDOM.Y.prototype, Y.DOM.Function);
+	//Y.extend(YAXDOM.Y.prototype, Y.DOM.Function);
 
 	YAXDOM.Y.prototype = Y.DOM.Function;
 	Y.DOM.prototype = Y.DOM.Function;

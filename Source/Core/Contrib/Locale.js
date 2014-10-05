@@ -21,7 +21,7 @@
 
 	'use strict';
 
-	Y.Locale = Y.Class.Extend({
+	Y.Locale = Y.Class.extend({
 		STATICS: {
 			// FOO: 'FOOED!!'
 		},

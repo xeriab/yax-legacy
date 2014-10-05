@@ -24,7 +24,7 @@
 	 * Y.Events is a base class that YAEX classes inherit from to
 	 * handle custom events.
 	 */
-	Y.Evented = Y.Class.Extend({
+	Y.Evented = Y.Class.extend({
 		CLASS_NAME: 'Evented',
 
 		eventsArray: [],
@@ -34,7 +34,7 @@
 			// Types can be a map of types/handlers
 			if (Y.Lang.isObject(types)) {
 				for (type in types) {
-					if (Y.HasOwnProperty.call(types, type)) {
+					if (Y.hasOwn.call(types, type)) {
 						// We don't process space-separated events here for performance;
 						// It's a hot path since Layer uses the on(obj) syntax
 						this._On(type, types[type], callback);
@@ -60,7 +60,7 @@
 				delete this.eventsArray;
 			} else if (Y.Lang.isObject(types)) {
 				for (type in types) {
-					if (Y.HasOwnProperty.call(types, type)) {
+					if (Y.hasOwn.call(types, type)) {
 						this._Off(type, types[type], callback);
 					}
 				}
@@ -170,7 +170,7 @@
 				return this;
 			}
 
-			var event = Y.Extend({}, data, {type: type, target: this}),
+			var event = Y.extend({}, data, {type: type, target: this}),
 				events = this.eventsArray,
 				typeIndex,
 				i,
@@ -216,7 +216,7 @@
 			if (propagate) {
 				// Also check parents for listeners if event propagates
 				for (id in this.eventParents) {
-					if (Y.HasOwnProperty.call(this.eventParents, id)) {
+					if (Y.hasOwn.call(this.eventParents, id)) {
 						if (this.eventParents[id].listens(type)) {
 							return true;
 						}
@@ -268,8 +268,8 @@
 			var id;
 
 			for (id in this.eventParents) {
-				if (Y.HasOwnProperty.call(this.eventParents, id)) {
-					this.eventParents[id].fire(e.type, Y.Extend({layer: e.target}, e));
+				if (Y.hasOwn.call(this.eventParents, id)) {
+					this.eventParents[id].fire(e.type, Y.extend({layer: e.target}, e));
 				}
 			}
 		}

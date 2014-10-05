@@ -39,7 +39,7 @@
 			Y.DOM.each(eventName.split(/\s/), function (i, eventName) {
 				eventName = eventName.split(/\./)[0];
 
-				var tmp = Y.HasOwnProperty.call(Y.DOM.event.special, eventName);
+				var tmp = Y.hasOwn.call(Y.DOM.event.special, eventName);
 
 				if (tmp) {
 					specialEvent = Y.DOM.event.special[eventName];
@@ -55,7 +55,7 @@
 							/// make event argument writable, like on jQuery
 							var args = Y.G.Slice.call(arguments);
 
-							args[0] = Y.Extend({}, args[0]);
+							args[0] = Y.extend({}, args[0]);
 
 							/// define the event handle, Y.DOM.event.dispatch is only for newer versions of jQuery
 							Y.DOM.Event.handle = function () {

@@ -20,7 +20,7 @@
 (function () {
 	// 'use strict';
 
-	var Y = Object.create({});
+	var Y = {};
 
 	var isNode = false;
 
@@ -160,7 +160,7 @@
 
 	//---
 
-	Y._INFO = Object.create({});
+	Y._INFO = {};
 
 	//---
 
@@ -174,27 +174,27 @@
 	/**
 	 * YAX._CONFIG_STORAGE
 	 */
-	Y._CONFIG_STORAGE = Object.create({});
+	Y._CONFIG_STORAGE = {};
 
 	/**
 	 * YAX.Lang
 	 */
-	Y.Lang = Object.create({});
+	Y.Lang = {};
 
 	/**
 	 * YAX._GLOBALS
 	 */
-	Y._GLOBALS = Y.G = Object.create({});
+	Y._GLOBALS = Y.G = {};
 
 	/**
 	 * YAX.Mixin
 	 */
-	Y.Mixin = Object.create({});
+	Y.Mixin = {};
 
 	/**
 	 * YAX.Settings
 	 */
-	Y.Settings = Object.create({});
+	Y.Settings = {};
 
 	//---
 
@@ -205,7 +205,7 @@
 	Y.G.ToString = toString;
 	Y.G.Filter = Filter;
 
-	Y.HasOwnProperty = HasOwnProperty;
+	Y.hasOwn = HasOwnProperty;
 
 	Y.G.FuncProto = FuncProto;
 	Y.G.ArrayProto = ArrayProto;

@@ -24,77 +24,77 @@
 	// Plugin information
 
 	// Default options for the Plugin
-	Y.Extend(Y.Settings.DOM, {
-		Router: {
-			DefaultPath: '/',
-			Before: Y.Lang.Noop,
-			On: Y.Lang.noop,
-			NotFound: Y.Lang.Noop
+	Y.extend(Y.Settings.DOM, {
+		router: {
+			defaultPath: '/',
+			before: Y.Lang.noop,
+			on: Y.Lang.noop,
+			notFound: Y.Lang.noop
 		}
 	});
 
-	var DefaultOptions = Y.Settings.DOM.Router;
+	var defaultOptions = Y.Settings.DOM.router;
 
-	var Location = Y.Location;
-	var Router;
+	var location = Y.Location;
+	var router;
 
-	Router = {
-		// Routes array
-		Routes: [],
+	router = {
+		// routes array
+		routes: [],
 
-		Current: null,
+		current: null,
 
-		Previous: null,
+		previous: null,
 
-		HashRegex: {
-			HashStrip: /^#!*/,
-			NamedArgument: /:([\w\d]+)/g,
-			ArgumentSplat: /\*([\w\d]+)/g,
-			Escape: /[\-\[\]{}()+?.,\\\^$|#\s]/g
+		hashRegex: {
+			hashStrip: /^#!*/,
+			namedArgument: /:([\w\d]+)/g,
+			argumentSplat: /\*([\w\d]+)/g,
+			escape: /[\-\[\]{}()+?.,\\\^$|#\s]/g
 		},
 
-		Config: function (options) {
+		config: function (options) {
 			var option;
 
 			for (option in options) {
 				if (options.hasOwnProperty(option)) {
-					DefaultOptions[option] = options[option];
+					defaultOptions[option] = options[option];
 				} // END if
 			} // END for
 
-			return Router;
+			return router;
 		},
 
-		History: {
-			Cache: false,
-			// Support: ('history' in global)
-			Support: Y.HasOwnProperty.call(global, 'history')
+		history: {
+			cache: false,
+			// support: ('history' in global)
+			support: Y.hasOwn.call(global, 'history')
 		},
 
-		Array: function (args) {
-			return Array.prototype.slice.call(args, 0);
+		array: function (args) {
+			return Y.G.Slice.call(args, 0);
 		},
 
-		Go: function (path) {
-			Location.hash = path;
+		go: function (path) {
+			location.hash = path;
 
-			return Router;
+			return router;
 		},
 
-		Back: function (path) {
+		back: function (path) {
 			// Only 1-step back
-			if (Router.Previous) {
+			if (router.previous) {
 				history.back();
-				Router.Previous = null;
+				router.previous = null;
 				// Fallback if can't go back
 			} else if (path) {
-				Location.hash = path;
+				location.hash = path;
 			} // END if
 
-			return Router;
+			return router;
 		},
 
-		Proxy: function (object) {
+		proxy: function (object) {
 			var self = this,
 				func;
 
@@ -106,33 +106,33 @@
 		},
 
 		proxyAll: function () {
-			var functions = this.Array(arguments),
+			var functions = this.array(arguments),
 				x;
 
 			for (x = 0; x < functions.length; x++) {
-				this[functions[x]] = this.Proxy(this[functions[x]]);
+				this[functions[x]] = this.proxy(this[functions[x]]);
 			}
 		},
 
-		Add: function (path, callback) {
+		add: function (path, callback) {
 			var x,
 				temp;
 
 			if (Y.Lang.isObject(path)) {
 				for (x in path) {
 					if (path.hasOwnProperty(x)) {
-						this.Add(x, path[x]);
+						this.add(x, path[x]);
 					}
 				}
 			} else {
 				if (Y.Lang.isString(path)) {
-					path = path.replace(this.HashRegex.Escape, '\\$&').replace(this.HashRegex
-						.NamedArgument, '([^\/]*)').replace(this.HashRegex.ArgumentSplat,
+					path = path.replace(this.hashRegex.escape, '\\$&').replace(this.hashRegex
+						.namedArgument, '([^\/]*)').replace(this.hashRegex.argumentSplat,
 						'(.*?)');
 					temp = new RegExp('^' + path + '$');
 				}
 
-				this.Routes.push({
+				this.routes.push({
 					'Route': temp,
 					'Function': callback || function () {
 						return false;
@@ -141,32 +141,32 @@
 			}
 		},
 
-		Setup: function (options) {
-			if (options && options.History) {
-				this.History.Cache = this.History.Support && options.History;
+		setup: function (options) {
+			if (options && options.history) {
+				this.history.cache = this.history.support && options.history;
 			}
 
-			if (this.History.Cache) {
-				Y.Node(global).bind('popstate', this.Change);
+			if (this.history.cache) {
+				Y.DOM(global).bind('popstate', this.change);
 			} else {
-				Y.Node(global).bind('hashchange', this.Change);
+				Y.DOM(global).bind('hashchange', this.change);
 			}
 
-			this.proxyAll('Change');
+			this.proxyAll('change');
 
-			return this.Change();
+			return this.change();
 		},
 
-		Unbind: function () {
-			if (this.History) {
-				Y.Node(global).unbind('popstate', this.Change);
+		unbind: function () {
+			if (this.history) {
+				Y.DOM(global).unbind('popstate', this.change);
 			} else {
-				Y.Node(global).unbind('hashchange', this.Change);
+				Y.DOM(global).unbind('hashchange', this.change);
 			}
 		},
 
-		Navigate: function () {
-			var args = this.Array(arguments),
+		navigate: function () {
+			var args = this.array(arguments),
 				triggers = false,
 				path;
 
@@ -184,10 +184,10 @@
 				this.Path = path;
 			}
 
-			if (this.History.Cache) {
-				history.cache.pushState({}, document.title, this.getHost() + path);
+			if (this.history.cache) {
+				history.cache.pushState({}, Y.Document.title, this.getHost() + path);
 			} else {
-				Location.hash = path;
+				location.hash = path;
 			}
 		},
 
@@ -199,7 +199,7 @@
 		 * @returns {boolean}
 		 * @constructor
 		 */
-		Match: function (path, route, callback) {
+		match: function (path, route, callback) {
 			var match = route.exec(path),
 				params;
 
@@ -215,89 +215,89 @@
 		},
 
 		getPath: function () {
-			return Location.pathname;
+			return location.pathname;
 		},
 
 		getHash: function () {
-			return Location.hash;
+			return location.hash;
 		},
 
 		getHost: function () {
-			return ((document.location + Y.Lang.empty()).replace(this.getPath() + this.getHash(),
+			return ((Y.Document.location + Y.Lang.empty()).replace(this.getPath() + this.getHash(),
 				''));
 		},
 
 		getFragment: function () {
-			return this.getHash().replace(this.HashRegex.HashStrip, '');
+			return this.getHash().replace(this.hashRegex.hashStrip, '');
 		},
 
-		Change: function () {
-			var path = (Router.History.Cache ? Router.getPath() : Router.getFragment()),
-				hash = Router.getHash(),
+		change: function () {
+			var path = (router.history.cache ? router.getPath() : router.getFragment()),
+				hash = router.getHash(),
 				found = false,
-				current = Router.Current,
+				current = router.current,
 				x, n, route, matches;
 
-			if (path === Router.Path) {
+			if (path === router.Path) {
 				return;
 			}
 
-			Router.Path = path;
+			router.Path = path;
 
 			if (!hash) {
-				hash = DefaultOptions.DefaultPath;
+				hash = defaultOptions.defaultPath;
 			} // END if
 
-			if (current && current !== Router.Previous) {
-				Router.Previous = current;
+			if (current && current !== router.previous) {
+				router.previous = current;
 			} // END if
 
-			Router.Current = hash;
+			router.current = hash;
 
-			for (x = 0, n = Router.Routes.length; x < n && !found; x++) {
-				route = Router.Routes[x];
+			for (x = 0, n = router.routes.length; x < n && !found; x++) {
+				route = router.routes[x];
 
-				// if (Router.Match(path, route['Route'], route['Function'])) {
-				if (Router.Match(path, route.Route, route.Function)) {
+				// if (router.match(path, route['Route'], route['Function'])) {
+				if (router.match(path, route.Route, route.Function)) {
 					return;
 				}
 			}
 
-			for (x = 0, n = Router.Routes.length; x < n && !found; x++) {
-				route = Router.Routes[x];
+			for (x = 0, n = router.routes.length; x < n && !found; x++) {
+				route = router.routes[x];
 
 				if (Y.Lang.isString(path)) {
 					if (path.toLowerCase() === hash.toLowerCase().slice(1)) {
-						DefaultOptions.Before.call(Router, path);
-						// route['Function'].call(Router);
+						defaultOptions.before.call(router, path);
+						// route['Function'].call(router);
 						/** @namespace route.Function.call */
-						route.Function.call(Router);
-						DefaultOptions.On.call(Router, path);
+						route.Function.call(router);
+						defaultOptions.on.call(router, path);
 						found = true;
 					} // END if
 				} else {
 					matches = hash.match(path);
 
 					if (matches) {
-						DefaultOptions.Before.call(Router, path, matches);
-						// route['Function'].apply(Router, matches);
-						route.Function.apply(Router, matches);
-						DefaultOptions.On.call(Router, path, matches);
+						defaultOptions.before.call(router, path, matches);
+						// route['Function'].apply(router, matches);
+						route.Function.apply(router, matches);
+						defaultOptions.on.call(router, path, matches);
 						found = true;
 					} // END if
 				} // END if
 			} // END for
 
 			if (!found) {
-				DefaultOptions.NotFound.call(Router);
+				defaultOptions.notFound.call(router);
 			} // END if
 
-			return Router;
+			return router;
 		}
-	}; // END OF Router CLASS
+	}; // END OF router CLASS
 
-	// Assign the Router class to YAX's and Window global
-	Y.DOM.Router = Router;
+	// Assign the router class to YAX's and Window global
+	Y.DOM.router = router;
 
 	//---
 

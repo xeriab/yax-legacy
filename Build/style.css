@@ -240,8 +240,8 @@ ul#toolbar-list a:active {
 	height: auto;
 	line-height: 40px;
 	background-color: rgba(0, 80, 30, .2);
-	padding-left: 10px;
-	padding-right: 10px;
+	/*padding-left: 10px;*/
+	/*padding-right: 10px;*/
 	color: rgba(0, 0, 0, .6);
 	text-shadow: 1px 1px 0 rgba(255, 255, 255, .7);
 }
@@ -260,6 +260,7 @@ ul#toolbar-list a:active {
 	margin-bottom: 5px;
 	border-top: 1px dashed rgba(255, 255, 255, .5);
 }
+
 #dependencies-list input {
 	display: inline;
 	float: left;
@@ -271,25 +272,32 @@ ul#toolbar-list a:active {
 #dependencies-list label {
 	float: left;
 	width: 160px;
+	height: auto;
 	font-weight: bold;
-	border-right: 1px dashed rgba(0, 0, 0, .05);
 	background: radial-gradient(200px 500px, rgba(255, 255, 255, .2) -150px, transparent 50%);
 	line-height: 37px;
+	padding-left: 10px;
+	display: block;
+	margin-right: 10px;
+	border-right: 1px dashed rgba(0, 0, 0, .05);
 }
 #dependencies-list div {
-	display: table-cell;
+	display: block;
 	height: 1%;
-	width: 900px;
+	margin: 0 auto;
 	background: radial-gradient(800px 300px, rgba(255, 255, 255, .2) 10%, transparent 50%);
 }
 #dependencies-list .desc {
 	color: #777;
-	padding: 0 0 0 10px;
+	margin-right: 10px;
+}
+#dependencies-list .Desc {
+	color: #777;
 }
 #dependencies-list .deps {
 	color: #777;
 }
-#dependencies-list li:nth-child(n+1) span.desc:first-child:before {
+#dependencies-list li:nth-child(n+1) div.desc:first-child:before {
 	content: '';
 	width: auto;
 	padding: 1px 3px 1px 3px;
@@ -310,25 +318,25 @@ ul#toolbar-list a:active {
 	top: 11px;
 	box-shadow: 0 0 5px rgba(255, 255, 255, .7);
 }
-#dependencies-list li:nth-child(n+1) span.desc:first-child:before {
+#dependencies-list li:nth-child(n+1) div.desc:first-child:before {
 	content: 'Core';
 	background: rgba(20, 40, 160, .4);
 }
-#dependencies-list li:nth-child(n+3) span.desc:first-child:before {
+#dependencies-list li:nth-child(n+3) div.desc:first-child:before {
 	content: 'Core Module';
 	background: rgba(40, 160, 40, .5);
 }
-#dependencies-list li:nth-child(n+5) span.desc:first-child:before {
+#dependencies-list li:nth-child(n+5) div.desc:first-child:before {
 	content: 'Extension';
 	background: rgba(160, 40, 40, .5);
 }
-#dependencies-list li:nth-child(n+8) span.desc:first-child:before {
+#dependencies-list li:nth-child(n+8) div.desc:first-child:before {
 	content: 'Plugin';
 	background: rgba(100, 40, 140, .5);
 }
 #dependencies-list li:nth-child(n+1) label:before {
 	content: '';
-	width: 2px;
+	width: 3px;
 	height: 15px;
 	line-height: 15px;
 	display: block;
@@ -343,7 +351,6 @@ ul#toolbar-list a:active {
 	position: relative;
 	float: left;
 	top: 11px;
-	box-shadow: 0 0 5px rgba(255, 255, 255, .7);
 	margin-right: 10px;
 }
 #dependencies-list li:nth-child(n+1) label:before {

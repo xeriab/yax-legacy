@@ -45,7 +45,7 @@
 
 	// cancelFunction = window.cancelAnimationFrame ||
 	// cancelFunction = window.cancelRequestAnimationFrame ||
-	cancelFunction = Y.CallProperty(Y.Window, 'cancelAnimationFrame') ||
+	cancelFunction = Y.callProperty(Y.Window, 'cancelAnimationFrame') ||
 		getPrefixed('CancelAnimationFrame') ||
 		getPrefixed('CancelRequestAnimationFrame') ||
 

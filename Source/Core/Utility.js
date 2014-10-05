@@ -173,7 +173,7 @@
 				array = Y.Lang.isArray(object),
 				hash = Y.Lang.isPlainObject(object);
 
-			Y.Each(object, function (key, value) {
+			Y.each(object, function (key, value) {
 				type = Y.Lang.type(value);
 
 				if (scope) {

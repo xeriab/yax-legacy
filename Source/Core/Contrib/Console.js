@@ -20,7 +20,7 @@
 
 	// 'use strict';
 
-	Y.CLE = Y.Class.Extend({
+	Y.CLE = Y.Class.extend({
 		CLASS_NAME: 'Console',
 
 		CONSOLE_STYLES: {
@@ -297,7 +297,7 @@
 						}*/
 
 						// if (name in this.CONSOLE_STYLES) {
-						if (Y.HasOwnProperty.call(this.CONSOLE_STYLES, name)) {
+						if (Y.hasOwn.call(this.CONSOLE_STYLES, name)) {
 							code = this.CONSOLE_STYLES[name][0];
 							cstack.push(code);
 						}

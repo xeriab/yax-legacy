@@ -21,32 +21,32 @@
 
 	'use strict';
 
-	Y.Extend(Y.Settings.DOM, {
-		Tooltip: {
-			Opacity: 1,
-			Content: '',
-			Size: 'small',
-			Gravity: 'north',
-			Theme: 'dark',
-			Trigger: 'hover',
-			Animation: 'flipIn',
-			Confirm: false,
-			Yes: 'Yes',
-			No: 'No',
-			FinalMessage: '',
-			FinalMessageDuration: 500,
-			OnYes: Y.Lang.noop,
-			OnNo: Y.Lang.noop,
-			Container: 'body'
+	Y.extend(Y.Settings.DOM, {
+		tooltip: {
+			opacity: 1,
+			content: '',
+			size: 'small',
+			gravity: 'north',
+			theme: 'dark',
+			trigger: 'hover',
+			animation: 'flipIn',
+			confirm: false,
+			yes: 'Yes',
+			no: 'No',
+			finalMessage: '',
+			finalMessageDuration: 500,
+			onYes: Y.Lang.noop,
+			onNo: Y.Lang.noop,
+			container: 'body'
 		}
 	});
 
-	var PluginOptions = Y.Settings.DOM.Tooltip;
+	var pluginOptions = Y.Settings.DOM.tooltip;
 
 	function Tooltip(element, options) {
-		this.Element = element;
-		this.Options = options;
-		this.Delay = null;
+		this.element = element;
+		this.options = options;
+		this.delay = null;
 		this.init();
 	}
 
@@ -54,18 +54,18 @@
 		init: function () {
 			this.setContent();
 
-			if (this.Content) {
+			if (this.content) {
 				this.setEvents();
 			}
 		},
 
 		Show: function () {
-			Y.DOM(this.Element).css('cursor', 'pointer');
+			Y.DOM(this.element).css('cursor', 'pointer');
 
 			// Close all other Tooltips
 			// Y.DOM('div.yax-tooltip').hide();
 			Y.DOM('div.yax-tooltip').remove();
-			Y.Window.clearTimeout(this.Delay);
+			Y.Window.clearTimeout(this.delay);
 			this.setContent();
 			this.setPositions();
 
@@ -75,7 +75,7 @@
 		Hide: function () {
 			// this.Tooltip.hide();
 			this.Tooltip.remove();
-			window.clearTimeout(this.Delay);
+			window.clearTimeout(this.delay);
 			// this.Tooltip.css('display', 'none');
 			this.Tooltip.css('display', 'none');
 		},
@@ -89,7 +89,7 @@
 		},
 
 		addAnimation: function () {
-			switch (this.Options.Animation) {
+			switch (this.options.animation) {
 			case 'none':
 				break;
 
@@ -107,21 +107,21 @@
 
 		setContent: function () {
 			// Get Tooltip content
-			if (this.Options.Content) {
-				this.Content = this.Options.Content;
-			} else if (this.Element.data('tooltip')) {
-				this.Content = this.Element.data('tooltip');
-			} else if (this.Element.title()) {
-				this.Content = this.Element.title();
-				this.Element.title('');
+			if (this.options.content) {
+				this.content = this.options.content;
+			} else if (this.element.data('tooltip')) {
+				this.content = this.element.data('tooltip');
+			} else if (this.element.title()) {
+				this.content = this.element.title();
+				this.element.title('');
 			} else {
-				Y.ERROR('No content for Tooltip: ' + this.Element.selector);
+				Y.ERROR('no content for Tooltip: ' + this.element.selector);
 				return;
 			}
 
-			if (this.Content.charAt(0) === '#') {
-				Y.DOM(this.Content).hide();
-				this.Content = Y.DOM(this.Content).html();
+			if (this.content.charAt(0) === '#') {
+				Y.DOM(this.content).hide();
+				this.content = Y.DOM(this.content).html();
 				this.contentType = 'html';
 			} else {
 				this.contentType = 'text';
@@ -129,35 +129,35 @@
 
 			// Create Tooltip container
 			this.Tooltip = Y.DOM('<div class="yax-tooltip ' +
-				this.Options.Theme + ' ' +
-				this.Options.Size + ' ' +
-				this.Options.Gravity +
+				this.options.theme + ' ' +
+				this.options.size + ' ' +
+				this.options.gravity +
 				'"><div class="tooltiptext">' +
-				this.Content +
+				this.content +
 				'</div><div class="tip"></div></div>'
 			);
 
 			this.Tip = this.Tooltip.find('.tip');
 
 
-			// this.Tooltip.insertBefore(this.Element.parent());
+			// this.Tooltip.insertBefore(this.element.parent());
 
-			// this.Options.Container ? this.Tooltip.prependTo(this.Options.Container) : this.Tooltip.insertAfter(this.Element.parent());
-			if (this.Options.Container !== '' || this.Options.Container) {
-				this.Tooltip.prependTo(this.Options.Container);
-				// this.Tooltip.appendTo(this.Options.Container);
+			// this.options.container ? this.Tooltip.prependTo(this.options.container) : this.Tooltip.insertAfter(this.element.parent());
+			if (this.options.container !== '' || this.options.container) {
+				this.Tooltip.prependTo(this.options.container);
+				// this.Tooltip.appendTo(this.options.container);
 			} else {
-				// this.Tooltip.insertAfter(this.Element.parent());
-				// this.Tooltip.insertBefore(this.Element.parent());
-				this.Tooltip.insertBefore(this.Element.parent());
+				// this.Tooltip.insertAfter(this.element.parent());
+				// this.Tooltip.insertBefore(this.element.parent());
+				this.Tooltip.insertBefore(this.element.parent());
 			}
 
 
-			// this.Tooltip.insertBefore(Y.DOM(this.Element));
+			// this.Tooltip.insertBefore(Y.DOM(this.element));
 
-			// Y.DOM(this.Element).parent().append(this.Tooltip);
+			// Y.DOM(this.element).parent().append(this.Tooltip);
 
-			// this.Element.append(this.Tooltip);
+			// this.element.append(this.Tooltip);
 
 
 			// Adjust size for html Tooltip
@@ -165,21 +165,21 @@
 				this.Tooltip.css('max-width', 'none');
 			}
 
-			this.Tooltip.css('opacity', this.Options.Opacity);
+			this.Tooltip.css('opacity', this.options.opacity);
 
 			this.addAnimation();
 
-			if (this.Options.Confirm) {
+			if (this.options.confirm) {
 				this.addConfirm();
 			}
 		},
 
 		getPosition: function () {
-			var Element = this.Element[0];
-			return Y.Extend({}, (Y.Lang.isFunction(Element.getBoundingClientRect)) ? Element.getBoundingClientRect() : {
-				width: Element.offsetWidth,
-				height: Element.offsetHeight
-			}, this.Element.offset());
+			var element = this.element[0];
+			return Y.extend({}, (Y.Lang.isFunction(element.getBoundingClientRect)) ? element.getBoundingClientRect() : {
+				width: element.offsetWidth,
+				height: element.offsetHeight
+			}, this.element.offset());
 		},
 
 		setPositions: function () {
@@ -187,48 +187,48 @@
 
 			var leftPos = 0,
 				topPos = 0,
-				ElementTop = this.Element.offset().top,
-				ElementLeft = this.Element.offset().left;
+				ElementTop = this.element.offset().top,
+				ElementLeft = this.element.offset().left;
 
-			if (this.Element.css('position') === 'fixed' || this.Element.css('position') ===
+			if (this.element.css('position') === 'fixed' || this.element.css('position') ===
 				'absolute') {
 				ElementTop = 0;
 				ElementLeft = 0;
 			}
 
-			switch (this.Options.Gravity) {
+			switch (this.options.gravity) {
 				case 'south':
-					leftPos = ElementLeft + this.Element.outerWidth() / 2 - this.Tooltip.outerWidth() /
+					leftPos = ElementLeft + this.element.outerWidth() / 2 - this.Tooltip.outerWidth() /
 						2;
 					topPos = ElementTop - this.Tooltip.outerHeight() - this.Tip.outerHeight() /
 						2;
 					break;
 
 				case 'west':
-					leftPos = ElementLeft + this.Element.outerWidth() + this.Tip.outerWidth() /
+					leftPos = ElementLeft + this.element.outerWidth() + this.Tip.outerWidth() /
 						2;
-					topPos = ElementTop + this.Element.outerHeight() / 2 - (this.Tooltip.outerHeight() /
+					topPos = ElementTop + this.element.outerHeight() / 2 - (this.Tooltip.outerHeight() /
 						2);
 					break;
 
 				case 'north':
-					leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
+					leftPos = ElementLeft + this.element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
 						2);
-					topPos = ElementTop + this.Element.outerHeight() + this.Tip.outerHeight() /
+					topPos = ElementTop + this.element.outerHeight() + this.Tip.outerHeight() /
 						2;
 					break;
 
 				case 'east':
 					leftPos = ElementLeft - this.Tooltip.outerWidth() - this.Tip.outerWidth() /
 						2;
-					topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tooltip.outerHeight() /
+					topPos = ElementTop + this.element.outerHeight() / 2 - this.Tooltip.outerHeight() /
 						2;
 					break;
 
 				case 'center':
-					leftPos = ElementLeft + this.Element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
+					leftPos = ElementLeft + this.element.outerWidth() / 2 - (this.Tooltip.outerWidth() /
 						2);
-					topPos = ElementTop + this.Element.outerHeight() / 2 - this.Tip.outerHeight() /
+					topPos = ElementTop + this.element.outerHeight() / 2 - this.Tip.outerHeight() /
 						2;
 					break;
 			}
@@ -240,21 +240,21 @@
 		setEvents: function () {
 			var self = this;
 
-			if (this.Options.Trigger === 'hover' || this.Options.Trigger ===
-				'mouseover' || this.Options.Trigger === 'onmouseover') {
-				this.Element.mouseover(function () {
+			if (this.options.trigger === 'hover' || this.options.trigger ===
+				'mouseover' || this.options.trigger === 'onmouseover') {
+				this.element.mouseover(function () {
 					self.setPositions();
 					self.Show();
 				}).mouseout(function () {
 					self.Hide();
 				});
-			} else if (this.Options.Trigger === 'click' || this.Options.Trigger ===
+			} else if (this.options.trigger === 'click' || this.options.trigger ===
 				'onclick') {
 				this.Tooltip.click(function (event) {
 					event.stopPropagation();
 				});
 
-				this.Element.click(function (event) {
+				this.element.click(function (event) {
 					event.preventDefault();
 					self.setPositions();
 					self.Toggle();
@@ -270,14 +270,14 @@
 		activate: function () {
 			this.setContent();
 
-			if (this.Content) {
+			if (this.content) {
 				this.setEvents();
 			}
 		},
 
 		addConfirm: function () {
 			this.Tooltip.append('<ul class="confirm"><li class="yax-tooltip-yes">' +
-				this.Options.Yes + '</li><li class="yax-tooltip-no">' + this.Options.No +
+				this.options.yes + '</li><li class="yax-tooltip-no">' + this.options.no +
 				'</li></ul>');
 			this.setConfirmEvents();
 		},
@@ -296,33 +296,33 @@
 		},
 
 		finalMessage: function () {
-			if (this.Options.FinalMessage) {
+			if (this.options.finalMessage) {
 				var self = this;
-				self.Tooltip.find('div:first').html(this.Options.FinalMessage);
+				self.Tooltip.find('div:first').html(this.options.finalMessage);
 				self.Tooltip.find('ul').remove();
 				self.setPositions();
 				setTimeout(function () {
 					self.Hide();
 					self.setContent();
-				}, self.Options.FinalMessageDuration);
+				}, self.options.finalMessageDuration);
 			} else {
 				this.Hide();
 			}
 		},
 
 		onYes: function () {
-			this.Options.OnYes(this.Element);
+			this.options.onYes(this.element);
 			this.finalMessage();
 		},
 
 		onNo: function () {
-			this.Options.OnNo(this.Element);
+			this.options.onNo(this.element);
 			this.Hide();
 		}
 	};
 
-	Y.DOM.Function.Tooltip = function (options) {
-		options = Y.Extend({}, PluginOptions, options);
+	Y.DOM.Function.tooltip = function (options) {
+		options = Y.extend({}, pluginOptions, options);
 
 		return this.each(function () {
 			return new Tooltip(Y.DOM(this), options);

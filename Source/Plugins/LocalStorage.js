@@ -1,7 +1,7 @@
 /**
- * Y Plugins | LocalStorage
+ * Y Plugins | localStorage
  *
- * Cross browser LocalStorage implementation using Y's API [CORE, Node]
+ * Cross browser localStorage implementation using Y's API [CORE, Node]
  *
  * @version     0.15
  * @depends:    Core, Node
@@ -23,24 +23,24 @@
 
 	//---
 
-	Y.Store.MergeObject('Drivers', {
-		LocalStorage: {
-			ID: 'Y.Store.Drivers.LocalStorage',
+	Y.Store.mergeObject('drivers', {
+		localStorage: {
+			id: 'Y.Store.drivers.localStorage',
 
-			Scope: 'All',
+			scope: 'All',
 
 			/**
 			 *
 			 * @returns {boolean}
 			 * @constructor
 			 */
-			Available: function () {
+			available: function () {
 				try {
 					// Firefox won't allow localStorage if cookies are disabled
-					if (Y.UserAgent.Features.LocalStorage) {
+					if (Y.UserAgent.Features.localStorage) {
 						// Safari's "Private" mode throws a QUOTA_EXCEEDED_ERR on setItem
-						Y.Window.localStorage.setItem('Y.Store.LocalStorage Availability test', true);
-						Y.Window.localStorage.removeItem('Y.Store.LocalStorage Availability test');
+						Y.Window.localStorage.setItem('Y.Store.localStorage Availability test', true);
+						Y.Window.localStorage.removeItem('Y.Store.localStorage Availability test');
 
 						return true;
 					}
@@ -52,28 +52,28 @@
 				}
 			},
 
-			Initialise: Y.Lang.Noop,
+			initialise: Y.Lang.Noop,
 
 			/**
 			 * @return {boolean}
 			 */
-			Set: function (key, value) {
-				if (this.Available()) {
+			set: function (key, value) {
+				if (this.available()) {
 					Y.Window.localStorage.setItem(key, value);
 				} else {
 					var name;
 
-					Y.Window.LocalStorage = {};
+					Y.Window.localStorage = {};
 
 					if (Y.Lang.isString(key) && Y.Lang.isString(value)) {
-						Y.Window.LocalStorage[key] = value;
+						Y.Window.localStorage[key] = value;
 						return true;
 					}
 
 					if (Y.Lang.isObject(key) && Y.Lang.isUndefined(value)) {
 						for (name in key) {
 							if (key.hasOwnProperty(name)) {
-								Y.Window.LocalStorage[name] = key[name];
+								Y.Window.localStorage[name] = key[name];
 							}
 						}
 
@@ -84,27 +84,27 @@
 				}
 			},
 
-			Get: function (key) {
-				if (this.Available()) {
+			get: function (key) {
+				if (this.available()) {
 					return Y.Window.localStorage.getItem(key);
 				}
 
-				return Y.Window.LocalStorage[key];
+				return Y.Window.localStorage[key];
 			},
 
-			Delete: function (key) {
-				if (this.Available()) {
+			delete: function (key) {
+				if (this.available()) {
 					Y.Window.localStorage.removeItem(key);
 				} else {
-					delete Y.Window.LocalStorage[key];
+					delete Y.Window.localStorage[key];
 				}
 			},
 
-			Flush: function () {
-				if (this.Available()) {
+			flush: function () {
+				if (this.available()) {
 					Y.Window.localStorage.clear();
 				} else {
-					Y.Window.LocalStorage = {};
+					Y.Window.localStorage = {};
 				}
 			}
 		}

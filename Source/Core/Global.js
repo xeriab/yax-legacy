@@ -32,9 +32,10 @@
 
 	//---
 
-	Y.Extend(Y.Lang, {
-		//now: new Date().getTime(),
-		now: new Date().getTime,
+	Y.extend(Y.Lang, {
+		// now: new Date().getTime(),
+		// now: new Date().getTime(),
+		now: Date.now,
 
 		date: new Date(),
 
@@ -65,7 +66,7 @@
 
 	// Cross-browser XML parsing
 	if (!Y.G.isNodeJs) {
-		Y.Extend(Y.Lang, {
+		Y.extend(Y.Lang, {
 			parseXML: function (data) {
 				if (!data || !Y.Lang.isString(data)) {
 					return null;
@@ -91,9 +92,9 @@
 		});
 	}
 
-	Y.Lang.Now = Y.Lang.now;
+	Y.Lang.Now = Y.Lang.now();
 
-	Y.Extend(Y.Lang, {
+	Y.extend(Y.Lang, {
 		lowerCaseFirst: function (string) {
 			string += this.empty();
 

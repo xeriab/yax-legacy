@@ -39,7 +39,7 @@
 				return require(resultantId);
 			};
 
-			module.exports = Object.create({});
+			module.exports = {};
 
 			delete module.factory;
 

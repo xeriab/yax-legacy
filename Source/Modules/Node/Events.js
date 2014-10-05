@@ -36,7 +36,7 @@
 
 		ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$)/,
 
-		focusinSupported = Y.HasOwnProperty.call(Y.Window, 'onfocusin'),
+		focusinSupported = Y.hasOwn.call(Y.Window, 'onfocusin'),
 
 		eventMethods = {
 			preventDefault: 'isDefaultPrevented',
@@ -52,7 +52,7 @@
 
 		document = Y.Document,
 
-		specialEvents = Object.create({});
+		specialEvents = {};
 
 	specialEvents.click =
 		specialEvents.mousedown =
@@ -91,7 +91,7 @@
 
 		var result = null;
 
-		if (Y.HasOwnProperty.call(element, 'EventHandlers')) {
+		if (Y.hasOwn.call(element, 'EventHandlers')) {
 			result = element.EventHandlers;
 		} else {
 			element.EventHandlers = [];
@@ -129,7 +129,7 @@
 			// source || (source = event);
 			source = source || event;
 
-			Y.Each(eventMethods, function (name, predicate) {
+			Y.each(eventMethods, function (name, predicate) {
 				var sourceMethod = source[name];
 
 				event[name] = function () {
@@ -239,7 +239,7 @@
 
 		event.initEvent(type, bubbles, true);
 
-		this.timeStamp = type && type.timeStamp || Y.Lang.now;
+		this.timeStamp = type && type.timeStamp || Y.Lang.now();
 
 		// Mark it as fixed
 		this[Y.DOM.expando] = true;
@@ -255,7 +255,7 @@
 	/**
 	 * Y.DOM.Event contains functions for working with Node events.
 	 */
-	Y.Extend(Y.DOM.Event, {
+	Y.extend(Y.DOM.Event, {
 		on: function (object, types, func, context) {
 			var type, x, len;
 
@@ -512,11 +512,11 @@
 
 	//---
 
-	Y.DOM.event = Object.create({});
+	Y.DOM.event = {};
 
 	//---
 
-	Y.Extend(Y.DOM.event, {
+	Y.extend(Y.DOM.event, {
 		add: function (element, events, func, data, selector, delegator, capture) {
 			var set = eventHandlers(element);
 			var callback;
@@ -532,7 +532,7 @@
 				handler.selector = selector;
 
 				// Emulate mouseenter, mouseleave
-				if (Y.HasOwnProperty.call(hover, handler.e)) {
+				if (Y.hasOwn.call(hover, handler.e)) {
 				//if (handler.e in hover) {
 					func = function (e) {
 						var related = e.relatedTarget;
@@ -588,7 +588,7 @@
 			});
 		},
 
-		special: Object.create({})
+		special: {}
 	});
 
 	//---
@@ -669,7 +669,7 @@
 		var autoRemove, delegator, $this = this;
 
 		if (event && !Y.Lang.isString(event)) {
-			Y.Each(event, function (type, func) {
+			Y.each(event, function (type, func) {
 				$this.on(type, selector, data, func, one);
 			});
 
@@ -705,7 +705,7 @@
 						match = Y.DOM(event.target).closest(selector, element).get(0);
 
 					if (match && match !== element) {
-						evt = Y.Extend(createProxy(event), {
+						evt = Y.extend(createProxy(event), {
 							currentTarget: match,
 							liveFired: element
 						});
@@ -723,7 +723,7 @@
 		var $this = this;
 
 		if (event && !Y.Lang.isString(event)) {
-			Y.Each(event, function (type, func) {
+			Y.each(event, function (type, func) {
 				$this.off(type, selector, func);
 			});
 
@@ -781,7 +781,7 @@
 			e._args = args;
 			e.target = element;
 
-			Y.Each(findHandlers(element, event.type || event), function (i, handler) {
+			Y.each(findHandlers(element, event.type || event), function (i, handler) {
 				result = handler.proxy(e);
 
 				if (e.isImmediatePropagationStopped()) {

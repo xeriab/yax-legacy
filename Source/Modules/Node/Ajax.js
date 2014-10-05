@@ -208,7 +208,7 @@
 
 	//---
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		AjaxSettings: {
 			// Default type of request
 			type: 'GET',
@@ -281,7 +281,7 @@
 
 	//---
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		getJSON: function () {
 			var options = parseArguments.apply(null, arguments);
 			options.dataType = 'json';
@@ -381,7 +381,7 @@
 		},
 
 		Ajax: function (options) {
-			var settings = Y.Extend({}, options || {}),
+			var settings = Y.extend({}, options || {}),
 				deferred = Y.G.Deferred && Y.G.Deferred(),
 				key,
 				dataType,
@@ -501,7 +501,7 @@
 				}
 			}
 
-			settings.headers = Y.Extend(headers, settings.headers, {});
+			settings.headers = Y.extend(headers, settings.headers, {});
 
 			xhr.setRequestHeader = setHeader;
 
@@ -614,7 +614,7 @@
 		}
 	});
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		get: Y.DOM.Get,
 		post: Y.DOM.Post,
 		ajax: Y.DOM.Ajax,
@@ -663,7 +663,7 @@
 	 * Extend YAX's AJAX beforeSend method by setting an X-CSRFToken on any
 	 * 'unsafe' request methods.
 	 **/
-	Y.Extend(Y.DOM.AjaxSettings, {
+	Y.extend(Y.DOM.AjaxSettings, {
 		beforeSend: function (xhr, settings) {
 			if (!(/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type)) && sameOrigin(
 				settings.url)) {

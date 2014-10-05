@@ -45,7 +45,7 @@
 
 	// Y.G.Compatibility = true;
 
-	// Y.DOM._temp = Object.create({});
+	// Y.DOM._temp = {};
 
 	Y.DOM.camelCase = Y.Lang.camelise;
 	Y.DOM.isReady = true;
@@ -183,7 +183,7 @@
 	//---
 
 	/*Y.DOM.event.simulate = function (type, elem, event, bubble) {
-		var e = Y.Extend(new Y.DOM.Event(type), event, {
+		var e = Y.extend(new Y.DOM.Event(type), event, {
 			type: type,
 			isSimulated: true,
 			originalEvent: {},
@@ -204,7 +204,7 @@
 		var attaches = 0;
 
 		var handler = function (event) {
-			Y.DOM.event.simulate(fix, event.target, Y.Extend({}, event), true);
+			Y.DOM.event.simulate(fix, event.target, Y.extend({}, event), true);
 		};
 
 		Y.DOM.event.special[fix] = {

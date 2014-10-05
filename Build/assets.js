@@ -234,13 +234,13 @@
 
 		li.appendChild(label);
 
-		desc = document.createElement('span');
+		desc = document.createElement('div');
 
 		xdesc = document.createElement('span');
 
 		desc.className = 'desc';
 
-		xdesc.className = 'desc';
+		xdesc.className = 'Desc';
 
 		desc.appendChild(document.createTextNode(Dependencies[name].desc));
 
@@ -260,6 +260,7 @@
 		}
 
 		div.appendChild(desc);
+//		div.appendChild(document.createElement('br'));
 //		div.appendChild(document.createElement('br'));
 		div.appendChild(xdesc);
 		// div.appendChild(document.createElement('br'));

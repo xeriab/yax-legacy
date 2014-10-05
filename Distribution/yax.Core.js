@@ -39,7 +39,7 @@
 				return require(resultantId);
 			};
 
-			module.exports = Object.create({});
+			module.exports = {};
 
 			delete module.factory;
 
@@ -134,7 +134,7 @@
 (function () {
 	// 'use strict';
 
-	var Y = Object.create({});
+	var Y = {};
 
 	var isNode = false;
 
@@ -274,7 +274,7 @@
 
 	//---
 
-	Y._INFO = Object.create({});
+	Y._INFO = {};
 
 	//---
 
@@ -288,27 +288,27 @@
 	/**
 	 * YAX._CONFIG_STORAGE
 	 */
-	Y._CONFIG_STORAGE = Object.create({});
+	Y._CONFIG_STORAGE = {};
 
 	/**
 	 * YAX.Lang
 	 */
-	Y.Lang = Object.create({});
+	Y.Lang = {};
 
 	/**
 	 * YAX._GLOBALS
 	 */
-	Y._GLOBALS = Y.G = Object.create({});
+	Y._GLOBALS = Y.G = {};
 
 	/**
 	 * YAX.Mixin
 	 */
-	Y.Mixin = Object.create({});
+	Y.Mixin = {};
 
 	/**
 	 * YAX.Settings
 	 */
-	Y.Settings = Object.create({});
+	Y.Settings = {};
 
 	//---
 
@@ -319,7 +319,7 @@
 	Y.G.ToString = toString;
 	Y.G.Filter = Filter;
 
-	Y.HasOwnProperty = HasOwnProperty;
+	Y.hasOwn = HasOwnProperty;
 
 	Y.G.FuncProto = FuncProto;
 	Y.G.ArrayProto = ArrayProto;
@@ -384,7 +384,7 @@
 
 	'use strict';
 
-	var classToType = Object.create({});
+	var classToType = {};
 	var False = false;
 	var obj = Object.prototype;
 	var hasOwn = obj.hasOwnProperty;
@@ -619,8 +619,8 @@
 	 * @return    boolean TRUE|FALSE
 	 */
 	function likeArray(object) {
-		return type(object.length) === 'number';
-		// return isNumber(object.length);
+		// return type(object.length) === 'number';
+		return isNumber(object.length);
 	}
 
 	/**
@@ -644,8 +644,7 @@
 		}
 
 		return _type === 'array' || len === 0 ||
-			typeof len === 'number' && len > 0 &&
-			(len - 1) in object;
+			(typeof len === 'number' && len > 0) && (len - 1) in object;
 	}
 
 	/**
@@ -996,14 +995,14 @@
 
 		if (type && isNumber(type) && type === 1) {
 			for (x in object) {
-				// if (Y.HasOwnProperty.call(object, x)) {
+				// if (Y.hasOwn.call(object, x)) {
 				if (object.hasOwnProperty(x)) {
 					tmp.push([x, object[x]]);
 				}
 			}
 		} else {
 			for (n in object) {
-				// if (Y.HasOwnProperty.call(object, n)) {
+				// if (Y.hasOwn.call(object, n)) {
 				if (object.hasOwnProperty(n)) {
 					tmp.push(object[n]);
 				}
@@ -1226,7 +1225,7 @@
 			source = arguments[x];
 
 			for (prop in source) {
-				//if (Y.HasOwnProperty.call(source, prop)) {
+				//if (Y.hasOwn.call(source, prop)) {
 				if (source.hasOwnProperty(prop)) {
 					object[prop] = source[prop];
 				}
@@ -1245,7 +1244,7 @@
 		var self = Y;
 		var setArray;
 
-		Y._CONFIG_STORAGE[varName] = Y._CONFIG_STORAGE[varName] || Object.create({});
+		Y._CONFIG_STORAGE[varName] = Y._CONFIG_STORAGE[varName] || {};
 
 		oldValue = Y._CONFIG_STORAGE[varName].LOCAL_VALUE;
 
@@ -1325,17 +1324,18 @@
 
 	extend(Y, {
 		setConfig: configSet,
+
 		getConfig: configGet,
 
-		Each: each,
+		each: each,
 
-		Foreach: foreach,
+		foreach: foreach,
 
-		Every: every,
+		every: every,
 
-		ClassToType: classToType,
+		classToType: classToType,
 
-		Extend: function(object) {
+		extend: function(object) {
 			if (!isObject(object) && !isFunction(object)) {
 				return object;
 			}
@@ -1364,11 +1364,7 @@
 			return object;
 		},
 
-		// ObjectHasProperty: hasProperty,
-
-		// HasProperty: hasProp,
-
-		CallProperty: getOwn
+		callProperty: getOwn
 	});
 
 	//---
@@ -1520,7 +1516,7 @@
 	// Shortcut function for checking if an object has a given property directly
 	// on itself (in other words, not on a prototype).
 	Y.Lang.Has = function(obj, key) {
-		return obj !== null && Y.HasOwnProperty.call(obj, key);
+		return obj !== null && Y.hasOwn.call(obj, key);
 		// return obj !== null && obj.hasOwnProperty(key);
 	};
 
@@ -1878,7 +1874,7 @@
 		rcleanScript: /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g
 	};
 
-	Y.Extend(Y.RegEx, {
+	Y.extend(Y.RegEx, {
 		rnumsplit: new RegExp('^(' + Y.RegEx.pnum + ')(.*)$', 'i'),
 
 		rnumnonpx: new RegExp('^(' + Y.RegEx.pnum + ')(?!px)[a-z%]+$', 'i'),
@@ -1927,9 +1923,10 @@
 
 	//---
 
-	Y.Extend(Y.Lang, {
-		//now: new Date().getTime(),
-		now: new Date().getTime,
+	Y.extend(Y.Lang, {
+		// now: new Date().getTime(),
+		// now: new Date().getTime(),
+		now: Date.now,
 
 		date: new Date(),
 
@@ -1960,7 +1957,7 @@
 
 	// Cross-browser XML parsing
 	if (!Y.G.isNodeJs) {
-		Y.Extend(Y.Lang, {
+		Y.extend(Y.Lang, {
 			parseXML: function (data) {
 				if (!data || !Y.Lang.isString(data)) {
 					return null;
@@ -1986,9 +1983,9 @@
 		});
 	}
 
-	Y.Lang.Now = Y.Lang.now;
+	Y.Lang.Now = Y.Lang.now();
 
-	Y.Extend(Y.Lang, {
+	Y.extend(Y.Lang, {
 		lowerCaseFirst: function (string) {
 			string += this.empty();
 
@@ -2192,7 +2189,7 @@
 				array = Y.Lang.isArray(object),
 				hash = Y.Lang.isPlainObject(object);
 
-			Y.Each(object, function (key, value) {
+			Y.each(object, function (key, value) {
 				type = Y.Lang.type(value);
 
 				if (scope) {
@@ -2286,7 +2283,7 @@
 
 	//---
 
-	Y.Class.Extend = Y.Class.extend = function (properties) {
+	Y.Class.extend = function (properties) {
 		// Extended class with the new prototype
 		var newClass = function () {
 			// Call the initialise constructor
@@ -2331,7 +2328,7 @@
 		// Y.Log(properties.CLASS_NAME);
 
 		if (properties.CLASS_NAME) {
-			Y.Extend(newClass, {
+			Y.extend(newClass, {
 				CLASS_NAME: properties.CLASS_NAME.toString()
 			});
 
@@ -2340,25 +2337,25 @@
 
 		// Mix static properties into the class
 		if (properties.STATICS) {
-			Y.Extend(newClass, properties.STATICS);
+			Y.extend(newClass, properties.STATICS);
 			delete properties.STATICS;
 		}
 
 		// Mix includes into the prototype
 		/** @namespace properties.INCLUDES */
 		if (properties.INCLUDES) {
-			Y.Extend.apply(null, [proto].concat(properties.INCLUDES));
+			Y.extend.apply(null, [proto].concat(properties.INCLUDES));
 			/** @namespace properties.Includes */
 			delete properties.INCLUDES;
 		}
 
 		//  OPTIONS
 		if (proto.OPTIONS) {
-			properties.OPTIONS = Y.Extend(Y.Util.Create(proto.OPTIONS), properties.OPTIONS);
+			properties.OPTIONS = Y.extend(Y.Util.Create(proto.OPTIONS), properties.OPTIONS);
 		}
 
 		// Mix given properties into the prototype
-		Y.Extend(proto, properties);
+		Y.extend(proto, properties);
 
 		proto.initialHooks = [];
 
@@ -2385,22 +2382,22 @@
 	//---
 
 	// Method for adding properties to prototype
-	Y.Class.Include = Y.Class.include = function (properties) {
-		Y.Extend(this.prototype, properties);
+	Y.Class.include = function (properties) {
+		Y.extend(this.prototype, properties);
 	};
 
 	//---
 
 	//  new default options to the Class
-	Y.Class.Options = Y.Class.options = function (options) {
-		Y.Extend(this.prototype.OPTIONS, options);
+	Y.Class.options = function (options) {
+		Y.extend(this.prototype.OPTIONS, options);
 	};
 
 	//---
 
 	//  new default object to the Class
-	Y.Class.MergeObject = Y.Class.mergeObject = function (name, object) {
-		Y.Extend(this.prototype[name], object);
+	Y.Class.mergeObject = function (name, object) {
+		Y.extend(this.prototype[name], object);
 	};
 
 	//---
@@ -2466,7 +2463,7 @@
 	 * Y.Events is a base class that YAEX classes inherit from to
 	 * handle custom events.
 	 */
-	Y.Evented = Y.Class.Extend({
+	Y.Evented = Y.Class.extend({
 		CLASS_NAME: 'Evented',
 
 		eventsArray: [],
@@ -2476,7 +2473,7 @@
 			// Types can be a map of types/handlers
 			if (Y.Lang.isObject(types)) {
 				for (type in types) {
-					if (Y.HasOwnProperty.call(types, type)) {
+					if (Y.hasOwn.call(types, type)) {
 						// We don't process space-separated events here for performance;
 						// It's a hot path since Layer uses the on(obj) syntax
 						this._On(type, types[type], callback);
@@ -2502,7 +2499,7 @@
 				delete this.eventsArray;
 			} else if (Y.Lang.isObject(types)) {
 				for (type in types) {
-					if (Y.HasOwnProperty.call(types, type)) {
+					if (Y.hasOwn.call(types, type)) {
 						this._Off(type, types[type], callback);
 					}
 				}
@@ -2612,7 +2609,7 @@
 				return this;
 			}
 
-			var event = Y.Extend({}, data, {type: type, target: this}),
+			var event = Y.extend({}, data, {type: type, target: this}),
 				events = this.eventsArray,
 				typeIndex,
 				i,
@@ -2658,7 +2655,7 @@
 			if (propagate) {
 				// Also check parents for listeners if event propagates
 				for (id in this.eventParents) {
-					if (Y.HasOwnProperty.call(this.eventParents, id)) {
+					if (Y.hasOwn.call(this.eventParents, id)) {
 						if (this.eventParents[id].listens(type)) {
 							return true;
 						}
@@ -2710,8 +2707,8 @@
 			var id;
 
 			for (id in this.eventParents) {
-				if (Y.HasOwnProperty.call(this.eventParents, id)) {
-					this.eventParents[id].fire(e.type, Y.Extend({layer: e.target}, e));
+				if (Y.hasOwn.call(this.eventParents, id)) {
+					this.eventParents[id].fire(e.type, Y.extend({layer: e.target}, e));
 				}
 			}
 		}

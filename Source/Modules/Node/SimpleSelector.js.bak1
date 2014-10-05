@@ -119,9 +119,11 @@
 	}
 
 	YAXDOM.QSA = function (node, selector) {
-		var taggedParent, nodes;
+		var taggedParent, nodes, res, _res;
 
 		return process(selector, function (_selector, filter, argument) {
+			var re = /(.[a-z]*||[A-Z]*) (.[a-z]*||[A-Z]*):(.[a-z]*||[A-Z]*) (.[a-z]*||[A-Z]*)/g;
+
 			try {
 				if (!_selector && filter) {
 					_selector = '*';
@@ -130,9 +132,27 @@
 					// unique class and prepending that classname onto the selector
 					taggedParent = Y.DOM(node).addClass(classTag);
 					_selector = '.' + classTag + ' ' + _selector;
+				} else if (re.test(_selector)) {
+					taggedParent = Y.DOM(node).addClass(classTag);
+					// _selector = '.' + classTag + ' ' + _selector;
+					var _sel = _selector.split(' ');
+
+					res = '_res = taggedParent';
+
+					_sel.forEach(function (sel, x) {
+						res += ".find('" + sel + "')";
+
+					});
+
+					/* jshint evil: true */
+					eval(res);
+
+					nodes = _res;
+				} else {
+					nodes = oldQSA(node, _selector);
 				}
 
-				nodes = oldQSA(node, _selector);
+				//nodes = oldQSA(node, _selector);
 			} catch (e) {
 				Y.ERROR('Error performing selector: %o', selector);
 				throw e;

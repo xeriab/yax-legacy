@@ -83,7 +83,7 @@
 					// Fallback to a less secure definition
 				} catch (e) {
 					descriptor[this.Expando] = unlock;
-					Y.Extend(owner, descriptor);
+					Y.extend(owner, descriptor);
 				}
 			}
 
@@ -110,7 +110,7 @@
 			} else {
 				// Fresh assignments by object are shallow copied
 				if (Y.Lang.isEmpty(cache)) {
-					Y.Extend(this.cache[unlock], data);
+					Y.extend(this.cache[unlock], data);
 					// Otherwise, copy the properties one-by-one to the cache object
 				} else {
 					for (prop in data) {
@@ -220,7 +220,7 @@
 	Y.DOM.dataUser = Y.DOM.data_user = new Data();
 	Y.DOM.dataPrivative = Y.DOM.data_priv = new Data();
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		acceptData: Data.accepts,
 		hasData: function (elem) {
 			return Y.DOM.dataUser.hasData(elem) || Y.DOM.dataPrivative.hasData(elem);
@@ -276,7 +276,7 @@
 	function attributeData(node) {
 		var store = {};
 
-		Y.Each(node.attributes || Y.G.ArrayProto, function (i, attr) {
+		Y.each(node.attributes || Y.G.ArrayProto, function (i, attr) {
 			if (attr.name.indexOf('data-') === 0) {
 				store[Y.Lang.camelise(attr.name.replace('data-', ''))] =
 					Y.Lang.deserialiseValue(attr.value);
@@ -448,7 +448,7 @@
 		if (Y.Lang.isUndefined(value)) {
 			if (Y.Lang.isPlainObject(name)) {
 				result = this.each(function (i, node) {
-					Y.Each(name, function (key, value) {
+					Y.each(name, function (key, value) {
 						setData(node, key, value);
 					});
 				});
@@ -479,7 +479,7 @@
 				store = id && data[id];
 
 			if (store) {
-				Y.Each(names || store, function (key) {
+				Y.each(names || store, function (key) {
 					delete store[names ? Y.Lang.camelise(this) : key];
 				});
 			}

@@ -39,7 +39,7 @@
 				return require(resultantId);
 			};
 
-			module.exports = Object.create({});
+			module.exports = {};
 
 			delete module.factory;
 
@@ -134,7 +134,7 @@
 (function () {
 	// 'use strict';
 
-	var Y = Object.create({});
+	var Y = {};
 
 	var isNode = false;
 
@@ -274,7 +274,7 @@
 
 	//---
 
-	Y._INFO = Object.create({});
+	Y._INFO = {};
 
 	//---
 
@@ -288,27 +288,27 @@
 	/**
 	 * YAX._CONFIG_STORAGE
 	 */
-	Y._CONFIG_STORAGE = Object.create({});
+	Y._CONFIG_STORAGE = {};
 
 	/**
 	 * YAX.Lang
 	 */
-	Y.Lang = Object.create({});
+	Y.Lang = {};
 
 	/**
 	 * YAX._GLOBALS
 	 */
-	Y._GLOBALS = Y.G = Object.create({});
+	Y._GLOBALS = Y.G = {};
 
 	/**
 	 * YAX.Mixin
 	 */
-	Y.Mixin = Object.create({});
+	Y.Mixin = {};
 
 	/**
 	 * YAX.Settings
 	 */
-	Y.Settings = Object.create({});
+	Y.Settings = {};
 
 	//---
 
@@ -319,7 +319,7 @@
 	Y.G.ToString = toString;
 	Y.G.Filter = Filter;
 
-	Y.HasOwnProperty = HasOwnProperty;
+	Y.hasOwn = HasOwnProperty;
 
 	Y.G.FuncProto = FuncProto;
 	Y.G.ArrayProto = ArrayProto;
@@ -384,7 +384,7 @@
 
 	'use strict';
 
-	var classToType = Object.create({});
+	var classToType = {};
 	var False = false;
 	var obj = Object.prototype;
 	var hasOwn = obj.hasOwnProperty;
@@ -619,8 +619,8 @@
 	 * @return    boolean TRUE|FALSE
 	 */
 	function likeArray(object) {
-		return type(object.length) === 'number';
-		// return isNumber(object.length);
+		// return type(object.length) === 'number';
+		return isNumber(object.length);
 	}
 
 	/**
@@ -644,8 +644,7 @@
 		}
 
 		return _type === 'array' || len === 0 ||
-			typeof len === 'number' && len > 0 &&
-			(len - 1) in object;
+			(typeof len === 'number' && len > 0) && (len - 1) in object;
 	}
 
 	/**
@@ -996,14 +995,14 @@
 
 		if (type && isNumber(type) && type === 1) {
 			for (x in object) {
-				// if (Y.HasOwnProperty.call(object, x)) {
+				// if (Y.hasOwn.call(object, x)) {
 				if (object.hasOwnProperty(x)) {
 					tmp.push([x, object[x]]);
 				}
 			}
 		} else {
 			for (n in object) {
-				// if (Y.HasOwnProperty.call(object, n)) {
+				// if (Y.hasOwn.call(object, n)) {
 				if (object.hasOwnProperty(n)) {
 					tmp.push(object[n]);
 				}
@@ -1226,7 +1225,7 @@
 			source = arguments[x];
 
 			for (prop in source) {
-				//if (Y.HasOwnProperty.call(source, prop)) {
+				//if (Y.hasOwn.call(source, prop)) {
 				if (source.hasOwnProperty(prop)) {
 					object[prop] = source[prop];
 				}
@@ -1245,7 +1244,7 @@
 		var self = Y;
 		var setArray;
 
-		Y._CONFIG_STORAGE[varName] = Y._CONFIG_STORAGE[varName] || Object.create({});
+		Y._CONFIG_STORAGE[varName] = Y._CONFIG_STORAGE[varName] || {};
 
 		oldValue = Y._CONFIG_STORAGE[varName].LOCAL_VALUE;
 
@@ -1325,17 +1324,18 @@
 
 	extend(Y, {
 		setConfig: configSet,
+
 		getConfig: configGet,
 
-		Each: each,
+		each: each,
 
-		Foreach: foreach,
+		foreach: foreach,
 
-		Every: every,
+		every: every,
 
-		ClassToType: classToType,
+		classToType: classToType,
 
-		Extend: function(object) {
+		extend: function(object) {
 			if (!isObject(object) && !isFunction(object)) {
 				return object;
 			}
@@ -1364,11 +1364,7 @@
 			return object;
 		},
 
-		// ObjectHasProperty: hasProperty,
-
-		// HasProperty: hasProp,
-
-		CallProperty: getOwn
+		callProperty: getOwn
 	});
 
 	//---
@@ -1520,7 +1516,7 @@
 	// Shortcut function for checking if an object has a given property directly
 	// on itself (in other words, not on a prototype).
 	Y.Lang.Has = function(obj, key) {
-		return obj !== null && Y.HasOwnProperty.call(obj, key);
+		return obj !== null && Y.hasOwn.call(obj, key);
 		// return obj !== null && obj.hasOwnProperty(key);
 	};
 
@@ -1878,7 +1874,7 @@
 		rcleanScript: /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g
 	};
 
-	Y.Extend(Y.RegEx, {
+	Y.extend(Y.RegEx, {
 		rnumsplit: new RegExp('^(' + Y.RegEx.pnum + ')(.*)$', 'i'),
 
 		rnumnonpx: new RegExp('^(' + Y.RegEx.pnum + ')(?!px)[a-z%]+$', 'i'),
@@ -1927,9 +1923,10 @@
 
 	//---
 
-	Y.Extend(Y.Lang, {
-		//now: new Date().getTime(),
-		now: new Date().getTime,
+	Y.extend(Y.Lang, {
+		// now: new Date().getTime(),
+		// now: new Date().getTime(),
+		now: Date.now,
 
 		date: new Date(),
 
@@ -1960,7 +1957,7 @@
 
 	// Cross-browser XML parsing
 	if (!Y.G.isNodeJs) {
-		Y.Extend(Y.Lang, {
+		Y.extend(Y.Lang, {
 			parseXML: function (data) {
 				if (!data || !Y.Lang.isString(data)) {
 					return null;
@@ -1986,9 +1983,9 @@
 		});
 	}
 
-	Y.Lang.Now = Y.Lang.now;
+	Y.Lang.Now = Y.Lang.now();
 
-	Y.Extend(Y.Lang, {
+	Y.extend(Y.Lang, {
 		lowerCaseFirst: function (string) {
 			string += this.empty();
 
@@ -2192,7 +2189,7 @@
 				array = Y.Lang.isArray(object),
 				hash = Y.Lang.isPlainObject(object);
 
-			Y.Each(object, function (key, value) {
+			Y.each(object, function (key, value) {
 				type = Y.Lang.type(value);
 
 				if (scope) {
@@ -2286,7 +2283,7 @@
 
 	//---
 
-	Y.Class.Extend = Y.Class.extend = function (properties) {
+	Y.Class.extend = function (properties) {
 		// Extended class with the new prototype
 		var newClass = function () {
 			// Call the initialise constructor
@@ -2331,7 +2328,7 @@
 		// Y.Log(properties.CLASS_NAME);
 
 		if (properties.CLASS_NAME) {
-			Y.Extend(newClass, {
+			Y.extend(newClass, {
 				CLASS_NAME: properties.CLASS_NAME.toString()
 			});
 
@@ -2340,25 +2337,25 @@
 
 		// Mix static properties into the class
 		if (properties.STATICS) {
-			Y.Extend(newClass, properties.STATICS);
+			Y.extend(newClass, properties.STATICS);
 			delete properties.STATICS;
 		}
 
 		// Mix includes into the prototype
 		/** @namespace properties.INCLUDES */
 		if (properties.INCLUDES) {
-			Y.Extend.apply(null, [proto].concat(properties.INCLUDES));
+			Y.extend.apply(null, [proto].concat(properties.INCLUDES));
 			/** @namespace properties.Includes */
 			delete properties.INCLUDES;
 		}
 
 		//  OPTIONS
 		if (proto.OPTIONS) {
-			properties.OPTIONS = Y.Extend(Y.Util.Create(proto.OPTIONS), properties.OPTIONS);
+			properties.OPTIONS = Y.extend(Y.Util.Create(proto.OPTIONS), properties.OPTIONS);
 		}
 
 		// Mix given properties into the prototype
-		Y.Extend(proto, properties);
+		Y.extend(proto, properties);
 
 		proto.initialHooks = [];
 
@@ -2385,22 +2382,22 @@
 	//---
 
 	// Method for adding properties to prototype
-	Y.Class.Include = Y.Class.include = function (properties) {
-		Y.Extend(this.prototype, properties);
+	Y.Class.include = function (properties) {
+		Y.extend(this.prototype, properties);
 	};
 
 	//---
 
 	//  new default options to the Class
-	Y.Class.Options = Y.Class.options = function (options) {
-		Y.Extend(this.prototype.OPTIONS, options);
+	Y.Class.options = function (options) {
+		Y.extend(this.prototype.OPTIONS, options);
 	};
 
 	//---
 
 	//  new default object to the Class
-	Y.Class.MergeObject = Y.Class.mergeObject = function (name, object) {
-		Y.Extend(this.prototype[name], object);
+	Y.Class.mergeObject = function (name, object) {
+		Y.extend(this.prototype[name], object);
 	};
 
 	//---
@@ -2466,7 +2463,7 @@
 	 * Y.Events is a base class that YAEX classes inherit from to
 	 * handle custom events.
 	 */
-	Y.Evented = Y.Class.Extend({
+	Y.Evented = Y.Class.extend({
 		CLASS_NAME: 'Evented',
 
 		eventsArray: [],
@@ -2476,7 +2473,7 @@
 			// Types can be a map of types/handlers
 			if (Y.Lang.isObject(types)) {
 				for (type in types) {
-					if (Y.HasOwnProperty.call(types, type)) {
+					if (Y.hasOwn.call(types, type)) {
 						// We don't process space-separated events here for performance;
 						// It's a hot path since Layer uses the on(obj) syntax
 						this._On(type, types[type], callback);
@@ -2502,7 +2499,7 @@
 				delete this.eventsArray;
 			} else if (Y.Lang.isObject(types)) {
 				for (type in types) {
-					if (Y.HasOwnProperty.call(types, type)) {
+					if (Y.hasOwn.call(types, type)) {
 						this._Off(type, types[type], callback);
 					}
 				}
@@ -2612,7 +2609,7 @@
 				return this;
 			}
 
-			var event = Y.Extend({}, data, {type: type, target: this}),
+			var event = Y.extend({}, data, {type: type, target: this}),
 				events = this.eventsArray,
 				typeIndex,
 				i,
@@ -2658,7 +2655,7 @@
 			if (propagate) {
 				// Also check parents for listeners if event propagates
 				for (id in this.eventParents) {
-					if (Y.HasOwnProperty.call(this.eventParents, id)) {
+					if (Y.hasOwn.call(this.eventParents, id)) {
 						if (this.eventParents[id].listens(type)) {
 							return true;
 						}
@@ -2710,8 +2707,8 @@
 			var id;
 
 			for (id in this.eventParents) {
-				if (Y.HasOwnProperty.call(this.eventParents, id)) {
-					this.eventParents[id].fire(e.type, Y.Extend({layer: e.target}, e));
+				if (Y.hasOwn.call(this.eventParents, id)) {
+					this.eventParents[id].fire(e.type, Y.extend({layer: e.target}, e));
 				}
 			}
 		}
@@ -2762,13 +2759,13 @@
 	var rnotwhite = (/\S+/g);
 
 	// String to Object options format cache
-	var optionsCache = Object.create({});
+	var optionsCache = {};
 
 	// Convert String-formatted options into Object-formatted ones and store in cache
 	function createOptions (options) {
 		var object = optionsCache[options] = {};
 
-		Y.Each(options.match(rnotwhite) || [], function(_, flag) {
+		Y.each(options.match(rnotwhite) || [], function(_, flag) {
 			object[flag] = true;
 		});
 
@@ -2787,12 +2784,12 @@
 	 */
 	Y.G.Callbacks = function (options) {
 
-		// options = Y.Extend({}, options || {});
+		// options = Y.extend({}, options || {});
 
 		if (Y.Lang.isString(options)) {
 			options = optionsCache[options] || createOptions(options);
 		} else {
-			options = Y.Extend({}, options);
+			options = Y.extend({}, options);
 		}
 
 		// Y.LOG(options);
@@ -2862,7 +2859,7 @@
 					var start = list.length,
 						add;
 					add = function (args) {
-						Y.Each(args, function (_, arg) {
+						Y.each(args, function (_, arg) {
 							if (Y.Lang.isFunction(arg)) {
 								if (!options.unique || !Callbacks.has(arg)) {
 									list.push(arg);
@@ -2887,7 +2884,7 @@
 			},
 			remove: function () {
 				if (list) {
-					Y.Each(arguments, function (_, arg) {
+					Y.each(arguments, function (_, arg) {
 						var index = 0;
 						while ((index = Y.Lang.inArray(arg, list, index)) > -1) {
 							list.splice(index, 1);
@@ -3004,7 +3001,7 @@
 
 		var state = 'pending';
 
-		var deferred = Object.create({});
+		var deferred = {};
 
 		var promise = {
 			state: function () {
@@ -3020,7 +3017,7 @@
 				var fns = arguments, context, values;
 
 				return newDeferred(function (defer) {
-					Y.Each(tuples, function (x, tuple) {
+					Y.each(tuples, function (x, tuple) {
 						var fn = Y.Lang.isFunction(fns[x]) && fns[x];
 						deferred[tuple[1]](function () {
 							var returned = fn && fn.apply(this, arguments);
@@ -3044,19 +3041,19 @@
 
 			promise: function (obj) {
 				if (Y.Lang.isSet(obj)) {
-					return Y.Extend(obj, promise);
+					return Y.extend(obj, promise);
 				}
 
 				return promise;
 
-				// return obj !== null ? Y.Extend(obj, promise) : promise;
+				// return obj !== null ? Y.extend(obj, promise) : promise;
 			}
 		};
 
 		// Keep pipe for back-compat
 		promise.pipe = promise.then;
 
-		Y.Each(tuples, function (x, tuple) {
+		Y.each(tuples, function (x, tuple) {
 			var list = tuple[2],
 				stateString = tuple[3];
 
@@ -3166,31 +3163,31 @@
 
 	'use strict';
 
-	Y.Store = Y.Class.Extend({
+	Y.Store = Y.Class.extend({
 		STATICS: {
 			// FOO: 'FOOED!!'
 		},
 
 		CLASS_NAME: 'Store',
 
-		Serialisers: {
+		serialisers: {
 			JSON: {
-				ID: 'Y.Store.Serialisers.JSON',
+				id: 'Y.Store.serialisers.JSON',
 
-				'Initialise': function (encoders, decoders) {
+				'initialise': function (encoders, decoders) {
 					encoders.push('JSON');
 					decoders.push('JSON');
 				},
 
-				Encode: JSON.stringify,
+				encode: JSON.stringify,
 
-				Decode: JSON.parse
+				decode: JSON.parse
 			},
 
 			XML: {
-				ID: 'Y.Store.Serialisers.XML',
+				id: 'Y.Store.serialisers.XML',
 
-				'Initialise': function (encoders, decoders) {
+				'initialise': function (encoders, decoders) {
 					encoders.push('XML');
 					decoders.push('XML');
 				},
@@ -3201,7 +3198,7 @@
 				},
 
 				// Encodes a XML node to string (taken from $.jStorage, MIT License)
-				Encode: function (value) {
+				encode: function (value) {
 					if (!value || value._serialised || !this.isXML(value)) {
 						return value;
 					}
@@ -3223,22 +3220,22 @@
 
 							return _value;
 						} catch (er) {
-							console.error(er);
+							Y.ERROR(er);
 						}
 
-						console.error(err);
+						Y.ERROR(err);
 					}
 
 					return value;
 				},
 
 				// Decodes a XML node from string (taken from $.jStorage, MIT License)
-				Decode: function (value) {
+				decode: function (value) {
 					if (!value || value._serialised || value._serialised !== this.ID) {
 						return value;
 					}
 
-					var domParser = (Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser()).parseFromString);
+					var domParser = (Y.hasOwn.call(global, 'DOMParser') && (new DOMParser()).parseFromString);
 
 					/** @namespace global.ActiveX */
 					if (!domParser && global.ActiveX) {
@@ -3257,7 +3254,7 @@
 					}
 
 					value.value = domParser.call(
-						(Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser())) || Y.Window,
+						(Y.hasOwn.call(global, 'DOMParser') && (new DOMParser())) || Y.Window,
 						value.value,
 						'text/xml'
 					);
@@ -3267,68 +3264,68 @@
 			}
 		},
 
-		Drivers: {
-			WindowName: {
-				ID: 'Y.Store.Drivers.WindowName',
+		drivers: {
+			windowName: {
+				id: 'Y.Store.drivers.windowName',
 
-				Scope: 'Window',
+				scope: 'Window',
 
-				Cache: {
+				sache: {
 
 				},
 
-				Encodes: true,
+				encodes: true,
 
 				/**
 				 *
 				 * @returns {boolean}
 				 * @constructor
 				 */
-				Available: function () {
+				available: function () {
 					return true;
 				},
 
-				Initialise: function () {
+				initialise: function () {
 					this.Load();
 				},
 
-				Save: function () {
-					global.name = Y.Store.prototype.Serialisers.JSON.Encode(this.Cache);
+				save: function () {
+					global.name = Y.Store.prototype.serialisers.JSON.encode(this.cache);
 				},
 
-				Load: function () {
+				load: function () {
 					try {
-						this.Cache = Y.Store.prototype.Serialisers.JSON.Decode(global.name + Y.Lang.empty);
+						this.cache = Y.Store.prototype.serialisers.JSON.decode(global.name + Y.Lang.empty);
 
-						if (!Y.Lang.isObject(this.Cache)) {
-							this.Cache = {};
+						if (!Y.Lang.isObject(this.cache)) {
+							this.cache = {};
 						}
 					} catch (e) {
-						this.Cache = {};
+						this.cache = {};
 						global.name = '{}';
 					}
 				},
 
-				Set: function (key, value) {
-					this.Cache[key] = value;
+				set: function (key, value) {
+					this.cache[key] = value;
 					this.Save();
 				},
 
-				Get: function (key) {
-					return this.Cache[key];
+				get: function (key) {
+					return this.cache[key];
 				},
 
-				Delete: function (key) {
+				delete: function (key) {
 					try {
-						delete this.Cache[key];
+						delete this.cache[key];
 					} catch (e) {
-						this.Cache[key] = undef;
+						this.cache[key] = undef;
 					}
 
 					this.Save();
 				},
 
-				Flush: function () {
+				flush: function () {
 					global.name = '{}';
 				}
 			}
@@ -3350,29 +3347,29 @@
 //			};
 
 //			for (x; x < len; x++) {
-//				this.loaded_driver = this.Drivers[tmpFunc(args[x])];
+//				this.loaded_driver = this.drivers[tmpFunc(args[x])];
 //			}
 
 			if (len === 1) {
-				// this[args[0]] = this.Drivers[args[0]];
-				Y.Extend(this, this.Drivers[args[0]]);
+				// this[args[0]] = this.drivers[args[0]];
+				Y.extend(this, this.drivers[args[0]]);
 
-				// delete this.Drivers[args[0]];
+				// delete this.drivers[args[0]];
 			} else if (len > 1) {
 				for (x; x < len; x++) {
-					this[args[x]] = this.Drivers[args[x]];
-					// delete this.Drivers[args[x]];
+					this[args[x]] = this.drivers[args[x]];
+					// delete this.drivers[args[x]];
 				}
 			} else {
-				Y.Extend(this, this.Drivers);
-				// delete this.Drivers;
+				Y.extend(this, this.drivers);
+				// delete this.drivers;
 			}
 		}
 	});
 
 	//---
 
-	// Y.Data = Y.Store.prototype.Serialisers;
+	// Y.Data = Y.Store.prototype.serialisers;
 
 	//---
 
@@ -3399,112 +3396,18 @@
 /*jshint strict: false */
 /*global Y, Y, XMLSerializer, DOMParser, ActiveX */
 
-(function (global, undef) {
+(function () {
 
 	'use strict';
 
-	Y.Parser = Y.Class.Extend({
+	Y.Parser = Y.Class.extend({
 		STATICS: {
 			// FOO: 'FOOED!!'
 		},
 
 		CLASS_NAME: 'Parser',
 
-		Serialisers: {
-			JSON: {
-				ID: 'Y.Store.Serialisers.JSON',
-
-				'Initialise': function (encoders, decoders) {
-					encoders.push('JSON');
-					decoders.push('JSON');
-				},
-
-				Encode: JSON.stringify,
-
-				Decode: JSON.parse
-			},
-
-			XML: {
-				ID: 'Y.Store.Serialisers.XML',
-
-				'Initialise': function (encoders, decoders) {
-					encoders.push('XML');
-					decoders.push('XML');
-				},
-
-				isXML: function (value) {
-					var docElement = (value ? value.ownerDocument || value : 0 ).documentElement;
-					return docElement ? docElement.nodeName.toLowerCase() !== 'html' : false;
-				},
-
-				// Encodes a XML node to string (taken from $.jStorage, MIT License)
-				Encode: function (value) {
-					if (!value || value._serialised || !this.isXML(value)) {
-						return value;
-					}
-
-					var _value = {
-						_serialised: this.ID,
-						value: value
-					};
-
-					try {
-						// Mozilla, Webkit, Opera
-						_value.value = new XMLSerializer().serializeToString(value);
-
-						return _value;
-					} catch (err) {
-						try {
-							// Internet Explorer
-							_value.value = value.xml;
-
-							return _value;
-						} catch (er) {
-							console.error(er);
-						}
-
-						console.error(err);
-					}
-
-					return value;
-				},
-
-				// Decodes a XML node from string (taken from $.jStorage, MIT License)
-				Decode: function (value) {
-					if (!value || value._serialised || value._serialised !== this.ID) {
-						return value;
-					}
-
-					var domParser = (Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser()).parseFromString);
-
-					/** @namespace global.ActiveX */
-					if (!domParser && global.ActiveX) {
-						domParser = function (xmlString) {
-							var xmlDoc = new ActiveX('Microsoft.XMLDOM');
-
-							xmlDoc.async = 'false';
-							xmlDoc.loadXML(xmlString);
-
-							return xmlDoc;
-						};
-					}
-
-					if (!domParser) {
-						return undef;
-					}
-
-					value.value = domParser.call(
-							(Y.HasOwnProperty.call(global, 'DOMParser') && (new DOMParser())) || Y.Window,
-						value.value,
-						'text/xml'
-					);
-
-					return this.isXML( value.value ) ? value.value : undef;
-				}
-			}
-		},
-
-		Drivers: {},
+		drivers: {},
 
 		construct: function () {
 			var args = Y.G.Slice.call(arguments),
@@ -3512,20 +3415,20 @@
 				x = 0;
 
 			if (len === 1) {
-				Y.Extend(this, this.Drivers[args[0]]);
+				Y.extend(this, this.drivers[args[0]]);
 			} else if (len > 1) {
 				for (x; x < len; x++) {
-					this[args[x]] = this.Drivers[args[x]];
+					this[args[x]] = this.drivers[args[x]];
 				}
 			} else {
-				Y.Extend(this, this.Drivers);
+				Y.extend(this, this.drivers);
 			}
 		}
 	});
 
 	//---
 
-	//	Y.Parsers = Y.Parser.prototype.Drivers;
+	//	Y.Parsers = Y.Parser.prototype.drivers;
 
 	//---
 

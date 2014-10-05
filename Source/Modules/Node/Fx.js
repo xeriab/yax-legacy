@@ -57,7 +57,7 @@
 		return eventPrefix ? eventPrefix + name : name.toLowerCase();
 	}
 
-	Y.Each(vendors, function (vendor, event) {
+	Y.each(vendors, function (vendor, event) {
 		if (testEl.style[vendor + 'TransitionProperty'] !== undef) {
 			prefix = '-' + vendor.toLowerCase() + '-';
 			eventPrefix = event;
@@ -240,7 +240,7 @@
 
 	//---
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		queue: function (elem, type, data) {
 			var queue;
 
@@ -309,7 +309,7 @@
 
 	//---
 
-	Y.Extend(Y.DOM.Function, {
+	Y.extend(Y.DOM.Function, {
 		queue: function (type, data) {
 			var setter = 2;
 
@@ -398,6 +398,37 @@
 			return defer.promise(obj);
 		}
 	});
+
+	//---
+
+	Y.DOM.Function.stopTranAnim = function (jumpToEnd, cancelCallback) {
+		var props;
+		var style;
+		// var cssValues = {};
+		var x;
+
+		props = this.css(prefix + 'transition-property').split(', ');
+
+		if (!props.length) {
+			return this;
+		}
+
+		if (!jumpToEnd) {
+			style = Y.DOM.getDocStyles(this.get(0));
+
+			for (x = 0; x < props.length; x++) {
+				this.css(props[x], style.getPropertyValue(props[x]));
+			}
+		}
+
+		if (cancelCallback) {
+			this.unbind(Y.DOM.fx.transitionEnd).css(cssReset);
+		} else {
+			this.trigger(Y.DOM.fx.transitionEnd);
+		}
+
+		return this;
+	};
 
 	//---
 

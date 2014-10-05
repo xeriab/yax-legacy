@@ -45,7 +45,7 @@
 
 	// cancelFunction = window.cancelAnimationFrame ||
 	// cancelFunction = window.cancelRequestAnimationFrame ||
-	cancelFunction = Y.CallProperty(Y.Window, 'cancelAnimationFrame') ||
+	cancelFunction = Y.callProperty(Y.Window, 'cancelAnimationFrame') ||
 		getPrefixed('CancelAnimationFrame') ||
 		getPrefixed('CancelRequestAnimationFrame') ||
 
@@ -96,7 +96,7 @@
 
 	'use strict';
 
-	var YAXDOM = Object.create({});
+	var YAXDOM = {};
 
 	var ClassList;
 
@@ -104,11 +104,11 @@
 
 	var docElement = Y.Document.documentElement;
 
-	var elementDisplay = Object.create({});
+	var elementDisplay = {};
 
-	var ClassCache = Object.create({});
+	var ClassCache = {};
 
-	var IDsCache = Object.create({});
+	var IDsCache = {};
 
 	// Special attributes that should be get/set via method calls
 	var MethodAttributes = [
@@ -194,7 +194,7 @@
 
 	var DomNode;
 
-	var ClassTag = 'YAX' + Y.Lang.now;
+	var ClassTag = 'YAX' + Y.Lang.now();
 
 	//---
 
@@ -212,7 +212,7 @@
 	function classReplacement(name) {
 		var result;
 
-		if (Y.HasOwnProperty.call(ClassCache, name)) {
+		if (Y.hasOwn.call(ClassCache, name)) {
 			result = ClassCache[name];
 		} else {
 			ClassCache[name] = new RegExp('(^|\\s)' + name + '(\\s|)');
@@ -225,7 +225,7 @@
 	function idReplacement(name) {
 		var result;
 
-		if (Y.HasOwnProperty.call(IDsCache, name)) {
+		if (Y.hasOwn.call(IDsCache, name)) {
 			result = IDsCache[name];
 		} else {
 			IDsCache[name] = new RegExp('(^|\\s)' + name + '(\\s|)');
@@ -241,7 +241,7 @@
 		func(node);
 
 		for (key in node.childNodes) {
-			// if (Y.HasOwnProperty.call(node.childNodes, key)) {
+			// if (Y.hasOwn.call(node.childNodes, key)) {
 			if (node.childNodes.hasOwnProperty(key)) {
 				traverseNode(node.childNodes[key], func);
 			}
@@ -350,11 +350,11 @@
 		Class = node.className || '';
 
 		//svg = Class && Class.baseVal !== undef;
-		svg = Class && Y.CallProperty(Class, 'baseVal') !== undef;
+		svg = Class && Y.callProperty(Class, 'baseVal') !== undef;
 
 		if (value === undef) {
 			// result = svg ? Class.baseVal : Class;
-			return svg ? Y.CallProperty(Class, 'baseVal') : Class;
+			return svg ? Y.callProperty(Class, 'baseVal') : Class;
 		}
 
 		// result = svg ? Y.Inject(Class, 'baseVal', value) : (node.className = value);
@@ -377,11 +377,11 @@
 		ID = node.id || '';
 
 		// svg = ID && ID.baseVal !== undef;
-		svg = ID && Y.CallProperty(ID, 'baseVal') !== undef;
+		svg = ID && Y.callProperty(ID, 'baseVal') !== undef;
 
 		if (value === undef) {
 			// return svg ? ID.baseVal : ID;
-			return svg ? Y.CallProperty(ID, 'baseVal') : ID;
+			return svg ? Y.callProperty(ID, 'baseVal') : ID;
 		}
 
 		if (svg) {
@@ -591,7 +591,7 @@
 
 	//---
 
-	Y.Extend(YAXDOM, {
+	Y.extend(YAXDOM, {
 		/**
 		 *
 		 * @param element
@@ -606,10 +606,10 @@
 				return false;
 			}
 
-			matchesSelector = Y.CallProperty(element, 'webkitMatchesSelector') ||
-				Y.CallProperty(element, 'mozMatchesSelector') ||
-				Y.CallProperty(element, 'oMatchesSelector') ||
-				Y.CallProperty(element, 'matchesSelector');
+			matchesSelector = Y.callProperty(element, 'webkitMatchesSelector') ||
+				Y.callProperty(element, 'mozMatchesSelector') ||
+				Y.callProperty(element, 'oMatchesSelector') ||
+				Y.callProperty(element, 'matchesSelector');
 
 			if (matchesSelector) {
 				return matchesSelector.call(element, selector);
@@ -661,7 +661,7 @@
 					name = Y.RegEx.FragmentReplacement.test(html) && RegExp.$1;
 				}
 
-				if (!(Y.HasOwnProperty.call(Containers, name))) {
+				if (!(Y.hasOwn.call(Containers, name))) {
 					name = '*';
 				}
 
@@ -669,7 +669,7 @@
 
 				container.innerHTML = Y.Lang.empty() + html;
 
-				dom = Y.Each(Y.G.Slice.call(container.childNodes), function() {
+				dom = Y.each(Y.G.Slice.call(container.childNodes), function() {
 					self = this;
 					// container.removeChild(this);
 					container.removeChild(self);
@@ -679,7 +679,7 @@
 			if (Y.Lang.isPlainObject(properties)) {
 				nodes = Y.DOM(dom);
 
-				Y.Each(properties, function(key, value) {
+				Y.each(properties, function(key, value) {
 					if (MethodAttributes.indexOf(key) > -1) {
 						nodes[key](value);
 					} else {
@@ -790,12 +790,12 @@
 					// result = {'res': found};
 					result = [found];
 				} else {
-					// result = Object.create({});
+					// result = {};
 					result = [];
 				}
 			} else {
 				result = (!Y.Lang.isUndefined(element) && element.nodeType !== 1 &&
-						element.nodeType !== 9) ? Object.create({}) :
+						element.nodeType !== 9) ? [] :
 					Y.G.Slice.call(
 						isSimple && !maybeID ?
 						// If it's simple, it could be a class
@@ -818,11 +818,14 @@
 			var result;
 
 			result = dom || [];
-			// result = dom || Object.create({});
+			// result = dom || {};
+
 			/* jshint -W103 */
 			// result.__proto__ = Y.DOM.Function;
-			result.__proto__ = Y.DOM.Function;
-			// Y.Extend(result.__proto__, Y.DOM.Function);
+
+			/** @namespace Object.setPrototypeOf */
+			Object.setPrototypeOf(result, Y.DOM.Function);
+
 			result.selector = selector || Y.Lang.empty();
 
 			return result;
@@ -857,12 +860,8 @@
 	/**
 	 * Y.DomNode is a DOM class that Y.DOM classes inherit from.
 	 */
-	Y.DomNode = Y.Class.Extend({
+	Y.DomNode = Y.Class.extend({
 		CLASS_NAME: 'DOM',
-
-		// initialise: function (selector, context) {
-		// 	return YAXDOM.init(selector, context);
-		// },
 
 		getStyle: function(el, style) {
 			var value, css;
@@ -893,7 +892,7 @@
 			sort: Y.G.ArrayProto.sort,
 			indexOf: Y.G.IndexOf,
 			concat: Y.G.Concat,
-			extend: Y.Extend,
+			extend: Y.extend,
 			// `map` and `slice` in the jQuery API work differently
 			// from their array counterparts
 			map: function(callback) {
@@ -908,7 +907,7 @@
 			ready: function(callback) {
 				// need to check if Y.Document.body exists for IE as that browser reports
 				// Y.Document ready when it hasn't yet created the body element
-				if (Y.RegEx.ReadyReplacement.test(Y.CallProperty(Y.Document, 'readyState')) &&
+				if (Y.RegEx.ReadyReplacement.test(Y.callProperty(Y.Document, 'readyState')) &&
 					Y.Document.body) {
 					callback(Y.DOM);
 				} else {
@@ -1429,9 +1428,9 @@
 					}
 
 					if (Y.Lang.isArray(name)) {
-						props = Object.create({});
+						props = {};
 
-						Y.Each(Y.Lang.isArray(name) ? name : [name], function(tmp, prop) {
+						Y.each(Y.Lang.isArray(name) ? name : [name], function(tmp, prop) {
 							props[prop] = (element.style[Y.Lang.camelise(prop)] || computedStyle.getPropertyValue(
 								prop));
 						});
@@ -1449,7 +1448,7 @@
 				}
 
 				return Y.DOM.Access(this, function(element, name, value) {
-					var styles, len, mapo = Object.create({}),
+					var styles, len, mapo = {},
 						i = 0;
 
 					if (Y.Lang.isArray(name)) {
@@ -1467,10 +1466,6 @@
 						Y.DOM.Style(element, name, value) :
 						Y.DOM.CSS(element, name);
 				}, name, value, arguments.length > 1);
-			},
-
-			prevAll: function(elem) {
-				return Y.DOM.dir(elem, "previousSibling");
 			},
 
 			index: function(element) {
@@ -1806,7 +1801,7 @@
 		// If support gets modularized, this method should be moved back to the css module.
 		Swap: function(element, options, callback, args) {
 			var ret, name,
-				old = Object.create({});
+				old = {};
 
 			// Remember the old values, and insert the new ones
 			for (name in options) {
@@ -1999,14 +1994,14 @@
 
 	//---
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		offset: {
 			setOffset: function(element, options, i) {
 				var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft,
 					calculatePosition,
 					position = Y.DOM.CSS(element, "position"),
 					curElem = Y.DOM(element),
-					props = Object.create({});
+					props = {};
 
 				// Set position first, in-case top/left are set even on static element
 				if (position === "static") {
@@ -2051,9 +2046,7 @@
 
 		isLTR: DomNode.documentIsLtr,
 
-		// EC: 0,
-
-		each: Y.Each,
+		each: Y.each,
 
 		vardump: Y.Lang.variableDump,
 
@@ -2064,8 +2057,6 @@
 		pushStack: DomNode.pushStack,
 
 		Swap: DomNode.Swap,
-
-		dir: DomNode.dir,
 
 		swap: DomNode.Swap,
 
@@ -2104,8 +2095,8 @@
 		parseJSON: Y.Lang.parseJSON
 	});
 
-	Y.DOM.Support = Y.DOM.support = Object.create({});
-	Y.DOM.Expr = Y.DOM.expr = Object.create({});
+	Y.DOM.Support = Y.DOM.support = {};
+	Y.DOM.Expr = Y.DOM.expr = {};
 	Y.DOM.Map = Y.DOM.map = map;
 
 	//---
@@ -2118,7 +2109,7 @@
 	//---
 
 	// Create scrollLeft and scrollTop methods
-	Y.Each({
+	Y.each({
 		scrollLeft: 'pageXOffset',
 		scrollTop: 'pageYOffset'
 	}, function(method, prop) {
@@ -2148,7 +2139,7 @@
 
 	//---
 
-	Y.Each(['height', 'width'], function(i, name) {
+	Y.each(['height', 'width'], function(i, name) {
 		Y.DOM.CSS_Hooks[name] = {
 			get: function(element, computed, extra) {
 				if (computed) {
@@ -2180,11 +2171,11 @@
 
 	//---
 
-	Y.Each({
+	Y.each({
 		Height: 'height',
 		Width: 'width'
 	}, function(name, type) {
-		Y.Each({
+		Y.each({
 			padding: 'inner' + name,
 			content: type,
 			'': 'outer' + name
@@ -2231,8 +2222,8 @@
 
 	//---
 
-	Y.DOM.Extend = Y.DOM.extend = Y.Extend;
-	Y.DOM.Function.extend = Y.Extend;
+	Y.DOM.Extend = Y.DOM.extend = Y.extend;
+	Y.DOM.Function.extend = Y.extend;
 
 	//---
 
@@ -2286,7 +2277,7 @@
 							'SCRIPT' && (!el.type || el.type === 'text/javascript')) {
 							if (!el.src) {
 								// window['eval'].call(window, el.innerHTML);
-								globalEval(window, el.innerHTML);
+								globalEval(Y.Window, el.innerHTML);
 							}
 						}
 					});
@@ -2311,7 +2302,7 @@
 
 	//---
 
-	//Y.Extend(YAXDOM.Y.prototype, Y.DOM.Function);
+	//Y.extend(YAXDOM.Y.prototype, Y.DOM.Function);
 
 	YAXDOM.Y.prototype = Y.DOM.Function;
 	Y.DOM.prototype = Y.DOM.Function;
@@ -2473,8 +2464,7 @@
 
 				nodes = oldQSA(node, _selector);
 			} catch (e) {
-				// console.error('error performing selector: %o', selector);
-				Y.ERROR('Error performing selector: ' + selector);
+				Y.ERROR('Error performing selector: %o', selector);
 				throw e;
 			} finally {
 				if (taggedParent) {
@@ -2587,7 +2577,7 @@
 					// Fallback to a less secure definition
 				} catch (e) {
 					descriptor[this.Expando] = unlock;
-					Y.Extend(owner, descriptor);
+					Y.extend(owner, descriptor);
 				}
 			}
 
@@ -2614,7 +2604,7 @@
 			} else {
 				// Fresh assignments by object are shallow copied
 				if (Y.Lang.isEmpty(cache)) {
-					Y.Extend(this.cache[unlock], data);
+					Y.extend(this.cache[unlock], data);
 					// Otherwise, copy the properties one-by-one to the cache object
 				} else {
 					for (prop in data) {
@@ -2724,7 +2714,7 @@
 	Y.DOM.dataUser = Y.DOM.data_user = new Data();
 	Y.DOM.dataPrivative = Y.DOM.data_priv = new Data();
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		acceptData: Data.accepts,
 		hasData: function (elem) {
 			return Y.DOM.dataUser.hasData(elem) || Y.DOM.dataPrivative.hasData(elem);
@@ -2780,7 +2770,7 @@
 	function attributeData(node) {
 		var store = {};
 
-		Y.Each(node.attributes || Y.G.ArrayProto, function (i, attr) {
+		Y.each(node.attributes || Y.G.ArrayProto, function (i, attr) {
 			if (attr.name.indexOf('data-') === 0) {
 				store[Y.Lang.camelise(attr.name.replace('data-', ''))] =
 					Y.Lang.deserialiseValue(attr.value);
@@ -2952,7 +2942,7 @@
 		if (Y.Lang.isUndefined(value)) {
 			if (Y.Lang.isPlainObject(name)) {
 				result = this.each(function (i, node) {
-					Y.Each(name, function (key, value) {
+					Y.each(name, function (key, value) {
 						setData(node, key, value);
 					});
 				});
@@ -2983,7 +2973,7 @@
 				store = id && data[id];
 
 			if (store) {
-				Y.Each(names || store, function (key) {
+				Y.each(names || store, function (key) {
 					delete store[names ? Y.Lang.camelise(this) : key];
 				});
 			}
@@ -3052,7 +3042,7 @@
 
 		ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$)/,
 
-		focusinSupported = Y.HasOwnProperty.call(Y.Window, 'onfocusin'),
+		focusinSupported = Y.hasOwn.call(Y.Window, 'onfocusin'),
 
 		eventMethods = {
 			preventDefault: 'isDefaultPrevented',
@@ -3068,7 +3058,7 @@
 
 		document = Y.Document,
 
-		specialEvents = Object.create({});
+		specialEvents = {};
 
 	specialEvents.click =
 		specialEvents.mousedown =
@@ -3107,7 +3097,7 @@
 
 		var result = null;
 
-		if (Y.HasOwnProperty.call(element, 'EventHandlers')) {
+		if (Y.hasOwn.call(element, 'EventHandlers')) {
 			result = element.EventHandlers;
 		} else {
 			element.EventHandlers = [];
@@ -3145,7 +3135,7 @@
 			// source || (source = event);
 			source = source || event;
 
-			Y.Each(eventMethods, function (name, predicate) {
+			Y.each(eventMethods, function (name, predicate) {
 				var sourceMethod = source[name];
 
 				event[name] = function () {
@@ -3255,7 +3245,7 @@
 
 		event.initEvent(type, bubbles, true);
 
-		this.timeStamp = type && type.timeStamp || Y.Lang.now;
+		this.timeStamp = type && type.timeStamp || Y.Lang.now();
 
 		// Mark it as fixed
 		this[Y.DOM.expando] = true;
@@ -3271,7 +3261,7 @@
 	/**
 	 * Y.DOM.Event contains functions for working with Node events.
 	 */
-	Y.Extend(Y.DOM.Event, {
+	Y.extend(Y.DOM.Event, {
 		on: function (object, types, func, context) {
 			var type, x, len;
 
@@ -3528,11 +3518,11 @@
 
 	//---
 
-	Y.DOM.event = Object.create({});
+	Y.DOM.event = {};
 
 	//---
 
-	Y.Extend(Y.DOM.event, {
+	Y.extend(Y.DOM.event, {
 		add: function (element, events, func, data, selector, delegator, capture) {
 			var set = eventHandlers(element);
 			var callback;
@@ -3548,7 +3538,7 @@
 				handler.selector = selector;
 
 				// Emulate mouseenter, mouseleave
-				if (Y.HasOwnProperty.call(hover, handler.e)) {
+				if (Y.hasOwn.call(hover, handler.e)) {
 				//if (handler.e in hover) {
 					func = function (e) {
 						var related = e.relatedTarget;
@@ -3604,7 +3594,7 @@
 			});
 		},
 
-		special: Object.create({})
+		special: {}
 	});
 
 	//---
@@ -3685,7 +3675,7 @@
 		var autoRemove, delegator, $this = this;
 
 		if (event && !Y.Lang.isString(event)) {
-			Y.Each(event, function (type, func) {
+			Y.each(event, function (type, func) {
 				$this.on(type, selector, data, func, one);
 			});
 
@@ -3721,7 +3711,7 @@
 						match = Y.DOM(event.target).closest(selector, element).get(0);
 
 					if (match && match !== element) {
-						evt = Y.Extend(createProxy(event), {
+						evt = Y.extend(createProxy(event), {
 							currentTarget: match,
 							liveFired: element
 						});
@@ -3739,7 +3729,7 @@
 		var $this = this;
 
 		if (event && !Y.Lang.isString(event)) {
-			Y.Each(event, function (type, func) {
+			Y.each(event, function (type, func) {
 				$this.off(type, selector, func);
 			});
 
@@ -3797,7 +3787,7 @@
 			e._args = args;
 			e.target = element;
 
-			Y.Each(findHandlers(element, event.type || event), function (i, handler) {
+			Y.each(findHandlers(element, event.type || event), function (i, handler) {
 				result = handler.proxy(e);
 
 				if (e.isImmediatePropagationStopped()) {
@@ -4114,7 +4104,7 @@
 
 	//---
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		AjaxSettings: {
 			// Default type of request
 			type: 'GET',
@@ -4187,7 +4177,7 @@
 
 	//---
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		getJSON: function () {
 			var options = parseArguments.apply(null, arguments);
 			options.dataType = 'json';
@@ -4287,7 +4277,7 @@
 		},
 
 		Ajax: function (options) {
-			var settings = Y.Extend({}, options || {}),
+			var settings = Y.extend({}, options || {}),
 				deferred = Y.G.Deferred && Y.G.Deferred(),
 				key,
 				dataType,
@@ -4407,7 +4397,7 @@
 				}
 			}
 
-			settings.headers = Y.Extend(headers, settings.headers, {});
+			settings.headers = Y.extend(headers, settings.headers, {});
 
 			xhr.setRequestHeader = setHeader;
 
@@ -4520,7 +4510,7 @@
 		}
 	});
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		get: Y.DOM.Get,
 		post: Y.DOM.Post,
 		ajax: Y.DOM.Ajax,
@@ -4569,7 +4559,7 @@
 	 * Extend YAX's AJAX beforeSend method by setting an X-CSRFToken on any
 	 * 'unsafe' request methods.
 	 **/
-	Y.Extend(Y.DOM.AjaxSettings, {
+	Y.extend(Y.DOM.AjaxSettings, {
 		beforeSend: function (xhr, settings) {
 			if (!(/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type)) && sameOrigin(
 				settings.url)) {
@@ -4644,7 +4634,7 @@
 		return eventPrefix ? eventPrefix + name : name.toLowerCase();
 	}
 
-	Y.Each(vendors, function (vendor, event) {
+	Y.each(vendors, function (vendor, event) {
 		if (testEl.style[vendor + 'TransitionProperty'] !== undef) {
 			prefix = '-' + vendor.toLowerCase() + '-';
 			eventPrefix = event;
@@ -4827,7 +4817,7 @@
 
 	//---
 
-	Y.Extend(Y.DOM, {
+	Y.extend(Y.DOM, {
 		queue: function (elem, type, data) {
 			var queue;
 
@@ -4896,7 +4886,7 @@
 
 	//---
 
-	Y.Extend(Y.DOM.Function, {
+	Y.extend(Y.DOM.Function, {
 		queue: function (type, data) {
 			var setter = 2;
 
@@ -4985,6 +4975,37 @@
 			return defer.promise(obj);
 		}
 	});
+
+	//---
+
+	Y.DOM.Function.stopTranAnim = function (jumpToEnd, cancelCallback) {
+		var props;
+		var style;
+		// var cssValues = {};
+		var x;
+
+		props = this.css(prefix + 'transition-property').split(', ');
+
+		if (!props.length) {
+			return this;
+		}
+
+		if (!jumpToEnd) {
+			style = Y.DOM.getDocStyles(this.get(0));
+
+			for (x = 0; x < props.length; x++) {
+				this.css(props[x], style.getPropertyValue(props[x]));
+			}
+		}
+
+		if (cancelCallback) {
+			this.unbind(Y.DOM.fx.transitionEnd).css(cssReset);
+		} else {
+			this.trigger(Y.DOM.fx.transitionEnd);
+		}
+
+		return this;
+	};
 
 	//---
 
@@ -5280,24 +5301,24 @@
 		gecko3d = Y.Document.documentElement.style.hasOwnProperty('MozPerspective'),
 		opera3d = Y.Document.documentElement.style.hasOwnProperty('OTransition');
 
-	retina = (Y.HasOwnProperty.call(Y.Window, 'devicePixelRatio') && Y.CallProperty(Y.Window, 'devicePixelRatio') > 1);
+	retina = (Y.hasOwn.call(Y.Window, 'devicePixelRatio') && Y.callProperty(Y.Window, 'devicePixelRatio') > 1);
 
-	if (!retina && Y.HasOwnProperty.call(Y.Window, 'matchMedia')) {
-		matches = Y.CallProperty(Y.Window, 'matchMedia');
-		retina = (Y.Lang.isSet(matches) && Y.CallProperty(matches, 'matches'));
+	if (!retina && Y.hasOwn.call(Y.Window, 'matchMedia')) {
+		matches = Y.callProperty(Y.Window, 'matchMedia');
+		retina = (Y.Lang.isSet(matches) && Y.callProperty(matches, 'matches'));
 	}
 
-	msPointer = (Y.HasOwnProperty.call(navigator, 'msPointerEnabled') &&
-		Y.HasOwnProperty.call(navigator, 'msMaxTouchPoints') &&
-		!Y.HasOwnProperty.call(Y.Window, 'PointerEvent'));
+	msPointer = (Y.hasOwn.call(navigator, 'msPointerEnabled') &&
+		Y.hasOwn.call(navigator, 'msMaxTouchPoints') &&
+		!Y.hasOwn.call(Y.Window, 'PointerEvent'));
 
-	pointer = (Y.HasOwnProperty.call(Y.Window, 'PointerEvent') &&
-		Y.HasOwnProperty.call(navigator, 'pointerEnabled') &&
-		!Y.HasOwnProperty.call(navigator, 'maxTouchPoints')) || msPointer;
+	pointer = (Y.hasOwn.call(Y.Window, 'PointerEvent') &&
+		Y.hasOwn.call(navigator, 'pointerEnabled') &&
+		!Y.hasOwn.call(navigator, 'maxTouchPoints')) || msPointer;
 
 	//---
 
-	Y.UA = Y.Class.Extend({
+	Y.UA = Y.Class.extend({
 		CLASS_NAME: 'UA',
 
 		initialise: function () {
@@ -5474,9 +5495,9 @@
 			// OS.Platform = navigator.platform;
 
 			Browser.Language = navigator.language;
-			Browser.Vendor = Y.CallProperty(navigator, 'vendor');
+			Browser.Vendor = Y.callProperty(navigator, 'vendor');
 
-			Y.Extend(OS, {
+			Y.extend(OS, {
 				Name: navigator.appVersion.indexOf('Linux') !== -1 ? osNames[0] : osNames[6] ||
 					navigator.appVersion.indexOf('Mac') !== -1 ? osNames[2] : osNames[6] ||
 					navigator.appVersion.indexOf('X11') !== -1 ? osNames[3] : osNames[6] ||
@@ -5491,7 +5512,7 @@
 			//
 
 			/** @namespace Y.Window.YAX_DISABLE_3D */
-			Y.Extend(features, {
+			Y.extend(features, {
 				// Elements
 				Audio: Y.Lang.isSet(document.createElement('audio').canPlayType),
 				Canvas: Y.Lang.isSet(document.createElement('canvas').getContext),
@@ -5501,7 +5522,7 @@
 
 				// Features and Attributes
 				Offline: navigator.hasOwnProperty('onLine') && navigator.onLine,
-				ApplicationCache: Y.Lang.isSet(Y.CallProperty(window, 'applicationCache')),
+				ApplicationCache: Y.Lang.isSet(Y.callProperty(window, 'applicationCache')),
 				ContentEditable: document.createElement('span').hasOwnProperty('isContentEditable'),
 				DragDrop: document.createElement('span').hasOwnProperty('draggable'),
 				Geolocation: Y.Lang.isSet(navigator.geolocation),
@@ -5523,7 +5544,7 @@
 				InputTypeUrl: testInput('url'),
 
 				// Storage
-				IndexDB: Y.Lang.isSet(Y.CallProperty(window, 'indexedDB')),
+				IndexDB: Y.Lang.isSet(Y.callProperty(window, 'indexedDB')),
 				LocalStorage: (window.window.hasOwnProperty('localStorage') && window.localStorage !== null),
 				WebSQL: Y.Lang.isSet(window.openDatabase),
 
@@ -5534,7 +5555,7 @@
 
 				// Propietary features
 				// Standalone: ((window.navigator.hasOwnProperty('standalone')) && (window.navigator.standalone))
-				Standalone: Y.Lang.isSet(Y.CallProperty(navigator, 'standalone')),
+				Standalone: Y.Lang.isSet(Y.callProperty(navigator, 'standalone')),
 
 				Any3D: !Y.Window.YAX_DISABLE_3D && (ie3d || webkit3d || gecko3d || opera3d),
 
@@ -5543,7 +5564,7 @@
 			});
 
 			// Return (boolean) of likely client device classifications.
-			Y.Extend(type, {
+			Y.extend(type, {
 				Mobile: (screen.width < 768),
 				Tablet: (screen.width >= 768 && features.Orientation),
 				Desktop: (screen.width >= 800 && !features.Orientation)
@@ -5587,31 +5608,14 @@
 
 	'use strict';
 
-	// YAX Timers
-	Y.Extend(Y.DOM.Function, {
-		everyTime: function (interval, label, fn, times, belay) {
-			//console.log(this);
-			return this.each(function () {
-				Y.DOM.timer.add(this, interval, label, fn, times, belay);
-			});
-		},
-		oneTime: function (interval, label, fn) {
-			return this.each(function () {
-				Y.DOM.timer.add(this, interval, label, fn, 1);
-			});
-		},
-		stopTime: function (label, fn) {
-			return this.each(function () {
-				Y.DOM.timer.remove(this, label, fn);
-			});
-		}
-	});
-
-	Y.Extend(Y.DOM, {
+	Y.DOM.extend({
 		timer: {
 			GUID: 1,
+
 			global: {},
+
 			regex: /^([0-9]+)\s*(.*s)?$/,
+
 			powers: {
 				// Yeah this is major overkill...
 				'ms': 1,
@@ -5622,6 +5626,7 @@
 				'hs': 100000,
 				'ks': 1000000
 			},
+
 			timeParse: function (value) {
 				var num, mult, result;
 
@@ -5639,15 +5644,16 @@
 
 				return value;
 			},
-			add: function (element, interval, label, fn, times, belay) {
+
+			add: function (element, interval, label, callback, times, belay) {
 				var counter = 0,
 					handler;
 
 				if (Y.Lang.isFunction(label)) {
 					if (!times) {
-						times = fn;
+						times = callback;
 					}
-					fn = label;
+					callback = label;
 					label = interval;
 				}
 
@@ -5669,10 +5675,12 @@
 				if (!element.$timers) {
 					element.$timers = {};
 				}
+
 				if (!element.$timers[label]) {
 					element.$timers[label] = {};
 				}
-				fn.$timerID = fn.$timerID || this.GUID++;
+
+				callback.$timerID = callback.$timerID || this.GUID++;
 
 				handler = function () {
 					if (belay && handler.inProgress) {
@@ -5680,16 +5688,16 @@
 					}
 					handler.inProgress = true;
 					if ((++counter > times && times !== 0) ||
-						fn.call(element, counter) === false) {
-						Y.DOM.timer.remove(element, label, fn);
+						callback.call(element, counter) === false) {
+						Y.DOM.timer.remove(element, label, callback);
 					}
 					handler.inProgress = false;
 				};
 
-				handler.$timerID = fn.$timerID;
+				handler.$timerID = callback.$timerID;
 
-				if (!element.$timers[label][fn.$timerID]) {
-					element.$timers[label][fn.$timerID] = window.setInterval(handler,
+				if (!element.$timers[label][callback.$timerID]) {
+					element.$timers[label][callback.$timerID] = Y.Window.setInterval(handler,
 						interval);
 				}
 
@@ -5699,7 +5707,8 @@
 				this.global[label].push(element);
 
 			},
-			remove: function (element, label, fn) {
+
+			remove: function (element, label, callback) {
 				var timers = element.$timers,
 					ret, lab, _fn;
 
@@ -5708,14 +5717,14 @@
 					if (!label) {
 						for (lab in timers) {
 							if (timers.hasOwnProperty(lab)) {
-								this.remove(element, lab, fn);
+								this.remove(element, lab, callback);
 							}
 						}
 					} else if (timers[label]) {
-						if (fn) {
-							if (fn.$timerID) {
-								window.clearInterval(timers[label][fn.$timerID]);
-								delete timers[label][fn.$timerID];
+						if (callback) {
+							if (callback.$timerID) {
+								window.clearInterval(timers[label][callback.$timerID]);
+								delete timers[label][callback.$timerID];
 							}
 						} else {
 							for (_fn in timers[label]) {
@@ -5740,7 +5749,7 @@
 
 					for (ret in timers) {
 						if (timers.hasOwnProperty(ret)) {
-							//if (Y.HasOwnProperty.call(timers, ret)) {
+							//if (Y.hasOwn.call(timers, ret)) {
 							break;
 						}
 					}
@@ -5753,51 +5762,30 @@
 		}
 	});
 
-	var prefix = Y.DOM.fx.cssPrefix;
-	var transitionEnd = Y.DOM.fx.transitionEnd;
-	var cssReset = Object.create({});
-
-	var transitionProperty;
-	var transitionDuration;
-	var transitionTiming;
-
-	cssReset[transitionProperty = prefix + 'transition-property'] =
-		cssReset[transitionDuration = prefix + 'transition-duration'] =
-		cssReset[transitionTiming = prefix + 'transition-timing-function'] = '';
-
-	Y.DOM.Function.stopTranAnim = function (jumpToEnd, cancelCallback) {
-		var props;
-		var style;
-		// var cssValues = {};
-		var x;
-
-		props = this.css(prefix + 'transition-property').split(', ');
-
-		if (!props.length) {
-			return this;
+	// YAX Timers
+	Y.DOM.Function.extend({
+		everyTime: function (interval, label, callback, times, belay) {
+			return this.each(function () {
+				Y.DOM.timer.add(this, interval, label, callback, times, belay);
+			});
+		},
+		
+		oneTime: function (interval, label, callback) {
+			return this.each(function () {
+				Y.DOM.timer.add(this, interval, label, callback, 1);
+			});
+		},
+		
+		stopTime: function (label, callback) {
+			return this.each(function () {
+				Y.DOM.timer.remove(this, label, callback);
+			});
 		}
-
-		if (!jumpToEnd) {
-			// style = Y.Document.defaultView.getComputedStyle(this.get(0), '');
-			style = Y.DOM.getDocStyles(this.get(0));
-
-			for (x = 0; x < props.length; x++) {
-				this.css(props[x], style.getPropertyValue(props[x]));
-			}
-		}
-
-		if (cancelCallback) {
-			this.unbind(transitionEnd).css(cssReset);
-		} else {
-			this.trigger(transitionEnd);
-		}
-
-		return this;
-	};
+	});
 
 	//---
 
-	Y.Extend(Y.DOM.Function, {
+	Y.extend(Y.DOM.Function, {
 		cycleNext: function () {
 			if (this.next().length > 0) {
 				return this.next();
@@ -5817,7 +5805,7 @@
 
 	//---
 
-	Y.Extend(Y.DOM.Function, {
+	Y.extend(Y.DOM.Function, {
 		role: function () {
 			var args = Y.G.Slice.call(arguments);
 			var data;
@@ -5885,7 +5873,7 @@
 
 	// Y.G.Compatibility = true;
 
-	// Y.DOM._temp = Object.create({});
+	// Y.DOM._temp = {};
 
 	Y.DOM.camelCase = Y.Lang.camelise;
 	Y.DOM.isReady = true;
@@ -6023,7 +6011,7 @@
 	//---
 
 	/*Y.DOM.event.simulate = function (type, elem, event, bubble) {
-		var e = Y.Extend(new Y.DOM.Event(type), event, {
+		var e = Y.extend(new Y.DOM.Event(type), event, {
 			type: type,
 			isSimulated: true,
 			originalEvent: {},
@@ -6044,7 +6032,7 @@
 		var attaches = 0;
 
 		var handler = function (event) {
-			Y.DOM.event.simulate(fix, event.target, Y.Extend({}, event), true);
+			Y.DOM.event.simulate(fix, event.target, Y.extend({}, event), true);
 		};
 
 		Y.DOM.event.special[fix] = {
@@ -6072,6 +6060,60 @@
 		});
 	}
 
+
+	//---
+
+}());
+
+//---
+
+
+/**
+ * YAX.DOM IE Support
+ *
+ * Add support for Internet Explorer 10+ on desktop and Windows Phone 8.
+ *
+ * @version     0.20
+ * @depends:    Core, DOM
+ * @license     Dual licensed under the MIT and GPL licenses.
+ */
+
+//---
+
+/*jslint indent: 4 */
+/*jslint white: true */
+/*jshint eqeqeq: false */
+/*jshint strict: false */
+/*jshint node: true */
+/*global Y, YAX */
+
+(function () {
+
+	'use strict';
+
+	// __proto__ doesn't exist on IE < 11, so redefine
+	// the Y.DOM.YAXDOM.Y function to use object extension instead
+
+	if (!('__proto__' in {})) {
+		Y.extend(Y.DOM.YAXDOM, {
+			Y: function(dom, selector) {
+				dom = dom || [];
+
+				Y.extend(dom, Y.DOM.Function);
+
+				dom.selector = selector || '';
+
+				dom.__Y = true;
+
+				return dom;
+			},
+
+			// this is a kludge but works
+			isY: function(object) {
+				return Y.Lang.type(object) === 'array' && '__Y' in object;
+			}
+		});
+	}
 
 	//---
 

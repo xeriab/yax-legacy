@@ -88,7 +88,9 @@ var Dependencies = {
 
 			// 'Modules/Node/Contrib/EventLogger.js',
 
-			'Support/Compatibility.js'
+			'Support/Compatibility.js',
+
+			'Support/IE.js'
 
 			// 'Modules/Node/Contrib/EventSpecial.js'
 		],
@@ -128,7 +130,9 @@ var Dependencies = {
 
 			'Modules/Node/Contrib/EventLogger.js',
 
-			'Support/Compatibility.js'
+			'Support/Compatibility.js',
+
+			'Support/IE.js'
 
 			// 'Modules/Node/Contrib/EventSpecial.js'
 		],
@@ -143,7 +147,7 @@ var Dependencies = {
 			'Plugins/LocalStorage.js'
 		],
 
-		desc: 'LocalStorage Plugin.',
+		desc: 'LocalStorage store plugin.',
 
 		extended_desc: ''
 	},
@@ -153,7 +157,7 @@ var Dependencies = {
 			'Plugins/Cookies.js'
 		],
 
-		desc: 'Cookies Plugin.',
+		desc: 'Cookies store plugin.',
 
 		extended_desc: ''
 	},
@@ -163,7 +167,7 @@ var Dependencies = {
 			'Plugins/CSV.js'
 		],
 
-		desc: 'CSV Parser Plugin.',
+		desc: 'CSV Parser plugin.',
 
 		extended_desc: ''
 	},
@@ -173,7 +177,7 @@ var Dependencies = {
 			'Plugins/Router.js'
 		],
 
-		desc: 'Router Plugin.',
+		desc: 'URL/Hash routing plugin.',
 
 		extended_desc: ''
 	},
@@ -183,7 +187,7 @@ var Dependencies = {
 			'Plugins/AutoFix/AutoFix.js'
 		],
 
-		desc: 'AutoFix Plugin.',
+		desc: 'AutoFix plugin.',
 
 		extended_desc: ''
 	},
@@ -193,7 +197,7 @@ var Dependencies = {
 			'Plugins/Tooltip/Tooltip.js'
 		],
 
-		desc: 'Tooltip Plugin.',
+		desc: 'Simple tooltip plugin.',
 
 		extended_desc: ''
 	},
@@ -203,50 +207,10 @@ var Dependencies = {
 			'Plugins/WaitForMe/WaitForMe.js'
 		],
 
-		desc: 'WaitForMe Plugin.',
+		desc: 'WaitForMe plugin.',
 
 		extended_desc: ''
-	},
-
-
-	/*'Bootstrap': {
-		src: [
-			'Plugins/Bootstrap/ProgressBar.js',
-		],
-
-		desc: 'Bootstrap Plugins.',
-
-		extended_desc: ''
-	},
-
-	'Extra Plugins': {
-		src: [
-			'Plugins/LocalStorage.js',
-			'Plugins/Cookies.js',
-			'Plugins/CSV.js',
-			'Plugins/Tooltip/Tooltip.js',
-			'Plugins/WaitForMe/WaitForMe.js',
-			'Plugins/AutoFix/AutoFix.js',
-			'Plugins/Router.js'
-		],
-
-		desc: 'Various Plugins.',
-
-		extended_desc: ''
-	}*/
-
-	/*'Stylesheets': {
-		src: [
-			'Plugins/yax.js.css',
-			'Plugins/Tooltip/Tooltip.css',
-			'Plugins/WaitForMe/WaitForMe.css',
-			'Plugins/AutoFix/AutoFix.css'
-		],
-
-		desc: 'Plugins stylesheets.',
-
-		extended_desc: ''
-	},*/
+	}
 };
 
 if (typeof exports !== 'undefined') {

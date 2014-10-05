@@ -86,7 +86,7 @@
 		rcleanScript: /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g
 	};
 
-	Y.Extend(Y.RegEx, {
+	Y.extend(Y.RegEx, {
 		rnumsplit: new RegExp('^(' + Y.RegEx.pnum + ')(.*)$', 'i'),
 
 		rnumnonpx: new RegExp('^(' + Y.RegEx.pnum + ')(?!px)[a-z%]+$', 'i'),

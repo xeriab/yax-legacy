@@ -23,7 +23,7 @@
 
 	'use strict';
 
-	Y.Extend(Y.Settings.DOM, {
+	Y.extend(Y.Settings.DOM, {
 		AutoFix: {
 			CustomOffset: true,
 			Manual: true,
@@ -34,7 +34,7 @@
 	var PluginOptions = Y.Settings.DOM.AutoFix;
 
 	Y.DOM.Function.AutoFix = function (options) {
-		var settings = Y.Extend(PluginOptions, options, {}),
+		var settings = Y.extend(PluginOptions, options, {}),
 			el = Y.DOM(this),
 			curpos = el.position(),
 			offset = settings.CustomOffset,

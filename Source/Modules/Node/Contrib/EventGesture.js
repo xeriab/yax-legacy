@@ -31,7 +31,7 @@
 
 	if (Y.UserAgent.OS.iOS) {
 		Y.DOM(document).bind('gesturestart', function (event) {
-			var now = Y.Lang.now;
+			var now = Y.Lang.now();
 			// var delta = now - (gesture.last || now);
 			gesture.target = parentIfText(event.target);
 

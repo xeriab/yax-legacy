@@ -39,7 +39,7 @@
 
 		var state = 'pending';
 
-		var deferred = Object.create({});
+		var deferred = {};
 
 		var promise = {
 			state: function () {
@@ -55,7 +55,7 @@
 				var fns = arguments, context, values;
 
 				return newDeferred(function (defer) {
-					Y.Each(tuples, function (x, tuple) {
+					Y.each(tuples, function (x, tuple) {
 						var fn = Y.Lang.isFunction(fns[x]) && fns[x];
 						deferred[tuple[1]](function () {
 							var returned = fn && fn.apply(this, arguments);
@@ -79,19 +79,19 @@
 
 			promise: function (obj) {
 				if (Y.Lang.isSet(obj)) {
-					return Y.Extend(obj, promise);
+					return Y.extend(obj, promise);
 				}
 
 				return promise;
 
-				// return obj !== null ? Y.Extend(obj, promise) : promise;
+				// return obj !== null ? Y.extend(obj, promise) : promise;
 			}
 		};
 
 		// Keep pipe for back-compat
 		promise.pipe = promise.then;
 
-		Y.Each(tuples, function (x, tuple) {
+		Y.each(tuples, function (x, tuple) {
 			var list = tuple[2],
 				stateString = tuple[3];
 

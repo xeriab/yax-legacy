@@ -21,31 +21,14 @@
 
 	'use strict';
 
-	// YAX Timers
-	Y.Extend(Y.DOM.Function, {
-		everyTime: function (interval, label, fn, times, belay) {
-			//console.log(this);
-			return this.each(function () {
-				Y.DOM.timer.add(this, interval, label, fn, times, belay);
-			});
-		},
-		oneTime: function (interval, label, fn) {
-			return this.each(function () {
-				Y.DOM.timer.add(this, interval, label, fn, 1);
-			});
-		},
-		stopTime: function (label, fn) {
-			return this.each(function () {
-				Y.DOM.timer.remove(this, label, fn);
-			});
-		}
-	});
-
-	Y.Extend(Y.DOM, {
+	Y.DOM.extend({
 		timer: {
 			GUID: 1,
+
 			global: {},
+
 			regex: /^([0-9]+)\s*(.*s)?$/,
+
 			powers: {
 				// Yeah this is major overkill...
 				'ms': 1,
@@ -56,6 +39,7 @@
 				'hs': 100000,
 				'ks': 1000000
 			},
+
 			timeParse: function (value) {
 				var num, mult, result;
 
@@ -73,15 +57,16 @@
 
 				return value;
 			},
-			add: function (element, interval, label, fn, times, belay) {
+
+			add: function (element, interval, label, callback, times, belay) {
 				var counter = 0,
 					handler;
 
 				if (Y.Lang.isFunction(label)) {
 					if (!times) {
-						times = fn;
+						times = callback;
 					}
-					fn = label;
+					callback = label;
 					label = interval;
 				}
 
@@ -103,10 +88,12 @@
 				if (!element.$timers) {
 					element.$timers = {};
 				}
+
 				if (!element.$timers[label]) {
 					element.$timers[label] = {};
 				}
-				fn.$timerID = fn.$timerID || this.GUID++;
+
+				callback.$timerID = callback.$timerID || this.GUID++;
 
 				handler = function () {
 					if (belay && handler.inProgress) {
@@ -114,16 +101,16 @@
 					}
 					handler.inProgress = true;
 					if ((++counter > times && times !== 0) ||
-						fn.call(element, counter) === false) {
-						Y.DOM.timer.remove(element, label, fn);
+						callback.call(element, counter) === false) {
+						Y.DOM.timer.remove(element, label, callback);
 					}
 					handler.inProgress = false;
 				};
 
-				handler.$timerID = fn.$timerID;
+				handler.$timerID = callback.$timerID;
 
-				if (!element.$timers[label][fn.$timerID]) {
-					element.$timers[label][fn.$timerID] = window.setInterval(handler,
+				if (!element.$timers[label][callback.$timerID]) {
+					element.$timers[label][callback.$timerID] = Y.Window.setInterval(handler,
 						interval);
 				}
 
@@ -133,7 +120,8 @@
 				this.global[label].push(element);
 
 			},
-			remove: function (element, label, fn) {
+
+			remove: function (element, label, callback) {
 				var timers = element.$timers,
 					ret, lab, _fn;
 
@@ -142,14 +130,14 @@
 					if (!label) {
 						for (lab in timers) {
 							if (timers.hasOwnProperty(lab)) {
-								this.remove(element, lab, fn);
+								this.remove(element, lab, callback);
 							}
 						}
 					} else if (timers[label]) {
-						if (fn) {
-							if (fn.$timerID) {
-								window.clearInterval(timers[label][fn.$timerID]);
-								delete timers[label][fn.$timerID];
+						if (callback) {
+							if (callback.$timerID) {
+								window.clearInterval(timers[label][callback.$timerID]);
+								delete timers[label][callback.$timerID];
 							}
 						} else {
 							for (_fn in timers[label]) {
@@ -174,7 +162,7 @@
 
 					for (ret in timers) {
 						if (timers.hasOwnProperty(ret)) {
-							//if (Y.HasOwnProperty.call(timers, ret)) {
+							//if (Y.hasOwn.call(timers, ret)) {
 							break;
 						}
 					}
@@ -187,51 +175,30 @@
 		}
 	});
 
-	var prefix = Y.DOM.fx.cssPrefix;
-	var transitionEnd = Y.DOM.fx.transitionEnd;
-	var cssReset = Object.create({});
-
-	var transitionProperty;
-	var transitionDuration;
-	var transitionTiming;
-
-	cssReset[transitionProperty = prefix + 'transition-property'] =
-		cssReset[transitionDuration = prefix + 'transition-duration'] =
-		cssReset[transitionTiming = prefix + 'transition-timing-function'] = '';
-
-	Y.DOM.Function.stopTranAnim = function (jumpToEnd, cancelCallback) {
-		var props;
-		var style;
-		// var cssValues = {};
-		var x;
-
-		props = this.css(prefix + 'transition-property').split(', ');
-
-		if (!props.length) {
-			return this;
+	// YAX Timers
+	Y.DOM.Function.extend({
+		everyTime: function (interval, label, callback, times, belay) {
+			return this.each(function () {
+				Y.DOM.timer.add(this, interval, label, callback, times, belay);
+			});
+		},
+		
+		oneTime: function (interval, label, callback) {
+			return this.each(function () {
+				Y.DOM.timer.add(this, interval, label, callback, 1);
+			});
+		},
+		
+		stopTime: function (label, callback) {
+			return this.each(function () {
+				Y.DOM.timer.remove(this, label, callback);
+			});
 		}
-
-		if (!jumpToEnd) {
-			// style = Y.Document.defaultView.getComputedStyle(this.get(0), '');
-			style = Y.DOM.getDocStyles(this.get(0));
-
-			for (x = 0; x < props.length; x++) {
-				this.css(props[x], style.getPropertyValue(props[x]));
-			}
-		}
-
-		if (cancelCallback) {
-			this.unbind(transitionEnd).css(cssReset);
-		} else {
-			this.trigger(transitionEnd);
-		}
-
-		return this;
-	};
+	});
 
 	//---
 
-	Y.Extend(Y.DOM.Function, {
+	Y.extend(Y.DOM.Function, {
 		cycleNext: function () {
 			if (this.next().length > 0) {
 				return this.next();
@@ -251,7 +218,7 @@
 
 	//---
 
-	Y.Extend(Y.DOM.Function, {
+	Y.extend(Y.DOM.Function, {
 		role: function () {
 			var args = Y.G.Slice.call(arguments);
 			var data;

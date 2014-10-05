@@ -241,8 +241,8 @@
 
 			var i, cur, tmp, bubbleType, ontype, handle, special,
 				eventPath = [elem || document],
-				type = Y.HasOwnProperty.call(event, "type") ? event.type : event,
-				namespaces = Y.HasOwnProperty.call(event, "namespace") ? event.namespace.split(".") : [];
+				type = Y.hasOwn.call(event, "type") ? event.type : event,
+				namespaces = Y.hasOwn.call(event, "namespace") ? event.namespace.split(".") : [];
 
 			cur = tmp = elem = elem || document;
 
@@ -680,7 +680,7 @@
 		}
 
 		// Create a timestamp if incoming event doesn't have one
-		this.timeStamp = src && src.timeStamp || Y.Lang.now;
+		this.timeStamp = src && src.timeStamp || Y.Lang.now();
 
 		// Mark it as fixed
 		this[Y.DOM.expando] = true;
