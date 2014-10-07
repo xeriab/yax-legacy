@@ -1,15 +1,6 @@
-
 /**
- * YAX Core | UserAgent
- *
- * Cross browser detector implementation using YAX's API [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility, Class, Tools
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX UserAgent Detector [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -19,37 +10,39 @@
 
 (function () {
 
+	//---
+
 	'use strict';
 
 	var retina, matches, msPointer, pointer,
-		_ie = Y.Window.hasOwnProperty('ActiveX'),
-		ie3d = _ie && (Y.Document.documentElement.style.hasOwnProperty('transition')),
-		webkit3d = (Y.Window.hasOwnProperty('WebKitCSSMatrix')) && (new Y.Window.WebKitCSSMatrix().hasOwnProperty('m11')),
-		gecko3d = Y.Document.documentElement.style.hasOwnProperty('MozPerspective'),
-		opera3d = Y.Document.documentElement.style.hasOwnProperty('OTransition');
+		_ie = Y.win.hasOwnProperty('ActiveX'),
+		ie3d = _ie && (Y.doc.documentElement.style.hasOwnProperty('transition')),
+		webkit3d = (Y.win.hasOwnProperty('WebKitCSSMatrix')) && (new Y.win.WebKitCSSMatrix().hasOwnProperty('m11')),
+		gecko3d = Y.doc.documentElement.style.hasOwnProperty('MozPerspective'),
+		opera3d = Y.doc.documentElement.style.hasOwnProperty('OTransition');
 
-	retina = (Y.hasOwn.call(Y.Window, 'devicePixelRatio') && Y.callProperty(Y.Window, 'devicePixelRatio') > 1);
+	retina = (Y.hasOwn.call(Y.win, 'devicePixelRatio') && Y.callProperty(Y.win, 'devicePixelRatio') > 1);
 
-	if (!retina && Y.hasOwn.call(Y.Window, 'matchMedia')) {
-		matches = Y.callProperty(Y.Window, 'matchMedia');
-		retina = (Y.Lang.isSet(matches) && Y.callProperty(matches, 'matches'));
+	if (!retina && Y.hasOwn.call(Y.win, 'matchMedia')) {
+		matches = Y.callProperty(Y.win, 'matchMedia');
+		retina = (Y.isSet(matches) && Y.callProperty(matches, 'matches'));
 	}
 
 	msPointer = (Y.hasOwn.call(navigator, 'msPointerEnabled') &&
 		Y.hasOwn.call(navigator, 'msMaxTouchPoints') &&
-		!Y.hasOwn.call(Y.Window, 'PointerEvent'));
+		!Y.hasOwn.call(Y.win, 'PointerEvent'));
 
-	pointer = (Y.hasOwn.call(Y.Window, 'PointerEvent') &&
+	pointer = (Y.hasOwn.call(Y.win, 'PointerEvent') &&
 		Y.hasOwn.call(navigator, 'pointerEnabled') &&
 		!Y.hasOwn.call(navigator, 'maxTouchPoints')) || msPointer;
 
 	//---
 
 	Y.UA = Y.Class.extend({
-		CLASS_NAME: 'UA',
+		_class_name: 'UA',
 
 		initialise: function () {
-			this.UserAgent = Y.Window.navigator.userAgent;
+			this.UserAgent = Y.win.navigator.userAgent;
 			this.OS = {};
 			this.Browser = {};
 			this.Features = {};
@@ -71,7 +64,7 @@
 		 * http://creativecommons.org/licenses/by/3.0/
 		 */
 		testInput: function (type) {
-			var temp = Y.Document.createElement('input');
+			var temp = Y.doc.createElement('input');
 
 			temp.setAttribute('type', type);
 
@@ -79,6 +72,7 @@
 		},
 
 		detect: function () {
+			/*jshint -W004 */
 			var testInput = this.testInput,
 				OS = this.OS,
 				Browser = this.Browser,
@@ -117,12 +111,12 @@
 
 
 
-			if (Y.Lang.isSet(webkit)) {
+			if (Y.isSet(webkit)) {
 				Browser.Webkit = true;
 				Browser.Version = webkit[1];
 			}
 
-			if (Y.Lang.isSet(gecko)) {
+			if (Y.isSet(gecko)) {
 				Browser.Gecko = true;
 				Browser.Version = gecko[1];
 			}
@@ -207,7 +201,7 @@
 				Browser.Version = ie[1];
 			}
 
-			if (safari && (ua.match(/Safari/) || Y.Lang.isSet(OS.iOS))) {
+			if (safari && (ua.match(/Safari/) || Y.isSet(OS.iOS))) {
 				Browser.Safari = true;
 				Browser.Name = 'Apple Safari';
 			}
@@ -229,36 +223,36 @@
 					navigator.appVersion.indexOf('Mac') !== -1 ? osNames[2] : osNames[6] ||
 					navigator.appVersion.indexOf('X11') !== -1 ? osNames[3] : osNames[6] ||
 					navigator.appVersion.indexOf('Win') !== -1 ? osNames[1] : osNames[6]
-				// Linux: Y.Lang.isSet(navigator.platform.match(/Linux/)),
-				// Windows: Y.Lang.isSet(navigator.platform.match(/Windows/)),
-				// Android: Y.Lang.isSet(navigator.platform.match(/Android/)),
-				// iOS: Y.Lang.isSet(navigator.platform.match(/iOS/)),
+				// Linux: Y.isSet(navigator.platform.match(/Linux/)),
+				// Windows: Y.isSet(navigator.platform.match(/Windows/)),
+				// Android: Y.isSet(navigator.platform.match(/Android/)),
+				// iOS: Y.isSet(navigator.platform.match(/iOS/)),
 				// Architcture: navigator.platform.split(' ')[1]
 			});
 
 			//
 
-			/** @namespace Y.Window.YAX_DISABLE_3D */
+			/** @namespace Y.win.YAX_DISABLE_3D */
 			Y.extend(features, {
 				// Elements
-				Audio: Y.Lang.isSet(document.createElement('audio').canPlayType),
-				Canvas: Y.Lang.isSet(document.createElement('canvas').getContext),
+				Audio: Y.isSet(document.createElement('audio').canPlayType),
+				Canvas: Y.isSet(document.createElement('canvas').getContext),
 				Command: document.createElement('command').hasOwnProperty('type'),
 				Time: document.createElement('time').hasOwnProperty('valueAsDate'),
-				Video: Y.Lang.isSet(document.createElement('video').canPlayType),
+				Video: Y.isSet(document.createElement('video').canPlayType),
 
 				// Features and Attributes
 				Offline: navigator.hasOwnProperty('onLine') && navigator.onLine,
-				ApplicationCache: Y.Lang.isSet(Y.callProperty(window, 'applicationCache')),
+				ApplicationCache: Y.isSet(Y.callProperty(window, 'applicationCache')),
 				ContentEditable: document.createElement('span').hasOwnProperty('isContentEditable'),
 				DragDrop: document.createElement('span').hasOwnProperty('draggable'),
-				Geolocation: Y.Lang.isSet(navigator.geolocation),
-				History: (Y.Lang.isSet(window.history) && Y.Lang.isSet(window.history.pushState)),
-				WebSockets: Y.Lang.isSet(window.WebSocket),
-				WebWorkers: Y.Lang.isSet(window.Worker),
+				Geolocation: Y.isSet(navigator.geolocation),
+				History: (Y.isSet(window.history) && Y.isSet(window.history.pushState)),
+				WebSockets: Y.isSet(window.WebSocket),
+				WebWorkers: Y.isSet(window.Worker),
 				Retina: retina,
-				Pointer: Y.Lang.isUndefined(pointer) ? false : pointer,
-				MicrosoftPointer: Y.Lang.isUndefined(msPointer) ? false : msPointer,
+				Pointer: Y.isUndefined(pointer) ? false : pointer,
+				MicrosoftPointer: Y.isUndefined(msPointer) ? false : msPointer,
 
 				// Forms
 				Autofocus: document.createElement('input').hasOwnProperty('autofocus'),
@@ -271,9 +265,9 @@
 				InputTypeUrl: testInput('url'),
 
 				// Storage
-				IndexDB: Y.Lang.isSet(Y.callProperty(window, 'indexedDB')),
+				IndexDB: Y.isSet(Y.callProperty(window, 'indexedDB')),
 				LocalStorage: (window.window.hasOwnProperty('localStorage') && window.localStorage !== null),
-				WebSQL: Y.Lang.isSet(window.openDatabase),
+				WebSQL: Y.isSet(window.openDatabase),
 
 				// Touch and orientation capabilities.
 				Orientation: window.window.hasOwnProperty('orientation'),
@@ -282,9 +276,9 @@
 
 				// Propietary features
 				// Standalone: ((window.navigator.hasOwnProperty('standalone')) && (window.navigator.standalone))
-				Standalone: Y.Lang.isSet(Y.callProperty(navigator, 'standalone')),
+				Standalone: Y.isSet(Y.callProperty(navigator, 'standalone')),
 
-				Any3D: !Y.Window.YAX_DISABLE_3D && (ie3d || webkit3d || gecko3d || opera3d),
+				Any3D: !Y.win.YAX_DISABLE_3D && (ie3d || webkit3d || gecko3d || opera3d),
 
 				Cookies: navigator.cookieEnabled
 
@@ -308,5 +302,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/UserAgentDetector.js
 
 //---

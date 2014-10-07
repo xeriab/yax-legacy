@@ -1,14 +1,6 @@
 /**
- * YAX.DOM IE Support
- *
- * Add support for Internet Explorer 10+ on desktop and Windows Phone 8.
- *
- * @version     0.20
- * @depends:    Core, DOM
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX IE10+ Support [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -18,6 +10,8 @@
 /*global Y, YAX */
 
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -40,7 +34,7 @@
 
 			// this is a kludge but works
 			isY: function(object) {
-				return Y.Lang.type(object) === 'array' && '__Y' in object;
+				return Y.type(object) === 'array' && '__Y' in object;
 			}
 		});
 	}
@@ -48,5 +42,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Support/IE.js
 
 //---

@@ -1,14 +1,6 @@
 /**
- * YAX Node | Assets
- *
- * Cross browser assets implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX iOS Assets [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,9 +9,9 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -51,5 +43,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Contrib/Assets.js
 
 //---

@@ -1,14 +1,6 @@
 /**
- * YAX Node | FX
- *
- * Cross browser animation implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Effects [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,9 +9,9 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function (undef) {
+
+	//---
 
 	'use strict';
 
@@ -32,7 +24,7 @@
 			ms: 'MS'
 		},
 
-		document = Y.Document,
+		document = Y.doc,
 		testEl = document.createElement('div'),
 		supportedTransforms =
 		/^((translate|rotate|scale)(X|Y|Z|3d)?|matrix(3d)?|perspective|skew(X|Y)?)$/i,
@@ -91,18 +83,18 @@
 
 	Y.DOM.Function.animate = function (properties, duration, ease, callback,
 		delay) {
-		if (Y.Lang.isFunction(duration)) {
+		if (Y.isFunction(duration)) {
 			callback = duration;
 			ease = undef;
 			duration = undef;
 		}
 
-		if (Y.Lang.isFunction(ease)) {
+		if (Y.isFunction(ease)) {
 			callback = ease;
 			ease = undef;
 		}
 
-		if (Y.Lang.isPlainObject(duration)) {
+		if (Y.isPlainObject(duration)) {
 			/** @namespace duration.easing */
 			ease = duration.easing;
 			callback = duration.complete;
@@ -176,7 +168,7 @@
 		}
 
 		wrappedCallback = function (event) {
-			if (!Y.Lang.isUndefined(event)) {
+			if (!Y.isUndefined(event)) {
 				// makes sure the event didn't bubble from 'below'
 				if (event.target !== event.currentTarget) {
 					return;
@@ -250,7 +242,7 @@
 
 				// Speed up dequeue by getting out quickly if this is just a lookup
 				if (data) {
-					if (!queue || Y.Lang.isArray(data)) {
+					if (!queue || Y.isArray(data)) {
 						queue = Y.DOM.dataPrivative.access(elem, type, Y.DOM.makeArray(data));
 					} else {
 						queue.push(data);
@@ -433,5 +425,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Fx.js
 
 //---

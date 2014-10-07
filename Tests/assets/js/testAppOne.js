@@ -7,7 +7,7 @@ Y.DOM(document).ready(function () {
 
 	var Wrapper = Y.DOM('body');
 	var TestOneImage = Y.DOM('#TestOneImage');
-	var ButtonOne = Y.DOM('#ButtonOne');
+//	var ButtonOne = Y.DOM('#ButtonOne');
 
 	TestOneImage.attr('src', '../../../../Media/yax_js_logo_01-o.svg');
 
@@ -37,14 +37,26 @@ Y.DOM(document).ready(function () {
 //	var localStorage = new Y.Store('localStorage');
 //	var cookies = new Y.Store('cookies');
 //	var csv = new Y.Parser('CSV');
+//	var csv_data = '"year","age","name","sex","country"\t\n1988,26,Xeriab Nabil,Male,Yemen\t\n1990,24,Radhda Jamal,Female,Yemen\t\n';
+
+//	localStorage.set('YAX.CONFIG', Y.Store.prototype.serialisers.JSON.encode(Y._CONFIG_STORAGE));
+
+//	Y.log('');
+//	Y.log(Y);
+
+	Y.log(Y.Env);
+//	Y.log(Y.Env.feature);
+
+//	Y.log(localStorage);
+//	Y.log(localStorage.available());
+//	Y.log(cookies);
+//	Y.log(cookies.available());
+//	Y.log(csv);
+//	Y.log(csv.dataSource(csv_data).parse());
 
 
+	//	Y.log(Y.size());
 
-//	Y.LOG('');
-	Y.LOG(Y);
-//	Y.LOG(localStorage);
-//	Y.LOG(cookies);
-//	Y.LOG(csv);
-	Y.LOG(Wrapper);
+//	Y.log(Y.UserAgent);
 
 });

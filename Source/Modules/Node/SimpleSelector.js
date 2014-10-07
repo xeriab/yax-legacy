@@ -1,14 +1,6 @@
 /**
- * YAX Node | Simple Selector
- *
- * Cross browser simple selector implementation using YAX's API [Node]
- *
- * @version     0.19
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Simple Selector [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,9 +9,9 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -134,7 +126,7 @@
 
 				nodes = oldQSA(node, _selector);
 			} catch (e) {
-				Y.ERROR('Error performing selector: %o', selector);
+				Y.error('Error performing selector: %o', selector);
 				throw e;
 			} finally {
 				if (taggedParent) {
@@ -143,7 +135,7 @@
 			}
 
 			return !filter ? nodes :
-				Y.Lang.unique(Y.DOM.map(nodes, function (n, i) {
+				Y.unique(Y.DOM.map(nodes, function (n, i) {
 					return filter.call(n, i, nodes, argument);
 				}));
 		});
@@ -158,5 +150,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/SimpleSelector.js
 
 //---

@@ -1,14 +1,6 @@
 /**
- * YAX Node | Data
- *
- * Cross browser data implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Data [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -16,9 +8,9 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-//---
-
 (function (undef) {
+
+	//---
 
 	'use strict';
 
@@ -109,7 +101,7 @@
 				// Handle: [ owner, { properties } ] args
 			} else {
 				// Fresh assignments by object are shallow copied
-				if (Y.Lang.isEmpty(cache)) {
+				if (Y.isEmpty(cache)) {
 					Y.extend(this.cache[unlock], data);
 					// Otherwise, copy the properties one-by-one to the cache object
 				} else {
@@ -151,7 +143,7 @@
 				stored = this.get(owner, key);
 
 				return stored !== undef ?
-					stored : this.get(owner, Y.Lang.camelise(key));
+					stored : this.get(owner, Y.camelise(key));
 			}
 
 			// [*]When the key is not a string, or both a key and value
@@ -176,16 +168,16 @@
 
 			} else {
 				// Support array or space separated string of keys
-				if (Y.Lang.isArray(key)) {
+				if (Y.isArray(key)) {
 					// If "name" is an array of keys...
 					// When data is initially created, via ("key", "val") signature,
 					// keys will be converted to camelCase.
 					// Since there is no way to tell _how_ a key was added, remove
 					// both plain key and camelCase key. #12786
 					// This will only penalize the array argument path.
-					name = key.concat(key.map(Y.Lang.camelise));
+					name = key.concat(key.map(Y.camelise));
 				} else {
-					camel = Y.Lang.camelise(key);
+					camel = Y.camelise(key);
 					// Try the string as a key before any manipulation
 					if (cache.hasOwnProperty(key)) {
 						name = [key, camel];
@@ -205,7 +197,7 @@
 			}
 		},
 		hasData: function (owner) {
-			return !Y.Lang.isEmpty(
+			return !Y.isEmpty(
 					this.cache[owner[this.Expando]] || {}
 			);
 		},
@@ -255,7 +247,7 @@
 							data === "false" ? false :
 							data === "null" ? null :
 						// Only convert to a number if it doesn't change the string
-							+ data + Y.Lang.empty() === data ? +data :
+							+ data + Y.empty() === data ? +data :
 						rbrace.test(data) ? JSON.parse(data) :
 							data;
 				} catch (e) {
@@ -278,8 +270,8 @@
 
 		Y.each(node.attributes || Y.G.ArrayProto, function (i, attr) {
 			if (attr.name.indexOf('data-') === 0) {
-				store[Y.Lang.camelise(attr.name.replace('data-', ''))] =
-					Y.Lang.deserialiseValue(attr.value);
+				store[Y.camelise(attr.name.replace('data-', ''))] =
+					Y.deserialiseValue(attr.value);
 			}
 		});
 
@@ -305,7 +297,7 @@
 		}
 
 		if (name !== undef) {
-			store[Y.Lang.camelise(name)] = value;
+			store[Y.camelise(name)] = value;
 		}
 
 		return store;
@@ -329,7 +321,7 @@
 				return store[name];
 			}
 
-			camelName = Y.Lang.camelise(name);
+			camelName = Y.camelise(name);
 
 			if (store.hasOwnProperty(camelName)) {
 				return store[camelName];
@@ -359,7 +351,7 @@
 							name = attrs[i].name;
 
 							if (name.indexOf("data-") === 0) {
-								name = Y.Lang.camelise(name.slice(5));
+								name = Y.camelise(name.slice(5));
 								dataAttribute(elem, name, datao[name]);
 							}
 						}
@@ -380,7 +372,7 @@
 
 			return Y.DOM.Access(this, function (value) {
 				var _data,
-					camelKey = Y.Lang.camelise(key);
+					camelKey = Y.camelise(key);
 
 				// The calling YAX object (element matches) is not empty
 				// (and therefore has an element appears at this[ 0 ]) and the
@@ -445,8 +437,8 @@
 		var result;
 
 		// Set multiple values via object
-		if (Y.Lang.isUndefined(value)) {
-			if (Y.Lang.isPlainObject(name)) {
+		if (Y.isUndefined(value)) {
+			if (Y.isPlainObject(name)) {
 				result = this.each(function (i, node) {
 					Y.each(name, function (key, value) {
 						setData(node, key, value);
@@ -480,7 +472,7 @@
 
 			if (store) {
 				Y.each(names || store, function (key) {
-					delete store[names ? Y.Lang.camelise(this) : key];
+					delete store[names ? Y.camelise(this) : key];
 				});
 			}
 		});
@@ -506,5 +498,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Data.js
 
 //---

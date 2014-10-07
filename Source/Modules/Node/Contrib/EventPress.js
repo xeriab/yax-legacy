@@ -1,14 +1,6 @@
 /**
- * YAX Node | Press Event
- *
- * Cross browser press event implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Press Event [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,12 +9,11 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function () {
 
-	'use strict';
+	//---
 
+	'use strict';
 
 	var ghostsLifeTime = 1000,
 		normalizeArgs,
@@ -39,7 +30,7 @@
 		var callback,
 			selector;
 
-		if (Y.Lang.isFunction(args[0])) {
+		if (Y.isFunction(args[0])) {
 			callback = args[0];
 		} else {
 			selector = args[0];
@@ -215,5 +206,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Contrib/EventPress.js
 
 //---

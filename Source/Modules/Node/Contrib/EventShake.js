@@ -1,14 +1,6 @@
 /**
- * YAX Node | Shake Event
- *
- * Cross browser shake event implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Shake Event [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,14 +9,14 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function () {
+
+	//---
 
 	'use strict';
 
-	/** @namespace Y.Window.DeviceMotionEvent */
-	if (!Y.Lang.isUndefined(Y.Window.DeviceMotionEvent)) {
+	/** @namespace Y.win.DeviceMotionEvent */
+	if (!Y.isUndefined(Y.win.DeviceMotionEvent)) {
 		Y.DOM.Function.onshake = function (callb, sens) {
 			// Shake sensitivity (a lower number is more sensitive)
 			var sensitivity = sens || 20,
@@ -67,11 +59,13 @@
 			checkDeviceMotion();
 		};
 	} else {
-		Y.DOM.Function.onshake = Y.Lang.Noop;
+		Y.DOM.Function.onshake = Y.noop;
 	}
 
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Contrib/EventShake.js
 
 //---

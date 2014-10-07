@@ -1,13 +1,6 @@
 /**
- * YAX Node | Event Logger
- *
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Events Logger [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,19 +10,18 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function () {
+
+	//---
 
 	'use strict';
 
-	//---
 	function consoleOutput(e) {
 		if (e.data.color) {
 			var style = 'color:' + e.data.color;
-			Y.LOG('%c' + e.type + ' on ' + this.tagName, style);
+			Y.log('%c' + e.type + ' on ' + this.tagName, style);
 		} else {
-			Y.LOG(e.type + ' on ' + this.tagName);
+			Y.log(e.type + ' on ' + this.tagName);
 		}
 	}
 
@@ -47,7 +39,7 @@
 	}
 
 	Y.DOM.Function.EventLoggerStart = function (event, color) {
-		var fontColor = Y.Lang.isString(color) ? color : '';
+		var fontColor = Y.isString(color) ? color : '';
 
 		this.on(event, {color: fontColor}, consoleOutput);
 
@@ -60,9 +52,9 @@
 		return this;
 	};
 
-	Y.Window.EventLogger = {
+	Y.win.EventLogger = {
 		start: function (selector, event, color) {
-			var fontColor = Y.Lang.isString(color) ? color : '';
+			var fontColor = Y.isString(color) ? color : '';
 
 			var obj = getCollectionObj(selector);
 
@@ -84,5 +76,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Contrib/EventLogger.js
 
 //---

@@ -1,14 +1,6 @@
 /**
- * Y Core | Events
- *
- * Events implementation using Y [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility, Class, Tools
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Evented
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -18,6 +10,8 @@
 
 (function () {
 
+	//---
+
 	'use strict';
 
 	/**
@@ -25,14 +19,14 @@
 	 * handle custom events.
 	 */
 	Y.Evented = Y.Class.extend({
-		CLASS_NAME: 'Evented',
+		_class_name: 'Evented',
 
 		eventsArray: [],
 
 		on: function (types, callback, context) {
 			var type, i, len;
 			// Types can be a map of types/handlers
-			if (Y.Lang.isObject(types)) {
+			if (Y.isObject(types)) {
 				for (type in types) {
 					if (Y.hasOwn.call(types, type)) {
 						// We don't process space-separated events here for performance;
@@ -58,7 +52,7 @@
 			if (!types) {
 				// Clear all listeners if called without arguments
 				delete this.eventsArray;
-			} else if (Y.Lang.isObject(types)) {
+			} else if (Y.isObject(types)) {
 				for (type in types) {
 					if (Y.hasOwn.call(types, type)) {
 						this._Off(type, types[type], callback);
@@ -79,7 +73,7 @@
 		_On: function (type, callback, context) {
 			// var events = this.eventsArray = this.eventsArray || {},
 			var events = this.eventsArray || {},
-				contextId = context && context !== this && Y.Stamp(context),
+				contextId = context && context !== this && Y.stamp(context),
 				indexKey,
 				indexLenKey,
 				typeIndex,
@@ -92,7 +86,7 @@
 				indexKey = type + '_idx';
 				indexLenKey = type + '_len';
 				typeIndex = events[indexKey] = events[indexKey] || {};
-				id = Y.Stamp(callback) + '_' + contextId;
+				id = Y.stamp(callback) + '_' + contextId;
 
 				if (!typeIndex[id]) {
 					typeIndex[id] = {
@@ -135,10 +129,10 @@
 				return;
 			}
 
-			contextId = context && context !== this && Y.Stamp(context);
+			contextId = context && context !== this && Y.stamp(context);
 
 			if (contextId) {
-				id = Y.Stamp(callback) + '_' + contextId;
+				id = Y.stamp(callback) + '_' + contextId;
 				listeners = events[indexKey];
 
 				if (listeners && listeners[id]) {
@@ -161,7 +155,7 @@
 
 			// Set the removed listener to noop so that's not called if remove happens in fire
 			if (listener) {
-				listener.callback = Y.Lang.noop;
+				listener.callback = Y.noop;
 			}
 		},
 
@@ -253,13 +247,13 @@
 		// Adds a parent to propagate events to (when you fire with true as a 3rd argument)
 		addEventParent: function (obj) {
 			this.eventParents = this.eventParents || {};
-			this.eventParents[Y.Stamp(obj)] = obj;
+			this.eventParents[Y.stamp(obj)] = obj;
 			return this;
 		},
 
 		removeEventParent: function (obj) {
 			if (this.eventParents) {
-				delete this.eventParents[Y.Stamp(obj)];
+				delete this.eventParents[Y.stamp(obj)];
 			}
 			return this;
 		},
@@ -291,5 +285,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Core/Evented.js
 
 //---

@@ -1,14 +1,6 @@
 /**
- * Y Core | Utility
- *
- * Another Y's utilities and shortcuts [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Utilities and Tools
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -17,6 +9,8 @@
 /*global Y, YAX */
 
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -34,35 +28,33 @@
 	 * Y.Util contains various utility functions used throughout Y code.
 	 */
 	Y.Util = {
-		LastUID: 0,
+		lastUID: 0,
 
 		// Create an object from a given prototype
-		Create: Object.create || (function () {
+		create: Object.create || (function () {
 			/**
 			 *
 			 * @constructor
 			 * @return {null}
 			 */
-			function TempFunction() {
-				//...
-			}
+			function tempFunc() {}
 
 			return function (tempPrototype) {
-				TempFunction.prototype = tempPrototype;
-				return new TempFunction();
+				tempFunc.prototype = tempPrototype;
+				return new tempFunc();
 			};
 		}()),
 
 		// Return unique ID of an object
-		Stamp: function (object) {
+		stamp: function (object) {
 			// jshint camelcase: false
-			object.YID = object.YID || ++Y.Util.LastUID;
+			object.YID = object.YID || ++Y.Util.lastUID;
 
 			return object.YID;
 		},
 
 		// Bind a function to be called with a given context
-		Bind: function (func, object) {
+		bind: function (func, object) {
 			var args = Y.G.Slice.call(arguments, 2);
 
 			if (func.bind) {
@@ -75,10 +67,10 @@
 		},
 
 		// Return a function that won't be called more often than the given interval
-		Throttle: function (func, time, context) {
+		throttle: function (func, time, context) {
 			var lock,
 				args,
-				wrapperFunction,
+				wrapperFunc,
 				later;
 
 			later = function () {
@@ -86,12 +78,12 @@
 				lock = false;
 
 				if (args) {
-					wrapperFunction.apply(context, args);
+					wrapperFunc.apply(context, args);
 					args = false;
 				}
 			};
 
-			wrapperFunction = function () {
+			wrapperFunc = function () {
 				if (lock) {
 					// Called too soon, queue to call later
 					args = arguments;
@@ -104,7 +96,7 @@
 				}
 			};
 
-			return wrapperFunction;
+			return wrapperFunc;
 		},
 
 		// Round a given number to a given precision
@@ -114,16 +106,14 @@
 		},
 
 		/**
-		 * Do nothing (used as a Noop throughout the code)
+		 * Do nothing (used as a noop throughout the code)
 		 * @returns {object}
 		 * @constructor
 		 */
-		Noop: function () {
-			//...
-		},
+		noop: function () {},
 
 		// Trim whitespace from both sides of a string
-		Trim: function (str) {
+		trim: function (str) {
 			return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
 		},
 
@@ -141,7 +131,7 @@
 
 		// Split a string into words
 		splitWords: function (string) {
-			return Y.Util.Trim(string).split(/\s+/);
+			return Y.Util.trim(string).split(/\s+/);
 		},
 
 		// Set options to an object, inheriting parent's options as well
@@ -168,19 +158,19 @@
 		// Minimal image URI, set to an image when disposing to flush memory
 		emptyImageUrl: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
 
-		Serialise: function (parameters, object, traditional, scope) {
+		serialise: function (parameters, object, traditional, scope) {
 			var type,
-				array = Y.Lang.isArray(object),
-				hash = Y.Lang.isPlainObject(object);
+				array = Y.isArray(object),
+				hash = Y.isPlainObject(object);
 
 			Y.each(object, function (key, value) {
-				type = Y.Lang.type(value);
+				type = Y.type(value);
 
 				if (scope) {
 					// key = traditional ? scope : scope + '[' + (array ? '' : key) + ']';
 					key = traditional ?
 						scope :
-						scope + '[' + (hash || Y.Lang.isObject(type) || Y.Lang.isArray(type) ? key : '') + ']';
+						scope + '[' + (hash || Y.isObject(type) || Y.isArray(type) ? key : '') + ']';
 				}
 
 				// Handle data in serializeArray() format
@@ -188,47 +178,33 @@
 					parameters.add(value.name, value.value);
 				}
 				// Recurse into nested objects
-				else if (Y.Lang.isArray(type) || (!traditional && Y.Lang.isObject(type))) {
+				else if (Y.isArray(type) || (!traditional && Y.isObject(type))) {
 					Y.Util.Serialise(parameters, value, traditional, key);
 				} else {
 					parameters.add(key, value);
 				}
 			});
-		},
-
-		/**
-		 * @return {string}
-		 */
-		Parameters: function (object, traditional) {
-			var params = [];
-
-			params.add = function (key, value) {
-				this.push(escape(key) + '=' + escape(value));
-			};
-
-			Y.Util.Serialise(params, object, traditional);
-
-			return params.join('&').replace(/%20/g, '+');
 		}
 	}; // END OF Y.Util OBJECT
 
 	//---
 
 	// Shortcuts for most used Utility functions
-	Y.Bind = Y.Util.Bind;
-	Y.Stamp = Y.Util.Stamp;
-	// Y.SetOptions = Y.Util.setOptions;
+	Y.bind = Y.Util.bind;
+	Y.stamp = Y.Util.stamp;
+	Y.SetOptions = Y.Util.setOptions;
 
-	Y.Lang.noop = Y.Lang.Noop = Y.Util.Noop;
-	Y.Lang.trim = Y.Util.Trim;
+	Y.noop = Y.Util.noop;
+	Y.trim = Y.Util.trim;
 
-	Y.Lang.reReplace = Y.Util.reStringReplace;
-	Y.Lang.strReplace = Y.Util.stringReplace;
-	Y.Lang.throttle = Y.Util.Throttle;
-	Y.Lang.parameters = Y.Util.Parameters;
+	Y.reStrReplace = Y.Util.reStringReplace;
+	Y.strReplace = Y.Util.stringReplace;
+	Y.throttle = Y.Util.throttle;
 
 	//---
 
 }());
+
+// FILE: ./Source/Core/Utility.js
 
 //---

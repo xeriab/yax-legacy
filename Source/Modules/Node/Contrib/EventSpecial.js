@@ -1,14 +1,6 @@
 /**
- * YAX Node | Special Event
- *
- * Cross browser special event implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Special Events [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,20 +9,18 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function () {
 
-	'use strict';
-
 	//---
+
+	'use strict';
 
 	Y.DOM.Function.bind = function (eventName, data, callback) {
 		var el = this;
 		// var $this = Y.DOM(el);
 		var specialEvent;
 
-		if (!Y.Lang.isSet(callback)) {
+		if (!Y.isSet(callback)) {
 			callback = data;
 			data = null;
 		}
@@ -72,11 +62,11 @@
 						};
 					}
 
-					//Y.LOG(el);
-					//Y.LOG(data);
-					//Y.LOG(specialEvent);
-					//Y.LOG(eventName);
-					//Y.LOG(eventName);
+					//Y.log(el);
+					//Y.log(data);
+					//Y.log(specialEvent);
+					//Y.log(eventName);
+					//Y.log(eventName);
 
 					/// setup special events on Y.DOM
 					// specialEvent.setup.apply(el, [data]);
@@ -85,11 +75,11 @@
 			});
 		}
 
-		// Y.LOG(bindBeforeSpecialEvents);
-//		Y.LOG(callback);
+		// Y.log(bindBeforeSpecialEvents);
+//		Y.log(callback);
 
 		// return bindBeforeSpecialEvents.apply(this, [eventName, callback]);
-		// return Y.Window.bindBeforeSpecialEvents.apply(this, [eventName, callback]);
+		// return Y.win.bindBeforeSpecialEvents.apply(this, [eventName, callback]);
 		// return Y.DOM.Function.bindEvent.apply(this, [eventName, callback]);
 		return Y.DOM.Function.bindEvent.apply(this, [eventName, callback]);
 	};
@@ -97,5 +87,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Contrib/EventSpecial.js
 
 //---

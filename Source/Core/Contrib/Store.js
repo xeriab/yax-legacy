@@ -1,14 +1,6 @@
 /**
- * Y Core | Store
- *
- * Powers Y's with store capability [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Store Class [Contrib]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -18,14 +10,12 @@
 
 (function (global, undef) {
 
+	//---
+
 	'use strict';
 
 	Y.Store = Y.Class.extend({
-		STATICS: {
-			// FOO: 'FOOED!!'
-		},
-
-		CLASS_NAME: 'Store',
+		_class_name: 'Store',
 
 		serialisers: {
 			JSON: {
@@ -77,10 +67,10 @@
 
 							return _value;
 						} catch (er) {
-							Y.ERROR(er);
+							Y.error(er);
 						}
 
-						Y.ERROR(err);
+						Y.error(err);
 					}
 
 					return value;
@@ -111,7 +101,7 @@
 					}
 
 					value.value = domParser.call(
-						(Y.hasOwn.call(global, 'DOMParser') && (new DOMParser())) || Y.Window,
+						(Y.hasOwn.call(global, 'DOMParser') && (new DOMParser())) || Y.win,
 						value.value,
 						'text/xml'
 					);
@@ -152,9 +142,9 @@
 
 				load: function () {
 					try {
-						this.cache = Y.Store.prototype.serialisers.JSON.decode(global.name + Y.Lang.empty);
+						this.cache = Y.Store.prototype.serialisers.JSON.decode(global.name + Y.empty);
 
-						if (!Y.Lang.isObject(this.cache)) {
+						if (!Y.isObject(this.cache)) {
 							this.cache = {};
 						}
 					} catch (e) {
@@ -188,17 +178,17 @@
 			}
 		},
 
-		construct: function () {
+		_init: function () {
 			var args = Y.G.Slice.call(arguments),
 				len = args.length,
 				x = 0;
 //				tmpFunc;
 
 //			tmpFunc = function (variable) {
-//				var t = Y.Lang.strReplace('-', ' ', variable);
+//				var t = Y.strReplace('-', ' ', variable);
 //
-//				t = Y.Lang.upperCaseWords(t);
-//				t = Y.Lang.strReplace(' ', '', t);
+//				t = Y.upperCaseWords(t);
+//				t = Y.strReplace(' ', '', t);
 //
 //				return t;
 //			};
@@ -231,5 +221,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Core/Contrib/Store.js
 
 //---

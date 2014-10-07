@@ -1,14 +1,6 @@
 /**
- * Y Core | Class
- *
- * Powers the OOP facilities of Y's [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Class
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -18,17 +10,15 @@
 
 (function () {
 
+	//---
+
 	'use strict';
 
-	//---
 
 	/**
 	 * Y.Class powers the OOP facilities of the library.
 	 */
-	Y.Class = function () {
-
-	};
-	// END OF Y.Class OBJECT
+	Y.Class = function () {};
 
 	//---
 
@@ -41,13 +31,16 @@
 			}
 
 			// Call the construct constructor
-			/** @namespace this.construct */
 			if (this.construct) {
 				// this.construct.apply(this, arguments);
 				return this.construct.apply(this, arguments);
 			}
 
-//			Y.LOG(this.initialHooks);
+			// Call the _init constructor
+			if (this._init) {
+				// this._init.apply(this, arguments);
+				return this._init.apply(this, arguments);
+			}
 
 			// Call all constructor hooks
 			if (this.initialHooks.length) {
@@ -61,7 +54,7 @@
 
 		// jshint camelcase: false
 		var parentProto = newClass.__super__ = this.prototype;
-		var proto = Y.Util.Create(parentProto);
+		var proto = Y.Util.create(parentProto);
 
 		proto.constructor = newClass;
 
@@ -74,33 +67,31 @@
 			}
 		}
 
-		// Y.Log(properties.CLASS_NAME);
-
-		if (properties.CLASS_NAME) {
+		if (properties._class_name) {
 			Y.extend(newClass, {
-				CLASS_NAME: properties.CLASS_NAME.toString()
+				_class_name: properties._class_name.toString()
 			});
 
-			delete properties.CLASS_NAME;
+			delete properties._class_name;
 		}
 
 		// Mix static properties into the class
-		if (properties.STATICS) {
-			Y.extend(newClass, properties.STATICS);
-			delete properties.STATICS;
+		/** @namespace properties._statics */
+		if (properties._statics) {
+			Y.extend(newClass, properties._statics);
+			delete properties._statics;
 		}
 
 		// Mix includes into the prototype
-		/** @namespace properties.INCLUDES */
-		if (properties.INCLUDES) {
-			Y.extend.apply(null, [proto].concat(properties.INCLUDES));
-			/** @namespace properties.Includes */
-			delete properties.INCLUDES;
+		/** @namespace properties._includes */
+		if (properties._includes) {
+			Y.extend.apply(null, [proto].concat(properties._includes));
+			delete properties._includes;
 		}
 
 		//  OPTIONS
-		if (proto.OPTIONS) {
-			properties.OPTIONS = Y.extend(Y.Util.Create(proto.OPTIONS), properties.OPTIONS);
+		if (proto._options) {
+			properties._options = Y.extend(Y.Util.create(proto._options), properties._options);
 		}
 
 		// Mix given properties into the prototype
@@ -139,7 +130,7 @@
 
 	//  new default options to the Class
 	Y.Class.options = function (options) {
-		Y.extend(this.prototype.OPTIONS, options);
+		Y.extend(this.prototype._options, options);
 	};
 
 	//---
@@ -157,7 +148,7 @@
 		var args = Y.G.Slice.call(arguments, 1);
 		var init;
 
-		if (Y.Lang.isFunction(func)) {
+		if (Y.isFunction(func)) {
 			init = func;
 		} else {
 			init = function () {
@@ -171,16 +162,14 @@
 
 	//---
 
-	// Y.Class.constructor = Y.Lang.Noop;
-
-	//---
-
 	Y.Class.toString = function () {
-		return '[YAX::Class' + (this.CLASS_NAME ? '::' + this.CLASS_NAME + ']' : ']');
+		return '[Y: Class' + (this._class_name ? '::' + this._class_name + ']' : ']');
 	};
 
 	//---
 
 }());
+
+// FILE: ./Source/Core/Class.js
 
 //---

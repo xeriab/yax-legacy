@@ -1,3 +1,7 @@
+/**
+ * YAX Require
+ */
+
 /*jslint indent: 4 */
 /*jslint white: true */
 /*jshint eqeqeq: false */
@@ -7,6 +11,9 @@
 /*global module */
 
 (function () {
+
+	//---
+
 	/*jshint -W079 */
 	/*jshint -W020 */
 	var require = null;
@@ -108,5 +115,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Require.js
 
 //---

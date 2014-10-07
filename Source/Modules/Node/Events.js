@@ -1,14 +1,6 @@
 /**
- * YAX Node | Events
- *
- * Cross browser events implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Events [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -17,6 +9,8 @@
 /*global Y, YAX */
 
 (function (undef) {
+
+	//---
 
 	'use strict';
 
@@ -36,7 +30,7 @@
 
 		ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$)/,
 
-		focusinSupported = Y.hasOwn.call(Y.Window, 'onfocusin'),
+		focusinSupported = Y.hasOwn.call(Y.win, 'onfocusin'),
 
 		eventMethods = {
 			preventDefault: 'isDefaultPrevented',
@@ -50,7 +44,7 @@
 
 		returnFalse,
 
-		document = Y.Document,
+		document = Y.doc,
 
 		specialEvents = {};
 
@@ -72,7 +66,7 @@
 	}
 
 	function parse(event) {
-		var parts = (Y.Lang.empty() + event).split('.');
+		var parts = (Y.empty() + event).split('.');
 
 		return {
 			e: parts[0],
@@ -117,7 +111,7 @@
 	}
 
 	function eventCapture(handler, captureSetting) {
-		return !(!handler.del || !(!focusinSupported && Y.Lang.hasProperty(focus, handler.e))) || Y.Lang.isSet(captureSetting);
+		return !(!handler.del || !(!focusinSupported && Y.hasProperty(focus, handler.e))) || Y.isSet(captureSetting);
 	}
 
 	function realEvent(type) {
@@ -140,12 +134,12 @@
 				event[predicate] = returnFalse;
 			});
 
-			if (!Y.Lang.isUndefined(source.defaultPrevented)) {
+			if (!Y.isUndefined(source.defaultPrevented)) {
 				if (source.defaultPrevented) {
 					event.isDefaultPrevented = returnTrue;
 				}
 			} else {
-				if (Y.Lang.hasProperty(source, 'returnValue')) {
+				if (Y.hasProperty(source, 'returnValue')) {
 					if (source.returnValue === false) {
 						event.isDefaultPrevented = returnTrue;
 					}
@@ -177,9 +171,9 @@
 
 	/*function safeActiveElement() {
 		try {
-			return Y.Document.activeElement;
+			return Y.doc.activeElement;
 		} catch (err) {
-			Y.ERROR(err);
+			Y.error(err);
 		}
 	}*/
 
@@ -190,7 +184,7 @@
 
 		for (key in event) {
 			if (event.hasOwnProperty(key)) {
-				if (!ignoreProperties.test(key) && !Y.Lang.isUndefined(event[key])) {
+				if (!ignoreProperties.test(key) && !Y.isUndefined(event[key])) {
 					proxy[key] = event[key];
 				}
 			}
@@ -212,12 +206,12 @@
 			return new Y.DOM.Event(type, props);
 		}
 
-		if (!Y.Lang.isString(type)) {
+		if (!Y.isString(type)) {
 			props = type;
 			type = props.type;
 		}
 
-		event = Y.Document.createEvent(specialEvents[type] || 'Events');
+		event = Y.doc.createEvent(specialEvents[type] || 'Events');
 
 		bubbles = true;
 
@@ -225,7 +219,7 @@
 			for (name in props) {
 				if (props.hasOwnProperty(name)) {
 					if (name === 'bubbles') {
-						bubbles = Y.Lang.isSet(props[name]);
+						bubbles = Y.isSet(props[name]);
 					} else {
 						event[name] = props[name];
 					}
@@ -239,7 +233,7 @@
 
 		event.initEvent(type, bubbles, true);
 
-		this.timeStamp = type && type.timeStamp || Y.Lang.now();
+		this.timeStamp = type && type.timeStamp || Y.now();
 
 		// Mark it as fixed
 		this[Y.DOM.expando] = true;
@@ -259,7 +253,7 @@
 		on: function (object, types, func, context) {
 			var type, x, len;
 
-			if (Y.Lang.isObject(types)) {
+			if (Y.isObject(types)) {
 				for (type in types) {
 					if (types.hasOwnProperty(type)) {
 						this.addListener(object, type, types[type], func);
@@ -277,14 +271,14 @@
 		addListener: function (object, type, callback, context) {
 			var id, originalHandler, handler;
 
-			id = type + Y.Stamp(callback) + (context ? '_' + Y.Stamp(context) : '');
+			id = type + Y.stamp(callback) + (context ? '_' + Y.stamp(context) : '');
 
 			if (object[eventsKey] && object[eventsKey][id]) {
 				return this;
 			}
 
 			handler = function (event) {
-				return callback.call(context || object, event || Y.Window.event);
+				return callback.call(context || object, event || Y.win.event);
 			};
 
 			originalHandler = handler;
@@ -299,13 +293,13 @@
 				this.addDoubleTapListener(object, handler, id);
 			}
 
-			if (Y.Lang.hasProperty(object, 'addEventListener')) {
+			if (Y.hasProperty(object, 'addEventListener')) {
 				if (type === 'mousewheel') {
 					object.addEventListener('DOMMouseScroll', handler, false);
 					object.addEventListener(type, handler, false);
 				} else if ((type === 'mouseenter') || (type === 'mouseleave')) {
 					handler = function (event) {
-						event = event || Y.Window.event;
+						event = event || Y.win.event;
 						if (!Y.DOM.Event._checkMouse(object, event)) {
 							return;
 						}
@@ -322,7 +316,7 @@
 
 					object.addEventListener(type, handler, false);
 				}
-			} else if (Y.Lang.hasProperty(object, 'attachEvent')) {
+			} else if (Y.hasProperty(object, 'attachEvent')) {
 				object.attachEvent('on' + type, handler);
 			}
 
@@ -335,7 +329,7 @@
 		off: function (object, types, func, context) {
 			var type, x, len;
 
-			if (Y.Lang.isObject(types)) {
+			if (Y.isObject(types)) {
 				for (type in types) {
 					if (types.hasOwnProperty(type)) {
 						this.removeListener(object, type, types[type], func);
@@ -353,7 +347,7 @@
 		removeListener: function (object, type, callback, context) {
 			var id, handler;
 
-			id = type + Y.Stamp(callback) + (context ? '_' + Y.Stamp(context) : '');
+			id = type + Y.stamp(callback) + (context ? '_' + Y.stamp(context) : '');
 
 			handler = object[eventsKey] && object[eventsKey][id];
 
@@ -367,7 +361,7 @@
 				this.removePointerListener(object, type, id);
 			} else if (Y.UserAgent.Features.Touch && (type === 'dblclick') && this.removeDoubleTapListener) {
 				this.removeDoubleTapListener(object, id);
-			} else if (Y.Lang.hasProperty(object, 'removeEventListener')) {
+			} else if (Y.hasProperty(object, 'removeEventListener')) {
 				if (type === 'mousewheel') {
 					object.removeEventListener('DOMMouseScroll', handler, false);
 					object.removeEventListener(type, handler, false);
@@ -376,7 +370,7 @@
 							type === 'mouseenter' ? 'mouseover' :
 								type === 'mouseleave' ? 'mouseout' : type, handler, false);
 				}
-			} else if (Y.Lang.hasProperty(object, 'detachEvent')) {
+			} else if (Y.hasProperty(object, 'detachEvent')) {
 				object.detachEvent('on' + type, handler);
 			}
 
@@ -570,7 +564,7 @@
 
 				set.push(handler);
 
-//				if (Y.Lang.hasProperty(element, 'addEventListener')) {
+//				if (Y.hasProperty(element, 'addEventListener')) {
 				Y.DOM.Event.on(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
 //				}
 			});
@@ -581,7 +575,7 @@
 				findHandlers(element, event, func, selector).forEach(function (handler) {
 					delete eventHandlers(element)[handler.i];
 
-//					if (Y.Lang.hasProperty(element, 'removeEventListener')) {
+//					if (Y.hasProperty(element, 'removeEventListener')) {
 					Y.DOM.Event.off(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
 //					}
 				});
@@ -598,7 +592,7 @@
 
 		args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
 
-		if (Y.Lang.isFunction(callback)) {
+		if (Y.isFunction(callback)) {
 
 			proxyFn = function () {
 				return callback.apply(context, args ? args.concat(Y.G.Slice.call(arguments)) : arguments);
@@ -609,7 +603,7 @@
 			proxyFn.GUID = callback.GUID = callback.GUID || proxyFn.GUID || Y.DOM.GUID++;
 
 			result = proxyFn;
-		} else if (Y.Lang.isString(context)) {
+		} else if (Y.isString(context)) {
 			//result = Y.DOM.Proxy(callback[context], callback);
 
 			if (args) {
@@ -622,19 +616,19 @@
 			throw new TypeError('expected function');
 		}
 
-		// Y.LOG(result);
+		// Y.log(result);
 
 		return result;
 	};
 
 	Y.DOM.Function.bind = function (eventName, data, callback) {
-		// Y.LOG(arguments);
+		// Y.log(arguments);
 		// return this.on(eventName, data, callback);
 		return this.on(eventName, data, callback);
 	};
 
 	Y.DOM.Function.bindEvent = function (eventName, data, callback) {
-		// Y.LOG(arguments);
+		// Y.log(arguments);
 		// return this.on(eventName, data, callback);
 		return this.on(eventName, data, callback);
 	};
@@ -656,19 +650,19 @@
 	};
 
 	Y.DOM.Function.live = function (event, callback) {
-		Y.DOM(Y.Document.body).delegate(this.selector, event, callback);
+		Y.DOM(Y.doc.body).delegate(this.selector, event, callback);
 		return this;
 	};
 
 	Y.DOM.Function.die = function (event, callback) {
-		Y.DOM(Y.Document.body).undelegate(this.selector, event, callback);
+		Y.DOM(Y.doc.body).undelegate(this.selector, event, callback);
 		return this;
 	};
 
 	Y.DOM.Function.on = function (event, selector, data, callback, one) {
 		var autoRemove, delegator, $this = this;
 
-		if (event && !Y.Lang.isString(event)) {
+		if (event && !Y.isString(event)) {
 			Y.each(event, function (type, func) {
 				$this.on(type, selector, data, func, one);
 			});
@@ -676,13 +670,13 @@
 			return $this;
 		}
 
-		if (!Y.Lang.isString(selector) && !Y.Lang.isFunction(callback) && callback !== false) {
+		if (!Y.isString(selector) && !Y.isFunction(callback) && callback !== false) {
 			callback = data;
 			data = selector;
 			selector = undef;
 		}
 
-		if (Y.Lang.isFunction(data) || data === false) {
+		if (Y.isFunction(data) || data === false) {
 			callback = data;
 			data = undef;
 		}
@@ -722,7 +716,7 @@
 	Y.DOM.Function.off = function (event, selector, callback) {
 		var $this = this;
 
-		if (event && !Y.Lang.isString(event)) {
+		if (event && !Y.isString(event)) {
 			Y.each(event, function (type, func) {
 				$this.off(type, selector, func);
 			});
@@ -730,7 +724,7 @@
 			return $this;
 		}
 
-		if (!Y.Lang.isString(selector) && !Y.Lang.isFunction(callback) && callback !== false) {
+		if (!Y.isString(selector) && !Y.isFunction(callback) && callback !== false) {
 			callback = selector;
 			selector = undef;
 		}
@@ -745,7 +739,7 @@
 	};
 
 	Y.DOM.Function.trigger = function (event, args) {
-		if (Y.Lang.isString(event) || Y.Lang.isPlainObject(event)) {
+		if (Y.isString(event) || Y.isPlainObject(event)) {
 			event = Y.DOM.Event(event);
 		} else {
 			event = compatible(event);
@@ -755,7 +749,7 @@
 
 		return this.each(function () {
 			// items in the collection might not be Node elements
-			/*if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
+			/*if (Y.hasProperty(this, 'dispatchEvent')) {
 				this.dispatchEvent(event);
 			} else {
 				Y.DOM(this).triggerHandler(event, args);
@@ -763,7 +757,7 @@
 
 			if (event.type && ~inputEvents.indexOf(event.type)) {
 				this[event.type]();
-			} else if (Y.Lang.hasProperty(this, 'dispatchEvent')) {
+			} else if (Y.hasProperty(this, 'dispatchEvent')) {
 				this.dispatchEvent(event);
 			}/* else {
 				Y.DOM(this).triggerHandler(event, args);
@@ -777,7 +771,7 @@
 		var e, result = null;
 
 		this.each(function (i, element) {
-			e = createProxy(Y.Lang.isString(event) ? Y.DOM.Event(event) : event);
+			e = createProxy(Y.isString(event) ? Y.DOM.Event(event) : event);
 			e._args = args;
 			e.target = element;
 
@@ -847,7 +841,7 @@
 						this[name]();
 					} catch (err) {
 						//...
-						Y.ERROR(err);
+						Y.error(err);
 					}
 				});
 			}
@@ -884,5 +878,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Events.js
 
 //---

@@ -1,14 +1,6 @@
 /**
- * Y Core | Callbacks
- *
- * Callbacks implementation using Y's [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility, Class
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Callbacks [Contrib]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -17,6 +9,8 @@
 /*global Y, YAX */
 
 (function (undef) {
+
+	//---
 
 	'use strict';
 
@@ -50,13 +44,13 @@
 
 		// options = Y.extend({}, options || {});
 
-		if (Y.Lang.isString(options)) {
+		if (Y.isString(options)) {
 			options = optionsCache[options] || createOptions(options);
 		} else {
 			options = Y.extend({}, options);
 		}
 
-		// Y.LOG(options);
+		// Y.log(options);
 
 		// Last fire value (for non-forgettable lists)
 		var memory,
@@ -124,11 +118,11 @@
 						add;
 					add = function (args) {
 						Y.each(args, function (_, arg) {
-							if (Y.Lang.isFunction(arg)) {
+							if (Y.isFunction(arg)) {
 								if (!options.unique || !Callbacks.has(arg)) {
 									list.push(arg);
 								}
-							} else if (arg && arg.length && !Y.Lang.isString(arg)) {
+							} else if (arg && arg.length && !Y.isString(arg)) {
 								add(arg);
 							}
 						});
@@ -150,7 +144,7 @@
 				if (list) {
 					Y.each(arguments, function (_, arg) {
 						var index = 0;
-						while ((index = Y.Lang.inArray(arg, list, index)) > -1) {
+						while ((index = Y.inArray(arg, list, index)) > -1) {
 							list.splice(index, 1);
 							// Handle firing indexes
 							if (firing) {
@@ -168,7 +162,7 @@
 				return this;
 			},
 			has: function (fn) {
-				return !!(list && (fn ? Y.Lang.inArray(fn, list) > -1 : list.length));
+				return !!(list && (fn ? Y.inArray(fn, list) > -1 : list.length));
 			},
 			empty: function () {
 				firingLength = list.length = 0;
@@ -220,5 +214,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Core/Contrib/Callbacks.js
 
 //---

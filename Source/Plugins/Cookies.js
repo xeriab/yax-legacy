@@ -1,14 +1,6 @@
 /**
- * YAX Plugins | cookies
- *
- * Cross browser cookies implementation using YAX's API [CORE, Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Cookies [CORE][DOM/NODE][EXTENSION]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -19,9 +11,9 @@
 
 (function () {
 
-	'use strict';
-
 	//---
+
+	'use strict';
 
 	Y.Store.mergeObject('drivers', {
 		cookies: {
@@ -36,12 +28,12 @@
 				try {
 					return !!Y.UserAgent.Features.cookies;
 				} catch (e) {
-					Y.ERROR(e);
+					Y.error(e);
 					return false;
 				}
 			},
 
-			initialise: Y.Lang.noop,
+			initialise: Y.noop,
 
 			/**
 			 * @return {boolean}
@@ -55,15 +47,15 @@
 				//expire = '; expires=' + date.toGMTString();
 				expire = '; expires=' + date.toUTCString();
 
-				if (Y.Lang.isString(name) && Y.Lang.isString(value)) {
-					Y.Document.cookie = name + '=' + value + expire + '; path=/';
+				if (Y.isString(name) && Y.isString(value)) {
+					Y.doc.cookie = name + '=' + value + expire + '; path=/';
 					return true;
 				}
 
-				if (Y.Lang.isObject(name) && Y.Lang.isUndefined(value)) {
+				if (Y.isObject(name) && Y.isUndefined(value)) {
 					for (key in name) {
 						if (name.hasOwnProperty(key)) {
-							Y.Document.cookie = key + '=' + name[key] + expire + '; path=/';
+							Y.doc.cookie = key + '=' + name[key] + expire + '; path=/';
 						}
 					}
 
@@ -80,7 +72,7 @@
 				var newName, cookieArray, x, cookie;
 
 				newName = name + '=';
-				cookieArray = Y.Document.cookie.split(';');
+				cookieArray = Y.doc.cookie.split(';');
 
 				for (x = 0; x < cookieArray.length; x++) {
 					cookie = cookieArray[x];
@@ -106,5 +98,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Plugins/Cookies.js
 
 //---

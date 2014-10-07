@@ -1,14 +1,6 @@
 /**
- * YAX Node | Form
- *
- * Cross browser form implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Form [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,9 +9,9 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -73,5 +65,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Form.js
 
 //---

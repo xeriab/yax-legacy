@@ -1,14 +1,6 @@
 /**
- * YAX Core | Console
- *
- * Another YAX's Console tools and shortcuts [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility, Class
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Console Class [Contrib]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -18,10 +10,12 @@
 
 (function () {
 
+	//---
+
 	// 'use strict';
 
 	Y.CLE = Y.Class.extend({
-		CLASS_NAME: 'Console',
+		_class_name: 'Console',
 
 		CONSOLE_STYLES: {
 			'reset': ['\x1B[0m', '\x1B[0m'],
@@ -145,14 +139,14 @@
 		],
 
 		CONSOLE: {
-			ERROR: Y.ERROR,
-			WARN: Y.WARN,
-			INFO: Y.INFO,
-			DEBUG: Y.LOG,
-			LOG: Y.LOG
+			ERROR: Y.error,
+			WARN: Y.warn,
+			INFO: Y.info,
+			DEBUG: Y.log,
+			LOG: Y.log
 		},
 
-		construct: function () {
+		_init: function () {
 			Y.setConfig('Console.Log.Extended', true);
 			Y.setConfig('Console.Level', this.LEVELS.DEBUG);
 			Y.setConfig('Console.Colored', false);
@@ -171,7 +165,7 @@
 		},
 
 		getLevelName: function (level) {
-			if (!Y.Lang.isSet(level)) {
+			if (!Y.isSet(level)) {
 				return this.LEVEL_NAMES[Y.getConfig('Console.Level')];
 			}
 
@@ -179,7 +173,7 @@
 		},
 
 		getLevelColor: function (level) {
-			if (!Y.Lang.isSet(level)) {
+			if (!Y.isSet(level)) {
 				return this.LEVEL_COLORS[Y.getConfig('Console.Level')];
 			}
 
@@ -384,7 +378,7 @@
 			var formattedMessage,
 				levelName;
 
-			if (!Y.Lang.isNull(Y.getConfig('Console.On.Output')) && Y.Lang.isFunction(Y.getConfig('Console.On.Output'))) {
+			if (!Y.isNull(Y.getConfig('Console.On.Output')) && Y.isFunction(Y.getConfig('Console.On.Output'))) {
 				levelName = this.getLevelName(level);
 				formattedMessage = this.formatMessage(message, levelName);
 
@@ -440,14 +434,14 @@
 		}
 
 		/*_log: function () {
-			return Y.LOG.apply(this, Y.Lang.makeArray(arguments));
+			return Y.log.apply(this, Y.makeArray(arguments));
 		},
 
 		log: function () {
 			var args = [];
 
-			Y.Lang.makeArray(arguments).forEach(function(arg) {
-				if (Y.Lang.isString(arg)) {
+			Y.makeArray(arguments).forEach(function(arg) {
+				if (Y.isString(arg)) {
 					args = args.concat(Y.Console.stringToArgs(arg));
 					return args;
 				} else {
@@ -468,21 +462,21 @@
 	//---
 
 	// Overrides some key "YAX" Object methods
-	Y.ERROR = function (message) {
+	Y.error = function (message) {
 		if (arguments.length > 0 && Y.Console.isLevelVisible(Y.Console.LEVELS.ERROR)) {
 			Y.Console.CONSOLE.ERROR.apply(this, Y.Console.decorateArgs(arguments, Y.Console.LEVELS.ERROR));
 			Y.Console.invokeOnOutput(message, Y.Console.LEVELS.ERROR);
 		}
 	};
 
-	Y.WARN = function (message) {
+	Y.warn = function (message) {
 		if (arguments.length > 0 && Y.Console.isLevelVisible(Y.Console.LEVELS.WARN)) {
 			Y.Console.CONSOLE.WARN.apply(this, Y.Console.decorateArgs(arguments, Y.Console.LEVELS.WARN));
 			Y.Console.invokeOnOutput(message, Y.Console.LEVELS.WARN);
 		}
 	};
 
-	Y.INFO = function (message) {
+	Y.info = function (message) {
 		if (arguments.length > 0 && Y.Console.isLevelVisible(Y.Console.LEVELS.INFO)) {
 			Y.Console.CONSOLE.INFO.apply(this, Y.Console.decorateArgs(arguments, Y.Console.LEVELS.INFO));
 			Y.Console.invokeOnOutput(message, Y.Console.LEVELS.INFO);
@@ -496,7 +490,7 @@
 		}
 	};
 
-	Y.LOG = function () {
+	Y.log = function () {
 		/*if (arguments.length > 0) {
 			Y.Console.CONSOLE.LOG.apply(this, arguments);
 		}*/
@@ -504,8 +498,8 @@
 		var args = [];
 
 		if (arguments.length > 0) {
-			Y.Lang.makeArray(arguments).forEach(function (arg) {
-				if (Y.Lang.isString(arg)) {
+			Y.makeArray(arguments).forEach(function (arg) {
+				if (Y.isString(arg)) {
 					args = args.concat(Y.Console.stringToArgs(arg));
 
 					return args;
@@ -521,5 +515,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Core/Contrib/Console.js
 
 //---

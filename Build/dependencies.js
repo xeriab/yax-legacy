@@ -10,19 +10,21 @@ var Dependencies = {
 			'Require.js',
 			'YAX.js',
 
+			'Core/Constants.js',
+
 			'Core/Core.js',
 			'Core/Regex.js',
 			'Core/Global.js',
 			'Core/Utility.js',
 			'Core/Class.js',
-			'Core/Evented.js'
+			'Core/Evented.js',
 
 			// 'Core/Contrib/Callbacks.js',
 			// 'Core/Contrib/Deferred.js',
 			// 'Core/Contrib/Store.js',
 			// 'Core/Contrib/Parser.js'
 
-			// 'Core/Contrib/Locale.js'
+			'Core/Contrib/I18n.js'
 			// 'Core/Contrib/Console.js'
 		],
 
@@ -36,6 +38,8 @@ var Dependencies = {
 			'Require.js',
 			'YAX.js',
 
+			'Core/Constants.js',
+
 			'Core/Core.js',
 			'Core/Regex.js',
 			'Core/Global.js',
@@ -46,9 +50,9 @@ var Dependencies = {
 			'Core/Contrib/Callbacks.js',
 			'Core/Contrib/Deferred.js',
 			'Core/Contrib/Store.js',
-			'Core/Contrib/Parser.js'
+			'Core/Contrib/Parser.js',
 
-			// 'Core/Contrib/Locale.js'
+			'Core/Contrib/I18n.js'
 			// 'Core/Contrib/Console.js'
 		],
 
@@ -172,9 +176,9 @@ var Dependencies = {
 		extended_desc: ''
 	},
 
-	'Router': {
+	'Hash Router': {
 		src: [
-			'Plugins/Router.js'
+			'Plugins/HashRouter.js'
 		],
 
 		desc: 'URL/Hash routing plugin.',

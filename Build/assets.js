@@ -76,7 +76,7 @@
 				break;
 
 			case '00010000000':
-				type = 'Router';
+				type = 'HashRouter';
 				break;
 
 			case '00100000000':

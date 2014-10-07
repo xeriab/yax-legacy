@@ -1,14 +1,6 @@
 /**
- * YAX Plugins | Autofix
- *
- * Cross browser hash router implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Hash/Router [DOM/NODE][Plugin]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -19,6 +11,8 @@
 
 (function (global) {
 
+	//---
+
 	'use strict';
 
 	// Plugin information
@@ -27,15 +21,15 @@
 	Y.extend(Y.Settings.DOM, {
 		router: {
 			defaultPath: '/',
-			before: Y.Lang.noop,
-			on: Y.Lang.noop,
-			notFound: Y.Lang.noop
+			before: Y.noop,
+			on: Y.noop,
+			notFound: Y.noop
 		}
 	});
 
 	var defaultOptions = Y.Settings.DOM.router;
 
-	var location = Y.Location;
+	var location = Y.loc;
 	var router;
 
 	router = {
@@ -118,14 +112,14 @@
 			var x,
 				temp;
 
-			if (Y.Lang.isObject(path)) {
+			if (Y.isObject(path)) {
 				for (x in path) {
 					if (path.hasOwnProperty(x)) {
 						this.add(x, path[x]);
 					}
 				}
 			} else {
-				if (Y.Lang.isString(path)) {
+				if (Y.isString(path)) {
 					path = path.replace(this.hashRegex.escape, '\\$&').replace(this.hashRegex
 						.namedArgument, '([^\/]*)').replace(this.hashRegex.argumentSplat,
 						'(.*?)');
@@ -170,7 +164,7 @@
 				triggers = false,
 				path;
 
-			if (Y.Lang.isBool(args[args.length - 1])) {
+			if (Y.isBool(args[args.length - 1])) {
 				triggers = args.pop();
 			}
 
@@ -185,7 +179,7 @@
 			}
 
 			if (this.history.cache) {
-				history.cache.pushState({}, Y.Document.title, this.getHost() + path);
+				history.cache.pushState({}, Y.doc.title, this.getHost() + path);
 			} else {
 				location.hash = path;
 			}
@@ -223,7 +217,7 @@
 		},
 
 		getHost: function () {
-			return ((Y.Document.location + Y.Lang.empty()).replace(this.getPath() + this.getHash(),
+			return ((Y.doc.location + Y.empty()).replace(this.getPath() + this.getHash(),
 				''));
 		},
 
@@ -266,7 +260,7 @@
 			for (x = 0, n = router.routes.length; x < n && !found; x++) {
 				route = router.routes[x];
 
-				if (Y.Lang.isString(path)) {
+				if (Y.isString(path)) {
 					if (path.toLowerCase() === hash.toLowerCase().slice(1)) {
 						defaultOptions.before.call(router, path);
 						// route['Function'].call(router);
@@ -302,5 +296,7 @@
 	//---
 
 }(this));
+
+// FILE: ./Source/Plugins/HashRouter.js
 
 //---

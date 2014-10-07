@@ -1,14 +1,6 @@
 /**
- * YAX Node | Touch Event
- *
- * Cross browser touch event implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Touch Event [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,9 +9,9 @@
 /*jslint node: false */
 /*global YAX, Y, MSGesture */
 
-//---
-
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -30,7 +22,7 @@
 		longTapTimeout,
 		longTapDelay = 750,
 		gesture,
-		document = Y.Document;
+		document = Y.doc;
 
 	function swipeDirection(x1, x2, y1, y2) {
 		return Math.abs(x1 - x2) >= Math.abs(y1 - y2) ? (x1 - x2 > 0 ? 'Left' : 'Right') : (y1 - y2 > 0 ? 'Up' : 'Down');
@@ -94,8 +86,8 @@
 			deltaY = 0,
 			firstTouch,
 			isPointerType;
-		/** @namespace Y.Window.hasOwnProperty */
-		if (Y.Window.hasOwnProperty('MSGesture')) {
+		/** @namespace Y.win.hasOwnProperty */
+		if (Y.win.hasOwnProperty('MSGesture')) {
 			gesture = new MSGesture();
 			gesture.target = document.body;
 		}
@@ -261,9 +253,11 @@
 			return this.bind(event, callback);
 		};
 	});
-	
+
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Contrib/EventTouch.js
 
 //---

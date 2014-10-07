@@ -1,14 +1,6 @@
 /**
- * Y Core | Deferred
- *
- * Deferred implementation using Y's [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility, Class
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Deferred [Contrib]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -17,6 +9,8 @@
 /*global Y, YAX */
 
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -56,10 +50,10 @@
 
 				return newDeferred(function (defer) {
 					Y.each(tuples, function (x, tuple) {
-						var fn = Y.Lang.isFunction(fns[x]) && fns[x];
+						var fn = Y.isFunction(fns[x]) && fns[x];
 						deferred[tuple[1]](function () {
 							var returned = fn && fn.apply(this, arguments);
-							if (returned && Y.Lang.isFunction(returned.promise)) {
+							if (returned && Y.isFunction(returned.promise)) {
 								returned.promise()
 									.done(defer.resolve)
 									.fail(defer.reject)
@@ -78,7 +72,7 @@
 			},
 
 			promise: function (obj) {
-				if (Y.Lang.isSet(obj)) {
+				if (Y.isSet(obj)) {
 					return Y.extend(obj, promise);
 				}
 
@@ -123,11 +117,11 @@
 
 	//---
 
-	Y.Lang.When = function (sub) {
+	Y.When = function (sub) {
 		var resolveValues = Y.G.Slice.call(arguments),
 			len = resolveValues.length,
 			x = 0,
-			remain = len !== 1 || (sub && Y.Lang.isFunction(sub.promise)) ? len : 0,
+			remain = len !== 1 || (sub && Y.isFunction(sub.promise)) ? len : 0,
 			deferred = remain === 1 ? sub : newDeferred(),
 			progressValues, progressContexts, resolveContexts,
 			updateFn = function (x, ctx, val) {
@@ -152,7 +146,7 @@
 			resolveContexts = [len];
 
 			for (x; x < len; ++x) {
-				if (resolveValues[x] && Y.Lang.isFunction(resolveValues[x].promise)) {
+				if (resolveValues[x] && Y.isFunction(resolveValues[x].promise)) {
 					resolveValues[x].promise()
 						.done(updateFn(x, resolveContexts, resolveValues))
 						.fail(deferred.reject)
@@ -175,5 +169,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Core/Contrib/Deferred.js
 
 //---

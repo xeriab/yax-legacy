@@ -1,14 +1,6 @@
 /**
  * YAX
- *
- * The main YAX.
- *
- * @version     0.15
- * @depends:    None
- * @license     Dual licensed under the MIT and GPL licenses.
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -92,6 +84,10 @@
 
 	//---
 
+	Y.ENV = {};
+
+	//---
+
 	Y.toString = function () {
 		return '[YAX]';
 	};
@@ -101,19 +97,13 @@
 	if (isNode) {
 		isNode = true;
 
-		Y.ENV = Object.create(null);
-		Y.ENV.Type = 'Nodejs';
-
 		Console.info('[INFO] Running YAX.JS in "Node" Environment!');
 	} else {
 		isNode = false;
 
-		Y.ENV = Object.create(null);
-		Y.ENV.Type = 'Browser';
-
-		Y.Window = this;
-		Y.Document = Y.Window.document;
-		Y.Location = Y.Window.location;
+		Y.win = this;
+		Y.doc = Y.win.document;
+		Y.loc = Y.win.location;
 
 		Console.info('[INFO] Running YAX.JS in "Browser" Environment!');
 	}
@@ -164,22 +154,17 @@
 
 	//---
 
-	Y.VERSION = Y._INFO.VERSION = 0.19;
-	Y._INFO.BUILD = 4352;
-	Y._INFO.STATUS = 'dev';
-	Y._INFO.CODENAME = 'Raghda';
+	Y.VERSION = Y._INFO.VERSION = 0.20;
+	Y._INFO.BUILD = 1000;
+	Y._INFO.STATUS = 'DEV';
+	Y._INFO.CODENAME = 'RAGHDA';
 
-	Y.hasProperty = ({}).hasOwnProperty;
+	Y.hasOwnProp = ({}).hasOwnProperty;
 
 	/**
 	 * YAX._CONFIG_STORAGE
 	 */
 	Y._CONFIG_STORAGE = {};
-
-	/**
-	 * YAX.Lang
-	 */
-	Y.Lang = {};
 
 	/**
 	 * YAX._GLOBALS
@@ -215,8 +200,8 @@
 
 	/** @namespace root.R */
 	/** @namespace root.D */
-	Y.Require = root.R || require || null;
-	Y.Define = root.D || define || null;
+	Y.require = root.R || require || null;
+	Y.define = root.D || define || null;
 
 	//---
 
@@ -245,5 +230,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/YAX.js
 
 //---

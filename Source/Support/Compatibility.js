@@ -1,14 +1,6 @@
 /**
- * DOM/DOM Compatibility
- *
- * Compatibility Module for YAX's DOM API.
- *
- * @version     0.15
- * @depends:    Core
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Compatibilities [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -19,23 +11,23 @@
 
 (function () {
 
-	'use strict';
-
 	//---
 
+	'use strict';
+
 	// Map over Yax.DOM in case of overwrite
-	var _YaxDOM = Y.Window.Y.DOM;
+	var _YaxDOM = Y.win.Y.DOM;
 
 	// Map over the $ in case of overwrite
-	var _$ = Y.Window.$;
+	var _$ = Y.win.$;
 
 	_YaxDOM.noConflict = function (deep) {
-		if (Y.Window.$ === Y.DOM) {
-			Y.Window.$ = _$;
+		if (Y.win.$ === Y.DOM) {
+			Y.win.$ = _$;
 		}
 
-		if (deep && Y.Window.Y.DOM === Y.DOM) {
-			Y.Window.Y.DOM = _YaxDOM;
+		if (deep && Y.win.Y.DOM === Y.DOM) {
+			Y.win.Y.DOM = _YaxDOM;
 		}
 
 		return Y.DOM;
@@ -47,20 +39,20 @@
 
 	// Y.DOM._temp = {};
 
-	Y.DOM.camelCase = Y.Lang.camelise;
+	Y.DOM.camelCase = Y.camelise;
 	Y.DOM.isReady = true;
-	Y.DOM.isArray = Y.Lang.isArray;
-	Y.DOM.isFunction = Y.Lang.isFunction;
-	Y.DOM.isWindow = Y.Lang.isWindow;
-	Y.DOM.trim = Y.Lang.trim;
-	Y.DOM.type = Y.Lang.type;
-	Y.DOM.isNumeric = Y.Lang.isNumeric;
-	Y.DOM.isEmptyObject = Y.Lang.isObjectEmpty;
-	Y.DOM.noop = Y.DOM.Noop = Y.Lang.noop;
-	Y.DOM.grep = Y.Lang.grep;
-	Y.DOM.merge = Y.Lang.merge;
+	Y.DOM.isArray = Y.isArray;
+	Y.DOM.isFunction = Y.isFunction;
+	Y.DOM.isWindow = Y.isWindow;
+	Y.DOM.trim = Y.trim;
+	Y.DOM.type = Y.type;
+	Y.DOM.isNumeric = Y.isNumeric;
+	Y.DOM.isEmptyObject = Y.isObjectEmpty;
+	Y.DOM.noop = Y.noop;
+	Y.DOM.grep = Y.grep;
+	Y.DOM.merge = Y.merge;
 
-	Y.DOM.when = Y.Lang.When;
+	Y.DOM.when = Y.When;
 
 	Y.DOM.Deferred = Y.G.Deferred;
 	Y.DOM.Callbacks = Y.G.Callbacks;
@@ -110,11 +102,11 @@
 				return;
 			}*/
 
-			// Y.LOG(wait === true ? --Y.DOM.readyWait : Y.DOM.isReady);
+			// Y.log(wait === true ? --Y.DOM.readyWait : Y.DOM.isReady);
 
 			tmp1 = (wait === true ? --Y.DOM.readyWait : Y.DOM.isReady);
 
-			// Y.LOG(tmp)
+			// Y.log(tmp)
 
 			// Abort if there are pending holds or we're already ready
 			if (tmp1) {
@@ -136,12 +128,12 @@
 			}
 
 			// If there are functions bound, to execute
-			readyList.resolveWith(Y.Document, [Y.DOM]);
+			readyList.resolveWith(Y.doc, [Y.DOM]);
 
 			// Trigger any bound ready events
 			if (Y.DOM.Function.triggerHandler) {
-				Y.DOM(Y.Document).triggerHandler('ready');
-				Y.DOM(Y.Document).off('ready');
+				Y.DOM(Y.doc).triggerHandler('ready');
+				Y.DOM(Y.doc).off('ready');
 			}
 		}
 	});
@@ -150,8 +142,8 @@
 	 * The ready event handler and self cleanup method
 	 */
 	function completed() {
-		Y.Document.removeEventListener('DOMContentLoaded', completed, false);
-		Y.Window.removeEventListener('load', completed, false);
+		Y.doc.removeEventListener('DOMContentLoaded', completed, false);
+		Y.win.removeEventListener('load', completed, false);
 		Y.DOM.ready();
 	}
 
@@ -162,15 +154,15 @@
 			// Catch cases where $(document).ready() is called after the browser event has already occurred.
 			// we once tried to use readyState 'interactive' here, but it caused issues like the one
 			// discovered by ChrisS here: http://bugs.jquery.com/ticket/12282#comment:15
-			if (Y.Document.readyState === 'complete') {
+			if (Y.doc.readyState === 'complete') {
 				// Handle it asynchronously to allow scripts the opportunity to delay ready
 				setTimeout(Y.DOM.ready);
 			} else {
 				// Use the handy event callback
-				Y.Document.addEventListener('DOMContentLoaded', completed, false);
+				Y.doc.addEventListener('DOMContentLoaded', completed, false);
 
-				// A fallback to Y.Window.onload, that will always work
-				Y.Window.addEventListener('load', completed, false);
+				// A fallback to Y.win.onload, that will always work
+				Y.win.addEventListener('load', completed, false);
 			}
 		}
 
@@ -210,13 +202,13 @@
 		Y.DOM.event.special[fix] = {
 			setup: function () {
 				if (attaches++ === 0) {
-					Y.Document.addEventListener(orig, handler, true);
+					Y.doc.addEventListener(orig, handler, true);
 				}
 			},
 
 			teardown: function () {
 				if (--attaches === 0) {
-					Y.Document.removeEventListener(orig, handler, true);
+					Y.doc.removeEventListener(orig, handler, true);
 				}
 			}
 		};
@@ -224,17 +216,18 @@
 
 	//---
 
-	Y.Window.cordova = document.URL.indexOf('http://') === -1 && Y.Document.URL.indexOf('https://') === -1;
+	Y.win.cordova = document.URL.indexOf('http://') === -1 && Y.doc.URL.indexOf('https://') === -1;
 
-	if (Y.Window.cordova === false) {
+	if (Y.win.cordova === false) {
 		Y.DOM(function () {
-			Y.DOM(Y.Document).trigger('deviceready');
+			Y.DOM(Y.doc).trigger('deviceready');
 		});
 	}
-
 
 	//---
 
 }());
+
+// FILE: ./Source/Support/Compatibility.js
 
 //---

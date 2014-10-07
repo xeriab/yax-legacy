@@ -1,14 +1,6 @@
 /**
- * YAX Node | Extra
- *
- * Cross browser extra functions using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Extra Stuff [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -18,6 +10,8 @@
 /*global YAX, Y, transitionProperty, transitionDuration, transitionTiming*/
 
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -47,7 +41,7 @@
 					return null;
 				}
 
-				result = this.regex.exec(Y.Lang.trim(value.toString()));
+				result = this.regex.exec(Y.trim(value.toString()));
 
 				if (result[2]) {
 					num = parseInt(result[1], 10);
@@ -62,7 +56,7 @@
 				var counter = 0,
 					handler;
 
-				if (Y.Lang.isFunction(label)) {
+				if (Y.isFunction(label)) {
 					if (!times) {
 						times = callback;
 					}
@@ -110,7 +104,7 @@
 				handler.$timerID = callback.$timerID;
 
 				if (!element.$timers[label][callback.$timerID]) {
-					element.$timers[label][callback.$timerID] = Y.Window.setInterval(handler,
+					element.$timers[label][callback.$timerID] = Y.win.setInterval(handler,
 						interval);
 				}
 
@@ -236,5 +230,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Extra.js
 
 //---

@@ -1,13 +1,6 @@
 /**
- * YAX DOM | WiatForMe Plugin
- *
- *
- * @version     0.15
- * @depends:    Core, DOM, Events
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX WaitForMe [DOM/NODE][PLUGIN]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -18,9 +11,9 @@
 
 (function () {
 
-	'use strict';
-
 	//---
+
+	'use strict';
 
 	Y.extend(Y.Settings.DOM, {
 		waitForMe: {
@@ -58,13 +51,7 @@
 	WaitForMe.prototype = {
 		init: function () {
 			this.setContent();
-
 			this._init_();
-
-			//			if (this.content) {
-			//				this.setEvents();
-			//			}
-
 			this.setEvents();
 		},
 
@@ -235,9 +222,9 @@
 			this.containerSize = 'width: ' + this.containerSize.width + '; height: ' +
 				this.containerSize.height;
 
-			if (Y.Lang.isEmpty(this.options.width) && Y.Lang.isEmpty(this.options.height)) {
-				this.elementSize = Y.Lang.empty();
-				this.containerSize = Y.Lang.empty();
+			if (Y.isEmpty(this.options.width) && Y.isEmpty(this.options.height)) {
+				this.elementSize = Y.empty();
+				this.containerSize = Y.empty();
 			}
 
 			this.effects = Y.DOM('<div class="' + this.cssClass + '-progress ' + this
@@ -311,12 +298,12 @@
 				this.content = this.options.content;
 			} else if (this.element.data('YAX-WaitForMe')) {
 				this.content = this.element.data('YAX-WaitForMe');
-			} else if (Y.Lang.isEmpty(this.options.content)) {
-				this.content = Y.Lang.empty();
-			} else if (Y.Lang.isNull(this.options.content)) {
-				this.content = Y.Lang.empty();
+			} else if (Y.isEmpty(this.options.content)) {
+				this.content = Y.empty();
+			} else if (Y.isNull(this.options.content)) {
+				this.content = Y.empty();
 			} else {
-				Y.ERROR('No content for WaitForMe: ' + this.element.selector);
+				Y.error('No content for WaitForMe: ' + this.element.selector);
 				return;
 			}
 
@@ -376,5 +363,8 @@
 
 }());
 
+// FILE: ./Source/Plugins/WaitForMe/WaitForMe.js
+
 //---
+
 

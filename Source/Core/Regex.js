@@ -1,11 +1,5 @@
 /**
- * YAX Core | RegEx
- *
- * Another YAX's RegEx tools and shortcuts [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility, Class
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Regex Object
  */
 
 //---
@@ -17,6 +11,8 @@
 /*global Y, YAX */
 
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -97,5 +93,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Core/Regex.js
 
 //---

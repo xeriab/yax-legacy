@@ -1,14 +1,6 @@
 /**
- * YAX Node | Events
- *
- * Cross browser events implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Another Events [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -16,13 +8,11 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-
 (function (undef) {
-
-	'use strict';
 
 	//---
 
+	'use strict';
 
 	var
 		rkeyEvent = /^key/,
@@ -44,7 +34,7 @@
 		try {
 			return document.activeElement;
 		} catch (err) {
-			Y.ERROR(err);
+			Y.error(err);
 		}
 	}
 
@@ -680,7 +670,7 @@
 		}
 
 		// Create a timestamp if incoming event doesn't have one
-		this.timeStamp = src && src.timeStamp || Y.Lang.now();
+		this.timeStamp = src && src.timeStamp || Y.now();
 
 		// Mark it as fixed
 		this[Y.DOM.expando] = true;
@@ -947,9 +937,11 @@
 			return this.on(type, fn);
 		};
 	});
-	
+
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/AnotherEvents.js
 
 //---

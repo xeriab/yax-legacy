@@ -1,14 +1,6 @@
 /**
- * YAX Node | Stack
- *
- * Cross browser stack implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Stack [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,9 +9,9 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -59,5 +51,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Contrib/Stack.js
 
 //---

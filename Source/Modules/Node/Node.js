@@ -1,14 +1,6 @@
 /**
- * DOM/DOM Module
- *
- * Cross browser DOM utilities using YAX's API.
- *
- * @version     0.15
- * @depends:    Core
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX DOM/NODE
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -19,15 +11,19 @@
 
 (function(undef) {
 
+	//---
+
 	'use strict';
 
 	var YAXDOM = {};
+
+	var $ = null;
 
 	var ClassList;
 
 	var IDsList;
 
-	var docElement = Y.Document.documentElement;
+	var docElement = Y.doc.documentElement;
 
 	var elementDisplay = {};
 
@@ -56,21 +52,21 @@
 		'append'
 	];
 
-	var Table = Y.Document.createElement('table');
+	var Table = Y.doc.createElement('table');
 
-	var TableRow = Y.Document.createElement('tr');
+	var TableRow = Y.doc.createElement('tr');
 
 	var Containers = {
-		'tr': Y.Document.createElement('tbody'),
+		'tr': Y.doc.createElement('tbody'),
 		'tbody': Table,
 		'thead': Table,
 		'tfoot': Table,
 		'td': TableRow,
 		'th': TableRow,
-		'*': Y.Document.createElement('div')
+		'*': Y.doc.createElement('div')
 	};
 
-	var temporaryParent = Y.Document.createElement('div');
+	var temporaryParent = Y.doc.createElement('div');
 
 	var properitiesMap = {
 		'tabindex': 'tabIndex',
@@ -119,18 +115,18 @@
 
 	var DomNode;
 
-	var ClassTag = 'YAX' + Y.Lang.now();
+	var ClassTag = 'YAX' + Y.now();
 
 	//---
 
-	Y.DOM = function(selector, context) {
+	$ = function(selector, context) {
 		return YAXDOM.init(selector, context);
 	};
 
 	// BEGIN OF [Private Functions]
 
 	function functionArgument(context, argument, index, payload) {
-		return Y.Lang.isFunction(argument) ? argument.call(context, index, payload) :
+		return Y.isFunction(argument) ? argument.call(context, index, payload) :
 			argument;
 	}
 
@@ -203,23 +199,23 @@
 	function getStyles() {
 		var args = Y.G.Slice.call(arguments);
 
-		if (!Y.Lang.isUndefined(args[0])) {
+		if (!Y.isUndefined(args[0])) {
 			// return window.getComputedStyle(element, null);
-			return Y.Window.getComputedStyle(args[0], null);
+			return Y.win.getComputedStyle(args[0], null);
 		}
 	}
 
 	function getDocStyles() {
 		var args = Y.G.Slice.call(arguments);
 
-		if (!Y.Lang.isUndefined(args[0])) {
+		if (!Y.isUndefined(args[0])) {
 			// return window.getComputedStyle(element, null);
-			return Y.Document.defaultView.getComputedStyle(args[0], null);
+			return Y.doc.defaultView.getComputedStyle(args[0], null);
 		}
 	}
 
 	function getWindow(element) {
-		return Y.Lang.isWindow(element) ? element : element.nodeType === 9 &&
+		return Y.isWindow(element) ? element : element.nodeType === 9 &&
 			element.defaultView;
 	}
 
@@ -227,9 +223,9 @@
 		var element, display;
 
 		if (!elementDisplay[nodeName]) {
-			element = Y.Document.createElement(nodeName);
-			Y.Document.body.appendChild(element);
-			//display = getComputedStyle(element, Y.Lang.empty()).getPropertyValue("display");
+			element = Y.doc.createElement(nodeName);
+			Y.doc.body.appendChild(element);
+			//display = getComputedStyle(element, Y.empty()).getPropertyValue("display");
 			display = getStyles(element).getPropertyValue('display');
 			element.parentNode.removeChild(element);
 			// display == 'none' && (display = 'block');
@@ -248,7 +244,7 @@
 		var result, len = array.length;
 
 		if (len > 0) {
-			result = Y.DOM.Function.concat.apply([], array);
+			result = $.Function.concat.apply([], array);
 		} else {
 			result = array;
 		}
@@ -286,7 +282,7 @@
 		// svg = svg ? (Class.baseVal = value) : (node.className = value);
 
 		if (svg) {
-			result = Y.Lang.inject(Class, 'baseVal', value);
+			result = Y.inject(Class, 'baseVal', value);
 		} else {
 			node.className = value;
 
@@ -310,7 +306,7 @@
 		}
 
 		if (svg) {
-			result = Y.Lang.inject(ID, 'baseVal', value);
+			result = Y.inject(ID, 'baseVal', value);
 		} else {
 			node.ID = value;
 
@@ -327,12 +323,12 @@
 			key,
 			len = elements.length;
 
-		if (Y.Lang.isArraylike(elements) && !Y.Lang.isUndefined(elements)) {
+		if (Y.isArraylike(elements) && !Y.isUndefined(elements)) {
 			for (x; x < len; x++) {
-				if (!Y.Lang.isUndefined(elements[x])) {
+				if (!Y.isUndefined(elements[x])) {
 					value = callback(elements[x], x, arg);
 
-					if (!Y.Lang.isNull(value) && !Y.Lang.isUndefined(value)) {
+					if (!Y.isNull(value) && !Y.isUndefined(value)) {
 						// values.push(value);
 						values[values.length] = value;
 					}
@@ -343,7 +339,7 @@
 				if (elements.hasOwnProperty(key)) {
 					value = callback(elements[key], key, arg);
 
-					if (!Y.Lang.isNull(value) && !Y.Lang.isUndefined(value)) {
+					if (!Y.isNull(value) && !Y.isUndefined(value)) {
 						// values.push(value);
 						values[values.length] = value;
 					}
@@ -373,8 +369,8 @@
 			style = element.style;
 
 		if (computed) {
-			if (Y.Lang.isEmpty(ret) && !contains(element.ownerDocument, element)) {
-				ret = Y.DOM.Style(element, name);
+			if (Y.isEmpty(ret) && !contains(element.ownerDocument, element)) {
+				ret = $.Style(element, name);
 			}
 
 			// Support: Safari 5.1
@@ -420,27 +416,27 @@
 		for (null; i < 4; i += 2) {
 			// both box models exclude margin, so add it if we want it
 			if (extra === 'margin') {
-				val += Y.DOM.CSS(element, extra + cssExpand[i], true, styles);
+				val += $.CSS(element, extra + cssExpand[i], true, styles);
 			}
 
 			if (isBorderBox) {
 				// border-box includes padding, so remove it if we want content
 				if (extra === 'content') {
-					val -= Y.DOM.CSS(element, 'padding' + cssExpand[i], true, styles);
+					val -= $.CSS(element, 'padding' + cssExpand[i], true, styles);
 				}
 
 				// at this point, extra isn't border nor margin, so remove border
 				if (extra !== 'margin') {
-					val -= Y.DOM.CSS(element, 'border' + cssExpand[i] + 'Width', true,
+					val -= $.CSS(element, 'border' + cssExpand[i] + 'Width', true,
 						styles);
 				}
 			} else {
 				// at this point, extra isn't content, so add padding
-				val += Y.DOM.CSS(element, 'padding' + cssExpand[i], true, styles);
+				val += $.CSS(element, 'padding' + cssExpand[i], true, styles);
 
 				// at this point, extra isn't content nor padding, so add border
 				if (extra !== 'padding') {
-					val += Y.DOM.CSS(element, 'border' + cssExpand[i] + 'Width', true,
+					val += $.CSS(element, 'border' + cssExpand[i] + 'Width', true,
 						styles);
 				}
 			}
@@ -454,7 +450,7 @@
 		var valueIsBorderBox = true,
 			val = name === 'width' ? element.offsetWidth : element.offsetHeight,
 			styles = getStyles(element),
-			isBorderBox = Y.DOM.Support.boxSizing && Y.DOM.CSS(element, 'boxSizing',
+			isBorderBox = $.Support.boxSizing && $.CSS(element, 'boxSizing',
 				false, styles) === 'border-box';
 
 		// val = val.toString();
@@ -477,7 +473,7 @@
 
 			// we need the check for style in case a browser which returns unreliable values
 			// for getComputedStyle silently falls back to the reliable element.style
-			valueIsBorderBox = isBorderBox && (Y.DOM.Support.boxSizingReliable || val ===
+			valueIsBorderBox = isBorderBox && ($.Support.boxSizingReliable || val ===
 				element.style[name]);
 
 			// Normalize "", auto, and prepare for extra
@@ -499,13 +495,13 @@
 	function globalEval(code) {
 		var script, indirect = eval;
 
-		code = Y.Lang.trim(code);
+		code = Y.trim(code);
 
 		if (code) {
 			if (code.indexOf('use strict') === 1) {
-				script = Y.Document.createElement('script');
+				script = Y.doc.createElement('script');
 				script.text = code;
-				Y.Document.head.appendChild(script).parentNode.removeChild(script);
+				Y.doc.head.appendChild(script).parentNode.removeChild(script);
 			} else {
 				indirect(code);
 			}
@@ -542,7 +538,7 @@
 
 			// Fall back to performing a selector:
 			parent = element.parentNode;
-			//temp = !Y.Lang.isSet(parent);
+			//temp = !Y.isSet(parent);
 			temp = !parent;
 
 			if (temp) {
@@ -574,7 +570,7 @@
 
 			// A special case optimization for a single tag
 			if (Y.RegEx.SingleTagReplacement.test(html)) {
-				dom = Y.DOM(Y.Document.createElement(RegExp.$1));
+				dom = $(Y.doc.createElement(RegExp.$1));
 			}
 
 			if (!dom) {
@@ -592,7 +588,7 @@
 
 				container = Containers[name];
 
-				container.innerHTML = Y.Lang.empty() + html;
+				container.innerHTML = Y.empty() + html;
 
 				dom = Y.each(Y.G.Slice.call(container.childNodes), function() {
 					self = this;
@@ -601,8 +597,8 @@
 				});
 			}
 
-			if (Y.Lang.isPlainObject(properties)) {
-				nodes = Y.DOM(dom);
+			if (Y.isPlainObject(properties)) {
+				nodes = $(dom);
 
 				Y.each(properties, function(key, value) {
 					if (MethodAttributes.indexOf(key) > -1) {
@@ -616,7 +612,7 @@
 			return dom;
 		},
 
-		// `YAXDOM.init` is Y.DOM's counterpart to jQuery's `Y.DOM.Function.init` and
+		// `YAXDOM.init` is $'s counterpart to jQuery's `$.Function.init` and
 		// takes a CSS selector and an optional context (and handles various
 		// special cases).
 		// This method can be overriden in plugins.
@@ -628,7 +624,7 @@
 				return YAXDOM.Y();
 			}
 
-			if (Y.Lang.isString(selector)) {
+			if (Y.isString(selector)) {
 				// Optimize for string selectors
 				selector = selector.trim();
 
@@ -643,26 +639,26 @@
 					selector = null;
 				} else if (context !== undef) {
 					// If there's a context, create a collection on that context first, and select nodes from there
-					return Y.DOM(context).find(selector);
+					return $(context).find(selector);
 				} else {
 					// If it's a CSS selector, use it to select nodes.
-					dom = this.QSA(Y.Document, selector);
+					dom = this.QSA(Y.doc, selector);
 				}
 			}
 
 			// If a function is given, call it when the DOM is ready
-			else if (Y.Lang.isFunction(selector)) {
-				return Y.DOM(Y.Document).ready(selector);
+			else if (Y.isFunction(selector)) {
+				return $(Y.doc).ready(selector);
 				// If a YAX collection is given, just return it
 			} else if (this.isY(selector)) {
 				return selector;
 			} else {
 				// normalize array if an array of nodes is given
-				if (Y.Lang.isArray(selector)) {
-					dom = Y.Lang.compact(selector);
-					// dom = Y.DOM.makeArray(selector, this.Y());
+				if (Y.isArray(selector)) {
+					dom = Y.compact(selector);
+					// dom = $.makeArray(selector, this.Y());
 					// Wrap DOM nodes.
-				} else if (Y.Lang.isObject(selector)) {
+				} else if (Y.isObject(selector)) {
 					dom = [selector];
 					selector = null;
 					// If it's a html Fragment, create nodes from it
@@ -671,13 +667,13 @@
 					selector = null;
 					// If there's a context, create a collection on that context first, and select
 					// nodes from there
-				} else if (Y.Lang.isDefined(context)) {
-					return Y.DOM(context).find(selector);
+				} else if (Y.isDefined(context)) {
+					return $(context).find(selector);
 					// console.log(context);
-					//result = Y.DOM(context).find(selector);
+					//result = $(context).find(selector);
 					// And last but no least, if it's a CSS selector, use it to select nodes.
 				} else {
-					dom = this.QSA(Y.Document, selector);
+					dom = this.QSA(Y.doc, selector);
 				}
 			}
 
@@ -686,7 +682,7 @@
 		},
 
 		// `YAXDOM.QSA` is YAX's CSS selector implementation which
-		// uses `Y.Document.querySelectorAll` and optimizes for some special cases, like `#id`.
+		// uses `Y.doc.querySelectorAll` and optimizes for some special cases, like `#id`.
 		// This method can be overriden in plugins.
 		QSA: function(element, selector) {
 			var found, maybeID, maybeClass, nameOnly, isSimple, result;
@@ -708,10 +704,10 @@
 
 			isSimple = Y.RegEx.SimpleSelectorReplacement.test(nameOnly);
 
-			if (Y.Lang.isDocument(element) && isSimple && maybeID) {
+			if (Y.isDocument(element) && isSimple && maybeID) {
 				found = element.getElementById(nameOnly);
 
-				if (Y.Lang.isSet(found)) {
+				if (Y.isSet(found)) {
 					// result = {'res': found};
 					result = [found];
 				} else {
@@ -719,7 +715,7 @@
 					result = [];
 				}
 			} else {
-				result = (!Y.Lang.isUndefined(element) && element.nodeType !== 1 &&
+				result = (!Y.isUndefined(element) && element.nodeType !== 1 &&
 						element.nodeType !== 9) ? [] :
 					Y.G.Slice.call(
 						isSimple && !maybeID ?
@@ -736,7 +732,7 @@
 		},
 
 		// `YAXDOM.Y` swaps out the prototype of the given `DOM` array
-		// of nodes with `Y.DOM.Function` and thus supplying all the Y.DOM functions
+		// of nodes with `$.Function` and thus supplying all the $ functions
 		// to the array. Note that `__proto__` is not supported on Internet
 		// Explorer. This method can be overriden in Plugins.
 		Y: function(dom, selector) {
@@ -746,12 +742,12 @@
 			// result = dom || {};
 
 			/* jshint -W103 */
-			// result.__proto__ = Y.DOM.Function;
+			// result.__proto__ = $.Function;
 
 			/** @namespace Object.setPrototypeOf */
-			Object.setPrototypeOf(result, Y.DOM.Function);
+			Object.setPrototypeOf(result, $.Function);
 
-			result.selector = selector || Y.Lang.empty();
+			result.selector = selector || Y.empty();
 
 			return result;
 		},
@@ -770,11 +766,11 @@
 	function filtered(nodes, selector) {
 		var result;
 
-		if (Y.Lang.isNull(selector) || Y.Lang.isUndefined(selector) || Y.Lang.isEmpty(
+		if (Y.isNull(selector) || Y.isUndefined(selector) || Y.isEmpty(
 				selector)) {
-			result = Y.DOM(nodes);
+			result = $(nodes);
 		} else {
-			result = Y.DOM(nodes).filter(selector);
+			result = $(nodes).filter(selector);
 		}
 
 		return result;
@@ -783,18 +779,18 @@
 	//---
 
 	/**
-	 * Y.DomNode is a DOM class that Y.DOM classes inherit from.
+	 * Y.DomNode is a DOM class that $ classes inherit from.
 	 */
 	Y.DomNode = Y.Class.extend({
-		CLASS_NAME: 'DOM',
+		_class_name: 'DOM',
 
 		getStyle: function(el, style) {
 			var value, css;
 
 			value = el.style[style] || (el.currentStyle && el.currentStyle[style]);
 
-			if ((!value || value === 'auto') && Y.Document.defaultView) {
-				css = Y.Document.defaultView.getComputedStyle(el, null);
+			if ((!value || value === 'auto') && Y.doc.defaultView) {
+				css = Y.doc.defaultView.getComputedStyle(el, null);
 				value = css ? css[style] : null;
 			}
 
@@ -802,9 +798,9 @@
 		},
 
 		documentIsLtr: function() {
-			Y.DOM.docIsLTR = Y.DOM.docIsLTR || DomNode.getStyle(Y.Document.body,
+			$.docIsLTR = $.docIsLTR || DomNode.getStyle(Y.doc.body,
 				'direction') === 'ltr';
-			return Y.DOM.docIsLTR;
+			return $.docIsLTR;
 		},
 
 		'Function': {
@@ -821,23 +817,23 @@
 			// `map` and `slice` in the jQuery API work differently
 			// from their array counterparts
 			map: function(callback) {
-				return Y.DOM(map(this, function(el, i) {
+				return $(map(this, function(el, i) {
 					return callback.call(el, i, el);
 				}));
 			},
 			slice: function() {
-				return Y.DOM(Y.G.Slice.apply(this, arguments));
-				// return Y.DOM.pushStack(Slice.apply(this, arguments));
+				return $(Y.G.Slice.apply(this, arguments));
+				// return $.pushStack(Slice.apply(this, arguments));
 			},
 			ready: function(callback) {
-				// need to check if Y.Document.body exists for IE as that browser reports
-				// Y.Document ready when it hasn't yet created the body element
-				if (Y.RegEx.ReadyReplacement.test(Y.callProperty(Y.Document, 'readyState')) &&
-					Y.Document.body) {
-					callback(Y.DOM);
+				// need to check if Y.doc.body exists for IE as that browser reports
+				// Y.doc ready when it hasn't yet created the body element
+				if (Y.RegEx.ReadyReplacement.test(Y.callProperty(Y.doc, 'readyState')) &&
+					Y.doc.body) {
+					callback($);
 				} else {
-					Y.Document.addEventListener('DOMContentLoaded', function() {
-						callback(Y.DOM);
+					Y.doc.addEventListener('DOMContentLoaded', function() {
+						callback($);
 					}, false);
 				}
 
@@ -877,16 +873,16 @@
 				return this;
 			},
 			filter: function(selector) {
-				if (Y.Lang.isFunction(selector)) {
+				if (Y.isFunction(selector)) {
 					return this.not(this.not(selector));
 				}
 
-				return Y.DOM(Y.G.Filter.call(this, function(element) {
+				return $(Y.G.Filter.call(this, function(element) {
 					return YAXDOM.Matches(element, selector);
 				}));
 			},
 			add: function(selector, context) {
-				return Y.DOM(Y.Lang.unique(this.concat(Y.DOM(selector, context))));
+				return $(Y.unique(this.concat($(selector, context))));
 			},
 			is: function(selector) {
 				return this.length > 0 && YAXDOM.Matches(this[0], selector);
@@ -895,16 +891,16 @@
 				var nodes = [],
 					excludes;
 
-				if (Y.Lang.isFunction(selector) && selector.call !== undef) {
+				if (Y.isFunction(selector) && selector.call !== undef) {
 					this.each(function(index) {
 						if (!selector.call(this, index)) {
 							nodes.push(this);
 						}
 					});
 				} else {
-					excludes = Y.Lang.isString(selector) ? this.filter(selector) :
-						(Y.Lang.likeArray(selector) && Y.Lang.isFunction(selector.item)) ? Y.G.Slice
-						.call(selector) : Y.DOM(selector);
+					excludes = Y.isString(selector) ? this.filter(selector) :
+						(Y.likeArray(selector) && Y.isFunction(selector.item)) ? Y.G.Slice
+						.call(selector) : $(selector);
 
 					this.forEach(function(el) {
 						if (excludes.indexOf(el) < 0) {
@@ -913,13 +909,13 @@
 					});
 				}
 
-				return Y.DOM(nodes);
+				return $(nodes);
 			},
 			has: function(selector) {
 				return this.filter(function() {
-					return Y.Lang.isObject(selector) ?
+					return Y.isObject(selector) ?
 						contains(this, selector) :
-						Y.DOM(this).find(selector).size();
+						$(this).find(selector).size();
 				});
 			},
 			eq: function(index) {
@@ -927,11 +923,11 @@
 			},
 			first: function() {
 				var el = this[0];
-				return el && !Y.Lang.isObject(el) ? el : Y.DOM(el);
+				return el && !Y.isObject(el) ? el : $(el);
 			},
 			last: function() {
 				var el = this[this.length - 1];
-				return el && !Y.Lang.isObject(el) ? el : Y.DOM(el);
+				return el && !Y.isObject(el) ? el : $(el);
 			},
 
 			find: function(selector) {
@@ -940,16 +936,16 @@
 
 				if (!selector) {
 					result = [];
-				} else if (Y.Lang.isObject(selector)) {
-					result = Y.DOM(selector).filter(function() {
+				} else if (Y.isObject(selector)) {
+					result = $(selector).filter(function() {
 						var node = this;
 
 						return Y.G.ArrayProto.some.call(self, function(parent) {
-							return Y.DOM.contains(parent, node);
+							return $.contains(parent, node);
 						});
 					});
 				} else if (this.length === 1) {
-					result = Y.DOM(YAXDOM.QSA(this[0], selector));
+					result = $(YAXDOM.QSA(this[0], selector));
 				} else {
 					result = this.map(function() {
 						return YAXDOM.QSA(this, selector);
@@ -963,16 +959,16 @@
 				var node = this[0],
 					collection = false;
 
-				if (Y.Lang.isObject(selector)) {
-					collection = Y.DOM(selector);
+				if (Y.isObject(selector)) {
+					collection = $(selector);
 				}
 
-				while (node && Y.Lang.isFalse(collection ? collection.indexOf(node) >= 0 :
+				while (node && Y.isFalse(collection ? collection.indexOf(node) >= 0 :
 						YAXDOM.Matches(node, selector))) {
-					node = node !== context && !Y.Lang.isDocument(node) && node.parentNode;
+					node = node !== context && !Y.isDocument(node) && node.parentNode;
 				}
 
-				return Y.DOM(node);
+				return $(node);
 			},
 			parents: function(selector) {
 				var ancestors = [],
@@ -983,7 +979,7 @@
 				tempFunc = function(node) {
 					node = node.parentNode;
 
-					if (node && !Y.Lang.isDocument(node) && ancestors.indexOf(node) < x) {
+					if (node && !Y.isDocument(node) && ancestors.indexOf(node) < x) {
 						ancestors.push(node);
 						// ancestors[x] = node;
 
@@ -995,7 +991,7 @@
 					nodes = map(nodes, tempFunc);
 				}
 
-				if (Y.Lang.isUndefined(selector) || Y.Lang.isNull(selector) || Y.Lang.isEmpty(
+				if (Y.isUndefined(selector) || Y.isNull(selector) || Y.isEmpty(
 						selector)) {
 					result = filtered(ancestors, '*');
 				} else {
@@ -1005,7 +1001,7 @@
 				return result;
 			},
 			parent: function(selector) {
-				return filtered(Y.Lang.unique(this.pluck('parentNode')), selector);
+				return filtered(Y.unique(this.pluck('parentNode')), selector);
 			},
 			children: function(selector) {
 				return filtered(this.map(function() {
@@ -1026,7 +1022,7 @@
 			},
 			empty: function() {
 				return this.each(function() {
-					this.innerHTML = Y.Lang.empty();
+					this.innerHTML = Y.empty();
 				});
 			},
 			// `pluck` is borrowed from Prototype.js
@@ -1038,10 +1034,10 @@
 			show: function() {
 				return this.each(function() {
 					if (this.style.display === 'none') {
-						this.style.display = Y.Lang.empty();
+						this.style.display = Y.empty();
 					}
 
-					// this.style.display === 'none' && (this.style.display = Y.Lang.empty());
+					// this.style.display === 'none' && (this.style.display = Y.empty());
 
 					if (getStyles(this).getPropertyValue('display') === 'none') {
 						this.style.display = defaultDisplay(this.nodeName);
@@ -1052,16 +1048,16 @@
 				return this.before(newContent).remove();
 			},
 			wrap: function(structure) {
-				var func = Y.Lang.isFunction(structure),
+				var func = Y.isFunction(structure),
 					dom, clone;
 
 				if (this[0] && !func) {
-					dom = Y.DOM(structure).get(0);
+					dom = $(structure).get(0);
 					clone = dom.parentNode || this.length > 1;
 				}
 
 				return this.each(function(index) {
-					Y.DOM(this).wrapAll(
+					$(this).wrapAll(
 						func ? structure.call(this, index) :
 						clone ? dom.cloneNode(true) : dom
 					);
@@ -1069,7 +1065,7 @@
 			},
 			wrapAll: function(structure) {
 				if (this[0]) {
-					Y.DOM(this[0]).before(structure = Y.DOM(structure));
+					$(this[0]).before(structure = $(structure));
 
 					var childreno, self = this;
 
@@ -1080,16 +1076,16 @@
 						structure = children.first();
 					}
 
-					Y.DOM(structure).append(self);
+					$(structure).append(self);
 				}
 
 				return this;
 			},
 			wrapInner: function(structure) {
-				var func = Y.Lang.isFunction(structure),
+				var func = Y.isFunction(structure),
 					self, dom, contents;
 				return this.each(function(index) {
-					self = Y.DOM(this);
+					self = $(this);
 
 					contents = self.contents();
 
@@ -1106,7 +1102,7 @@
 			},
 			unwrap: function() {
 				this.parent().each(function() {
-					Y.DOM(this).replaceWith(Y.DOM(this).children());
+					$(this).replaceWith($(this).children());
 				});
 
 				return this;
@@ -1121,12 +1117,12 @@
 			},
 			toggle: function(setting) {
 				return this.each(function() {
-					var el = Y.DOM(this),
+					var el = $(this),
 						val;
 
 					val = el.css('display') === 'none';
 
-					if (Y.Lang.isUndefined(setting)) {
+					if (Y.isUndefined(setting)) {
 						if (val) {
 							setting = val;
 						}
@@ -1140,18 +1136,18 @@
 				});
 			},
 			prev: function(selector) {
-				return Y.DOM(this.pluck('previousElementSibling')).filter(selector ||
+				return $(this.pluck('previousElementSibling')).filter(selector ||
 					'*');
 			},
 			next: function(selector) {
-				return Y.DOM(this.pluck('nextElementSibling')).filter(selector || '*');
+				return $(this.pluck('nextElementSibling')).filter(selector || '*');
 			},
 			html: function(html) {
 				return arguments.length === 0 ?
 					(this.length > 0 ? this[0].innerHTML : null) :
 					this.each(function(index) {
 						var originHtml = this.innerHTML;
-						Y.DOM(this).empty().append(functionArgument(this, html, index,
+						$(this).empty().append(functionArgument(this, html, index,
 							originHtml));
 					});
 			},
@@ -1159,7 +1155,7 @@
 				return arguments.length === 0 ?
 					(this.length > 0 ? this[0].textContent : null) :
 					this.each(function() {
-						this.textContent = (text === undef) ? Y.Lang.empty() : Y.Lang.empty() +
+						this.textContent = (text === undef) ? Y.empty() : Y.empty() +
 							text;
 					});
 			},
@@ -1167,17 +1163,17 @@
 				return arguments.length === 0 ?
 					(this.length > 0 ? this[0].title : null) :
 					this.each(function() {
-						this.title = (title === undef) ? Y.Lang.empty() : Y.Lang.empty() +
+						this.title = (title === undef) ? Y.empty() : Y.empty() +
 							title;
 					});
 			},
 			attr: function(name, value) {
 				var result;
 
-				return (Y.Lang.isString(name) && value === undef) ?
+				return (Y.isString(name) && value === undef) ?
 					(this.length === 0 || this[0].nodeType !== 1 ? undef :
 						(name === 'value' && this[0].nodeName === 'INPUT') ? this.val() :
-						(Y.Lang.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
+						(Y.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
 							name)) ? this[0][name] : result
 					) :
 					this.each(function(index) {
@@ -1185,7 +1181,7 @@
 							return;
 						}
 
-						if (Y.Lang.isObject(name)) {
+						if (Y.isObject(name)) {
 							var key;
 
 							for (key in name) {
@@ -1205,7 +1201,7 @@
 					this.each(function() {
 						var tmp = this.draggable;
 
-						if (Y.Lang.isUndefined(value) || !Y.Lang.isBool(value)) {
+						if (Y.isUndefined(value) || !Y.isBool(value)) {
 							this.draggable = tmp;
 						} else {
 							this.draggable = value;
@@ -1230,13 +1226,13 @@
 					});
 			},
 			data: function(name, value) {
-				var data = this.attr('data-' + Y.Lang.dasherise(name), value);
-				return data !== null ? Y.Lang.deserialiseValue(data) : undef;
+				var data = this.attr('data-' + Y.dasherise(name), value);
+				return data !== null ? Y.deserialiseValue(data) : undef;
 			},
 			val: function(value) {
 				return arguments.length === 0 ?
 					(this[0] && (this[0].multiple ?
-						Y.DOM(this[0]).find('option').filter(function() {
+						$(this[0]).find('option').filter(function() {
 							return this.selected;
 						}).pluck('value') :
 						this[0].value)) :
@@ -1247,7 +1243,7 @@
 			value: function(value) {
 				return arguments.length === 0 ?
 					(this[0] && (this[0].multiple ?
-						Y.DOM(this[0]).find('option').filter(function() {
+						$(this[0]).find('option').filter(function() {
 							return this.selected;
 						}).pluck('value') :
 						this[0].value)) :
@@ -1258,7 +1254,7 @@
 			offset: function(coordinates) {
 				if (coordinates) {
 					return this.each(function(index) {
-						var $this = Y.DOM(this),
+						var $this = $(this),
 							coords = functionArgument(this, coordinates, index, $this.offset()),
 							parentOffset = $this.offsetParent().offset(),
 							props = {
@@ -1301,7 +1297,7 @@
 					return options === undef ?
 						this :
 						this.each(function(i) {
-							Y.DOM.offset.setOffset(this, options, i);
+							$.offset.setOffset(this, options, i);
 						});
 				}
 
@@ -1317,7 +1313,7 @@
 					return;
 				}
 
-				docElem = Y.Document.documentElement;
+				docElem = Y.doc.documentElement;
 
 				// Make sure it's not a disconnected DOM node
 				if (!contains(docElem, element)) {
@@ -1326,7 +1322,7 @@
 
 				// If we don't have gBCR, just use 0,0 rather than error
 				// BlackBerry 5, iOS 3 (original iPhone)
-				if (!Y.Lang.isUndefined(element.getBoundingClientRect)) {
+				if (!Y.isUndefined(element.getBoundingClientRect)) {
 					box = element.getBoundingClientRect();
 				}
 
@@ -1347,16 +1343,16 @@
 						return;
 					}
 
-					if (Y.Lang.isString(name)) {
-						return element.style[Y.Lang.camelise(name)] || computedStyle.getPropertyValue(
+					if (Y.isString(name)) {
+						return element.style[Y.camelise(name)] || computedStyle.getPropertyValue(
 							name);
 					}
 
-					if (Y.Lang.isArray(name)) {
+					if (Y.isArray(name)) {
 						props = {};
 
-						Y.each(Y.Lang.isArray(name) ? name : [name], function(tmp, prop) {
-							props[prop] = (element.style[Y.Lang.camelise(prop)] || computedStyle.getPropertyValue(
+						Y.each(Y.isArray(name) ? name : [name], function(tmp, prop) {
+							props[prop] = (element.style[Y.camelise(prop)] || computedStyle.getPropertyValue(
 								prop));
 						});
 
@@ -1364,32 +1360,32 @@
 					}
 				}
 
-				if (Y.Lang.type(name) === 'string') {
+				if (Y.type(name) === 'string') {
 					if (!value && value !== 0) {
 						this.each(function() {
-							this.style.removeProperty(Y.Lang.dasherise(name));
+							this.style.removeProperty(Y.dasherise(name));
 						});
 					}
 				}
 
-				return Y.DOM.Access(this, function(element, name, value) {
+				return $.Access(this, function(element, name, value) {
 					var styles, len, mapo = {},
 						i = 0;
 
-					if (Y.Lang.isArray(name)) {
+					if (Y.isArray(name)) {
 						styles = getStyles(element);
 						len = name.length;
 
 						for (i; i < len; i++) {
-							mapo[name[i]] = Y.DOM.CSS(element, name[i], false, styles);
+							mapo[name[i]] = $.CSS(element, name[i], false, styles);
 						}
 
 						return mapo;
 					}
 
 					return value !== undef ?
-						Y.DOM.Style(element, name, value) :
-						Y.DOM.CSS(element, name);
+						$.Style(element, name, value) :
+						$.CSS(element, name);
 				}, name, value, arguments.length > 1);
 			},
 
@@ -1398,15 +1394,15 @@
 				//					return (this[0] && this[0].parentNode) ? this.first().prevAll().length : -1;
 				//				}
 
-				//				return this.indexOf(Y.DOM(element)[0]);
+				//				return this.indexOf($(element)[0]);
 
-				//				if (Y.Lang.isString(element)) {
-				//					return this.indexOf.call(Y.DOM(element), this[0]);
+				//				if (Y.isString(element)) {
+				//					return this.indexOf.call($(element), this[0]);
 				//				}
 
 				//				return this.indexOf.call(this, element.YAXDOM ? element[0] : element);
 
-				return element ? this.indexOf(Y.DOM(element)[0]) : this.parent().children()
+				return element ? this.indexOf($(element)[0]) : this.parent().children()
 					.indexOf(this[0]);
 			},
 			hasClass: function(name) {
@@ -1439,16 +1435,16 @@
 						newName = functionArgument(this, name, index, id);
 
 					newName.split(/\s+/g).forEach(function(ID) {
-						if (!Y.DOM(this).hasId(ID)) {
+						if (!$(this).hasId(ID)) {
 							IDsList.push(ID);
 						}
 					}, this);
 
 					if (IDsList.length) {
-						idName(this, id + (id ? ' ' : Y.Lang.empty()) + IDsList.join(' '));
+						idName(this, id + (id ? ' ' : Y.empty()) + IDsList.join(' '));
 					}
 
-					// IDsList.length && idName(this, id + (id ? ' ' : Y.Lang.empty()) + IDsList.join(' '));
+					// IDsList.length && idName(this, id + (id ? ' ' : Y.empty()) + IDsList.join(' '));
 				});
 			},
 			addClass: function(name) {
@@ -1467,23 +1463,23 @@
 						newName = functionArgument(this, name, index, cls);
 
 					newName.split(/\s+/g).forEach(function(Class) {
-						if (!Y.DOM(this).hasClass(Class)) {
+						if (!$(this).hasClass(Class)) {
 							ClassList.push(Class);
 						}
 					}, this);
 
 					if (ClassList.length) {
-						className(this, cls + (cls ? ' ' : Y.Lang.empty()) + ClassList.join(
+						className(this, cls + (cls ? ' ' : Y.empty()) + ClassList.join(
 							' '));
 					}
 
-					// ClassList.length && className(this, cls + (cls ? ' ' : Y.Lang.empty()) + ClassList.join(' '));
+					// ClassList.length && className(this, cls + (cls ? ' ' : Y.empty()) + ClassList.join(' '));
 				});
 			},
 			removeId: function(name) {
 				return this.each(function(index) {
 					if (name === undef) {
-						return idName(this, Y.Lang.empty());
+						return idName(this, Y.empty());
 					}
 
 					IDsList = idName(this);
@@ -1503,7 +1499,7 @@
 					}
 
 					if (name === undef) {
-						return className(this, Y.Lang.empty());
+						return className(this, Y.empty());
 					}
 
 					ClassList = className(this);
@@ -1522,11 +1518,11 @@
 				}
 
 				return this.each(function(index) {
-					var $this = Y.DOM(this),
+					var $this = $(this),
 						names = functionArgument(this, name, index, className(this));
 
 					names.split(/\s+/g).forEach(function(Class) {
-						if (Y.Lang.isUndefined(when) || Y.Lang.isNull(when) || !Y.Lang.isSet(
+						if (Y.isUndefined(when) || Y.isNull(when) || !Y.isSet(
 								when)) {
 							if (!$this.hasClass(Class)) {
 								$this.addClass(Class);
@@ -1589,7 +1585,7 @@
 					};
 
 				// Fixed elements are offset from window (parentOffset = {top:0, left: 0}, because it is it's only offset parent
-				if (Y.DOM.CSS(element, 'position') === "fixed") {
+				if ($.CSS(element, 'position') === "fixed") {
 					// We assume that getBoundingClientRect is available when computed position is fixed
 					offset = element.getBoundingClientRect();
 
@@ -1600,20 +1596,20 @@
 					// Get correct offsets
 					offset = this.offset();
 
-					if (!Y.DOM.nodeName(offsetParent[0], "html")) {
+					if (!$.nodeName(offsetParent[0], "html")) {
 						parentOffset = offsetParent.offset();
 					}
 
 					// Add offsetParent borders
-					parentOffset.top += Y.DOM.CSS(offsetParent[0], "borderTopWidth", true);
-					parentOffset.left += Y.DOM.CSS(offsetParent[0], "borderLeftWidth", true);
+					parentOffset.top += $.CSS(offsetParent[0], "borderTopWidth", true);
+					parentOffset.left += $.CSS(offsetParent[0], "borderLeftWidth", true);
 				}
 
 				// Subtract parent offsets and element margins
 				return {
-					top: offset.top - parentOffset.top - Y.DOM.CSS(element, "marginTop",
+					top: offset.top - parentOffset.top - $.CSS(element, "marginTop",
 						true),
-					left: offset.left - parentOffset.left - Y.DOM.CSS(element, "marginLeft",
+					left: offset.left - parentOffset.left - $.CSS(element, "marginLeft",
 						true)
 				};
 			},
@@ -1635,13 +1631,13 @@
 				// Subtract element margins
 				// note: when an element has margin: auto the offsetLeft and marginLeft
 				// are the same in Safari causing offset.left to incorrectly be 0
-				offset.top -= parseFloat(Y.DOM(element).css('margin-top')) || 0;
-				offset.left -= parseFloat(Y.DOM(element).css('margin-left')) || 0;
+				offset.top -= parseFloat($(element).css('margin-top')) || 0;
+				offset.left -= parseFloat($(element).css('margin-left')) || 0;
 
 				// Add offsetParent borders
-				parentOffset.top += parseFloat(Y.DOM(offsetParent[0]).css(
+				parentOffset.top += parseFloat($(offsetParent[0]).css(
 					'border-top-width')) || 0;
-				parentOffset.left += parseFloat(Y.DOM(offsetParent[0]).css(
+				parentOffset.left += parseFloat($(offsetParent[0]).css(
 					'border-left-width')) || 0;
 
 				// Subtract the two offsets
@@ -1654,7 +1650,7 @@
 				return this.map(function() {
 					var offsetParent = this.offsetParent || docElement;
 
-					while (offsetParent && (!Y.DOM.nodeName(offsetParent, 'html') && Y.DOM
+					while (offsetParent && (!$.nodeName(offsetParent, 'html') && $
 							.CSS(offsetParent, 'position') === 'static')) {
 						offsetParent = offsetParent.offsetParent;
 					}
@@ -1668,9 +1664,9 @@
 			},
 			splice: [].splice
 		},
-		// Y.Lang.unique for each copy of YAX on the page
+		// Y.unique for each copy of YAX on the page
 		Expando: 'YAX' + (Y._INFO.VERSION.toString() + Y._INFO.BUILD.toString() +
-			Y.Lang.randomNumber(10000, 70000)).replace(/\D/g, Y.Lang.empty()),
+			Y.randomNumber(10000, 70000)).replace(/\D/g, Y.empty()),
 		// Multifunctional method to get and set values of a collection
 		// The value/s can optionally be executed if it's a function
 		Access: function(elems, callback, key, value, chainable, emptyGet, raw) {
@@ -1679,7 +1675,7 @@
 				bulk = key === null;
 
 			// Sets many values
-			if (Y.Lang.type(key) === 'object') {
+			if (Y.type(key) === 'object') {
 				chainable = true;
 				for (i in key) {
 					if (key.hasOwnProperty(i)) {
@@ -1690,7 +1686,7 @@
 			} else if (value !== undef) {
 				chainable = true;
 
-				if (!Y.Lang.isFunction(value)) {
+				if (!Y.isFunction(value)) {
 					raw = true;
 				}
 
@@ -1704,7 +1700,7 @@
 					} else {
 						bulk = callback;
 						callback = function(element, key, value) {
-							return bulk.call(Y.DOM(element), value);
+							return bulk.call($(element), value);
 						};
 					}
 				}
@@ -1751,7 +1747,7 @@
 		// (returning the new matched element set)
 		pushStack: function(elems) {
 			// Build a new YAX matched element set
-			var ret = Y.Lang.merge(this.constructor(), elems);
+			var ret = Y.merge(this.constructor(), elems);
 
 			// Add the old object onto the stack (as a reference)
 			ret.prevObject = this;
@@ -1761,11 +1757,11 @@
 			return ret;
 		},
 		nodeName: function(element, name) {
-			if (Y.Lang.isSet(element) && !Y.Lang.isSet(name)) {
+			if (Y.isSet(element) && !Y.isSet(name)) {
 				return element.nodeName;
 			}
 
-			if (Y.Lang.isSet(element) && Y.Lang.isSet(name)) {
+			if (Y.isSet(element) && Y.isSet(name)) {
 				return element.nodeName && element.nodeName.toLowerCase() === name.toLowerCase();
 			}
 		},
@@ -1777,7 +1773,7 @@
 					if (computed) {
 						// We should always get a number back from opacity
 						var ret = CCSS(element, 'opacity');
-						return Y.Lang.isEmpty(ret) ? '1' : ret;
+						return Y.isEmpty(ret) ? '1' : ret;
 					}
 				}
 			}
@@ -1811,7 +1807,7 @@
 
 			// Make sure that we're working with the right name
 			var ret, hooks,
-				origName = Y.Lang.camelise(name),
+				origName = Y.camelise(name),
 				style = element.style,
 				newvalue;
 
@@ -1829,23 +1825,23 @@
 				ret = Y.RegEx.rrelNum.exec(value);
 
 				// Convert relative number strings (+= or -=) to relative numbers. #7345
-				if (Y.Lang.isString(value) && ret) {
+				if (Y.isString(value) && ret) {
 					value = (ret[1] + 1) * ret[2] + parseFloat(this.CSS(element, name));
 				}
 
 				// Make sure that NaN and null values aren't set. See: #7116
-				if ((value === null || Y.Lang.isNumber(value)) && isNaN(value)) {
+				if ((value === null || Y.isNumber(value)) && isNaN(value)) {
 					return;
 				}
 
 				// If a number was passed in, add 'px' to the (except for certain CSS properties)
-				if (Y.Lang.isNumber(value) && !this.CSS_Number[origName]) {
+				if (Y.isNumber(value) && !this.CSS_Number[origName]) {
 					value += 'px';
 				}
 
 				// Fixes #8908, it can be done more correctly by specifying setters in CSS_Hooks,
 				// but it would mean to define eight (for every problematic property) identical functions
-				if (!this.Support.clearCloneStyle && Y.Lang.isEmpty(value) && name.indexOf(
+				if (!this.Support.clearCloneStyle && Y.isEmpty(value) && name.indexOf(
 						'background') === 0) {
 					style[name] = 'inherit';
 				}
@@ -1856,8 +1852,8 @@
 					style[name] = value;
 
 					if (!newvalue && newvalue !== 0) {
-						// style.setProperty(name, Y.Lang.empty());
-						style.setProperty(name, Y.Lang.empty(), Y.Lang.empty());
+						// style.setProperty(name, Y.empty());
+						style.setProperty(name, Y.empty(), Y.empty());
 						style.removeProperty(name);
 					}
 				}
@@ -1874,7 +1870,7 @@
 		},
 		CSS: function(element, name, extra, styles) {
 			var val, num, hooks,
-				origName = Y.Lang.camelise(name);
+				origName = Y.camelise(name);
 
 			// Make sure that we're working with the right name
 			name = this.CSS_Properities[origName] || (this.CSS_Properities[origName] =
@@ -1900,9 +1896,9 @@
 			}
 
 			// Return, converting to number if forced or a qualifier was provided and val looks numeric
-			if (Y.Lang.isEmpty(extra) || extra) {
+			if (Y.isEmpty(extra) || extra) {
 				num = parseFloat(val);
-				return extra === true || Y.Lang.isNumber(num) ? num || 0 : val;
+				return extra === true || Y.isNumber(num) ? num || 0 : val;
 			}
 
 			return val;
@@ -1915,17 +1911,17 @@
 
 	//---
 
-	Y.DOM.ClassTag = ClassTag;
+	$.ClassTag = ClassTag;
 
 	//---
 
-	Y.extend(Y.DOM, {
+	Y.extend($, {
 		offset: {
 			setOffset: function(element, options, i) {
 				var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft,
 					calculatePosition,
-					position = Y.DOM.CSS(element, "position"),
-					curElem = Y.DOM(element),
+					position = $.CSS(element, "position"),
+					curElem = $(element),
 					props = {};
 
 				// Set position first, in-case top/left are set even on static element
@@ -1934,8 +1930,8 @@
 				}
 
 				curOffset = curElem.offset();
-				curCSSTop = Y.DOM.CSS(element, "top");
-				curCSSLeft = Y.DOM.CSS(element, "left");
+				curCSSTop = $.CSS(element, "top");
+				curCSSLeft = $.CSS(element, "left");
 				calculatePosition = (position === "absolute" || position === "fixed") &&
 					(curCSSTop + curCSSLeft).indexOf("auto") > -1;
 
@@ -1949,15 +1945,15 @@
 					curLeft = parseFloat(curCSSLeft) || 0;
 				}
 
-				if (Y.Lang.isFunction(options)) {
+				if (Y.isFunction(options)) {
 					options = options.call(element, i, curOffset);
 				}
 
-				if (!Y.Lang.isNull(options.top)) {
+				if (!Y.isNull(options.top)) {
 					props.top = (options.top - curOffset.top) + curTop;
 				}
 
-				if (!Y.Lang.isNull(options.left)) {
+				if (!Y.isNull(options.left)) {
 					props.left = (options.left - curOffset.left) + curLeft;
 				}
 
@@ -1973,7 +1969,7 @@
 
 		each: Y.each,
 
-		vardump: Y.Lang.variableDump,
+		vardump: Y.variableDump,
 
 		contains: contains,
 
@@ -2015,21 +2011,21 @@
 
 		Timers: [],
 
-		Location: Y.Location,
+		Location: Y.loc,
 
-		parseJSON: Y.Lang.parseJSON
+		parseJSON: Y.parseJSON
 	});
 
-	Y.DOM.Support = Y.DOM.support = {};
-	Y.DOM.Expr = Y.DOM.expr = {};
-	Y.DOM.Map = Y.DOM.map = map;
+	$.Support = $.support = {};
+	$.Expr = $.expr = {};
+	$.Map = $.map = map;
 
 	//---
 
 
 	//---
 
-	Y.DOM.prototype = DomNode.prototype;
+	$.prototype = DomNode.prototype;
 
 	//---
 
@@ -2040,8 +2036,8 @@
 	}, function(method, prop) {
 		var top = 'pageYOffset' === prop;
 
-		Y.DOM.Function[method] = function(val) {
-			return Y.DOM.Access(this, function(element, method, val) {
+		$.Function[method] = function(val) {
+			return $.Access(this, function(element, method, val) {
 				var win = getWindow(element);
 
 				if (val === undef) {
@@ -2060,19 +2056,19 @@
 
 	//---
 
-	Y.DOM.cssExpand = cssExpand;
+	$.cssExpand = cssExpand;
 
 	//---
 
 	Y.each(['height', 'width'], function(i, name) {
-		Y.DOM.CSS_Hooks[name] = {
+		$.CSS_Hooks[name] = {
 			get: function(element, computed, extra) {
 				if (computed) {
 					// certain elements can have dimension info if we invisibly show them
 					// however, it must have a current display style that would benefit from this
-					return element.offsetWidth === 0 && Y.RegEx.rdisplayswap.test(Y.DOM.CSS(element,
+					return element.offsetWidth === 0 && Y.RegEx.rdisplayswap.test($.CSS(element,
 							'display')) ?
-						Y.DOM.Swap(element, cssShow, function() {
+						$.Swap(element, cssShow, function() {
 							return getWidthOrHeight(element, name, extra);
 						}) :
 						getWidthOrHeight(element, name, extra);
@@ -2085,7 +2081,7 @@
 						element,
 						name,
 						extra,
-						Y.DOM.Support.boxSizing && Y.DOM.CSS(element, 'boxSizing', false,
+						$.Support.boxSizing && $.CSS(element, 'boxSizing', false,
 							styles) === 'border-box',
 						styles
 					) : 0
@@ -2106,23 +2102,23 @@
 			'': 'outer' + name
 		}, function(defaultExtra, funcName) {
 			// margin is only for outerHeight, outerWidth
-			Y.DOM.Function[funcName] = function(margin, value) {
+			$.Function[funcName] = function(margin, value) {
 				var chainable = arguments.length && (defaultExtra || typeof margin !==
 						'boolean'),
 					extra = defaultExtra || (margin === true || value === true ? 'margin' :
 						'border');
 
-				return Y.DOM.Access(this, function(element, type, value) {
+				return $.Access(this, function(element, type, value) {
 					var doc;
 
-					if (Y.Lang.isWindow(element)) {
+					if (Y.isWindow(element)) {
 						// As of 5/8/2012 this will yield incorrect results for Mobile Safari, but there
 						// isn't a whole lot we can do. See pull request at this URL for discussion:
 						// https://github.com/jquery/jquery/pull/764
-						return element.Y.Document.documentElement['client' + name];
+						return element.Y.doc.documentElement['client' + name];
 					}
 
-					// Get Y.Document width or height
+					// Get Y.doc width or height
 					if (element.nodeType === 9) {
 						doc = element.documentElement;
 
@@ -2137,9 +2133,9 @@
 
 					return value === undef ?
 						// Get width or height on the element, requesting but not forcing parseFloat
-						Y.DOM.CSS(element, type, extra) :
+						$.CSS(element, type, extra) :
 						// Set width or height on the element
-						Y.DOM.Style(element, type, value, extra);
+						$.Style(element, type, value, extra);
 				}, type, chainable ? margin : undef, chainable, null);
 			};
 		});
@@ -2147,8 +2143,8 @@
 
 	//---
 
-	Y.DOM.Extend = Y.DOM.extend = Y.extend;
-	Y.DOM.Function.extend = Y.extend;
+	$.Extend = $.extend = Y.extend;
+	$.Function.extend = Y.extend;
 
 	//---
 
@@ -2157,12 +2153,12 @@
 	adjacencyOperators.forEach(function(operator, operatorIndex) {
 		var inside = operatorIndex % 2; //=> prepend, append
 
-		Y.DOM.Function[operator] = function() {
+		$.Function[operator] = function() {
 			// Arguments can be nodes, arrays of nodes, YAX objects and HTML strings
 			var nodes = map(arguments, function(arg) {
-					return Y.Lang.isObject(arg) ||
-						Y.Lang.isArray(arg) ||
-						Y.Lang.isNull(arg) ?
+					return Y.isObject(arg) ||
+						Y.isArray(arg) ||
+						Y.isNull(arg) ?
 						arg : YAXDOM.Fragment(arg);
 				}),
 				parent,
@@ -2188,21 +2184,21 @@
 					if (copyByClone) {
 						node = node.cloneNode(true);
 					} else if (!parent) {
-						return Y.DOM(node).remove();
+						return $(node).remove();
 					}
 
 					if (parentInDocument) {
 						return parent.insertBefore(node, target);
 					}
 
-					// for (var ancestor = parent.parentNode; ancestor !== null && ancestor !== Y.Document.createElement; ancestor = ancestor.parentNode);
+					// for (var ancestor = parent.parentNode; ancestor !== null && ancestor !== Y.doc.createElement; ancestor = ancestor.parentNode);
 
 					traverseNode(parent.insertBefore(node, target), function(el) {
-						if (Y.Lang.isNull(el.nodeName) && el.nodeName.toUpperCase() ===
+						if (Y.isNull(el.nodeName) && el.nodeName.toUpperCase() ===
 							'SCRIPT' && (!el.type || el.type === 'text/javascript')) {
 							if (!el.src) {
 								// window['eval'].call(window, el.innerHTML);
-								globalEval(Y.Window, el.innerHTML);
+								globalEval(Y.win, el.innerHTML);
 							}
 						}
 					});
@@ -2214,40 +2210,42 @@
 		// prepend  => prependTo
 		// before   => insertBefore
 		// append   => appendTo
-		Y.DOM.Function[inside ? operator + 'To' : 'insert' + (operatorIndex ?
+		$.Function[inside ? operator + 'To' : 'insert' + (operatorIndex ?
 			'Before' : 'After')] = function(html) {
-			Y.DOM(html)[operator](this);
+			$(html)[operator](this);
 			return this;
 		};
 	});
 
 	//---
 
-	Y.Settings.DOM = Object.create(null);
+	Y.Settings.DOM = {};
 
 	//---
 
-	//Y.extend(YAXDOM.Y.prototype, Y.DOM.Function);
+	//Y.extend(YAXDOM.Y.prototype, $.Function);
 
-	YAXDOM.Y.prototype = Y.DOM.Function;
-	Y.DOM.prototype = Y.DOM.Function;
+	YAXDOM.Y.prototype = $.Function;
+	$.prototype = $.Function;
 
-	Y.DOM.YAXDOM = YAXDOM;
-	Y.DOM.globalEval = globalEval;
-	Y.DOM.getStyles = getStyles;
-	Y.DOM.getDocStyles = getDocStyles;
-
-	//---
-
-
-	Y.Window.Y.DOM = Y.Window.$ = Y.DOM;
+	$.YAXDOM = YAXDOM;
+	$.globalEval = globalEval;
+	$.getStyles = getStyles;
+	$.getDocStyles = getDocStyles;
 
 	//---
 
-	return Y.DOM;
+
+	Y.DOM = Y.win.$ = $;
+
+	//---
+
+	return $;
 
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Node.js
 
 //---

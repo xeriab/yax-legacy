@@ -1,14 +1,6 @@
 /**
- * Y Plugins | localStorage
- *
- * Cross browser localStorage implementation using Y's API [CORE, Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX LocalStorage [CORE][DOM/NODE][EXTENSION]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -16,12 +8,11 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-
 (function () {
 
-	'use strict';
-
 	//---
+
+	'use strict';
 
 	Y.Store.mergeObject('drivers', {
 		localStorage: {
@@ -37,43 +28,43 @@
 			available: function () {
 				try {
 					// Firefox won't allow localStorage if cookies are disabled
-					if (Y.UserAgent.Features.localStorage) {
+					if (Y.UserAgent.Features.LocalStorage) {
 						// Safari's "Private" mode throws a QUOTA_EXCEEDED_ERR on setItem
-						Y.Window.localStorage.setItem('Y.Store.localStorage Availability test', true);
-						Y.Window.localStorage.removeItem('Y.Store.localStorage Availability test');
+						localStorage.setItem('Y.Store.localStorage Availability test', true);
+						localStorage.removeItem('Y.Store.localStorage Availability test');
 
 						return true;
 					}
 
 					return false;
 				} catch (e) {
-					Y.ERROR(e);
+					Y.error(e);
 					return false;
 				}
 			},
 
-			initialise: Y.Lang.Noop,
+			initialise: Y.noop,
 
 			/**
 			 * @return {boolean}
 			 */
 			set: function (key, value) {
 				if (this.available()) {
-					Y.Window.localStorage.setItem(key, value);
+					localStorage.setItem(key, value);
 				} else {
 					var name;
 
-					Y.Window.localStorage = {};
+					Y.win.localStorage = {};
 
-					if (Y.Lang.isString(key) && Y.Lang.isString(value)) {
-						Y.Window.localStorage[key] = value;
+					if (Y.isString(key) && Y.isString(value)) {
+						Y.win.localStorage[key] = value;
 						return true;
 					}
 
-					if (Y.Lang.isObject(key) && Y.Lang.isUndefined(value)) {
+					if (Y.isObject(key) && Y.isUndefined(value)) {
 						for (name in key) {
 							if (key.hasOwnProperty(name)) {
-								Y.Window.localStorage[name] = key[name];
+								Y.win.localStorage[name] = key[name];
 							}
 						}
 
@@ -86,25 +77,25 @@
 
 			get: function (key) {
 				if (this.available()) {
-					return Y.Window.localStorage.getItem(key);
+					return localStorage.getItem(key);
 				}
 
-				return Y.Window.localStorage[key];
+				return Y.win.localStorage[key];
 			},
 
 			delete: function (key) {
 				if (this.available()) {
-					Y.Window.localStorage.removeItem(key);
+					localStorage.removeItem(key);
 				} else {
-					delete Y.Window.localStorage[key];
+					delete Y.win.localStorage[key];
 				}
 			},
 
 			flush: function () {
 				if (this.available()) {
-					Y.Window.localStorage.clear();
+					localStorage.clear();
 				} else {
-					Y.Window.localStorage = {};
+					Y.win.localStorage = {};
 				}
 			}
 		}
@@ -113,5 +104,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Plugins/LocalStorage.js
 
 //---

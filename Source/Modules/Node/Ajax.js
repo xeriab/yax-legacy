@@ -1,14 +1,6 @@
 /**
- * YAX DOM | Data
- *
- * Cross browser Ajax implementation using YAX's API [DOM]
- *
- * @version     0.15
- * @depends:    Core, DOM
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Ajax [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -18,11 +10,13 @@
 
 (function () {
 
+	//---
+
 	'use strict';
 
 	var jsonpID = 0,
-		document = Y.Document,
-		window = Y.Window,
+		document = Y.doc,
+		window = Y.win,
 		escape = encodeURIComponent,
 		allTypes = '*/'.concat('*');
 
@@ -57,7 +51,7 @@
 
 	function ajaxStop(settings) {
 		if (settings.global) {
-			if (!Y.Lang.isSet(--Y.DOM.active)) {
+			if (!Y.isSet(--Y.DOM.active)) {
 				triggerGlobal(settings, null, 'ajaxStop');
 			}
 		}
@@ -178,8 +172,8 @@
 	// Serialise payload and append it to the URL for GET requests
 	/** @namespace options.traditional */
 	function serialiseData(options) {
-		if (options.processData && options.data && !Y.Lang.isString(options.data)) {
-			options.data = Y.DOM.Parameters(options.data, options.traditional);
+		if (options.processData && options.data && !Y.isString(options.data)) {
+			options.data = Y.DOM.parameters(options.data, options.traditional);
 		}
 
 		if (options.data && (!options.type || options.type.toUpperCase() === 'GET')) {
@@ -190,12 +184,12 @@
 
 	// Handle optional data/success arguments
 	function parseArguments(url, data, success, dataType) {
-		var hasData = !Y.Lang.isFunction(data);
+		var hasData = !Y.isFunction(data);
 
 		return {
 			url: url,
 			data: hasData ? data : undefined,
-			success: !hasData ? data : Y.Lang.isFunction(success) ? success : undefined,
+			success: !hasData ? data : Y.isFunction(success) ? success : undefined,
 			dataType: hasData ? dataType || success : success
 		};
 	}
@@ -204,7 +198,7 @@
 
 	//---
 
-	Y.DOM.AjaxSettings = Object.create(null);
+	Y.DOM.AjaxSettings = {};
 
 	//---
 
@@ -213,13 +207,13 @@
 			// Default type of request
 			type: 'GET',
 			// Callback that is executed before request
-			beforeSend: Y.Lang.noop,
+			beforeSend: Y.noop,
 			// Callback that is executed if the request succeeds
-			success: Y.Lang.noop,
+			success: Y.noop,
 			// Callback that is executed the the server drops error
-			error: Y.Lang.noop,
+			error: Y.noop,
 			// Callback that is executed on request complete (both: error and success)
-			complete: Y.Lang.noop,
+			complete: Y.noop,
 			// The context for the callbacks
 			context: null,
 			// The jsonp
@@ -266,14 +260,14 @@
 		/**
 		 * @return string {params}
 		 */
-		Parameters: function (object, traditional) {
+		parameters: function (object, traditional) {
 			var params = [];
 
 			params.add = function (key, value) {
 				this.push(escape(key) + '=' + escape(value));
 			};
 
-			Y.Util.Serialise(params, object, traditional);
+			Y.Util.serialise(params, object, traditional);
 
 			return params.join('&').replace(/%20/g, '+');
 		}
@@ -305,7 +299,7 @@
 
 			//var callbackName = 'jsonp' + (++jsonpID);
 			var _callbackName = options.jsonpCallback,
-				callbackName = Y.Lang.isFunction(_callbackName) ? _callbackName() :
+				callbackName = Y.isFunction(_callbackName) ? _callbackName() :
 					_callbackName || ('jsonp' + (++jsonpID)),
 				script = document.createElement('script'),
 				// originalCallback = window[callbackName],
@@ -338,14 +332,14 @@
 					ajaxSuccess(responseData[0], xhr, options, deferred);
 				}
 
-				// Y.Window[callbackName] = function (data) {
+				// Y.win[callbackName] = function (data) {
 				//				window[callbackName] = function (data) {
 				//					ajaxSuccess(data, xhr, options);
 				//				};
 
-				Y.Window[callbackName] = originalCallback;
+				Y.win[callbackName] = originalCallback;
 
-				if (responseData && Y.Lang.isFunction(originalCallback)) {
+				if (responseData && Y.isFunction(originalCallback)) {
 					originalCallback(responseData[0]);
 				}
 
@@ -357,7 +351,7 @@
 				return xhr;
 			}
 
-			Y.Window[callbackName] = function () {
+			Y.win[callbackName] = function () {
 				responseData = arguments;
 			};
 
@@ -408,11 +402,11 @@
 
 			if (!settings.crossDomain) {
 				settings.crossDomain = /^([\w\-]+:)?\/\/([^\/]+)/.test(settings.url) &&
-					RegExp.$2 !== Y.Location.host;
+					RegExp.$2 !== Y.loc.host;
 			}
 
 			if (!settings.url) {
-				settings.url = Y.Location.toString();
+				settings.url = Y.loc.toString();
 			}
 
 			serialiseData(settings);
@@ -436,7 +430,7 @@
 				return this.AjaxJSONP(settings, deferred);
 			}
 
-			//Y.Log(dataType);
+			//Y.log(dataType);
 
 			mime = settings.accepts[dataType];
 
@@ -447,7 +441,7 @@
 				headers[name] = [name, value];
 			};
 
-			protocol = /^([\w\-]+:)\/\//.test(settings.url) ? RegExp.$1 : Y.Location.protocol;
+			protocol = /^([\w\-]+:)\/\//.test(settings.url) ? RegExp.$1 : Y.loc.protocol;
 
 			xhr = settings.xhr();
 
@@ -505,17 +499,17 @@
 
 			xhr.setRequestHeader = setHeader;
 
-			// Y.Log(mime);
+			// Y.log(mime);
 
 			xhr.onreadystatechange = function () {
 				if (xhr.readyState == 4) {
-					xhr.onreadystatechange = Y.Lang.noop;
+					xhr.onreadystatechange = Y.noop;
 
 					clearTimeout(abortTimeout);
 
 					var result, error = false;
 
-					// Y.Log(xhr);
+					// Y.log(xhr);
 
 					if (
 						(xhr.status >= 200 && xhr.status < 300) ||
@@ -540,18 +534,18 @@
 							if (dataType === 'json') {
 								result = Y.RegEx.blankReplacement.test(result) ? 
 									null : 
-									Y.Lang.parseJSON(result);
+									Y.parseJSON(result);
 							}
 						} catch (err) {
 							error = err;
-							// Y.ERROR(err);
+							// Y.error(err);
 						}
 
 						if (error) {
-							//Y.ERROR(error);
+							//Y.error(error);
 							ajaxError(error, 'parsererror', xhr, settings, deferred);
 						} else {
-							//Y.ERROR(result);
+							//Y.error(result);
 							ajaxSuccess(result, xhr, settings, deferred);
 						}
 					} else {
@@ -587,7 +581,7 @@
 
 			if (settings.timeout > 0) {
 				abortTimeout = setTimeout(function () {
-					xhr.onreadystatechange = Y.Lang.noop;
+					xhr.onreadystatechange = Y.noop;
 					xhr.abort();
 					ajaxError(null, 'timeout', xhr, settings, deferred);
 				}, settings.timeout);
@@ -665,7 +659,7 @@
 	 **/
 	Y.extend(Y.DOM.AjaxSettings, {
 		beforeSend: function (xhr, settings) {
-			if (!(/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type)) && sameOrigin(
+			if (!(/^(GET|HEAD|OPTIONS|trace)$/.test(settings.type)) && sameOrigin(
 				settings.url)) {
 				xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
 			}
@@ -675,5 +669,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Ajax.js
 
 //---

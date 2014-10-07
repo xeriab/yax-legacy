@@ -1,14 +1,6 @@
 /**
- * Y Core | Global
- *
- * Global Y's functions and shortcuts [CORE]
- *
- * @version     0.15
- * @depends:    Core
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Global Shortcuts
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -18,25 +10,12 @@
 
 (function (undef) {
 
+	//---
+
 	'use strict';
 
-	//---
-
-	// Shortcuts global functions
-
-	// Number of active Ajax requests
-	// Y.AjaxActive = 0;
-
-	//---
-
-
-	//---
-
-	Y.extend(Y.Lang, {
-		// now: new Date().getTime(),
-		// now: new Date().getTime(),
+	Y.extend({
 		now: Date.now,
-
 		date: new Date(),
 
 		/**
@@ -66,9 +45,9 @@
 
 	// Cross-browser XML parsing
 	if (!Y.G.isNodeJs) {
-		Y.extend(Y.Lang, {
+		Y.extend({
 			parseXML: function (data) {
-				if (!data || !Y.Lang.isString(data)) {
+				if (!data || !Y.isString(data)) {
 					return null;
 				}
 
@@ -80,11 +59,11 @@
 					xml = temp.parseFromString(data, 'text/xml');
 				} catch (e) {
 					xml = undef;
-					Y.ERROR(e);
+					Y.error(e);
 				}
 
 				if (!xml || xml.getElementsByTagName('parsererror').length) {
-					Y.ERROR('Invalid XML: ' + data);
+					Y.error('Invalid XML: ' + data);
 				}
 
 				return xml;
@@ -92,9 +71,7 @@
 		});
 	}
 
-	Y.Lang.Now = Y.Lang.now();
-
-	Y.extend(Y.Lang, {
+	Y.extend({
 		lowerCaseFirst: function (string) {
 			string += this.empty();
 
@@ -118,6 +95,10 @@
 		}
 	});
 
+	//---
+
 }());
+
+// FILE: ./Source/Core/Global.js
 
 //---

@@ -1,14 +1,6 @@
 /**
- * Y Core | Parsers
- *
- * Powers Y's with Parsers capability [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Parser Class [Contrib]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -18,18 +10,16 @@
 
 (function () {
 
+	//---
+
 	'use strict';
 
 	Y.Parser = Y.Class.extend({
-		STATICS: {
-			// FOO: 'FOOED!!'
-		},
-
-		CLASS_NAME: 'Parser',
+		_class_name: 'Parser',
 
 		drivers: {},
 
-		construct: function () {
+		_init: function () {
 			var args = Y.G.Slice.call(arguments),
 				len = args.length,
 				x = 0;
@@ -53,5 +43,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Core/Contrib/Parser.js
 
 //---

@@ -1,14 +1,6 @@
 /**
- * Y DOM | Sizzle Selector
- *
- * Cross browser sizzle selector implementation using Y's API [DOM]
- *
- * @version     0.19
- * @depends:    Core, DOM
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Sizzle Selector [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,9 +9,9 @@
 /*jslint node: false */
 /*global Y, Y, Sizzle */
 
-//---
-
 (function() {
+
+	//---
 
 	'use strict';
 
@@ -31,7 +23,7 @@
 
 	var version = '0.10';
 
-	var ClassTag = 'YAX' + Y.Lang.now();
+	var ClassTag = 'YAX' + Y.now();
 
 	//---
 
@@ -115,7 +107,7 @@
 	Y.extend(Y.DOM.Function, tmpYaxDom.Function);
 
 	// data: string of html
-	// context (optional): If specified, the fragment will be created in this context, defaults to Y.Document
+	// context (optional): If specified, the fragment will be created in this context, defaults to Y.doc
 	// keepScripts (optional): If true, will include scripts passed in the html string
 	Y.DOM.parseHTML = function(data, context, keepScripts) {
 		if (!data || typeof data !== "string") {
@@ -127,7 +119,7 @@
 			context = false;
 		}
 
-		context = context || Y.Document;
+		context = context || Y.doc;
 
 		var parsed = Y.RegEx.rsingleTag.exec(data),
 			scripts = !keepScripts && [];
@@ -143,13 +135,13 @@
 			Y.DOM(scripts).remove();
 		}
 
-		return Y.Lang.merge([], parsed.childNodes);
+		return Y.merge([], parsed.childNodes);
 	};
 
 	// Implement the identical functionality for filter and not
 	function winnow(elements, qualifier, not) {
-		if (Y.Lang.isFunction(qualifier)) {
-			return Y.Lang.grep(elements, function(elem, i) {
+		if (Y.isFunction(qualifier)) {
+			return Y.grep(elements, function(elem, i) {
 				/* jshint -W018 */
 				return !!qualifier.call(elem, i, elem) !== not;
 			});
@@ -157,7 +149,7 @@
 		}
 
 		if (qualifier.nodeType) {
-			return Y.Lang.grep(elements, function(elem) {
+			return Y.grep(elements, function(elem) {
 				return (elem === qualifier) !== not;
 			});
 
@@ -171,7 +163,7 @@
 			qualifier = Y.DOM.filter(qualifier, elements);
 		}
 
-		return Y.Lang.grep(elements, function(elem) {
+		return Y.grep(elements, function(elem) {
 			return (Y.G.IndexOf.call(qualifier, elem) >= 0) !== not;
 		});
 	}
@@ -185,7 +177,7 @@
 
 		return elems.length === 1 && elem.nodeType === 1 ?
 			Y.DOM.find.matchesSelector(elem, expr) ? [elem] : [] :
-			Y.DOM.find.matches(expr, Y.Lang.grep(elems, function(elem) {
+			Y.DOM.find.matches(expr, Y.grep(elems, function(elem) {
 				return elem.nodeType === 1;
 			}));
 	};
@@ -197,7 +189,7 @@
 			var ret = [];
 			var self = this;
 
-			if (!Y.Lang.isString(selector)) {
+			if (!Y.isString(selector)) {
 				return this.pushStack(Y.DOM(selector).filter(function() {
 					for (x = 0; x < len; x++) {
 						if (Y.DOM.contains(self[x], this)) {
@@ -212,7 +204,7 @@
 			}
 
 			// Needed because $(selector, context) becomes $(context).find(selector)
-			ret = this.pushStack(len > 1 ? Y.Lang.unique(ret) : ret);
+			ret = this.pushStack(len > 1 ? Y.unique(ret) : ret);
 
 			ret.selector = this.selector ? this.selector + ' ' + selector : selector;
 
@@ -252,7 +244,7 @@
 		}
 
 		// Handle HTML strings
-		if (Y.Lang.isString(selector)) {
+		if (Y.isString(selector)) {
 			// if (selector[0] === "<" && selector[selector.length - 1] === ">" && selector.length >= 3) {
 			if (selector[0] === '<' && selector[selector.length - 1] === '>' && selector.length >= 3) {
 				// Assume that strings that start and end with <> are HTML and skip the regex check
@@ -268,17 +260,17 @@
 					context = context instanceof Y.DOM ? context[0] : context;
 					// scripts is true for back-compat
 					// Intentionally let the error be thrown if parseHTML is not present
-					Y.Lang.merge(this, Y.DOM.parseHTML(
+					Y.merge(this, Y.DOM.parseHTML(
 						match[1],
-						context && context.nodeType ? context.ownerDocument || context : Y.Document,
+						context && context.nodeType ? context.ownerDocument || context : Y.doc,
 						true
 					));
 
 					// HANDLE: Y.DOM(html, props)
-					if (Y.RegEx.rsingleTag.test(match[1]) && Y.Lang.isPlainObject(context)) {
+					if (Y.RegEx.rsingleTag.test(match[1]) && Y.isPlainObject(context)) {
 						for (match in context) {
 							// Properties of context are called as methods if possible
-							if (Y.Lang.isFunction(this[match])) {
+							if (Y.isFunction(this[match])) {
 								this[match](context[match]);
 								// ...and otherwise set as attributes
 							} else {
@@ -290,17 +282,17 @@
 					return this;
 					// HANDLE: Y.DOM(#id)
 				} else {
-					element = Y.Document.getElementById(match[2]);
+					element = Y.doc.getElementById(match[2]);
 
 					// Check parentNode to catch when Blackberry 4.6 returns
-					// nodes that are no longer in the Y.Document #6963
+					// nodes that are no longer in the Y.doc #6963
 					if (element && element.parentNode) {
 						// Inject the element directly into the Y.DOM object
 						this.length = 1;
 						this[0] = element;
 					}
 
-					this.context = Y.Document;
+					this.context = Y.doc;
 					this.selector = selector;
 
 					return this;
@@ -319,9 +311,9 @@
 			this.length = 1;
 			return this;
 			// HANDLE: Y.DOM(function)
-			// Shortcut for Y.Document ready
-		} else if (Y.Lang.isFunction(selector)) {
-			if (!Y.Lang.isUndefined(rootYaxDom.ready)) {
+			// Shortcut for Y.doc ready
+		} else if (Y.isFunction(selector)) {
+			if (!Y.isUndefined(rootYaxDom.ready)) {
 				return rootYaxDom.ready(selector);
 			}
 
@@ -340,7 +332,7 @@
 	init.prototype = Y.DOM.Function;
 
 	// Initialize central reference
-	rootYaxDom = Y.DOM(Y.Document);
+	rootYaxDom = Y.DOM(Y.doc);
 
 	Y.DOM.Support = Y.DOM.support = {};
 
@@ -372,8 +364,8 @@
 		var ret = results || [];
 
 		if (arr !== null) {
-			if (Y.Lang.isArraylike(arr)) {
-				Y.Lang.merge(ret,
+			if (Y.isArraylike(arr)) {
+				Y.merge(ret,
 					typeof arr === "string" ? [arr] : arr
 				);
 			} else {
@@ -408,13 +400,13 @@
 	function getAll(context, tag) {
 		// Support: IE9-11+
 		// Use typeof to avoid zero-argument method invocation on host objects (#15151)
-		var ret = !Y.Lang.isUndefined(context.getElementsByTagName) ?
+		var ret = !Y.isUndefined(context.getElementsByTagName) ?
 			context.getElementsByTagName(tag || "*") :
-			!Y.Lang.isUndefined(context.querySelectorAll) ?
+			!Y.isUndefined(context.querySelectorAll) ?
 			context.querySelectorAll(tag || "*") : [];
 
-		return (Y.Lang.isUndefined(tag) || tag) && Y.DOM.nodeName(context, tag) ?
-			Y.Lang.merge([context], ret) :
+		return (Y.isUndefined(tag) || tag) && Y.DOM.nodeName(context, tag) ?
+			Y.merge([context], ret) :
 			ret;
 	}
 
@@ -490,7 +482,7 @@
 		var value,
 			i = 0,
 			length = elems.length,
-			isArray = Y.Lang.isArraylike(elems),
+			isArray = Y.isArraylike(elems),
 			ret = [];
 
 		// Go through the array, translating each of the items to their new values
@@ -597,10 +589,10 @@
 			if (elem || elem === 0) {
 
 				// Add nodes directly
-				if (Y.Lang.isObject(elem)) {
+				if (Y.isObject(elem)) {
 					// Support: QtWebKit, PhantomJS
 					// push.apply(_, arraylike) throws on ancient WebKit
-					Y.Lang.merge(nodes, elem.nodeType ? [elem] : elem);
+					Y.merge(nodes, elem.nodeType ? [elem] : elem);
 
 					// Convert non-html into a text node
 				} else if (!Y.RegEx.rhtml.test(elem)) {
@@ -623,7 +615,7 @@
 
 					// Support: QtWebKit, PhantomJS
 					// push.apply(_, arraylike) throws on ancient WebKit
-					Y.Lang.merge(nodes, tmp.childNodes);
+					Y.merge(nodes, tmp.childNodes);
 
 					// Remember the top-level container
 					tmp = fragment.firstChild;
@@ -643,7 +635,7 @@
 
 			// #4087 - If origin and destination elements are the same, and this is
 			// that element, do not do anything
-			if (selection && Y.Lang.inArray(elem, selection) !== -1) {
+			if (selection && Y.inArray(elem, selection) !== -1) {
 				continue;
 			}
 
@@ -888,7 +880,7 @@
 				set = this,
 				iNoClone = l - 1,
 				value = args[0],
-				isFunction = Y.Lang.isFunction(value);
+				isFunction = Y.isFunction(value);
 
 			// We can't cloneNode fragments that contain checked, in WebKit
 			if (isFunction ||
@@ -1000,7 +992,7 @@
 
 	//---
 
-	Y.Window.Y.DOM = Y.Window.$ = Y.DOM;
+	Y.win.Y.DOM = Y.win.$ = Y.DOM;
 
 	//---
 
@@ -1009,5 +1001,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/SizzleSelector.js
 
 //---

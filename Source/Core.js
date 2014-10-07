@@ -11,41 +11,51 @@ require('./Require');
 
 require('./YAX');
 
-// Y.Window = Window;
-// Y.Document = Y.Window.document;
-// Y.Location = Y.Window.location;
+// Y.win = Window;
+// Y.doc = Y.win.document;
+// Y.loc = Y.win.location;
 
 require('./Core/Core');
+require('./Core/Constants');
 require('./Core/Regex');
 require('./Core/Global');
-require('./Core/Strings');
 require('./Core/Utility');
 require('./Core/Class');
-require('./Core/Events');
-require('./Core/Callbacks');
-require('./Core/Deferred');
-require('./Core/Store');
-require('./Core/Parser');
+require('./Core/Evented');
 
-var root = module;
+require('./Core/Contrib/Callbacks');
+require('./Core/Contrib/Deferred');
+require('./Core/Contrib/Store');
+require('./Core/Contrib/Parser');
+require('./Core/Contrib/I18n');
 
-Y.Define('Lumlim', function(require, exports, module) {
-    var Lumlim = {
-        VERSION: '0.1.9',
-        NAME: 'App'
-    };
+require('./Modules/EnvDetector');
 
-    module = root;
+// var root = module;
 
-    module.exports = Lumlim;
+//Y.define('Lumlim', function(require, exports, module) {
+//    var Lumlim = {
+//        VERSION: '0.1.9',
+//        NAME: 'App'
+//    };
+//
+//    // module = root;
+//
+//    module.exports = Lumlim;
+//
+//    return Lumlim;
+//});
 
-    return Lumlim;
-});
+// Y.require('Lumlim');
 
-Y.Require('Lumlim');
+//var lumlim_app = Y.require('Lumlim');
 
-//var lumlim_app = Y.Require('Lumlim');
-//Y.LOG(Y.VERSION);
-//Y.LOG(Y.CODENAME);
-//Y.LOG(Y.Lang.Keys(Y));
-Y.LOG(Y);
+//Y.log(Y._INFO.VERSION);
+//Y.log(Y._INFO.CODENAME);
+//Y.log(Y.keys(Y));
+
+
+//Y.log(Y);
+
+Y.log(Y.Env);
+

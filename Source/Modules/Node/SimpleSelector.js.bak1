@@ -154,7 +154,7 @@
 
 				//nodes = oldQSA(node, _selector);
 			} catch (e) {
-				Y.ERROR('Error performing selector: %o', selector);
+				Y.error('Error performing selector: %o', selector);
 				throw e;
 			} finally {
 				if (taggedParent) {
@@ -163,7 +163,7 @@
 			}
 
 			return !filter ? nodes :
-				Y.Lang.unique(Y.DOM.map(nodes, function (n, i) {
+				Y.unique(Y.DOM.map(nodes, function (n, i) {
 					return filter.call(n, i, nodes, argument);
 				}));
 		});

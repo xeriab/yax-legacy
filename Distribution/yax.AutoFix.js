@@ -1,14 +1,6 @@
 /**
- * YAX Plugins | Autofix
- *
- *
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Auto Fix [DOM/NODE][PLUGIN]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,9 +9,9 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -64,9 +56,9 @@
 				offset = el.parent().offset().top;
 			}
 
-			if (Y.DOM(Y.Document).scrollTop() > offset &&
-				Y.DOM(Y.Document).scrollTop() <= (el.parent().height() +
-				(offset - Y.DOM(Y.Window).height()))) {
+			if (Y.DOM(Y.doc).scrollTop() > offset &&
+				Y.DOM(Y.doc).scrollTop() <= (el.parent().height() +
+				(offset - Y.DOM(Y.win).height()))) {
 				el.removeClass('_bottom').addClass('_fixed').css({
 					top: 0,
 					left: pos.left,
@@ -74,9 +66,9 @@
 					bottom: 'auto'
 				});
 			} else {
-				if (Y.DOM(Y.Document).scrollTop() > offset) {
+				if (Y.DOM(Y.doc).scrollTop() > offset) {
 					if (settings.OnlyInContainer === true) {
-						if (Y.DOM(Y.Document).scrollTop() > (el.parent().height() - Y.DOM(Y.Window).height())) {
+						if (Y.DOM(Y.doc).scrollTop() > (el.parent().height() - Y.DOM(Y.win).height())) {
 							el.addClass('_bottom _fixed').removeAttr('style').css({
 								left: curpos.left
 							});
@@ -92,7 +84,7 @@
 		};
 
 		if (settings.Manual === false) {
-			Y.DOM(Y.Window).scroll(function () {
+			Y.DOM(Y.win).scroll(function () {
 				fixAll(el, settings, curpos, pos);
 			});
 		}
@@ -101,6 +93,8 @@
 	//---
 
 }());
+
+// FILE: ./Source/Plugins/AutoFix/AutoFix.js
 
 //---
 

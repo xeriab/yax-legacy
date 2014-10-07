@@ -1,14 +1,6 @@
 /**
- * YAX Node | FX
- *
- * Cross browser animation implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Effect Methods [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,9 +9,9 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function (undef) {
+
+	//---
 
 	'use strict';
 
@@ -170,9 +162,11 @@
 			}
 		});
 	};
-	
+
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/FxMethods.js
 
 //---

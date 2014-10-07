@@ -1,3 +1,7 @@
+/**
+ * YAX Require
+ */
+
 /*jslint indent: 4 */
 /*jslint white: true */
 /*jshint eqeqeq: false */
@@ -7,6 +11,9 @@
 /*global module */
 
 (function () {
+
+	//---
+
 	/*jshint -W079 */
 	/*jshint -W020 */
 	var require = null;
@@ -109,20 +116,13 @@
 
 }());
 
-//---
+// FILE: ./Source/Require.js
 
+//---
 
 /**
  * YAX
- *
- * The main YAX.
- *
- * @version     0.15
- * @depends:    None
- * @license     Dual licensed under the MIT and GPL licenses.
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -206,6 +206,10 @@
 
 	//---
 
+	Y.ENV = {};
+
+	//---
+
 	Y.toString = function () {
 		return '[YAX]';
 	};
@@ -215,19 +219,13 @@
 	if (isNode) {
 		isNode = true;
 
-		Y.ENV = Object.create(null);
-		Y.ENV.Type = 'Nodejs';
-
 		Console.info('[INFO] Running YAX.JS in "Node" Environment!');
 	} else {
 		isNode = false;
 
-		Y.ENV = Object.create(null);
-		Y.ENV.Type = 'Browser';
-
-		Y.Window = this;
-		Y.Document = Y.Window.document;
-		Y.Location = Y.Window.location;
+		Y.win = this;
+		Y.doc = Y.win.document;
+		Y.loc = Y.win.location;
 
 		Console.info('[INFO] Running YAX.JS in "Browser" Environment!');
 	}
@@ -278,22 +276,17 @@
 
 	//---
 
-	Y.VERSION = Y._INFO.VERSION = 0.19;
-	Y._INFO.BUILD = 4352;
-	Y._INFO.STATUS = 'dev';
-	Y._INFO.CODENAME = 'Raghda';
+	Y.VERSION = Y._INFO.VERSION = 0.20;
+	Y._INFO.BUILD = 1000;
+	Y._INFO.STATUS = 'DEV';
+	Y._INFO.CODENAME = 'RAGHDA';
 
-	Y.hasProperty = ({}).hasOwnProperty;
+	Y.hasOwnProp = ({}).hasOwnProperty;
 
 	/**
 	 * YAX._CONFIG_STORAGE
 	 */
 	Y._CONFIG_STORAGE = {};
-
-	/**
-	 * YAX.Lang
-	 */
-	Y.Lang = {};
 
 	/**
 	 * YAX._GLOBALS
@@ -329,8 +322,8 @@
 
 	/** @namespace root.R */
 	/** @namespace root.D */
-	Y.Require = root.R || require || null;
-	Y.Define = root.D || define || null;
+	Y.require = root.R || require || null;
+	Y.define = root.D || define || null;
 
 	//---
 
@@ -360,19 +353,38 @@
 
 }());
 
+// FILE: ./Source/YAX.js
+
 //---
 
 /**
- * Y Core
- *
- * The main Y core.
- *
- * @version     0.15
- * @depends:    Y.
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Constants
  */
 
+/*jslint indent: 4 */
+/*jslint white: true */
+/*jshint eqeqeq: false */
+/*jshint undef: true */
+/*jshint unused: true */
+/*global Y, YAX, exports, define, module */
+
+(function () {
+
+	//---
+
+	'use strict';
+
+	//---
+
+}());
+
+// FILE: ./Source/Core/Constants.js
+
 //---
+
+/**
+ * YAX Core
+ */
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -381,6 +393,8 @@
 /*global Y, YAX */
 
 (function(undef) {
+
+	//---
 
 	'use strict';
 
@@ -643,8 +657,11 @@
 			return true;
 		}
 
-		return _type === 'array' || len === 0 ||
-			(typeof len === 'number' && len > 0) && (len - 1) in object;
+		/*return _type === 'array' || len === 0 ||
+			(typeof len === 'number' && len > 0) && (len - 1) in object;*/
+
+		return isArray(object) || !(isFunction(object) ||
+			!((len === 0 || isNumber(len)) && len > 0 && object.hasOwnProperty(len - 1)));
 	}
 
 	/**
@@ -685,11 +702,11 @@
 	 * @return    string
 	 */
 	function getContainsWordCharRegEx() {
-		if (!Y.ReContainsWordChar) {
-			Y.ReContainsWordChar = new RegExp('\\S+', 'g');
+		if (!Y.reContainsWordChar) {
+			Y.reContainsWordChar = new RegExp('\\S+', 'g');
 		}
 
-		return Y.ReContainsWordChar;
+		return Y.reContainsWordChar;
 	}
 
 	/**
@@ -698,11 +715,11 @@
 	 * @return    string
 	 */
 	function getGetFunctionBodyRegEx() {
-		if (!Y.ReGetFunctionBody) {
-			Y.ReGetFunctionBody = new RegExp('{((.|\\s)*)}', 'm');
+		if (!Y.reGetFunctionBody) {
+			Y.reGetFunctionBody = new RegExp('{((.|\\s)*)}', 'm');
 		}
 
-		return Y.ReGetFunctionBody;
+		return Y.reGetFunctionBody;
 	}
 
 	/**
@@ -711,12 +728,12 @@
 	 * @return    string
 	 */
 	function getRemoveCodeCommentsRegEx() {
-		if (!Y.ReRemoveCodeComments) {
-			Y.ReRemoveCodeComments = new RegExp(
+		if (!Y.reRemoveCodeComments) {
+			Y.reRemoveCodeComments = new RegExp(
 				"(\\/\\*[\\w\\'\\s\\r\\n\\*]*\\*\\/)|(\\/\\/[\\w\\s\\']*)", 'g');
 		}
 
-		return Y.ReRemoveCodeComments;
+		return Y.reRemoveCodeComments;
 	}
 
 	/**
@@ -1262,10 +1279,6 @@
 				setArray(oldValue, newValue);
 				break;
 
-			case 'Extension':
-				setArray(oldValue, newValue);
-				break;
-
 			default:
 				Y._CONFIG_STORAGE[varName].LOCAL_VALUE = newValue;
 				break;
@@ -1315,26 +1328,15 @@
 
 	//---
 
-	extend(Y.Lang, {
-		grep: grep,
-		merge: merge
-	});
-
-	//---
-
 	extend(Y, {
+		grep: grep,
+		merge: merge,
 		setConfig: configSet,
-
 		getConfig: configGet,
-
 		each: each,
-
 		foreach: foreach,
-
 		every: every,
-
 		classToType: classToType,
-
 		extend: function(object) {
 			if (!isObject(object) && !isFunction(object)) {
 				return object;
@@ -1363,166 +1365,115 @@
 
 			return object;
 		},
-
-		callProperty: getOwn
-	});
-
-	//---
-
-	// Shortcuts for Lang functions
-	extend(Y.Lang, {
-
+		callProperty: getOwn,
 		variableDump: variableDump,
-
 		type: type,
-
 		getType: getType,
-
 		isArray: isArray,
-
 		isFloat: isFloat,
-
 		isArraylike: isArraylike,
-
 		isObject: isObject,
-
 		isFunction: isFunction,
-
 		isWindow: isWindow,
-
 		isDocument: isDocument,
-
 		isString: isString,
-
 		isPlainObject: isPlainObject,
-
 		isUndefined: isUndefined,
-
 		isDefined: isDefined,
-
 		likeArray: likeArray,
-
 		isNull: isNull,
-
 		isObjectEmpty: isObjectEmpty,
-
 		empty: empty,
-
 		isEmpty: isEmpty,
-
 		isFunctionEmpty: isFunctionEmpty,
-
 		isBool: isBool,
-
 		isFalse: isFalse,
-
 		isTrue: isTrue,
-
 		isNumber: isNumber,
-
 		isNumeric: isNumber,
-
 		isInteger: isInteger,
-
 		isDouble: isDouble,
-
 		inArray: inArray,
-
 		inArrayOther: inArrayOther,
-
 		unique: unique,
-
 		compact: compact,
-
 		camelise: camelCase,
-
 		toUnderscore: toUnderscore,
-
 		toCamel: toCamel,
-
 		toDash: toDash,
-
 		toArray: toArray,
-
 		randomNumber: randomNumber,
-
 		dasherise: dasherise,
-
 		deserialiseValue: deserialiseValue,
-
 		arrayToObject: arrayToObject,
-
 		objectToArray: objectToArray,
-
 		intoArray: intoArray,
-
 		toObject: toObject,
-
 		isSet: isSet,
-
 		makeArray: function(arrayLikeThing) {
 			return Y.G.Slice.call(arrayLikeThing);
 		},
-
 		inject: inject,
-
-		hasProperty: hasProperty
+		hasProperty: hasProperty,
+		size: function () {
+			return this.keys(this).length;
+		}
 	});
 
-	//---
+	//--
 
-	if (Y.Lang.isSet(Console)) {
+	if (Y.isSet(Console)) {
 		var warn = Console.warn;
 		var log = Console.log;
 		var error = Console.error;
 		var info = Console.info;
 		var trace = Console.trace;
 
-		Y.WARN = Function.prototype.bind.call(warn, Console);
-		Y.LOG = Function.prototype.bind.call(log, Console);
-		Y.ERROR = Function.prototype.bind.call(error, Console);
-		Y.INFO = Function.prototype.bind.call(info, Console);
-		Y.TRACE = Function.prototype.bind.call(trace, Console);
+		Y.warn = Function.prototype.bind.call(warn, Console);
+		Y.log = Function.prototype.bind.call(log, Console);
+		Y.error = Function.prototype.bind.call(error, Console);
+		Y.info = Function.prototype.bind.call(info, Console);
+		Y.trace = Function.prototype.bind.call(trace, Console);
 	} else {
-		Y.WARN = Y.Lang.Noop;
-		Y.LOG = Y.Lang.Noop;
-		Y.ERROR = Y.Lang.Noop;
-		Y.INFO = Y.Lang.Noop;
-		Y.TRACE = Y.Lang.Noop;
+		Y.warn = Y.noop;
+		Y.log = Y.noop;
+		Y.error = Y.noop;
+		Y.info = Y.noop;
+		Y.trace = Y.noop;
 	}
 
-	Y.WARN.toString = function() {
+	Y.warn.toString = function() {
 		return '[YAX::Console::Warn]';
 	};
 
-	Y.LOG.toString = function() {
+	Y.log.toString = function() {
 		return '[YAX::Console::Log]';
 	};
 
-	Y.ERROR.toString = function() {
+	Y.error.toString = function() {
 		return '[YAX::Console::Error]';
 	};
 
-	Y.INFO.toString = function() {
+	Y.info.toString = function() {
 		return '[YAX::Console::Info]';
 	};
 
-	Y.TRACE.toString = function() {
-		return '[YAX::Console::Trace]';
+	Y.trace.toString = function() {
+		return '[YAX::Console::trace]';
 	};
 
 	//---
 
 	// Shortcut function for checking if an object has a given property directly
 	// on itself (in other words, not on a prototype).
-	Y.Lang.Has = function(obj, key) {
+	Y.has = function(obj, key) {
 		return obj !== null && Y.hasOwn.call(obj, key);
 		// return obj !== null && obj.hasOwnProperty(key);
 	};
 
 	// Retrieve the names of an object's properties.
 	// Delegates to **ECMAScript 5**'s native `.keys`
-	Y.Lang.Keys = function(obj) {
+	Y.keys = function(obj) {
 		var key;
 
 		if (!isObject(obj) && !isFunction(obj)) {
@@ -1537,7 +1488,7 @@
 
 		for (key in obj) {
 			if (obj.hasOwnProperty(key)) {
-				if (Y.Lang.Has(obj, key)) {
+				if (Y.has(obj, key)) {
 					keys.push(key);
 				}
 			}
@@ -1550,8 +1501,8 @@
 	};
 
 	// Retrieve the values of an object's properties.
-	Y.Lang.Values = function(obj) {
-		var keys = Y.Lang.Keys(obj);
+	Y.values = function(obj) {
+		var keys = Y.keys(obj);
 		var length = keys.length;
 		var values = new Array(length);
 		var x;
@@ -1564,8 +1515,8 @@
 	};
 
 	// Convert an object into a list of `[key, value]` pairs.
-	Y.Lang.Pairs = function(obj) {
-		var keys = Y.Lang.Keys(obj);
+	Y.pairs = function(obj) {
+		var keys = Y.keys(obj);
 		var length = keys.length;
 		var pairs = new Array(length);
 		var x;
@@ -1578,9 +1529,9 @@
 	};
 
 	// Invert the keys and values of an object. The values must be serializable.
-	Y.Lang.Invert = function(obj) {
+	Y.invert = function(obj) {
 		var result = {};
-		var keys = Y.Lang.Keys(obj);
+		var keys = Y.keys(obj);
 		var x;
 		var length;
 
@@ -1593,7 +1544,7 @@
 
 	// Return a sorted list of the function names available on the object.
 	// Aliased as `methods`
-	Y.Lang.Functions = Y.Lang.Methods = function(obj) {
+	Y.functions = Y.methods = function(obj) {
 		var names = [];
 		var key;
 
@@ -1618,7 +1569,7 @@
 		'`': '&#x60;'
 	};
 
-	var unescapeMap = Y.Lang.Invert(escapeMap);
+	var unescapeMap = Y.invert(escapeMap);
 
 	// Functions for escaping and unescaping strings to/from HTML interpolation.
 	var createEscaper = function(map) {
@@ -1627,23 +1578,23 @@
 		};
 
 		// Regexes for identifying a key that needs to be escaped
-		var source = '(?:' + Y.Lang.Keys(map).join('|') + ')';
+		var source = '(?:' + Y.keys(map).join('|') + ')';
 		var testRegexp = new RegExp(source);
 		var replaceRegexp = new RegExp(source, 'g');
 
 		return function(string) {
-			string = string === null ? '' : Y.Lang.empty() + string;
+			string = string === null ? '' : Y.empty() + string;
 			return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
 		};
 	};
 
-	Y.Lang.Escape = createEscaper(escapeMap);
-	Y.Lang.UnEscape = createEscaper(unescapeMap);
+	Y.escape = createEscaper(escapeMap);
+	Y.unescape = createEscaper(unescapeMap);
 
 	//---
 
 	// Fill in a given object with default properties.
-	Y.Lang.Defaults = function(obj) {
+	Y.defaults = function(obj) {
 		var x;
 		var length;
 		var source;
@@ -1704,12 +1655,12 @@
 	// Underscore templating handles arbitrary delimiters, preserves whitespace,
 	// and correctly escapes quotes within interpolated code.
 	// NB: `oldSettings` only exists for backwards compatibility.
-	Y.Lang.Template = function(text, settings, oldSettings) {
+	Y.template = function(text, settings, oldSettings) {
 		if (!settings && oldSettings) {
 			settings = oldSettings;
 		}
 
-		settings = Y.Lang.Defaults({}, settings, Y.Settings.Template);
+		settings = Y.defaults({}, settings, Y.Settings.Template);
 
 		// Combine delimiters into one regular expression via alternation.
 		var matcher = new RegExp([
@@ -1725,7 +1676,7 @@
 			index = offset + match.length;
 
 			if (escape) {
-				source += "'+\n((__t=(" + escape + "))==null?'':Y.Lang.Escape(__t))+\n'";
+				source += "'+\n((__t=(" + escape + "))==null?'':Y.escape(__t))+\n'";
 			} else if (interpolate) {
 				source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
 			} else if (evaluate) {
@@ -1775,25 +1726,19 @@
 	//---
 
 
-	Y.setConfig('Use.Console', 'Off');
-	Y.setConfig('Extension', 'Use.Console');
+	Y.setConfig('YAX.Core.Use.Console', false);
+	Y.setConfig('extension', 'YAX.Core.Use.Console');
 
 	//---
 
-
 }());
+
+// FILE: ./Source/Core/Core.js
 
 //---
 
-
 /**
- * YAX Core | RegEx
- *
- * Another YAX's RegEx tools and shortcuts [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility, Class
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Regex Object
  */
 
 //---
@@ -1805,6 +1750,8 @@
 /*global Y, YAX */
 
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -1886,20 +1833,13 @@
 
 }());
 
-//---
+// FILE: ./Source/Core/Regex.js
 
+//---
 
 /**
- * Y Core | Global
- *
- * Global Y's functions and shortcuts [CORE]
- *
- * @version     0.15
- * @depends:    Core
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Global Shortcuts
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -1909,25 +1849,12 @@
 
 (function (undef) {
 
+	//---
+
 	'use strict';
 
-	//---
-
-	// Shortcuts global functions
-
-	// Number of active Ajax requests
-	// Y.AjaxActive = 0;
-
-	//---
-
-
-	//---
-
-	Y.extend(Y.Lang, {
-		// now: new Date().getTime(),
-		// now: new Date().getTime(),
+	Y.extend({
 		now: Date.now,
-
 		date: new Date(),
 
 		/**
@@ -1957,9 +1884,9 @@
 
 	// Cross-browser XML parsing
 	if (!Y.G.isNodeJs) {
-		Y.extend(Y.Lang, {
+		Y.extend({
 			parseXML: function (data) {
-				if (!data || !Y.Lang.isString(data)) {
+				if (!data || !Y.isString(data)) {
 					return null;
 				}
 
@@ -1971,11 +1898,11 @@
 					xml = temp.parseFromString(data, 'text/xml');
 				} catch (e) {
 					xml = undef;
-					Y.ERROR(e);
+					Y.error(e);
 				}
 
 				if (!xml || xml.getElementsByTagName('parsererror').length) {
-					Y.ERROR('Invalid XML: ' + data);
+					Y.error('Invalid XML: ' + data);
 				}
 
 				return xml;
@@ -1983,9 +1910,7 @@
 		});
 	}
 
-	Y.Lang.Now = Y.Lang.now();
-
-	Y.extend(Y.Lang, {
+	Y.extend({
 		lowerCaseFirst: function (string) {
 			string += this.empty();
 
@@ -2009,22 +1934,18 @@
 		}
 	});
 
+	//---
+
 }());
+
+// FILE: ./Source/Core/Global.js
 
 //---
 
 
 /**
- * Y Core | Utility
- *
- * Another Y's utilities and shortcuts [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Utilities and Tools
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -2033,6 +1954,8 @@
 /*global Y, YAX */
 
 (function () {
+
+	//---
 
 	'use strict';
 
@@ -2050,35 +1973,33 @@
 	 * Y.Util contains various utility functions used throughout Y code.
 	 */
 	Y.Util = {
-		LastUID: 0,
+		lastUID: 0,
 
 		// Create an object from a given prototype
-		Create: Object.create || (function () {
+		create: Object.create || (function () {
 			/**
 			 *
 			 * @constructor
 			 * @return {null}
 			 */
-			function TempFunction() {
-				//...
-			}
+			function tempFunc() {}
 
 			return function (tempPrototype) {
-				TempFunction.prototype = tempPrototype;
-				return new TempFunction();
+				tempFunc.prototype = tempPrototype;
+				return new tempFunc();
 			};
 		}()),
 
 		// Return unique ID of an object
-		Stamp: function (object) {
+		stamp: function (object) {
 			// jshint camelcase: false
-			object.YID = object.YID || ++Y.Util.LastUID;
+			object.YID = object.YID || ++Y.Util.lastUID;
 
 			return object.YID;
 		},
 
 		// Bind a function to be called with a given context
-		Bind: function (func, object) {
+		bind: function (func, object) {
 			var args = Y.G.Slice.call(arguments, 2);
 
 			if (func.bind) {
@@ -2091,10 +2012,10 @@
 		},
 
 		// Return a function that won't be called more often than the given interval
-		Throttle: function (func, time, context) {
+		throttle: function (func, time, context) {
 			var lock,
 				args,
-				wrapperFunction,
+				wrapperFunc,
 				later;
 
 			later = function () {
@@ -2102,12 +2023,12 @@
 				lock = false;
 
 				if (args) {
-					wrapperFunction.apply(context, args);
+					wrapperFunc.apply(context, args);
 					args = false;
 				}
 			};
 
-			wrapperFunction = function () {
+			wrapperFunc = function () {
 				if (lock) {
 					// Called too soon, queue to call later
 					args = arguments;
@@ -2120,7 +2041,7 @@
 				}
 			};
 
-			return wrapperFunction;
+			return wrapperFunc;
 		},
 
 		// Round a given number to a given precision
@@ -2130,16 +2051,14 @@
 		},
 
 		/**
-		 * Do nothing (used as a Noop throughout the code)
+		 * Do nothing (used as a noop throughout the code)
 		 * @returns {object}
 		 * @constructor
 		 */
-		Noop: function () {
-			//...
-		},
+		noop: function () {},
 
 		// Trim whitespace from both sides of a string
-		Trim: function (str) {
+		trim: function (str) {
 			return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
 		},
 
@@ -2157,7 +2076,7 @@
 
 		// Split a string into words
 		splitWords: function (string) {
-			return Y.Util.Trim(string).split(/\s+/);
+			return Y.Util.trim(string).split(/\s+/);
 		},
 
 		// Set options to an object, inheriting parent's options as well
@@ -2184,19 +2103,19 @@
 		// Minimal image URI, set to an image when disposing to flush memory
 		emptyImageUrl: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
 
-		Serialise: function (parameters, object, traditional, scope) {
+		serialise: function (parameters, object, traditional, scope) {
 			var type,
-				array = Y.Lang.isArray(object),
-				hash = Y.Lang.isPlainObject(object);
+				array = Y.isArray(object),
+				hash = Y.isPlainObject(object);
 
 			Y.each(object, function (key, value) {
-				type = Y.Lang.type(value);
+				type = Y.type(value);
 
 				if (scope) {
 					// key = traditional ? scope : scope + '[' + (array ? '' : key) + ']';
 					key = traditional ?
 						scope :
-						scope + '[' + (hash || Y.Lang.isObject(type) || Y.Lang.isArray(type) ? key : '') + ']';
+						scope + '[' + (hash || Y.isObject(type) || Y.isArray(type) ? key : '') + ']';
 				}
 
 				// Handle data in serializeArray() format
@@ -2204,62 +2123,40 @@
 					parameters.add(value.name, value.value);
 				}
 				// Recurse into nested objects
-				else if (Y.Lang.isArray(type) || (!traditional && Y.Lang.isObject(type))) {
+				else if (Y.isArray(type) || (!traditional && Y.isObject(type))) {
 					Y.Util.Serialise(parameters, value, traditional, key);
 				} else {
 					parameters.add(key, value);
 				}
 			});
-		},
-
-		/**
-		 * @return {string}
-		 */
-		Parameters: function (object, traditional) {
-			var params = [];
-
-			params.add = function (key, value) {
-				this.push(escape(key) + '=' + escape(value));
-			};
-
-			Y.Util.Serialise(params, object, traditional);
-
-			return params.join('&').replace(/%20/g, '+');
 		}
 	}; // END OF Y.Util OBJECT
 
 	//---
 
 	// Shortcuts for most used Utility functions
-	Y.Bind = Y.Util.Bind;
-	Y.Stamp = Y.Util.Stamp;
-	// Y.SetOptions = Y.Util.setOptions;
+	Y.bind = Y.Util.bind;
+	Y.stamp = Y.Util.stamp;
+	Y.SetOptions = Y.Util.setOptions;
 
-	Y.Lang.noop = Y.Lang.Noop = Y.Util.Noop;
-	Y.Lang.trim = Y.Util.Trim;
+	Y.noop = Y.Util.noop;
+	Y.trim = Y.Util.trim;
 
-	Y.Lang.reReplace = Y.Util.reStringReplace;
-	Y.Lang.strReplace = Y.Util.stringReplace;
-	Y.Lang.throttle = Y.Util.Throttle;
-	Y.Lang.parameters = Y.Util.Parameters;
+	Y.reStrReplace = Y.Util.reStringReplace;
+	Y.strReplace = Y.Util.stringReplace;
+	Y.throttle = Y.Util.throttle;
 
 	//---
 
 }());
 
+// FILE: ./Source/Core/Utility.js
+
 //---
 
 /**
- * Y Core | Class
- *
- * Powers the OOP facilities of Y's [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Class
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -2269,17 +2166,15 @@
 
 (function () {
 
+	//---
+
 	'use strict';
 
-	//---
 
 	/**
 	 * Y.Class powers the OOP facilities of the library.
 	 */
-	Y.Class = function () {
-
-	};
-	// END OF Y.Class OBJECT
+	Y.Class = function () {};
 
 	//---
 
@@ -2292,13 +2187,16 @@
 			}
 
 			// Call the construct constructor
-			/** @namespace this.construct */
 			if (this.construct) {
 				// this.construct.apply(this, arguments);
 				return this.construct.apply(this, arguments);
 			}
 
-//			Y.LOG(this.initialHooks);
+			// Call the _init constructor
+			if (this._init) {
+				// this._init.apply(this, arguments);
+				return this._init.apply(this, arguments);
+			}
 
 			// Call all constructor hooks
 			if (this.initialHooks.length) {
@@ -2312,7 +2210,7 @@
 
 		// jshint camelcase: false
 		var parentProto = newClass.__super__ = this.prototype;
-		var proto = Y.Util.Create(parentProto);
+		var proto = Y.Util.create(parentProto);
 
 		proto.constructor = newClass;
 
@@ -2325,33 +2223,31 @@
 			}
 		}
 
-		// Y.Log(properties.CLASS_NAME);
-
-		if (properties.CLASS_NAME) {
+		if (properties._class_name) {
 			Y.extend(newClass, {
-				CLASS_NAME: properties.CLASS_NAME.toString()
+				_class_name: properties._class_name.toString()
 			});
 
-			delete properties.CLASS_NAME;
+			delete properties._class_name;
 		}
 
 		// Mix static properties into the class
-		if (properties.STATICS) {
-			Y.extend(newClass, properties.STATICS);
-			delete properties.STATICS;
+		/** @namespace properties._statics */
+		if (properties._statics) {
+			Y.extend(newClass, properties._statics);
+			delete properties._statics;
 		}
 
 		// Mix includes into the prototype
-		/** @namespace properties.INCLUDES */
-		if (properties.INCLUDES) {
-			Y.extend.apply(null, [proto].concat(properties.INCLUDES));
-			/** @namespace properties.Includes */
-			delete properties.INCLUDES;
+		/** @namespace properties._includes */
+		if (properties._includes) {
+			Y.extend.apply(null, [proto].concat(properties._includes));
+			delete properties._includes;
 		}
 
 		//  OPTIONS
-		if (proto.OPTIONS) {
-			properties.OPTIONS = Y.extend(Y.Util.Create(proto.OPTIONS), properties.OPTIONS);
+		if (proto._options) {
+			properties._options = Y.extend(Y.Util.create(proto._options), properties._options);
 		}
 
 		// Mix given properties into the prototype
@@ -2390,7 +2286,7 @@
 
 	//  new default options to the Class
 	Y.Class.options = function (options) {
-		Y.extend(this.prototype.OPTIONS, options);
+		Y.extend(this.prototype._options, options);
 	};
 
 	//---
@@ -2408,7 +2304,7 @@
 		var args = Y.G.Slice.call(arguments, 1);
 		var init;
 
-		if (Y.Lang.isFunction(func)) {
+		if (Y.isFunction(func)) {
 			init = func;
 		} else {
 			init = function () {
@@ -2422,32 +2318,21 @@
 
 	//---
 
-	// Y.Class.constructor = Y.Lang.Noop;
-
-	//---
-
 	Y.Class.toString = function () {
-		return '[YAX::Class' + (this.CLASS_NAME ? '::' + this.CLASS_NAME + ']' : ']');
+		return '[Y: Class' + (this._class_name ? '::' + this._class_name + ']' : ']');
 	};
 
 	//---
 
 }());
 
-//---
+// FILE: ./Source/Core/Class.js
 
+//---
 
 /**
- * Y Core | Events
- *
- * Events implementation using Y [CORE]
- *
- * @version     0.15
- * @depends:    Core, Global, Utility, Class, Tools
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Evented
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -2457,6 +2342,8 @@
 
 (function () {
 
+	//---
+
 	'use strict';
 
 	/**
@@ -2464,14 +2351,14 @@
 	 * handle custom events.
 	 */
 	Y.Evented = Y.Class.extend({
-		CLASS_NAME: 'Evented',
+		_class_name: 'Evented',
 
 		eventsArray: [],
 
 		on: function (types, callback, context) {
 			var type, i, len;
 			// Types can be a map of types/handlers
-			if (Y.Lang.isObject(types)) {
+			if (Y.isObject(types)) {
 				for (type in types) {
 					if (Y.hasOwn.call(types, type)) {
 						// We don't process space-separated events here for performance;
@@ -2497,7 +2384,7 @@
 			if (!types) {
 				// Clear all listeners if called without arguments
 				delete this.eventsArray;
-			} else if (Y.Lang.isObject(types)) {
+			} else if (Y.isObject(types)) {
 				for (type in types) {
 					if (Y.hasOwn.call(types, type)) {
 						this._Off(type, types[type], callback);
@@ -2518,7 +2405,7 @@
 		_On: function (type, callback, context) {
 			// var events = this.eventsArray = this.eventsArray || {},
 			var events = this.eventsArray || {},
-				contextId = context && context !== this && Y.Stamp(context),
+				contextId = context && context !== this && Y.stamp(context),
 				indexKey,
 				indexLenKey,
 				typeIndex,
@@ -2531,7 +2418,7 @@
 				indexKey = type + '_idx';
 				indexLenKey = type + '_len';
 				typeIndex = events[indexKey] = events[indexKey] || {};
-				id = Y.Stamp(callback) + '_' + contextId;
+				id = Y.stamp(callback) + '_' + contextId;
 
 				if (!typeIndex[id]) {
 					typeIndex[id] = {
@@ -2574,10 +2461,10 @@
 				return;
 			}
 
-			contextId = context && context !== this && Y.Stamp(context);
+			contextId = context && context !== this && Y.stamp(context);
 
 			if (contextId) {
-				id = Y.Stamp(callback) + '_' + contextId;
+				id = Y.stamp(callback) + '_' + contextId;
 				listeners = events[indexKey];
 
 				if (listeners && listeners[id]) {
@@ -2600,7 +2487,7 @@
 
 			// Set the removed listener to noop so that's not called if remove happens in fire
 			if (listener) {
-				listener.callback = Y.Lang.noop;
+				listener.callback = Y.noop;
 			}
 		},
 
@@ -2692,13 +2579,13 @@
 		// Adds a parent to propagate events to (when you fire with true as a 3rd argument)
 		addEventParent: function (obj) {
 			this.eventParents = this.eventParents || {};
-			this.eventParents[Y.Stamp(obj)] = obj;
+			this.eventParents[Y.stamp(obj)] = obj;
 			return this;
 		},
 
 		removeEventParent: function (obj) {
 			if (this.eventParents) {
-				delete this.eventParents[Y.Stamp(obj)];
+				delete this.eventParents[Y.stamp(obj)];
 			}
 			return this;
 		},
@@ -2730,6 +2617,352 @@
 	//---
 
 }());
+
+// FILE: ./Source/Core/Evented.js
+
+//---
+
+/**
+ * YAX i18n [Contrib]
+ */
+
+/*jslint indent: 4 */
+/*jslint white: true */
+/*jshint eqeqeq: false */
+/*jshint strict: false */
+/*jshint unused: false */
+/*global YAX, Y */
+
+(function () {
+
+	//---
+
+	'use strict';
+
+	Y.i18n = function (text, langNumOrFormatting, numOrFormattingOrContext, formattingOrContext, context) {
+		var formatting;
+		var lang;
+		var num;
+
+		if (Y.isNull(context)) {
+			context = this.globalContext;
+		}
+
+		if (Y.isObject(langNumOrFormatting)) {
+			lang = null;
+			num = null;
+			formatting = langNumOrFormatting;
+			context = numOrFormattingOrContext || this.globalContext;
+		} else {
+			if (Y.isNumber(langNumOrFormatting)) {
+				lang = null;
+				num = langNumOrFormatting;
+				formatting = numOrFormattingOrContext;
+				context = formattingOrContext || this.globalContext;
+			} else {
+				lang = langNumOrFormatting;
+				if (Y.isNumber(numOrFormattingOrContext)) {
+					num = numOrFormattingOrContext;
+					formatting = formattingOrContext;
+					var _context;
+					// context = context;
+					_context = context;
+					context = _context;
+				} else {
+					num = null;
+					formatting = numOrFormattingOrContext;
+					context = formattingOrContext || this.globalContext;
+				}
+			}
+		}
+
+		if (Y.isObject(text)) {
+			/** @namespace text.i18n */
+			if (Y.isObject(text.i18n)) {
+				text = text.i18n;
+			}
+
+			return Y.i18n.translateHash(text, context, lang);
+		}
+
+		return Y.i18n.translate(text, num, formatting, context, lang);
+	};
+
+	Y.i18n.globalContext = null;
+	Y.i18n.data = null;
+	Y.i18n.languageData = null;
+
+	Y.i18n.add = function (d, lang) {
+		var c, data, k,
+			v, _i, _len,
+			_ref, _ref1,
+			_results;
+
+		if (Y.isSet(lang)) {
+			Y.i18n.languageData[lang] = null;
+
+			if (Y.isNull(Y.i18n.languageData[lang])) {
+				Y.i18n.languageData[lang] = {
+					values: {},
+					contexts: []
+				};
+			}
+
+			data = Y.i18n.languageData[lang];
+		} else {
+			data = Y.i18n.data;
+		}
+
+		if (Y.isSet(d.values)) {
+			_ref = d.values;
+
+			for (k in _ref) {
+				if (_ref.hasOwnProperty(k)) {
+					v = _ref[k];
+
+					data.values[k] = v;
+				}
+			}
+		}
+
+		if (Y.isSet(d.contexts)) {
+			_ref1 = d.contexts;
+			_results = [];
+
+			for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+				c = _ref1[_i];
+				_results.push(data.contexts.push(c));
+			}
+
+			return _results;
+		}
+	};
+
+	Y.i18n.setContext = function (key, value) {
+		Y.i18n.globalContext[key] = value;
+		return Y.i18n.globalContext[key];
+	};
+
+	Y.i18n.clearContext = function (key) {
+		Y.i18n.globalContext[key] = null;
+		return Y.i18n.globalContext[key];
+	};
+
+	Y.i18n.reset = function () {
+		Y.i18n.data = {
+			values: {},
+			contexts: []
+		};
+
+		Y.i18n.globalContext = {};
+		Y.i18n.languageData = {};
+
+		return Y.i18n.languageData;
+	};
+
+	Y.i18n.resetData = function () {
+		Y.i18n.data = {
+			values: {},
+			contexts: []
+		};
+
+		Y.i18n.languageData = {};
+		return Y.i18n.languageData;
+	};
+
+	Y.i18n.resetContext = function () {
+		Y.i18n.globalContext = {};
+		return Y.i18n.globalContext;
+	};
+
+	Y.i18n.resetLanguage = function (lang) {
+		Y.i18n.languageData[lang] = null;
+		return Y.i18n.languageData[lang];
+	};
+
+	Y.i18n.translateHash = function (hash, context, language) {
+		var k, v;
+
+		for (k in hash) {
+			if (hash.hasOwnProperty(k)) {
+				v = hash[k];
+
+				if (Y.isString(v)) {
+					hash[k] = Y.i18n.translate(v, null, null, context, language);
+				}
+			}
+		}
+
+		return hash;
+	};
+
+	Y.i18n.translate = function (text, num, formatting, context, language) {
+		var contextData, data, result;
+
+		if (Y.isNull(context)) {
+			context = Y.i18n.globalContext;
+		}
+
+		if (!Y.isNull(language)) {
+			data = Y.i18n.languageData[language];
+		}
+
+		if (Y.isUndefined(data)) {
+			data = Y.i18n.data;
+		}
+
+		//if (data == null) {
+		//	data = Y.i18n.data;
+		//}
+
+		//if (data == null) {
+		//	return Y.i18n.useOriginalText(text, num, formatting);
+		//}
+
+		if (Y.isNull(data)) {
+			return Y.i18n.useOriginalText(text, num, formatting);
+		}
+
+		contextData = Y.i18n.getContextData(data, context);
+
+		if (!Y.isNull(contextData)) {
+			result = Y.i18n.findTranslation(text, num, formatting, contextData.values);
+		}
+
+		//if (result == null) {
+		//	result = Y.i18n.findTranslation(text, num, formatting, data.values);
+		//}
+
+		//if (result == null) {
+		//	return Y.i18n.useOriginalText(text, num, formatting);
+		//}
+
+		if (Y.isUndefined(result)) {
+			result = Y.i18n.findTranslation(text, num, formatting, data.values);
+		}
+
+		if (Y.isNull(result)) {
+			return Y.i18n.useOriginalText(text, num, formatting);
+		}
+
+		return result;
+	};
+
+	Y.i18n.translateHash = function (hash, context, language) {
+		var k, v;
+
+		for (k in hash) {
+			if (hash.hasOwnProperty(k)) {
+				v = hash[k];
+
+				if (Y.isString(v)) {
+					hash[k] = Y.i18n.translate(v, null, null, context, language);
+				}
+			}
+		}
+
+		return hash;
+	};
+
+	Y.i18n.findTranslation = function (text, num, formatting, data) {
+		var result, triple, value, _i, _len;
+		value = data[text];
+
+
+		if (Y.isNull(value)) {
+			return null;
+		}
+
+		if (Y.isNull(num)) {
+			if (Y.isString(value)) {
+				return Y.i18n.applyFormatting(value, num, formatting);
+			}
+		} else {
+			if (value instanceof Array || value.length) {
+				for (_i = 0, _len = value.length; _i < _len; _i++) {
+					triple = value[_i];
+
+					if ((num >= triple[0] || Y.isNull(triple[0])) && (num <= triple[1] ||
+						Y.isNull(triple[1]))) {
+						result = Y.i18n.applyFormatting(triple[2].replace("-%n", String(-num)),
+							num, formatting);
+						return Y.i18n.applyFormatting(result.replace("%n", String(num)), num,
+							formatting);
+					}
+				}
+			}
+		}
+
+		return null;
+	};
+
+	Y.i18n.getContextData = function (data, context) {
+		var c, equal, key,
+			value, _i, _len,
+			_ref, _ref1;
+
+		if (!Y.isSet(data.contexts) || Y.isNull(data.contexts)) {
+			return null;
+		}
+
+		_ref = data.contexts;
+
+		for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+			c = _ref[_i];
+
+			equal = true;
+
+			/** @namespace c.matches */
+			_ref1 = c.matches;
+
+			for (key in _ref1) {
+				if (_ref1.hasOwnProperty(key)) {
+					value = _ref1[key];
+					equal = equal && value === context[key];
+				}
+			}
+
+			if (equal) {
+				return c;
+			}
+		}
+
+		return null;
+	};
+
+	Y.i18n.useOriginalText = function (text, num, formatting) {
+		if (Y.isNull(num)) {
+			return Y.i18n.applyFormatting(text, num, formatting);
+		}
+
+		return Y.i18n.applyFormatting(text.replace("%n", String(num)), num,
+			formatting);
+	};
+
+	Y.i18n.applyFormatting = function (text, num, formatting) {
+		var ind, regex;
+
+		for (ind in formatting) {
+			if (formatting.hasOwnProperty(ind)) {
+				regex = new RegExp("%{" + ind + "}", "g");
+				text = text.replace(regex, formatting[ind]);
+			}
+		}
+
+		return text;
+	};
+
+	//---
+
+	Y.i18n.reset();
+
+	Y._t = Y.i18n;
+
+	//---
+
+}());
+
+// FILE: ./Source/Core/Contrib/i18n.js
 
 //---
 

@@ -1,14 +1,6 @@
 /**
- * Y Core
- *
- * The main Y core.
- *
- * @version     0.15
- * @depends:    Y.
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Core
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
@@ -17,6 +9,8 @@
 /*global Y, YAX */
 
 (function(undef) {
+
+	//---
 
 	'use strict';
 
@@ -279,8 +273,11 @@
 			return true;
 		}
 
-		return _type === 'array' || len === 0 ||
-			(typeof len === 'number' && len > 0) && (len - 1) in object;
+		/*return _type === 'array' || len === 0 ||
+			(typeof len === 'number' && len > 0) && (len - 1) in object;*/
+
+		return isArray(object) || !(isFunction(object) ||
+			!((len === 0 || isNumber(len)) && len > 0 && object.hasOwnProperty(len - 1)));
 	}
 
 	/**
@@ -321,11 +318,11 @@
 	 * @return    string
 	 */
 	function getContainsWordCharRegEx() {
-		if (!Y.ReContainsWordChar) {
-			Y.ReContainsWordChar = new RegExp('\\S+', 'g');
+		if (!Y.reContainsWordChar) {
+			Y.reContainsWordChar = new RegExp('\\S+', 'g');
 		}
 
-		return Y.ReContainsWordChar;
+		return Y.reContainsWordChar;
 	}
 
 	/**
@@ -334,11 +331,11 @@
 	 * @return    string
 	 */
 	function getGetFunctionBodyRegEx() {
-		if (!Y.ReGetFunctionBody) {
-			Y.ReGetFunctionBody = new RegExp('{((.|\\s)*)}', 'm');
+		if (!Y.reGetFunctionBody) {
+			Y.reGetFunctionBody = new RegExp('{((.|\\s)*)}', 'm');
 		}
 
-		return Y.ReGetFunctionBody;
+		return Y.reGetFunctionBody;
 	}
 
 	/**
@@ -347,12 +344,12 @@
 	 * @return    string
 	 */
 	function getRemoveCodeCommentsRegEx() {
-		if (!Y.ReRemoveCodeComments) {
-			Y.ReRemoveCodeComments = new RegExp(
+		if (!Y.reRemoveCodeComments) {
+			Y.reRemoveCodeComments = new RegExp(
 				"(\\/\\*[\\w\\'\\s\\r\\n\\*]*\\*\\/)|(\\/\\/[\\w\\s\\']*)", 'g');
 		}
 
-		return Y.ReRemoveCodeComments;
+		return Y.reRemoveCodeComments;
 	}
 
 	/**
@@ -898,10 +895,6 @@
 				setArray(oldValue, newValue);
 				break;
 
-			case 'Extension':
-				setArray(oldValue, newValue);
-				break;
-
 			default:
 				Y._CONFIG_STORAGE[varName].LOCAL_VALUE = newValue;
 				break;
@@ -951,26 +944,15 @@
 
 	//---
 
-	extend(Y.Lang, {
-		grep: grep,
-		merge: merge
-	});
-
-	//---
-
 	extend(Y, {
+		grep: grep,
+		merge: merge,
 		setConfig: configSet,
-
 		getConfig: configGet,
-
 		each: each,
-
 		foreach: foreach,
-
 		every: every,
-
 		classToType: classToType,
-
 		extend: function(object) {
 			if (!isObject(object) && !isFunction(object)) {
 				return object;
@@ -999,166 +981,115 @@
 
 			return object;
 		},
-
-		callProperty: getOwn
-	});
-
-	//---
-
-	// Shortcuts for Lang functions
-	extend(Y.Lang, {
-
+		callProperty: getOwn,
 		variableDump: variableDump,
-
 		type: type,
-
 		getType: getType,
-
 		isArray: isArray,
-
 		isFloat: isFloat,
-
 		isArraylike: isArraylike,
-
 		isObject: isObject,
-
 		isFunction: isFunction,
-
 		isWindow: isWindow,
-
 		isDocument: isDocument,
-
 		isString: isString,
-
 		isPlainObject: isPlainObject,
-
 		isUndefined: isUndefined,
-
 		isDefined: isDefined,
-
 		likeArray: likeArray,
-
 		isNull: isNull,
-
 		isObjectEmpty: isObjectEmpty,
-
 		empty: empty,
-
 		isEmpty: isEmpty,
-
 		isFunctionEmpty: isFunctionEmpty,
-
 		isBool: isBool,
-
 		isFalse: isFalse,
-
 		isTrue: isTrue,
-
 		isNumber: isNumber,
-
 		isNumeric: isNumber,
-
 		isInteger: isInteger,
-
 		isDouble: isDouble,
-
 		inArray: inArray,
-
 		inArrayOther: inArrayOther,
-
 		unique: unique,
-
 		compact: compact,
-
 		camelise: camelCase,
-
 		toUnderscore: toUnderscore,
-
 		toCamel: toCamel,
-
 		toDash: toDash,
-
 		toArray: toArray,
-
 		randomNumber: randomNumber,
-
 		dasherise: dasherise,
-
 		deserialiseValue: deserialiseValue,
-
 		arrayToObject: arrayToObject,
-
 		objectToArray: objectToArray,
-
 		intoArray: intoArray,
-
 		toObject: toObject,
-
 		isSet: isSet,
-
 		makeArray: function(arrayLikeThing) {
 			return Y.G.Slice.call(arrayLikeThing);
 		},
-
 		inject: inject,
-
-		hasProperty: hasProperty
+		hasProperty: hasProperty,
+		size: function () {
+			return this.keys(this).length;
+		}
 	});
 
-	//---
+	//--
 
-	if (Y.Lang.isSet(Console)) {
+	if (Y.isSet(Console)) {
 		var warn = Console.warn;
 		var log = Console.log;
 		var error = Console.error;
 		var info = Console.info;
 		var trace = Console.trace;
 
-		Y.WARN = Function.prototype.bind.call(warn, Console);
-		Y.LOG = Function.prototype.bind.call(log, Console);
-		Y.ERROR = Function.prototype.bind.call(error, Console);
-		Y.INFO = Function.prototype.bind.call(info, Console);
-		Y.TRACE = Function.prototype.bind.call(trace, Console);
+		Y.warn = Function.prototype.bind.call(warn, Console);
+		Y.log = Function.prototype.bind.call(log, Console);
+		Y.error = Function.prototype.bind.call(error, Console);
+		Y.info = Function.prototype.bind.call(info, Console);
+		Y.trace = Function.prototype.bind.call(trace, Console);
 	} else {
-		Y.WARN = Y.Lang.Noop;
-		Y.LOG = Y.Lang.Noop;
-		Y.ERROR = Y.Lang.Noop;
-		Y.INFO = Y.Lang.Noop;
-		Y.TRACE = Y.Lang.Noop;
+		Y.warn = Y.noop;
+		Y.log = Y.noop;
+		Y.error = Y.noop;
+		Y.info = Y.noop;
+		Y.trace = Y.noop;
 	}
 
-	Y.WARN.toString = function() {
+	Y.warn.toString = function() {
 		return '[YAX::Console::Warn]';
 	};
 
-	Y.LOG.toString = function() {
+	Y.log.toString = function() {
 		return '[YAX::Console::Log]';
 	};
 
-	Y.ERROR.toString = function() {
+	Y.error.toString = function() {
 		return '[YAX::Console::Error]';
 	};
 
-	Y.INFO.toString = function() {
+	Y.info.toString = function() {
 		return '[YAX::Console::Info]';
 	};
 
-	Y.TRACE.toString = function() {
-		return '[YAX::Console::Trace]';
+	Y.trace.toString = function() {
+		return '[YAX::Console::trace]';
 	};
 
 	//---
 
 	// Shortcut function for checking if an object has a given property directly
 	// on itself (in other words, not on a prototype).
-	Y.Lang.Has = function(obj, key) {
+	Y.has = function(obj, key) {
 		return obj !== null && Y.hasOwn.call(obj, key);
 		// return obj !== null && obj.hasOwnProperty(key);
 	};
 
 	// Retrieve the names of an object's properties.
 	// Delegates to **ECMAScript 5**'s native `.keys`
-	Y.Lang.Keys = function(obj) {
+	Y.keys = function(obj) {
 		var key;
 
 		if (!isObject(obj) && !isFunction(obj)) {
@@ -1173,7 +1104,7 @@
 
 		for (key in obj) {
 			if (obj.hasOwnProperty(key)) {
-				if (Y.Lang.Has(obj, key)) {
+				if (Y.has(obj, key)) {
 					keys.push(key);
 				}
 			}
@@ -1186,8 +1117,8 @@
 	};
 
 	// Retrieve the values of an object's properties.
-	Y.Lang.Values = function(obj) {
-		var keys = Y.Lang.Keys(obj);
+	Y.values = function(obj) {
+		var keys = Y.keys(obj);
 		var length = keys.length;
 		var values = new Array(length);
 		var x;
@@ -1200,8 +1131,8 @@
 	};
 
 	// Convert an object into a list of `[key, value]` pairs.
-	Y.Lang.Pairs = function(obj) {
-		var keys = Y.Lang.Keys(obj);
+	Y.pairs = function(obj) {
+		var keys = Y.keys(obj);
 		var length = keys.length;
 		var pairs = new Array(length);
 		var x;
@@ -1214,9 +1145,9 @@
 	};
 
 	// Invert the keys and values of an object. The values must be serializable.
-	Y.Lang.Invert = function(obj) {
+	Y.invert = function(obj) {
 		var result = {};
-		var keys = Y.Lang.Keys(obj);
+		var keys = Y.keys(obj);
 		var x;
 		var length;
 
@@ -1229,7 +1160,7 @@
 
 	// Return a sorted list of the function names available on the object.
 	// Aliased as `methods`
-	Y.Lang.Functions = Y.Lang.Methods = function(obj) {
+	Y.functions = Y.methods = function(obj) {
 		var names = [];
 		var key;
 
@@ -1254,7 +1185,7 @@
 		'`': '&#x60;'
 	};
 
-	var unescapeMap = Y.Lang.Invert(escapeMap);
+	var unescapeMap = Y.invert(escapeMap);
 
 	// Functions for escaping and unescaping strings to/from HTML interpolation.
 	var createEscaper = function(map) {
@@ -1263,23 +1194,23 @@
 		};
 
 		// Regexes for identifying a key that needs to be escaped
-		var source = '(?:' + Y.Lang.Keys(map).join('|') + ')';
+		var source = '(?:' + Y.keys(map).join('|') + ')';
 		var testRegexp = new RegExp(source);
 		var replaceRegexp = new RegExp(source, 'g');
 
 		return function(string) {
-			string = string === null ? '' : Y.Lang.empty() + string;
+			string = string === null ? '' : Y.empty() + string;
 			return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
 		};
 	};
 
-	Y.Lang.Escape = createEscaper(escapeMap);
-	Y.Lang.UnEscape = createEscaper(unescapeMap);
+	Y.escape = createEscaper(escapeMap);
+	Y.unescape = createEscaper(unescapeMap);
 
 	//---
 
 	// Fill in a given object with default properties.
-	Y.Lang.Defaults = function(obj) {
+	Y.defaults = function(obj) {
 		var x;
 		var length;
 		var source;
@@ -1340,12 +1271,12 @@
 	// Underscore templating handles arbitrary delimiters, preserves whitespace,
 	// and correctly escapes quotes within interpolated code.
 	// NB: `oldSettings` only exists for backwards compatibility.
-	Y.Lang.Template = function(text, settings, oldSettings) {
+	Y.template = function(text, settings, oldSettings) {
 		if (!settings && oldSettings) {
 			settings = oldSettings;
 		}
 
-		settings = Y.Lang.Defaults({}, settings, Y.Settings.Template);
+		settings = Y.defaults({}, settings, Y.Settings.Template);
 
 		// Combine delimiters into one regular expression via alternation.
 		var matcher = new RegExp([
@@ -1361,7 +1292,7 @@
 			index = offset + match.length;
 
 			if (escape) {
-				source += "'+\n((__t=(" + escape + "))==null?'':Y.Lang.Escape(__t))+\n'";
+				source += "'+\n((__t=(" + escape + "))==null?'':Y.escape(__t))+\n'";
 			} else if (interpolate) {
 				source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
 			} else if (evaluate) {
@@ -1411,12 +1342,13 @@
 	//---
 
 
-	Y.setConfig('Use.Console', 'Off');
-	Y.setConfig('Extension', 'Use.Console');
+	Y.setConfig('YAX.Core.Use.Console', false);
+	Y.setConfig('extension', 'YAX.Core.Use.Console');
 
 	//---
 
-
 }());
+
+// FILE: ./Source/Core/Core.js
 
 //---

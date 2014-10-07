@@ -1,14 +1,6 @@
 /**
- * YAX Plugins | CSV
- *
- * Cross browser CSV parser implementation using YAX's API [CORE, Node]
- *
- * @version     0.15
- * @depends:    Core, Node
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX CSV Parser [CORE][EXTENSION]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -19,15 +11,15 @@
 
 (function () {
 
-	'use strict';
-
 	//---
+
+	'use strict';
 
 	/**
 	 * @return {boolean}
 	 */
 	var PRESENT = function (possible) {
-		return !Y.Lang.isUndefined(possible);
+		return !Y.isUndefined(possible);
 	};
 
 	var FLOAT = /^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/;
@@ -135,7 +127,7 @@
 			 */
 			encode: function (stream) {
 				if (this.data.length === 0) {
-					return Y.Lang.empty();
+					return Y.empty();
 				}
 
 				var data = this.data,
@@ -332,5 +324,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Plugins/CSV.js
 
 //---

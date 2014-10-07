@@ -1,14 +1,6 @@
 /**
- * YAX Node | Gesture Event
- *
- * Cross browser gesture event implementation using YAX's API [Node]
- *
- * @version     0.15
- * @depends:    Core, Node, Events
- * @license     Dual licensed under the MIT and GPL licenses.
+ * YAX Gesture Event [DOM/NODE]
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint browser: true */
@@ -17,13 +9,13 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-//---
-
 (function () {
+
+	//---
 
 	'use strict';
 
-	var gesture = {}, gestureTimeout = Y.Lang.Noop;
+	var gesture = {}, gestureTimeout = Y.noop;
 
 	function parentIfText (node) {
 		return node.hasOwnProperty('tagName') ? node : node.parentNode;
@@ -31,7 +23,7 @@
 
 	if (Y.UserAgent.OS.iOS) {
 		Y.DOM(document).bind('gesturestart', function (event) {
-			var now = Y.Lang.now();
+			var now = Y.now();
 			// var delta = now - (gesture.last || now);
 			gesture.target = parentIfText(event.target);
 
@@ -72,5 +64,7 @@
 	//---
 
 }());
+
+// FILE: ./Source/Modules/Node/Contrib/EventGesture.js
 
 //---
