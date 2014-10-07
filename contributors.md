@@ -1,1 +1,1 @@
-Xeriab Nabil
+* Xeriab Nabil (aka KodeBurner) <xeriab@lumlim.biz>
