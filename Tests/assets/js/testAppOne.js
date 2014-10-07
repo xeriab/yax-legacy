@@ -24,13 +24,13 @@ Y.DOM(document).ready(function () {
 		animation: 'flipIn'
 	});
 
-//	Wrapper.waitForMe();
-//
-//	var closeWaitForMe = function closeWaitForMe () {
-//		Wrapper.waitForMe('close');
-//	};
+	Wrapper.waitForMe();
 
-//	Wrapper.oneTime(3000, 'closeWaitForMe', closeWaitForMe);
+	var closeWaitForMe = function closeWaitForMe () {
+		Wrapper.waitForMe('close');
+	};
+
+	Wrapper.oneTime(4000, 'closeWaitForMe', closeWaitForMe);
 
 //	Wrapper.stopTranAnim(false, false);
 
