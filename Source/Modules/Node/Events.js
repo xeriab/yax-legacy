@@ -152,10 +152,10 @@
 			}
 
 			/*if (source.defaultPrevented !== undefined ? source.defaultPrevented :
-					'returnValue' in source ? source.returnValue === false :
-				source.getPreventDefault && source.getPreventDefault()) {
-				event.isDefaultPrevented = returnTrue;
-			}*/
+			 'returnValue' in source ? source.returnValue === false :
+			 source.getPreventDefault && source.getPreventDefault()) {
+			 event.isDefaultPrevented = returnTrue;
+			 }*/
 		}
 
 		return event;
@@ -170,12 +170,12 @@
 	};
 
 	/*function safeActiveElement() {
-		try {
-			return Y.doc.activeElement;
-		} catch (err) {
-			Y.error(err);
-		}
-	}*/
+	 try {
+	 return Y.doc.activeElement;
+	 } catch (err) {
+	 Y.error(err);
+	 }
+	 }*/
 
 	function createProxy(event) {
 		var key, proxy = {
@@ -527,7 +527,7 @@
 
 				// Emulate mouseenter, mouseleave
 				if (Y.hasOwn.call(hover, handler.e)) {
-				//if (handler.e in hover) {
+					//if (handler.e in hover) {
 					func = function (e) {
 						var related = e.relatedTarget;
 
@@ -750,18 +750,18 @@
 		return this.each(function () {
 			// items in the collection might not be Node elements
 			/*if (Y.hasProperty(this, 'dispatchEvent')) {
-				this.dispatchEvent(event);
-			} else {
-				Y.DOM(this).triggerHandler(event, args);
-			}*/
+			 this.dispatchEvent(event);
+			 } else {
+			 Y.DOM(this).triggerHandler(event, args);
+			 }*/
 
 			if (event.type && ~inputEvents.indexOf(event.type)) {
 				this[event.type]();
 			} else if (Y.hasProperty(this, 'dispatchEvent')) {
 				this.dispatchEvent(event);
 			}/* else {
-				Y.DOM(this).triggerHandler(event, args);
-			}*/
+			 Y.DOM(this).triggerHandler(event, args);
+			 }*/
 		});
 	};
 
@@ -816,12 +816,12 @@
 		'mousewheel',
 		'wheel'
 	].forEach(function (event) {
-		Y.DOM.Function[event] = function (callback) {
-			return callback ?
-				this.bind(event, callback) :
-				this.trigger(event);
-		};
-	});
+			Y.DOM.Function[event] = function (callback) {
+				return callback ?
+					this.bind(event, callback) :
+					this.trigger(event);
+			};
+		});
 
 	Y.DOM.Function.hashchange = function (callback) {
 		return callback ? this.bind('hashchange', callback) : this.trigger('hashchange', callback);
@@ -851,7 +851,7 @@
 	});
 
 	// Generate extended `remove` and `empty` functions
-	/*['remove', 'empty'].forEach(function (method) {
+	['remove', 'empty'].forEach(function (method) {
 		var origFn = Y.DOM.Function[method];
 
 		Y.DOM.Function[method] = function () {
@@ -867,7 +867,7 @@
 
 			return origFn.call(this);
 		};
-	});*/
+	});
 
 	//---
 
