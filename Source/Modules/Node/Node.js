@@ -19,17 +19,17 @@
 
 	var $ = null;
 
-	var ClassList;
+	var classList;
 
-	var IDsList;
+	var idList;
 
-	var docElement = Y.doc.documentElement;
+	var docElem = Y.doc.documentElement;
 
 	var elementDisplay = {};
 
-	var ClassCache = {};
+	var classCache = {};
 
-	var IDsCache = {};
+	var idCache = {};
 
 	// Special attributes that should be get/set via method calls
 	var MethodAttributes = [
@@ -52,23 +52,23 @@
 		'append'
 	];
 
-	var Table = Y.doc.createElement('table');
+	var _table = Y.doc.createElement('table');
 
-	var TableRow = Y.doc.createElement('tr');
+	var _tableRow = Y.doc.createElement('tr');
 
-	var Containers = {
+	var _containers = {
 		'tr': Y.doc.createElement('tbody'),
-		'tbody': Table,
-		'thead': Table,
-		'tfoot': Table,
-		'td': TableRow,
-		'th': TableRow,
+		'tbody': _table,
+		'thead': _table,
+		'tfoot': _table,
+		'td': _tableRow,
+		'th': _tableRow,
 		'*': Y.doc.createElement('div')
 	};
 
-	var temporaryParent = Y.doc.createElement('div');
+	var tempParent = Y.doc.createElement('div');
 
-	var properitiesMap = {
+	var propsMap = {
 		'tabindex': 'tabIndex',
 		'readonly': 'readOnly',
 		'for': 'htmlFor',
@@ -113,9 +113,9 @@
 		'ms'
 	];
 
-	var DomNode;
+	var domNode;
 
-	var ClassTag = 'YAX' + Y.now();
+	var classTag = 'YAX' + Y.now();
 
 	//---
 
@@ -133,11 +133,11 @@
 	function classReplacement(name) {
 		var result;
 
-		if (Y.hasOwn.call(ClassCache, name)) {
-			result = ClassCache[name];
+		if (Y.hasOwn.call(classCache, name)) {
+			result = classCache[name];
 		} else {
-			ClassCache[name] = new RegExp('(^|\\s)' + name + '(\\s|)');
-			result = ClassCache[name];
+			classCache[name] = new RegExp('(^|\\s)' + name + '(\\s|)');
+			result = classCache[name];
 		}
 
 		return result;
@@ -146,11 +146,11 @@
 	function idReplacement(name) {
 		var result;
 
-		if (Y.hasOwn.call(IDsCache, name)) {
-			result = IDsCache[name];
+		if (Y.hasOwn.call(idCache, name)) {
+			result = idCache[name];
 		} else {
-			IDsCache[name] = new RegExp('(^|\\s)' + name + '(\\s|)');
-			result = IDsCache[name];
+			idCache[name] = new RegExp('(^|\\s)' + name + '(\\s|)');
+			result = idCache[name];
 		}
 
 		return result;
@@ -363,8 +363,8 @@
 	CCSS = function(element, name, csssComputed) {
 		var width, minWidth, maxWidth,
 			computed = csssComputed || getStyles(element),
-			// Support: IE9
-			// getPropertyValue is only needed for .css('filter') in IE9, see #12537
+		// Support: IE9
+		// getPropertyValue is only needed for .css('filter') in IE9, see #12537
 			ret = computed ? computed.getPropertyValue(name) || computed[name] : undef,
 			style = element.style;
 
@@ -407,10 +407,10 @@
 
 	function argumentWidthOrHeight(element, name, extra, isBorderBox, styles) {
 		var i = extra === (isBorderBox ? 'border' : 'content') ?
-			// If we already have the right measurement, avoid augmentation
-			4 :
-			// Otherwise initialise for horizontal or vertical properties
-			name === 'width' ? 1 : 0,
+				// If we already have the right measurement, avoid augmentation
+				4 :
+				// Otherwise initialise for horizontal or vertical properties
+					name === 'width' ? 1 : 0,
 			val = 0;
 
 		for (null; i < 4; i += 2) {
@@ -485,11 +485,11 @@
 			argumentWidthOrHeight(
 				element,
 				name,
-				extra || (isBorderBox ? 'border' : 'content'),
+					extra || (isBorderBox ? 'border' : 'content'),
 				valueIsBorderBox,
 				styles
 			)
-		) + 'px';
+			) + 'px';
 	}
 
 	function globalEval(code) {
@@ -542,19 +542,19 @@
 			temp = !parent;
 
 			if (temp) {
-				// parent = temporaryParent;
+				// parent = tempParent;
 				// parent.appendChild(element);
-				(parent = temporaryParent).appendChild(element);
+				(parent = tempParent).appendChild(element);
 			}
 
 			// result = ~YAXDOM.QSA(parent, selector).indexOf(element);
 			/* jshint -W052 */
 			result = ~YAXDOM.QSA(parent, selector).indexOf(element);
 
-			// temp && temporaryParent.appendChild(element);
+			// temp && tempParent.appendChild(element);
 
 			if (temp) {
-				temporaryParent.appendChild(element);
+				tempParent.appendChild(element);
 			}
 
 			return result;
@@ -582,11 +582,11 @@
 					name = Y.RegEx.FragmentReplacement.test(html) && RegExp.$1;
 				}
 
-				if (!(Y.hasOwn.call(Containers, name))) {
+				if (!(Y.hasOwn.call(_containers, name))) {
 					name = '*';
 				}
 
-				container = Containers[name];
+				container = _containers[name];
 
 				container.innerHTML = Y.empty() + html;
 
@@ -716,15 +716,15 @@
 				}
 			} else {
 				result = (!Y.isUndefined(element) && element.nodeType !== 1 &&
-						element.nodeType !== 9) ? [] :
+					element.nodeType !== 9) ? [] :
 					Y.G.Slice.call(
-						isSimple && !maybeID ?
-						// If it's simple, it could be a class
-						maybeClass ? element.getElementsByClassName(nameOnly) :
-						// Or a tag
-						element.getElementsByTagName(selector) :
-						// Or it's not simple, and we need to query all
-						element.querySelectorAll(selector)
+							isSimple && !maybeID ?
+							// If it's simple, it could be a class
+							maybeClass ? element.getElementsByClassName(nameOnly) :
+								// Or a tag
+								element.getElementsByTagName(selector) :
+							// Or it's not simple, and we need to query all
+							element.querySelectorAll(selector)
 					);
 			}
 
@@ -740,14 +740,12 @@
 
 			result = dom || [];
 			// result = dom || {};
-
 			/* jshint -W103 */
 			// result.__proto__ = $.Function;
-
 			/** @namespace Object.setPrototypeOf */
 			Object.setPrototypeOf(result, $.Function);
-
 			result.selector = selector || Y.empty();
+			result.size = result.length;
 
 			return result;
 		},
@@ -767,7 +765,7 @@
 		var result;
 
 		if (Y.isNull(selector) || Y.isUndefined(selector) || Y.isEmpty(
-				selector)) {
+			selector)) {
 			result = $(nodes);
 		} else {
 			result = $(nodes).filter(selector);
@@ -779,18 +777,18 @@
 	//---
 
 	/**
-	 * Y.DomNode is a DOM class that $ classes inherit from.
+	 * Y.domNode is a DOM class that $ classes inherit from.
 	 */
-	Y.DomNode = Y.Class.extend({
+	Y.domNode = Y.Class.extend({
 		_class_name: 'DOM',
 
-		getStyle: function(el, style) {
+		getStyle: function(elem, style) {
 			var value, css;
 
-			value = el.style[style] || (el.currentStyle && el.currentStyle[style]);
+			value = elem.style[style] || (elem.currentStyle && elem.currentStyle[style]);
 
 			if ((!value || value === 'auto') && Y.doc.defaultView) {
-				css = Y.doc.defaultView.getComputedStyle(el, null);
+				css = Y.doc.defaultView.getComputedStyle(elem, null);
 				value = css ? css[style] : null;
 			}
 
@@ -798,12 +796,12 @@
 		},
 
 		documentIsLtr: function() {
-			$.docIsLTR = $.docIsLTR || DomNode.getStyle(Y.doc.body,
+			$.docIsLTR = $.docIsLTR || domNode.getStyle(Y.doc.body,
 				'direction') === 'ltr';
 			return $.docIsLTR;
 		},
 
-		'Function': {
+		Function: {
 			'YAX.DOM': '0.10',
 			// Because a collection acts like an array
 			// copy over these useful array functions.
@@ -817,8 +815,8 @@
 			// `map` and `slice` in the jQuery API work differently
 			// from their array counterparts
 			map: function(callback) {
-				return $(map(this, function(el, i) {
-					return callback.call(el, i, el);
+				return $(map(this, function(elem, i) {
+					return callback.call(elem, i, elem);
 				}));
 			},
 			slice: function() {
@@ -866,8 +864,8 @@
 				throw new Error(message);
 			},
 			each: function(callback) {
-				Y.G.ArrayProto.every.call(this, function(el, index) {
-					return callback.call(el, index, el) !== false;
+				Y.G.ArrayProto.every.call(this, function(elem, index) {
+					return callback.call(elem, index, elem) !== false;
 				});
 
 				return this;
@@ -900,11 +898,11 @@
 				} else {
 					excludes = Y.isString(selector) ? this.filter(selector) :
 						(Y.likeArray(selector) && Y.isFunction(selector.item)) ? Y.G.Slice
-						.call(selector) : $(selector);
+							.call(selector) : $(selector);
 
-					this.forEach(function(el) {
-						if (excludes.indexOf(el) < 0) {
-							nodes.push(el);
+					this.forEach(function(elem) {
+						if (excludes.indexOf(elem) < 0) {
+							nodes.push(elem);
 						}
 					});
 				}
@@ -922,12 +920,12 @@
 				return index === -1 ? this.slice(index) : this.slice(index, +index + 1);
 			},
 			first: function() {
-				var el = this[0];
-				return el && !Y.isObject(el) ? el : $(el);
+				var elem = this[0];
+				return elem && !Y.isObject(elem) ? elem : $(elem);
 			},
 			last: function() {
-				var el = this[this.length - 1];
-				return el && !Y.isObject(el) ? el : $(el);
+				var elem = this[this.length - 1];
+				return elem && !Y.isObject(elem) ? elem : $(elem);
 			},
 
 			find: function(selector) {
@@ -964,7 +962,7 @@
 				}
 
 				while (node && Y.isFalse(collection ? collection.indexOf(node) >= 0 :
-						YAXDOM.Matches(node, selector))) {
+					YAXDOM.Matches(node, selector))) {
 					node = node !== context && !Y.isDocument(node) && node.parentNode;
 				}
 
@@ -992,7 +990,7 @@
 				}
 
 				if (Y.isUndefined(selector) || Y.isNull(selector) || Y.isEmpty(
-						selector)) {
+					selector)) {
 					result = filtered(ancestors, '*');
 				} else {
 					result = filtered(ancestors, selector);
@@ -1014,9 +1012,9 @@
 				});
 			},
 			siblings: function(selector) {
-				return filtered(this.map(function(i, el) {
-					return Y.G.Filter.call(children(el.parentNode), function(child) {
-						return child !== el;
+				return filtered(this.map(function(i, elem) {
+					return Y.G.Filter.call(children(elem.parentNode), function(child) {
+						return child !== elem;
 					});
 				}), selector);
 			},
@@ -1027,8 +1025,8 @@
 			},
 			// `pluck` is borrowed from Prototype.js
 			pluck: function(property) {
-				return map(this, function(el) {
-					return el[property];
+				return map(this, function(elem) {
+					return elem[property];
 				});
 			},
 			show: function() {
@@ -1059,7 +1057,7 @@
 				return this.each(function(index) {
 					$(this).wrapAll(
 						func ? structure.call(this, index) :
-						clone ? dom.cloneNode(true) : dom
+							clone ? dom.cloneNode(true) : dom
 					);
 				});
 			},
@@ -1117,10 +1115,10 @@
 			},
 			toggle: function(setting) {
 				return this.each(function() {
-					var el = $(this),
+					var elem = $(this),
 						val;
 
-					val = el.css('display') === 'none';
+					val = elem.css('display') === 'none';
 
 					if (Y.isUndefined(setting)) {
 						if (val) {
@@ -1129,9 +1127,9 @@
 					}
 
 					if (setting) {
-						el.show();
+						elem.show();
 					} else {
-						el.hide();
+						elem.hide();
 					}
 				});
 			},
@@ -1173,9 +1171,9 @@
 				return (Y.isString(name) && value === undef) ?
 					(this.length === 0 || this[0].nodeType !== 1 ? undef :
 						(name === 'value' && this[0].nodeName === 'INPUT') ? this.val() :
-						(Y.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
-							name)) ? this[0][name] : result
-					) :
+							(Y.isFalse(result = this[0].getAttribute(name)) && this[0].hasOwnProperty(
+								name)) ? this[0][name] : result
+						) :
 					this.each(function(index) {
 						if (this.nodeType !== 1) {
 							return;
@@ -1218,7 +1216,7 @@
 				});
 			},
 			prop: function(name, value) {
-				name = properitiesMap[name] || name;
+				name = propsMap[name] || name;
 				return (value === undef) ?
 					(this[0] && this[0][name]) :
 					this.each(function(index) {
@@ -1278,16 +1276,16 @@
 
 				this.offset.toString = function() {
 					return {
-						left: obj.left + window.pageXOffset + 'px',
-						top: obj.top + window.pageYOffset + 'px',
+						left: obj.left + Y.win.pageXOffset + 'px',
+						top: obj.top + Y.win.pageYOffset + 'px',
 						width: Math.round(obj.width) + 'px',
 						height: Math.round(obj.height) + 'px'
 					};
 				};
 
 				return {
-					left: obj.left + window.pageXOffset,
-					top: obj.top + window.pageYOffset,
+					left: obj.left + Y.win.pageXOffset,
+					top: obj.top + Y.win.pageYOffset,
 					width: Math.round(obj.width),
 					height: Math.round(obj.height)
 				};
@@ -1410,8 +1408,8 @@
 					return false;
 				}
 
-				return Y.G.ArrayProto.some.call(this, function(el) {
-					return this.test(className(el));
+				return Y.G.ArrayProto.some.call(this, function(elem) {
+					return this.test(className(elem));
 				}, classReplacement(name));
 			},
 			hasId: function(name) {
@@ -1419,8 +1417,8 @@
 					return false;
 				}
 
-				return Y.G.ArrayProto.some.call(this, function(el) {
-					return this.test(idName(el));
+				return Y.G.ArrayProto.some.call(this, function(elem) {
+					return this.test(idName(elem));
 				}, idReplacement(name));
 			},
 			addId: function(name) {
@@ -1429,22 +1427,22 @@
 				}
 
 				return this.each(function(index) {
-					IDsList = [];
+					idList = [];
 
 					var id = idName(this),
 						newName = functionArgument(this, name, index, id);
 
 					newName.split(/\s+/g).forEach(function(ID) {
 						if (!$(this).hasId(ID)) {
-							IDsList.push(ID);
+							idList.push(ID);
 						}
 					}, this);
 
-					if (IDsList.length) {
-						idName(this, id + (id ? ' ' : Y.empty()) + IDsList.join(' '));
+					if (idList.length) {
+						idName(this, id + (id ? ' ' : Y.empty()) + idList.join(' '));
 					}
 
-					// IDsList.length && idName(this, id + (id ? ' ' : Y.empty()) + IDsList.join(' '));
+					// idList.length && idName(this, id + (id ? ' ' : Y.empty()) + idList.join(' '));
 				});
 			},
 			addClass: function(name) {
@@ -1457,23 +1455,23 @@
 						return;
 					}
 
-					ClassList = [];
+					classList = [];
 
 					var cls = className(this),
 						newName = functionArgument(this, name, index, cls);
 
 					newName.split(/\s+/g).forEach(function(Class) {
 						if (!$(this).hasClass(Class)) {
-							ClassList.push(Class);
+							classList.push(Class);
 						}
 					}, this);
 
-					if (ClassList.length) {
-						className(this, cls + (cls ? ' ' : Y.empty()) + ClassList.join(
+					if (classList.length) {
+						className(this, cls + (cls ? ' ' : Y.empty()) + classList.join(
 							' '));
 					}
 
-					// ClassList.length && className(this, cls + (cls ? ' ' : Y.empty()) + ClassList.join(' '));
+					// classList.length && className(this, cls + (cls ? ' ' : Y.empty()) + classList.join(' '));
 				});
 			},
 			removeId: function(name) {
@@ -1482,14 +1480,14 @@
 						return idName(this, Y.empty());
 					}
 
-					IDsList = idName(this);
+					idList = idName(this);
 
-					functionArgument(this, name, index, IDsList).split(/\s+/g).forEach(
+					functionArgument(this, name, index, idList).split(/\s+/g).forEach(
 						function(ID) {
-							IDsList = IDsList.replace(idReplacement(ID), ' ');
+							idList = idList.replace(idReplacement(ID), ' ');
 						});
 
-					idName(this, IDsList.trim());
+					idName(this, idList.trim());
 				});
 			},
 			removeClass: function(name) {
@@ -1502,14 +1500,14 @@
 						return className(this, Y.empty());
 					}
 
-					ClassList = className(this);
+					classList = className(this);
 
-					functionArgument(this, name, index, ClassList).split(/\s+/g).forEach(
+					functionArgument(this, name, index, classList).split(/\s+/g).forEach(
 						function(Class) {
-							ClassList = ClassList.replace(classReplacement(Class), ' ');
+							classList = classList.replace(classReplacement(Class), ' ');
 						});
 
-					className(this, ClassList.trim());
+					className(this, classList.trim());
 				});
 			},
 			toggleClass: function(name, when) {
@@ -1523,7 +1521,7 @@
 
 					names.split(/\s+/g).forEach(function(Class) {
 						if (Y.isUndefined(when) || Y.isNull(when) || !Y.isSet(
-								when)) {
+							when)) {
 							if (!$this.hasClass(Class)) {
 								$this.addClass(Class);
 							} else {
@@ -1619,9 +1617,9 @@
 				}
 
 				var element = this[0],
-					// Get *real* offsetParent
+				// Get *real* offsetParent
 					offsetParent = this.offsetParent(),
-					// Get correct offsets
+				// Get correct offsets
 					offset = this.offset(),
 					parentOffset = Y.RegEx.RootNodeReplacement.test(offsetParent[0].nodeName) ? {
 						top: 0,
@@ -1648,14 +1646,14 @@
 			},
 			offsetParent: function() {
 				return this.map(function() {
-					var offsetParent = this.offsetParent || docElement;
+					var offsetParent = this.offsetParent || docElem;
 
 					while (offsetParent && (!$.nodeName(offsetParent, 'html') && $
-							.CSS(offsetParent, 'position') === 'static')) {
+						.CSS(offsetParent, 'position') === 'static')) {
 						offsetParent = offsetParent.offsetParent;
 					}
 
-					return offsetParent || docElement;
+					return offsetParent || docElem;
 				});
 			},
 			detach: function(selector) {
@@ -1842,13 +1840,13 @@
 				// Fixes #8908, it can be done more correctly by specifying setters in CSS_Hooks,
 				// but it would mean to define eight (for every problematic property) identical functions
 				if (!this.Support.clearCloneStyle && Y.isEmpty(value) && name.indexOf(
-						'background') === 0) {
+					'background') === 0) {
 					style[name] = 'inherit';
 				}
 
 				// If a hook was provided, use that value, otherwise just set the specified value
 				if (!hooks || !(hooks.hasOwnProperty('set')) || (value = hooks.set(
-						element, value, extra)) !== undef) {
+					element, value, extra)) !== undef) {
 					style[name] = value;
 
 					if (!newvalue && newvalue !== 0) {
@@ -1860,7 +1858,7 @@
 			} else {
 				// If a hook was provided get the non-computed value from there
 				if (hooks && hooks.hasOwnProperty('get') && (ret = hooks.get(element,
-						false, extra)) !== undef) {
+					false, extra)) !== undef) {
 					return ret;
 				}
 
@@ -1903,15 +1901,15 @@
 
 			return val;
 		}
-	}); // END OF Y.DomNode CLASS
+	}); // END OF Y.domNode CLASS
 
 	//---
 
-	DomNode = Y.DomNode.prototype;
+	domNode = Y.domNode.prototype;
 
 	//---
 
-	$.ClassTag = ClassTag;
+	$.classTag = classTag;
 
 	//---
 
@@ -1965,7 +1963,7 @@
 			}
 		},
 
-		isLTR: DomNode.documentIsLtr,
+		isLTR: domNode.documentIsLtr,
 
 		each: Y.each,
 
@@ -1973,41 +1971,41 @@
 
 		contains: contains,
 
-		fn: DomNode.Function,
+		fn: domNode.Function,
 
-		pushStack: DomNode.pushStack,
+		pushStack: domNode.pushStack,
 
-		Swap: DomNode.Swap,
+		Swap: domNode.Swap,
 
-		swap: DomNode.Swap,
+		swap: domNode.Swap,
 
-		Access: DomNode.Access,
+		Access: domNode.Access,
 
-		access: DomNode.Access,
+		access: domNode.Access,
 
-		Style: DomNode.Style,
+		Style: domNode.Style,
 
-		style: DomNode.Style,
+		style: domNode.Style,
 
-		CSS_Number: DomNode.CSS_Number,
+		CSS_Number: domNode.CSS_Number,
 
-		nodeName: DomNode.nodeName,
+		nodeName: domNode.nodeName,
 
-		CSS_Properities: DomNode.CSS_Properities,
+		CSS_Properities: domNode.CSS_Properities,
 
-		CSS: DomNode.CSS,
+		CSS: domNode.CSS,
 
-		css: DomNode.CSS,
+		css: domNode.CSS,
 
-		CSS_Hooks: DomNode.CSS_Hooks,
+		CSS_Hooks: domNode.CSS_Hooks,
 
-		Function: DomNode.Function,
+		Function: domNode.Function,
 
 		UUID: 0,
 
 		GUID: 0,
 
-		Expando: DomNode.Expando,
+		Expando: domNode.Expando,
 
 		Timers: [],
 
@@ -2025,7 +2023,7 @@
 
 	//---
 
-	$.prototype = DomNode.prototype;
+	$.prototype = domNode.prototype;
 
 	//---
 
@@ -2045,7 +2043,7 @@
 				}
 
 				if (win) {
-					win.scrollTo(!top ? val : window.pageXOffset, top ? val : window.pageYOffset);
+					win.scrollTo(!top ? val : Y.win.pageXOffset, top ? val : Y.win.pageYOffset);
 
 				} else {
 					element[method] = val;
@@ -2067,7 +2065,7 @@
 					// certain elements can have dimension info if we invisibly show them
 					// however, it must have a current display style that would benefit from this
 					return element.offsetWidth === 0 && Y.RegEx.rdisplayswap.test($.CSS(element,
-							'display')) ?
+						'display')) ?
 						$.Swap(element, cssShow, function() {
 							return getWidthOrHeight(element, name, extra);
 						}) :
@@ -2077,14 +2075,14 @@
 			set: function(element, value, extra) {
 				var styles = extra && getStyles(element);
 				return setPositiveNumber(element, value, extra ?
-					argumentWidthOrHeight(
-						element,
-						name,
-						extra,
-						$.Support.boxSizing && $.CSS(element, 'boxSizing', false,
-							styles) === 'border-box',
-						styles
-					) : 0
+						argumentWidthOrHeight(
+							element,
+							name,
+							extra,
+								$.Support.boxSizing && $.CSS(element, 'boxSizing', false,
+								styles) === 'border-box',
+							styles
+						) : 0
 				);
 			}
 		};
@@ -2174,11 +2172,11 @@
 
 				// Convert all methods to a "before" operation
 				target = operatorIndex === 0 ? target.nextSibling :
-					operatorIndex === 1 ? target.firstChild :
-					operatorIndex === 2 ? target :
+						operatorIndex === 1 ? target.firstChild :
+						operatorIndex === 2 ? target :
 					null;
 
-				parentInDocument = docElement.contains(parent);
+				parentInDocument = docElem.contains(parent);
 
 				nodes.forEach(function(node) {
 					if (copyByClone) {
@@ -2193,12 +2191,14 @@
 
 					// for (var ancestor = parent.parentNode; ancestor !== null && ancestor !== Y.doc.createElement; ancestor = ancestor.parentNode);
 
-					traverseNode(parent.insertBefore(node, target), function(el) {
-						if (Y.isNull(el.nodeName) && el.nodeName.toUpperCase() ===
-							'SCRIPT' && (!el.type || el.type === 'text/javascript')) {
-							if (!el.src) {
-								// window['eval'].call(window, el.innerHTML);
-								globalEval(Y.win, el.innerHTML);
+					traverseNode(parent.insertBefore(node, target), function(elem) {
+						if (Y.isNull(elem.nodeName) && elem.nodeName.toUpperCase() ===
+							'SCRIPT' && (!elem.type || elem.type === 'text/javascript')) {
+							if (!elem.src) {
+								// Y.win['eval'].call(Y.win, elem.innerHTML);
+								// globalEval(Y.win, elem.innerHTML);
+								/* jshint evil:true */
+								eval(Y.win, elem.innerHTML);
 							}
 						}
 					});
@@ -2236,7 +2236,7 @@
 	//---
 
 
-	Y.DOM = Y.win.$ = $;
+	Y.win.$ = Y.DOM = $;
 
 	//---
 
