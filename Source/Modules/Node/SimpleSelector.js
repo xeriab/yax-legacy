@@ -9,32 +9,32 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-(function () {
+(function ($) {
 
 	//---
 
 	'use strict';
 
-	var YAXDOM = Y.DOM.YAXDOM;
+	var YAXDOM = $.YAXDOM;
 
-	// var tmpYaxDom = Y.DOM;
+	// var tmpYaxDom = $;
 
 	var oldQSA = YAXDOM.QSA;
 	var oldMatches = YAXDOM.Matches;
-	var classTag = Y.DOM.ClassTag;
+	var classTag = $.classTag;
 	var Filters;
 
 	//---
 
 	function visible(element) {
-		element = Y.DOM(element);
+		element = $(element);
 		return !!(element.width() || element.height()) && element.css('display') !== 'none';
 	}
 
 	// Complex selectors are not supported:
 	//   li:has(label:contains("foo")) + li:has(label:contains("bar"))
 	//   ul.inner:first > li
-	Filters = Y.DOM.Expr[':'] = Y.DOM.expr[':'] = {
+	Filters = $.Expr[':'] = $.expr[':'] = {
 		visible: function () {
 			if (visible(this)) {
 				return this;
@@ -74,12 +74,12 @@
 			}
 		},
 		contains: function (index, _, text) {
-			if (Y.DOM(this).text().indexOf(text) > -1) {
+			if ($(this).text().indexOf(text) > -1) {
 				return this;
 			}
 		},
 		has: function (index, _, selector) {
-			if (Y.DOM.YAXDOM.QSA(this, selector).length) {
+			if ($.YAXDOM.QSA(this, selector).length) {
 				return this;
 			}
 		}
@@ -120,7 +120,7 @@
 				} else if (Y.RegEx.ChildReplacement.test(_selector)) {
 					// support "> *" child queries by tagging the parent node with a
 					// unique class and prepending that classname onto the selector
-					taggedParent = Y.DOM(node).addClass(classTag);
+					taggedParent = $(node).addClass(classTag);
 					_selector = '.' + classTag + ' ' + _selector;
 				}
 
@@ -135,7 +135,7 @@
 			}
 
 			return !filter ? nodes :
-				Y.unique(Y.DOM.map(nodes, function (n, i) {
+				Y.unique($.map(nodes, function (n, i) {
 					return filter.call(n, i, nodes, argument);
 				}));
 		});
@@ -149,7 +149,7 @@
 
 	//---
 
-}());
+}($));
 
 // FILE: ./Source/Modules/Node/SimpleSelector.js
 
