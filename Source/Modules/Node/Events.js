@@ -14,48 +14,64 @@
 
 	'use strict';
 
-	var YID = 1,
+	var YID = 1;
 
-		hover = {
-			mouseenter: 'mouseover',
-			mouseleave: 'mouseout'
-		},
+	var hover = {
+		mouseenter: 'mouseover',
+		mouseleave: 'mouseout'
+	};
 
-		inputEvents = ['focus', 'blur'],
+	var inputEvents = ['focus', 'blur'];
 
-		focus = {
-			focus: 'focusin',
-			blur: 'focusout'
-		},
+	var focus = {
+		focus: 'focusin',
+		blur: 'focusout'
+	};
 
-		ignoreProperties = /^([A-Z]|returnValue$|layer[XY]$)/,
+	var focusinSupported = Y.hasOwn.call(window, 'onfocusin');
 
-		focusinSupported = Y.hasOwn.call(Y.win, 'onfocusin'),
+	var eventMethods = {
+		preventDefault: 'isDefaultPrevented',
+		stopImmediatePropagation: 'isImmediatePropagationStopped',
+		stopPropagation: 'isPropagationStopped'
+	};
 
-		eventMethods = {
-			preventDefault: 'isDefaultPrevented',
-			stopImmediatePropagation: 'isImmediatePropagationStopped',
-			stopPropagation: 'isPropagationStopped'
-		},
+	var eventsKey = 'YAX.Event.Handlers';
 
-		eventsKey = 'YAX_EVENTS',
+	var returnTrue;
 
-		returnTrue,
+	var returnFalse;
 
-		returnFalse,
+	var specialEvents = {};
 
-		document = Y.doc,
-
-		specialEvents = {};
+	//---
 
 	specialEvents.click =
 		specialEvents.mousedown =
 			specialEvents.mouseup =
 				specialEvents.mousemove = 'MouseEvents';
 
+	Y.DOM.support.focusinBubbles = Y.hasOwn.call(window, 'onfocusin');
+
 	//---
 
 	// BEGIN OF [Private Functions]
+
+	returnTrue = function returnTrue() {
+		return true;
+	};
+
+	returnFalse = function returnFalse() {
+		return false;
+	};
+
+	function safeActiveElement () {
+		try {
+			return document.activeElement;
+		} catch (err) {
+			Y.error(err);
+		}
+	}
 
 	function yID(element) {
 		element.YID = YID++;
@@ -66,7 +82,7 @@
 	}
 
 	function parse(event) {
-		var parts = (Y.empty() + event).split('.');
+		var parts = (Y.empty + event).split('.');
 
 		return {
 			e: parts[0],
@@ -79,23 +95,13 @@
 	}
 
 	function eventHandlers(element) {
-		//element.EventHandlers = [];
-
-		//return element.EventHandlers;
-
-		var result = null;
-
-		if (Y.hasOwn.call(element, 'EventHandlers')) {
-			result = element.EventHandlers;
-		} else {
-			element.EventHandlers = [];
-
-			result = element.EventHandlers;
+		if (Y.hasOwn.call(element, 'Y.Event.Handlers')) {
+			return element['Y.Event.Handlers'];
 		}
 
-		return result;
+		element['Y.Event.Handlers'] = [];
 
-		// return element.EventHandlers || (element.EventHandlers = []);
+		return element['Y.Event.Handlers'];
 	}
 
 	function findHandlers(element, event, func, selector) {
@@ -150,32 +156,10 @@
 					}
 				}
 			}
-
-			/*if (source.defaultPrevented !== undefined ? source.defaultPrevented :
-			 'returnValue' in source ? source.returnValue === false :
-			 source.getPreventDefault && source.getPreventDefault()) {
-			 event.isDefaultPrevented = returnTrue;
-			 }*/
 		}
 
 		return event;
 	}
-
-	returnTrue = function () {
-		return true;
-	};
-
-	returnFalse = function () {
-		return false;
-	};
-
-	/*function safeActiveElement() {
-	 try {
-	 return Y.doc.activeElement;
-	 } catch (err) {
-	 Y.error(err);
-	 }
-	 }*/
 
 	function createProxy(event) {
 		var key, proxy = {
@@ -184,7 +168,7 @@
 
 		for (key in event) {
 			if (event.hasOwnProperty(key)) {
-				if (!ignoreProperties.test(key) && !Y.isUndefined(event[key])) {
+				if (!Y.RegEx.ignoreProperties.test(key) && !Y.isUndefined(event[key])) {
 					proxy[key] = event[key];
 				}
 			}
@@ -198,20 +182,22 @@
 	//---
 
 
-	Y.DOM.Event = function (type, props) {
-		var event, name, bubbles;
-
+	Y.DOM.Event = function (src, props) {
 		// Allow instantiation without the 'new' keyword
 		if (!(this instanceof Y.DOM.Event)) {
-			return new Y.DOM.Event(type, props);
+			return new Y.DOM.Event(src, props);
 		}
 
-		if (!Y.isString(type)) {
-			props = type;
-			type = props.type;
+		/*var event;
+		var name;
+		var bubbles;
+
+		if (!Y.isString(src)) {
+			props = src;
+			src = props.type;
 		}
 
-		event = Y.doc.createEvent(specialEvents[type] || 'Events');
+		event = document.createEvent(specialEvents[src] || 'Events');
 
 		bubbles = true;
 
@@ -223,26 +209,102 @@
 					} else {
 						event[name] = props[name];
 					}
-
-					// (name === 'bubbles') ? (bubbles = !!props[name]) : (event[name] = props[name]);
 				}
 			}
 
 			Y.DOM.extend(this, props);
 		}
 
-		event.initEvent(type, bubbles, true);
+		event.initEvent(src, bubbles, true);
 
-		this.timeStamp = type && type.timeStamp || Y.now();
+		return compatible(event);*/
+
+		//---
+
+
+		//---
+
+		// Event object
+		if (src && src.type) {
+			this.originalEvent = src;
+			this.type = src.type;
+
+			// Events bubbling up the document may have been marked as prevented
+			// by a handler lower down the tree; reflect the correct value.
+			if (src.defaultPrevented ||
+				(Y.isUndefined(src.defaultPrevented) &&
+					src.returnValue === false)) {
+				this.isDefaultPrevented = returnTrue();
+			} else {
+				this.isDefaultPrevented = returnFalse();
+			}
+		// Event type
+		} else {
+			this.type = src;
+		}
+
+		//
+
+		if (props) {
+			Y.extend(this, props);
+		}
+
+		//
+
+		// Create a timestamp if incoming event doesn't have one
+		this.timeStamp = (src && src.timeStamp) || Y.now();
 
 		// Mark it as fixed
 		this[Y.DOM.expando] = true;
 
-		return compatible(event);
+		compatible(this);
 	};
 
 	//---
 
+	// Y.DOM.Event is based on DOM3 Events as specified by the ECMAScript Language Binding
+	// http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html
+	Y.DOM.Event.prototype = {
+		constructor: Y.DOM.Event,
+
+		isDefaultPrevented: returnFalse,
+
+		isPropagationStopped: returnFalse,
+
+		isImmediatePropagationStopped: returnFalse,
+
+		preventDefault: function () {
+			var e = this.originalEvent;
+
+			this.isDefaultPrevented = returnTrue;
+
+			if (e && e.preventDefault) {
+				e.preventDefault();
+			}
+		},
+
+		stopPropagation: function () {
+			var e = this.originalEvent;
+
+			this.isPropagationStopped = returnTrue;
+
+			if (e && e.stopPropagation) {
+				e.stopPropagation();
+			}
+		},
+
+		stopImmediatePropagation: function () {
+			var e = this.originalEvent;
+
+			this.isImmediatePropagationStopped = returnTrue;
+
+			if (e && e.stopImmediatePropagation) {
+				e.stopImmediatePropagation();
+			}
+
+			this.stopPropagation();
+		}
+	};
 
 	//---
 
@@ -250,25 +312,25 @@
 	 * Y.DOM.Event contains functions for working with Node events.
 	 */
 	Y.extend(Y.DOM.Event, {
-		on: function (object, types, func, context) {
+		add: function (object, types, func, context) {
 			var type, x, len;
 
 			if (Y.isObject(types)) {
 				for (type in types) {
 					if (types.hasOwnProperty(type)) {
-						this.addListener(object, type, types[type], func);
+						this._on(object, type, types[type], func);
 					}
 				}
 			} else {
 				types = Y.Util.splitWords(types);
 
 				for (x = 0, len = types.length; x < len; x++) {
-					this.addListener(object, types[x], func, context);
+					this._on(object, types[x], func, context);
 				}
 			}
 		},
 
-		addListener: function (object, type, callback, context) {
+		_on: function (object, type, callback, context) {
 			var id, originalHandler, handler;
 
 			id = type + Y.stamp(callback) + (context ? '_' + Y.stamp(context) : '');
@@ -278,18 +340,18 @@
 			}
 
 			handler = function (event) {
-				return callback.call(context || object, event || Y.win.event);
+				return callback.call(context || object, event || window.event);
 			};
 
 			originalHandler = handler;
 
 			/** @namespace this.addPointerListener */
-			if (Y.UserAgent.Features.Pointer && type.indexOf('touch') === 0) {
+			if (Y.UA.features.pointer && type.indexOf('touch') === 0) {
 				return this.addPointerListener(object, type, handler, id);
 			}
 
 			/** @namespace this.addDoubleTapListener */
-			if (Y.UserAgent.Features.Touch && (type === 'dblclick') && this.addDoubleTapListener) {
+			if (Y.UA.features.touch && (type === 'dblclick') && this.addDoubleTapListener) {
 				this.addDoubleTapListener(object, handler, id);
 			}
 
@@ -299,7 +361,7 @@
 					object.addEventListener(type, handler, false);
 				} else if ((type === 'mouseenter') || (type === 'mouseleave')) {
 					handler = function (event) {
-						event = event || Y.win.event;
+						event = event || window.event;
 						if (!Y.DOM.Event._checkMouse(object, event)) {
 							return;
 						}
@@ -308,7 +370,7 @@
 
 					object.addEventListener(type === 'mouseenter' ? 'mouseover' : 'mouseout', handler, false);
 				} else {
-					if (type === 'click' && Y.UserAgent.OS.Android) {
+					if (type === 'click' && Y.OS.android) {
 						handler = function (event) {
 							return Y.DOM.Event._filterClick(event, originalHandler);
 						};
@@ -326,25 +388,25 @@
 			return this;
 		},
 
-		off: function (object, types, func, context) {
+		remove: function (object, types, func, context) {
 			var type, x, len;
 
 			if (Y.isObject(types)) {
 				for (type in types) {
 					if (types.hasOwnProperty(type)) {
-						this.removeListener(object, type, types[type], func);
+						this._off(object, type, types[type], func);
 					}
 				}
 			} else {
 				types = Y.Util.splitWords(types);
 
 				for (x = 0, len = types.length; x < len; x++) {
-					this.removeListener(object, types[x], func, context);
+					this._off(object, types[x], func, context);
 				}
 			}
 		},
 
-		removeListener: function (object, type, callback, context) {
+		_off: function (object, type, callback, context) {
 			var id, handler;
 
 			id = type + Y.stamp(callback) + (context ? '_' + Y.stamp(context) : '');
@@ -357,9 +419,9 @@
 
 			/** @namespace this.removePointerListener */
 			/** @namespace this.removeDoubleTapListener */
-			if (Y.UserAgent.Features.Pointer && type.indexOf('touch') === 0) {
+			if (Y.UA.features.pointer && type.indexOf('touch') === 0) {
 				this.removePointerListener(object, type, id);
-			} else if (Y.UserAgent.Features.Touch && (type === 'dblclick') && this.removeDoubleTapListener) {
+			} else if (Y.UA.features.touch && (type === 'dblclick') && this.removeDoubleTapListener) {
 				this.removeDoubleTapListener(object, id);
 			} else if (Y.hasProperty(object, 'removeEventListener')) {
 				if (type === 'mousewheel') {
@@ -397,6 +459,10 @@
 			return Y.DOM.Event
 				.on(el, 'mousewheel', stop)
 				.on(el, 'MozMousePixelScroll', stop);
+		},
+
+		disableClickPropagation: function (el) {
+
 		},
 
 //		disableClickPropagation: function (el) {
@@ -444,18 +510,20 @@
 		_skipEvents: {},
 
 		_fakeStop: function (event) {
-			// fakes stopPropagation by setting a special event flag, checked/reset with Y.DOM.Event._skipped(e)
+			// fakes stopPropagation by setting a special event flag,
+			// checked/reset with Y.DOM.Event._skipped(e)
 			Y.DOM.Event._skipEvents[event.type] = true;
 		},
 
 		_skipped: function (event) {
 			var skipped = this._skipEvents[event.type];
-			// reset when checking, as it's only used in map container and propagates outside of the map
+			// reset when checking
 			this._skipEvents[event.type] = false;
 			return skipped;
 		},
 
-		// check if element really left/entered the event target (for mouseenter/mouseleave)
+		// check if element really left/entered
+		// the event target (for mouseenter/mouseleave)
 		_checkMouse: function (el, event) {
 			var related = event.relatedTarget;
 
@@ -499,9 +567,6 @@
 
 	//---
 
-	// Y.DOM.Event.on = Y.DOM.Event.addListener;
-	// Y.DOM.Event.off = Y.DOM.Event.removeListener;
-
 	Y.DOM.Event.wheelDelta = Y.DOM.Event.getWheelDelta;
 
 	//---
@@ -511,24 +576,28 @@
 	//---
 
 	Y.extend(Y.DOM.event, {
-		add: function (element, events, func, data, selector, delegator, capture) {
-			var set = eventHandlers(element);
-			var callback;
+		global: {},
 
-			events.split(/\s/).forEach(function (event) {
+		//---
+
+		add_: function (element, types, callback, data, selector, delegator, capture) {
+			var set = eventHandlers(element);
+			var _callback;
+
+			types.split(/\s/).forEach(function (event) {
 				if (event === 'ready') {
-					return Y.DOM(document).ready(func);
+					return Y.DOM(document).ready(callback);
 				}
 
 				var handler = parse(event);
 
-				handler.callback = func;
+				handler.callback = callback;
 				handler.selector = selector;
 
 				// Emulate mouseenter, mouseleave
 				if (Y.hasOwn.call(hover, handler.e)) {
 					//if (handler.e in hover) {
-					func = function (e) {
+					callback = function (e) {
 						var related = e.relatedTarget;
 
 						if (!related || (related !== this && !Y.DOM.contains(this, related))) {
@@ -539,7 +608,7 @@
 
 				handler.del = delegator;
 
-				callback = delegator || func;
+				_callback = delegator || callback;
 
 				handler.proxy = function (e) {
 					e = compatible(e);
@@ -550,7 +619,7 @@
 
 					e.data = data;
 
-					var result = callback.apply(element, e._args === undef ? [e] : [e].concat(e._args));
+					var result = _callback.apply(element, e._args === undef ? [e] : [e].concat(e._args));
 
 					if (result === false) {
 						e.preventDefault();
@@ -564,33 +633,718 @@
 
 				set.push(handler);
 
-//				if (Y.hasProperty(element, 'addEventListener')) {
-				Y.DOM.Event.on(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
-//				}
+				if (Y.hasProperty(element, 'addEventListener')) {
+					Y.DOM.Event.add(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+				}
 			});
 		},
 
-		remove: function (element, events, func, selector, capture) {
+		remove_: function (element, events, func, selector, capture) {
 			(events || '').split(/\s/).forEach(function (event) {
 				findHandlers(element, event, func, selector).forEach(function (handler) {
 					delete eventHandlers(element)[handler.i];
 
-//					if (Y.hasProperty(element, 'removeEventListener')) {
-					Y.DOM.Event.off(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
-//					}
+					if (Y.hasProperty(element, 'removeEventListener')) {
+						Y.DOM.Event.remove(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
+					}
 				});
 			});
 		},
 
-		special: {}
+		add: function(elem, types, handler, data, selector) {
+			var handleObjIn, eventHandle, tmp,
+				events, t, handleObj,
+				special, handlers, type, namespaces, origType,
+				elemData = Y.DOM.data_priv.get(elem);
+
+			// Don't attach events to noData or text/comment nodes (but allow plain objects)
+			if (!elemData) {
+				return;
+			}
+
+			// Caller can pass in an object of custom data in lieu of the handler
+			if (handler.handler) {
+				handleObjIn = handler;
+				handler = handleObjIn.handler;
+				selector = handleObjIn.selector;
+			}
+
+			// Make sure that the handler has a unique ID, used to find/remove it later
+			if (!handler.guid) {
+				handler.guid = Y.DOM.GUID++;
+			}
+
+			// Init the element's event structure and main handler, if this is the first
+			events = elemData.events;
+			if (!events) {
+				events = elemData.events = {};
+			}
+
+			eventHandle = elemData.handle;
+
+			if (!eventHandle) {
+				eventHandle = elemData.handle = function (e) {
+					// Discard the second event of a Y.DOM.event.trigger() and
+					// when an event is called after a page has unloaded
+					return !Y.isUndefined(Y.DOM) && Y.DOM.event.triggered !== e.type ?
+						Y.DOM.event.dispatch.apply(elem, arguments) : undef;
+				};
+			}
+
+			// Handle multiple events separated by a space
+			types = (types || '').match(Y.RegEx.rnotwhite) || [''];
+
+			t = types.length;
+
+			while (t--) {
+				tmp = Y.RegEx.rtypenamespace.exec(types[t]) || [];
+				type = origType = tmp[1];
+				namespaces = (tmp[2] || '').split('.').sort();
+
+				// There *must* be a type, no attaching namespace-only handlers
+				if (!type) {
+					continue;
+				}
+
+				// If event changes its type, use the special event handlers for the changed type
+				special = Y.DOM.event.special[type] || {};
+
+				// If selector defined, determine special event api type, otherwise given type
+				// type = (selector ? special.delegateType : special.bindType) || type;
+				if (selector) {
+					type = special.delegateType || type;
+				} else {
+					type = special.bindType || type;
+				}
+
+				// Update special based on newly reset type
+				special = Y.DOM.event.special[type] || {};
+
+				// handleObj is passed to all event handlers
+				handleObj = Y.DOM.extend({
+					type: type,
+					origType: origType,
+					data: data,
+					handler: handler,
+					guid: handler.guid,
+					selector: selector,
+					needsContext: selector && Y.DOM.expr.match.needsContext.test(selector),
+					namespace: namespaces.join('.')
+				}, handleObjIn);
+
+				// Init the event handler queue if we're the first
+				handlers = events[type];
+
+				if (!handlers) {
+					handlers = events[type] = [];
+					handlers.delegateCount = 0;
+
+					// Only use addEventListener if the special events handler returns false
+					if (!special.setup ||
+						special.setup.call(elem, data, namespaces, eventHandle) === false) {
+
+						if (elem.addEventListener) {
+							// elem.addEventListener(type, eventHandle, false);
+							// add: function (object, types, func, context)
+
+							Y.DOM.Event.add(elem, type, eventHandle, false);
+						}
+					}
+				}
+
+				if (special.add) {
+					special.add.call(elem, handleObj);
+
+					if (!handleObj.handler.guid) {
+						handleObj.handler.guid = handler.guid;
+					}
+				}
+
+				// Add to the element's handler list, delegates in front
+				if (selector) {
+					handlers.splice(handlers.delegateCount++, 0, handleObj);
+				} else {
+					handlers.push(handleObj);
+				}
+
+				// Keep track of which events have ever been used, for event optimization
+				Y.DOM.event.global[type] = true;
+			}
+
+		},
+
+		// Detach an event or set of events from an element
+		remove: function(elem, types, handler, selector, mappedTypes) {
+
+			var j, origCount, tmp,
+				events, t, handleObj,
+				special, handlers, type, namespaces, origType,
+				elemData = Y.DOM.data_priv.hasData(elem) && Y.DOM.data_priv.get(elem);
+
+			events = elemData.events;
+
+			if (!elemData || !events) {
+				return;
+			}
+
+			// Once for each type.namespace in types; type may be omitted
+			types = (types || '').match(Y.RegEx.rnotwhite) || [''];
+
+			t = types.length;
+
+			while (t--) {
+				tmp = Y.RegEx.rtypenamespace.exec(types[t]) || [];
+				type = origType = tmp[1];
+				namespaces = (tmp[2] || '').split('.').sort();
+
+				// Unbind all events (on this namespace, if provided) for the element
+				if (!type) {
+					for (type in events) {
+						if (events.hasOwnProperty(type)) {
+							Y.DOM.event.remove(elem, type + types[t], handler, selector, true);
+						}
+					}
+
+					continue;
+				}
+
+				special = Y.DOM.event.special[type] || {};
+
+				// type = (selector ? special.delegateType : special.bindType) || type;
+
+				if (selector) {
+					type = special.delegateType || type;
+				} else {
+					type = special.bindType || type;
+				}
+
+				handlers = events[type] || [];
+
+				tmp = tmp[2] && new RegExp('(^|\\.)' + namespaces.join('\\.(?:.*\\.|)') + '(\\.|$)');
+
+				// Remove matching events
+				origCount = j = handlers.length;
+
+				while (j--) {
+					handleObj = handlers[j];
+
+					if ((mappedTypes || origType === handleObj.origType) &&
+						(!handler || handler.guid === handleObj.guid) &&
+						(!tmp || tmp.test(handleObj.namespace)) &&
+						(!selector || selector === handleObj.selector || (selector === '**' && handleObj.selector))) {
+						handlers.splice(j, 1);
+
+						if (handleObj.selector) {
+							handlers.delegateCount--;
+						}
+
+						if (special.remove) {
+							special.remove.call(elem, handleObj);
+						}
+					}
+				}
+
+				// Remove generic event handler if we removed something and no more handlers exist
+				// (avoids potential for endless recursion during removal of special event handlers)
+				if (origCount && !handlers.length) {
+					if (!special.teardown ||
+						special.teardown.call(elem, namespaces, elemData.handle) === false) {
+
+						Y.DOM.removeEvent(elem, type, elemData.handle);
+					}
+
+					delete events[type];
+				}
+			}
+
+			// Remove the expando if it's no longer used
+			if (Y.isEmptyObject(events)) {
+				delete elemData.handle;
+				Y.DOM.data_priv.remove(elem, 'events');
+			}
+		},
+
+		trigger: function(event, data, elem, onlyHandlers) {
+			var i, cur, tmp, bubbleType, ontype, handle, special,
+				eventPath = [elem || document],
+				type = Y.hasOwn.call(event, 'type') ? event.type : event,
+				namespaces = Y.hasOwn.call(event, 'namespace') ? event.namespace.split('.') : [];
+
+			cur = tmp = elem = elem || document;
+
+			// Don't do events on text and comment nodes
+			if (elem.nodeType === 3 || elem.nodeType === 8) {
+				return;
+			}
+
+			// focus/blur morphs to focusin/out; ensure we're not firing them right now
+			if (Y.RegEx.rfocusMorph.test(type + Y.DOM.event.triggered)) {
+				return;
+			}
+
+			if (type.indexOf('.') >= 0) {
+				// Namespaced trigger; create a regexp to match event type in handle()
+				namespaces = type.split('.');
+				type = namespaces.shift();
+				namespaces.sort();
+			}
+
+			ontype = type.indexOf(':') < 0 && 'on' + type;
+
+			// Caller can pass in a Y.DOM.Event object, Object, or just an event type string
+			event = event[Y.DOM.expando] ?
+				event :
+				// new Y.DOM.Event(type, typeof event === 'object' && event);
+				new Y.DOM.Event(type, Y.isObject(event) && event);
+
+			// Trigger bitmask: & 1 for native handlers; & 2 for Y.DOM (always true)
+			event.isTrigger = onlyHandlers ? 2 : 3;
+			event.namespace = namespaces.join('.');
+			event.rnamespace = event.namespace ?
+				new RegExp('(^|\\.)' + namespaces.join('\\.(?:.*\\.|)') + '(\\.|$)') :
+				null;
+
+			// Clean up the event in case it is being reused
+			event.result = undef;
+
+			if (!event.target) {
+				event.target = elem;
+			}
+
+			/*jshint -W041 */
+			// Clone any incoming data and prepend the event, creating the handler arg list
+			data = data == null ?
+				[event] :
+				Y.makeArray(data, [event]);
+
+			// Allow special events to draw outside the lines
+			special = Y.DOM.event.special[type] || {};
+
+			if (!onlyHandlers && special.trigger && special.trigger.apply(elem, data) === false) {
+				return;
+			}
+
+			// Determine event propagation path in advance, per W3C events spec (#9951)
+			// Bubble up to document, then to window; watch for a global ownerDocument var (#9724)
+			if (!onlyHandlers && !special.noBubble && !Y.isWindow(elem)) {
+
+				bubbleType = special.delegateType || type;
+				if (!Y.RegEx.rfocusMorph.test(bubbleType + type)) {
+					cur = cur.parentNode;
+				}
+				for (null; cur; cur = cur.parentNode) {
+					eventPath.push(cur);
+					tmp = cur;
+				}
+
+				// Only add window if we got to document (e.g., not plain obj or detached DOM)
+				if (tmp === (elem.ownerDocument || document)) {
+					eventPath.push(tmp.defaultView || tmp.parentWindow || window);
+				}
+			}
+
+			// Fire handlers on the event path
+			i = 0;
+
+			while ((cur = eventPath[i++]) && !event.isPropagationStopped()) {
+				event.type = i > 1 ?
+					bubbleType :
+					special.bindType || type;
+
+				// Y.DOM handler
+				handle = (Y.DOM.data_priv.get(cur, 'events') || {})[event.type] &&
+					Y.DOM.data_priv.get(cur, 'handle');
+
+				if (handle) {
+					handle.apply(cur, data);
+				}
+
+				// Native handler
+				handle = ontype && cur[ontype];
+
+				if (handle && handle.apply && Y.DOM.acceptData(cur)) {
+					event.result = handle.apply(cur, data);
+					if (event.result === false) {
+						event.preventDefault();
+					}
+				}
+			}
+
+			event.type = type;
+
+			// If nobody prevented the default action, do it now
+			if (!onlyHandlers && !event.isDefaultPrevented()) {
+
+				if ((!special._default || special._default.apply(eventPath.pop(), data) === false) &&
+					Y.DOM.acceptData(elem)) {
+
+					// Call a native DOM method on the target with the same name name as the event.
+					// Don't do default actions on window, that's where global variables be (#6170)
+					if (ontype && Y.isFunction(elem[type]) && !Y.isWindow(elem)) {
+
+						// Don't re-trigger an onFOO event when we call its FOO() method
+						tmp = elem[ontype];
+
+						if (tmp) {
+							elem[ontype] = null;
+						}
+
+						// Prevent re-triggering of the same event, since we already bubbled it above
+						Y.DOM.event.triggered = type;
+						elem[type]();
+						Y.DOM.event.triggered = undef;
+
+						if (tmp) {
+							elem[ontype] = tmp;
+						}
+					}
+				}
+			}
+
+			return event.result;
+		},
+
+		dispatch: function (event) {
+			// Make a writable Y.DOM.Event from the native event object
+			event = Y.DOM.event.fix(event);
+
+			var i, j, ret, matched, handleObj,
+				handlerQueue = [],
+				args = Y.G.Slice.call(arguments),
+				handlers = (Y.DOM.data_priv.get(this, 'events') || {})[event.type] || [],
+				special = Y.DOM.event.special[event.type] || {};
+
+			// Use the fix-ed Y.DOM.Event rather than the (read-only) native event
+			args[0] = event;
+			event.delegateTarget = this;
+
+			/** @namespace special.preDispatch */
+			// Call the preDispatch hook for the mapped type, and let it bail if desired
+			if (special.preDispatch && special.preDispatch.call(this, event) === false) {
+				return;
+			}
+
+			// Determine handlers
+			handlerQueue = Y.DOM.event.handlers.call(this, event, handlers);
+
+			// Run delegates first; they may want to stop propagation beneath us
+			i = 0;
+
+			while ((matched = handlerQueue[i++]) && !event.isPropagationStopped()) {
+				event.currentTarget = matched.elem;
+
+				j = 0;
+
+				while ((handleObj = matched.handlers[j++]) &&
+					!event.isImmediatePropagationStopped()) {
+					// Triggered event must either 1) have no namespace, or 2) have namespace(s)
+					// a subset or equal to those in the bound event (both can have no namespace).
+					if (!event.rnamespace || event.rnamespace.test(handleObj.namespace)) {
+
+						event.handleObj = handleObj;
+						event.data = handleObj.data;
+
+						ret = ((Y.DOM.event.special[handleObj.origType] || {}).handle ||
+							handleObj.handler).apply(matched.elem, args);
+
+						if (ret !== undef) {
+							if ((event.result = ret) === false) {
+								event.preventDefault();
+								event.stopPropagation();
+							}
+						}
+					}
+				}
+			}
+
+			// Call the postDispatch hook for the mapped type
+			if (special.postDispatch) {
+				special.postDispatch.call(this, event);
+			}
+
+			return event.result;
+		},
+
+		handlers: function (event, handlers) {
+			var i, matches, sel, handleObj,
+				handlerQueue = [],
+				delegateCount = handlers.delegateCount,
+				cur = event.target;
+
+			// Find delegate handlers
+			// Black-hole SVG <use> instance trees (#13180)
+			// Avoid non-left-click bubbling in Firefox (#3861)
+			if (delegateCount && cur.nodeType && (!event.button || event.type !== 'click')) {
+
+				for (null; cur !== this; cur = cur.parentNode || this) {
+
+					// Don't process clicks on disabled elements (#6911, #8165, #11382, #11764)
+					if (cur.disabled !== true || event.type !== 'click') {
+						matches = [];
+
+						for (i = 0; i < delegateCount; i++) {
+							handleObj = handlers[i];
+
+							// Don't conflict with Object.prototype properties (#13203)
+							sel = handleObj.selector + ' ';
+
+							if (matches[sel] === undef) {
+								matches[sel] = handleObj.needsContext ?
+									Y.DOM(sel, this).index(cur) >= 0 :
+									Y.DOM.find(sel, this, null, [cur]).length;
+							}
+
+							if (matches[sel]) {
+								matches.push(handleObj);
+							}
+						}
+
+						if (matches.length) {
+							handlerQueue.push({ elem: cur, handlers: matches });
+						}
+					}
+				}
+			}
+
+			// Add the remaining (directly-bound) handlers
+			if (delegateCount < handlers.length) {
+				handlerQueue.push({
+					elem: this,
+					handlers: handlers.slice(delegateCount)
+				});
+			}
+
+			return handlerQueue;
+		},
+
+		// Includes some event props shared by KeyEvent and MouseEvent
+		props: [
+			'altKey',
+			'bubbles',
+			'cancelable',
+			'ctrlKey',
+			'currentTarget',
+			'eventPhase',
+			'metaKey',
+			'relatedTarget',
+			'shiftKey',
+			'target',
+			'timeStamp',
+			'view',
+			'which'
+		],
+
+		fixHooks: {},
+
+		keyHooks: {
+			props: [
+				'char',
+				'charCode',
+				'key',
+				'keyCode'
+			],
+
+			filter: function(event, original) {
+				// Add which for key events
+				/*jshint -W041 */
+				if (event.which == null) {
+					event.which = original.charCode != null ? original.charCode : original.keyCode;
+				}
+
+				return event;
+			}
+		},
+
+		mouseHooks: {
+			props: [
+				'button',
+				'buttons',
+				'clientX',
+				'clientY',
+				'offsetX',
+				'offsetY',
+				'pageX',
+				'pageY',
+				'screenX',
+				'screenY',
+				'toElement'
+			],
+
+			filter: function(event, original) {
+				var eventDoc, doc, body,
+					button = original.button;
+
+				// Y.log(event)
+
+				// Calculate pageX/Y if missing and clientX/Y available
+				/*jshint -W041 */
+				if (event.pageX == null && original.clientX != null) {
+					eventDoc = event.target.ownerDocument || document;
+					doc = eventDoc.documentElement;
+					body = eventDoc.body;
+
+					event.pageX = original.clientX + ((doc && doc.scrollLeft) ||
+						(body && body.scrollLeft) || 0) -
+						((doc && doc.clientLeft) || (body && body.clientLeft) || 0);
+
+					event.pageY = original.clientY +
+						((doc && doc.scrollTop) || (body && body.scrollTop) || 0) -
+						((doc && doc.clientTop) || (body && body.clientTop) || 0);
+				}
+
+				// Add which for click: 1 === left; 2 === middle; 3 === right
+				// Note: button is not normalized, so don't use it
+				if (!event.which && button !== undef) {
+					/*jshint -W016 */
+					event.which = (button & 1 ? 1 : (button & 2 ? 3 : (button & 4 ? 2 : 0)));
+				}
+
+				return event;
+			}
+		},
+
+		fix: function (event) {
+			if (event[Y.DOM.expando]) {
+				return event;
+			}
+
+			// Create a writable copy of the event object and normalize some properties
+			var i, prop, copy,
+				type = event.type,
+				originalEvent = event,
+				fixHook = this.fixHooks[type];
+
+			if (!fixHook) {
+				this.fixHooks[type] = fixHook =
+					Y.RegEx.rmouseEvent.test(type) ? this.mouseHooks :
+						Y.RegEx.rkeyEvent.test(type) ? this.keyHooks :
+						{};
+			}
+
+			copy = fixHook.props ? this.props.concat(fixHook.props) : this.props;
+
+			event = new Y.DOM.Event(originalEvent);
+
+			i = copy.length;
+
+			while (i--) {
+				prop = copy[i];
+				event[prop] = originalEvent[prop];
+			}
+
+			// Support: Cordova 2.5 (WebKit) (#13255)
+			// All events should have a target; Cordova deviceready doesn't
+			if (!event.target) {
+				event.target = document;
+			}
+
+			// Support: Safari 6.0+, Chrome<28
+			// Target should not be a text node (#504, #13143)
+			if (event.target.nodeType === 3) {
+				event.target = event.target.parentNode;
+			}
+
+			return fixHook.filter ? fixHook.filter(event, originalEvent) : event;
+		},
+
+		special: {
+			load: {
+				// Prevent triggered image.load events from bubbling to window.load
+				noBubble: true
+			},
+
+			focus: {
+				// Fire native event if possible so blur/focus sequence is correct
+				trigger: function () {
+					if (this !== safeActiveElement() && this.focus) {
+						this.focus();
+						return false;
+					}
+				},
+
+				delegateType: 'focusin'
+			},
+
+			blur: {
+				trigger: function () {
+					if (this === safeActiveElement() && this.blur) {
+						this.blur();
+						return false;
+					}
+				},
+
+				delegateType: 'focusout'
+			},
+
+			click: {
+				// For checkbox, fire native event so checked state will be right
+				trigger: function () {
+					if (this.type === 'checkbox' &&
+						this.click && Y.DOM.nodeName(this, 'input')) {
+						this.click();
+						return false;
+					}
+				},
+
+				// For cross-browser consistency, don't fire native .click() on links
+				_default: function (event) {
+					return Y.DOM.nodeName(event.target, 'a');
+				}
+			},
+
+			beforeunload: {
+				postDispatch: function (event) {
+					// Support: Firefox 20+
+					// Firefox doesn't alert if the returnValue field is not set.
+					if (event.result !== undef && event.originalEvent) {
+						event.originalEvent.returnValue = event.result;
+					}
+				}
+			}
+		},
+
+		simulate: function (type, elem, event, bubble) {
+			// var e = Y.extend(new Y.DOM.Event(type), event, {
+			var e = Y.extend(new Y.DOM.Event(), event, {
+				type: type,
+				isSimulated: true,
+				originalEvent: {},
+				bubbles: true
+			});
+
+			if (bubble) {
+				Y.DOM.event.trigger(e, null, elem);
+			} else {
+				Y.DOM.event.dispatch.call(elem, e);
+			}
+
+			if (e.isDefaultPrevented()) {
+				event.preventDefault();
+			}
+		}
 	});
+
+	//---
+
+	Y.DOM.removeEvent = function(elem, type, handle) {
+		if (elem.removeEventListener) {
+			// elem.removeEventListener(type, handle, false);
+			Y.DOM.Event.remove(elem, type, handle, false);
+		}
+	};
 
 	//---
 
 	Y.DOM.proxy = Y.DOM.Proxy = function (callback, context) {
 		var result, proxyFn, args;
 
-		args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
+		/*var _in = function (arg1, arg2) {
+			return (arg1 in arg2);
+		};*/
+
+		// args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
+		// args = _in(2, arguments) && Y.G.Slice.call(arguments, 2);
+		args = Y.G.Slice.call(arguments, 2);
 
 		if (Y.isFunction(callback)) {
 
@@ -600,7 +1354,7 @@
 
 			proxyFn.YID = yID(callback);
 
-			proxyFn.GUID = callback.GUID = callback.GUID || proxyFn.GUID || Y.DOM.GUID++;
+			proxyFn.guid = callback.guid = callback.guid || proxyFn.guid || Y.DOM.GUID++;
 
 			result = proxyFn;
 		} else if (Y.isString(context)) {
@@ -616,50 +1370,116 @@
 			throw new TypeError('expected function');
 		}
 
-		// Y.log(result);
-
 		return result;
 	};
 
-	Y.DOM.Function.bind = function (eventName, data, callback) {
-		// Y.log(arguments);
-		// return this.on(eventName, data, callback);
-		return this.on(eventName, data, callback);
+	Y.DOM.fn.bind = function (types, data, callback) {
+		// return this.on(types, data, callback);
+		return this.on(types, null, data, callback);
 	};
 
-	Y.DOM.Function.bindEvent = function (eventName, data, callback) {
-		// Y.log(arguments);
-		// return this.on(eventName, data, callback);
-		return this.on(eventName, data, callback);
+	Y.DOM.fn.bindEvent = function (types, data, callback) {
+		// return this.on(types, data, callback);
+		return this.on(types, null, data, callback);
 	};
 
-	Y.DOM.Function.unbind = function (event, callback) {
-		return this.off(event, callback);
+	Y.DOM.fn.unbind = function (types, callback) {
+		// return this.off(types, callback);
+		return this.off(types, null, callback);
 	};
 
-	Y.DOM.Function.one = function (event, selector, data, callback) {
-		return this.on(event, selector, data, callback, 1);
+	Y.DOM.fn.one = function (types, selector, data, callback) {
+		return this.on(types, selector, data, callback, 1);
 	};
 
-	Y.DOM.Function.delegate = function (selector, event, callback) {
-		return this.on(event, selector, callback);
+	Y.DOM.fn.delegate = function (selector, types, data, callback) {
+		return this.on(types, selector, data, callback);
 	};
 
-	Y.DOM.Function.undelegate = function (selector, event, callback) {
-		return this.off(event, selector, callback);
+	Y.DOM.fn.undelegate = function (selector, types, callback) {
+		// (namespace) or (selector, types [, fn])
+		return arguments.length === 1 ?
+			this.off(selector, '**') :
+			this.off(types, selector || '**', callback);
 	};
 
-	Y.DOM.Function.live = function (event, callback) {
-		Y.DOM(Y.doc.body).delegate(this.selector, event, callback);
+	/*Y.DOM.fn.live = function (event, callback) {
+		Y.DOM(document.body).delegate(this.selector, event, callback);
 		return this;
-	};
+	};*/
 
-	Y.DOM.Function.die = function (event, callback) {
-		Y.DOM(Y.doc.body).undelegate(this.selector, event, callback);
+	/*Y.DOM.fn.die = function (event, callback) {
+		Y.DOM(document.body).undelegate(this.selector, event, callback);
 		return this;
+	};*/
+
+	Y.DOM.fn.on = function on(types, selector, data, fn, /*INTERNAL*/ one) {
+		var origFn, type;
+
+		// Types can be a map of types/handlers
+		if (typeof types === 'object') {
+			// (types-Object, selector, data)
+			if (typeof selector !== 'string') {
+				// (types-Object, data)
+				data = data || selector;
+				selector = undef;
+			}
+
+			for (type in types) {
+				if (types.hasOwnProperty(type)) {
+					this.on(type, selector, data, types[type], one);
+				}
+			}
+
+			return this;
+		}
+
+		/*jshint -W041 */
+		if (data == null && fn == null) {
+			// (types, fn)
+			fn = selector;
+			data = selector = undef;
+		} else if (fn == null) {
+			if (typeof selector === 'string') {
+				// (types, selector, fn)
+				fn = data;
+				data = undef;
+			} else {
+				// (types, data, fn)
+				fn = data;
+				data = selector;
+				selector = undef;
+			}
+		}
+		if (fn === false) {
+			fn = returnFalse;
+		} else if (!fn) {
+			return this;
+		}
+
+		if (one === 1) {
+			origFn = fn;
+			fn = function(event) {
+				// Can use an empty set, since event contains the info
+				Y.DOM().off(event);
+				return origFn.apply(this, arguments);
+			};
+			// Use same guid so caller can remove using origFn
+			if (origFn.guid) {
+				fn.guid = origFn.guid;
+			} else {
+				origFn.guid = Y.DOM.GUID++;
+				fn.guid = origFn.guid;
+			}
+
+			// fn.guid = origFn.guid || (origFn.guid = Y.DOM.GUID++);
+		}
+		return this.each(function() {
+			Y.DOM.event.add(this, types, fn, data, selector);
+		});
 	};
 
-	Y.DOM.Function.on = function (event, selector, data, callback, one) {
+	Y.DOM.fn.on_ = function (event, selector, data, callback, one) {
 		var autoRemove, delegator, $this = this;
 
 		if (event && !Y.isString(event)) {
@@ -713,7 +1533,51 @@
 		});
 	};
 
-	Y.DOM.Function.off = function (event, selector, callback) {
+	Y.DOM.fn.off = function (types, selector, callback) {
+		var handleObj, type;
+
+		if (types && types.preventDefault && types.handleObj) {
+			// (event)  dispatched Y.DOM.Event
+			handleObj = types.handleObj;
+
+			Y.DOM(types.delegateTarget).off(
+				handleObj.namespace ?
+					handleObj.origType + '.' + handleObj.namespace :
+					handleObj.origType,
+				handleObj.selector,
+				handleObj.handler
+			);
+
+			return this;
+		}
+
+		if (typeof types === 'object') {
+			// (types-object [, selector])
+			for (type in types) {
+				if (types.hasOwnProperty(type)) {
+					this.off(type, selector, types[type]);
+				}
+			}
+
+			return this;
+		}
+
+		if (selector === false || typeof selector === 'function') {
+			// (types [, fn])
+			callback = selector;
+			selector = undef;
+		}
+
+		if (callback === false) {
+			callback = returnFalse;
+		}
+
+		return this.each(function() {
+			Y.DOM.event.remove(this, types, callback, selector);
+		});
+	};
+
+	Y.DOM.fn.off_ = function (event, selector, callback) {
 		var $this = this;
 
 		if (event && !Y.isString(event)) {
@@ -738,7 +1602,30 @@
 		});
 	};
 
-	Y.DOM.Function.trigger = function (event, args) {
+	Y.DOM.fn.trigger = function (type, data) {
+		if (Y.isString(type) || Y.isPlainObject(type)) {
+			type = Y.DOM.Event(type);
+		} else {
+			type = compatible(type);
+		}
+
+		type._args = data;
+
+		return this.each(function () {
+			/*jshint -W052 */
+			if (type.type && ~inputEvents.indexOf(type.type)) {
+				this[type.type]();
+			} else {
+				Y.DOM.event.trigger(type, data, this);
+			}
+		});
+
+		/*return this.each(function() {
+			Y.DOM.event.trigger(type, data, this);
+		});*/
+	};
+
+	Y.DOM.fn.trigger_ = function (event, args) {
 		if (Y.isString(event) || Y.isPlainObject(event)) {
 			event = Y.DOM.Event(event);
 		} else {
@@ -749,25 +1636,28 @@
 
 		return this.each(function () {
 			// items in the collection might not be Node elements
-			/*if (Y.hasProperty(this, 'dispatchEvent')) {
-			 this.dispatchEvent(event);
-			 } else {
-			 Y.DOM(this).triggerHandler(event, args);
-			 }*/
-
+			/*jshint -W052 */
 			if (event.type && ~inputEvents.indexOf(event.type)) {
 				this[event.type]();
 			} else if (Y.hasProperty(this, 'dispatchEvent')) {
 				this.dispatchEvent(event);
-			}/* else {
-			 Y.DOM(this).triggerHandler(event, args);
-			 }*/
+			} else {
+				Y.DOM(this).triggerHandler(event, args);
+			}
 		});
+	};
+
+	Y.DOM.fn.triggerHandler = function (type, data) {
+		var element = this[0];
+
+		if (element) {
+			return Y.DOM.event.trigger(type, data, element, true);
+		}
 	};
 
 	// triggers event handlers on current element just as if an event occurred,
 	// doesn't trigger an actual event, doesn't bubble
-	Y.DOM.Function.triggerHandler = function (event, args) {
+	Y.DOM.fn.triggerHandler_ = function (event, args) {
 		var e, result = null;
 
 		this.each(function (i, element) {
@@ -788,9 +1678,9 @@
 	};
 
 	// Shortcut methods for `.bind(event, func)` for each event type
-	[
-		'focusin',
-		'focusout',
+	Y.forEach([
+		// 'focusin',
+		// 'focusout',
 		'load',
 		'resize',
 		'scroll',
@@ -815,24 +1705,32 @@
 		'contextmenu',
 		'mousewheel',
 		'wheel'
-	].forEach(function (event) {
-			Y.DOM.Function[event] = function (callback) {
-				return callback ?
-					this.bind(event, callback) :
-					this.trigger(event);
-			};
-		});
+	], function (name) {
+		Y.DOM.fn[name] = function (data, callback) {
+			return arguments.length > 0 ?
+				this.on(name, null, data, callback) :
+				this.trigger(name);
 
-	Y.DOM.Function.hashchange = function (callback) {
-		return callback ? this.bind('hashchange', callback) : this.trigger('hashchange', callback);
+			/*return callback ?
+				this.bind(name, callback) :
+				this.trigger(name);*/
+		};
+	});
+
+	Y.DOM.fn.hashchange = function (callback) {
+		if (Y.isWindow(this[0])) {
+			return arguments.length > 0 ?
+				this.bind('hashchange', callback) :
+				this.trigger('hashchange', callback);
+		}
 	};
 
-	Y.DOM.Function.hover = function(over, out) {
+	Y.DOM.fn.hover = function(over, out) {
 		return this.mouseenter(over).mouseleave(out || over);
 	};
 
-	inputEvents.forEach(function (name) {
-		Y.DOM.Function[name] = function (callback) {
+	Y.forEach(inputEvents, function (name) {
+		Y.DOM.fn[name] = function (callback) {
 			if (callback) {
 				this.bind(name, callback);
 			} else {
@@ -840,7 +1738,6 @@
 					try {
 						this[name]();
 					} catch (err) {
-						//...
 						Y.error(err);
 					}
 				});
@@ -851,10 +1748,10 @@
 	});
 
 	// Generate extended `remove` and `empty` functions
-	['remove', 'empty'].forEach(function (method) {
-		var origFn = Y.DOM.Function[method];
+	/*['remove', 'empty'].forEach(function (method) {
+		var origFn = Y.DOM.fn[method];
 
-		Y.DOM.Function[method] = function () {
+		Y.DOM.fn[method] = function () {
 			var elements = this.find('*');
 
 			if (method === 'remove') {
@@ -867,13 +1764,99 @@
 
 			return origFn.call(this);
 		};
+	});*/
+
+	//---
+
+	// Support: Firefox, Chrome, Safari
+	// Create 'bubbling' focus and blur events
+	if (!Y.DOM.support.focusinBubbles) {
+		Y.DOM.each({
+			focus: 'focusin',
+			blur: 'focusout'
+		}, function (orig, fix) {
+			// Attach a single capturing handler on the document while someone wants focusin/focusout
+			var handler = function (event) {
+				Y.DOM.event.simulate(fix, event.target, Y.DOM.event.fix(event), true);
+			};
+
+			Y.DOM.event.special[fix] = {
+				setup: function () {
+					var doc = this.ownerDocument || this,
+						attaches = Y.DOM.dataPrivative.access(doc, fix);
+
+					if (!attaches) {
+						doc.addEventListener(orig, handler, true);
+					}
+					Y.DOM.dataPrivative.access(doc, fix, (attaches || 0) + 1);
+				},
+
+				teardown: function () {
+					var doc = this.ownerDocument || this,
+						attaches = Y.DOM.dataPrivative.access(doc, fix) - 1;
+
+					if (!attaches) {
+						doc.removeEventListener(orig, handler, true);
+						Y.DOM.dataPrivative.remove(doc, fix);
+
+					} else {
+						Y.DOM.dataPrivative.access(doc, fix, attaches);
+					}
+				}
+			};
+		});
+	}
+
+	//---
+
+	// Create mouseenter/leave events using mouseover/out and event-time checks
+	// Support: Chrome 15+
+	Y.each({
+		mouseenter: 'mouseover',
+		mouseleave: 'mouseout',
+		pointerenter: 'pointerover',
+		pointerleave: 'pointerout'
+	}, function (orig, fix) {
+		Y.DOM.event.special[orig] = {
+			delegateType: fix,
+			bindType: fix,
+
+			handle: function (event) {
+				var ret,
+					target = this,
+					related = event.relatedTarget,
+					handleObj = event.handleObj;
+
+				// For mousenter/leave call the handler if related is outside the target.
+				// NB: No relatedTarget if the mouse left/entered the browser window
+				if (!related || (related !== target && !Y.DOM.contains(target, related))) {
+					event.type = handleObj.origType;
+					ret = handleObj.handler.apply(this, arguments);
+					event.type = fix;
+				}
+
+				return ret;
+			}
+		};
 	});
 
 	//---
 
-	Y.DOM.Event.prototype.isDefaultPrevented = function () {
-		return this.defaultPrevented;
-	};
+	//---
+
+	// Attach a bunch of functions for handling common AJAX events
+	Y.forEach([
+		'ajaxStart',
+		'ajaxStop',
+		'ajaxComplete',
+		'ajaxError',
+		'ajaxSuccess',
+		'ajaxSend'
+	], function(name) {
+		Y.DOM.fn[name] = function(callback) {
+			return this.on(name, callback);
+		};
+	});
 
 	//---
 
