@@ -1,24 +1,50 @@
 /**
- * YAX Require
+ * YAX
  */
 
 /*jslint indent: 4 */
 /*jslint white: true */
 /*jshint eqeqeq: false */
-/*jshint strict: false */
-/*jshint undef: false */
+/*jshint undef: true */
 /*jshint unused: true */
-/*global module */
+/*jshint strict: false */
+/*global exports, module */
 
 (function () {
 
 	//---
 
+	// 'use strict';
+
+	// var Y = {};
+
+	var isNode = false;
+
+	// Establish the root object, `window` in the browser, or `exports` on the server.
+	var root = this;
+
+	// Save the previous value of the `Y` or `YAX` variable.
+	var previousYax = root.Y || root.YAX || null;
+
 	/*jshint -W079 */
 	/*jshint -W020 */
 	var require = null;
 	var define = null;
-	var root = this;
+
+	// Save bytes in the minified (but not gzipped) version:
+	var ArrayProto = Array.prototype;
+	var ObjProto = Object.prototype;
+	var FuncProto = Function.prototype;
+
+	// Create quick reference variables for speed access to core prototypes.
+	var Push = ArrayProto.push;
+	var Filter = ArrayProto.filter;
+	var Slice = ArrayProto.slice;
+	var Concat = ArrayProto.concat;
+	var toString = ObjProto.toString;
+	var HasOwnProperty = ObjProto.hasOwnProperty;
+
+	//---
 
 	(function () {
 		var modules = {};
@@ -109,70 +135,25 @@
 		module.exports.define = define;
 	}
 
-	root.R = require;
-	root.D = define;
+	//---
+
+	root.require = require;
+	root.define = define;
 
 	//---
 
-}());
-
-// FILE: ./Source/Require.js
-
-//---
-
-/**
- * YAX
- */
-
-/*jslint indent: 4 */
-/*jslint white: true */
-/*jshint eqeqeq: false */
-/*jshint undef: true */
-/*jshint unused: true */
-/*global exports, define, module */
-
-(function () {
-	// 'use strict';
-
-	var Y = {};
-
-	var isNode = false;
-
-	// Establish the root object, `window` in the browser, or `exports` on the server.
-	var root = this;
-
-	// Save the previous value of the `Y` or `YAX` variable.
-	var previousYax = root.Y || root.YAX || null;
-
-	// Save bytes in the minified (but not gzipped) version:
-	var ArrayProto = Array.prototype;
-	var ObjProto = Object.prototype;
-	var FuncProto = Function.prototype;
-
-	// Create quick reference variables for speed access to core prototypes.
-	var Push = ArrayProto.push;
-	var Filter = ArrayProto.filter;
-	var Slice = ArrayProto.slice;
-	var Concat = ArrayProto.concat;
-	var toString = ObjProto.toString;
-	var HasOwnProperty = ObjProto.hasOwnProperty;
-
-	var Console = root.console;
-
-	//---
-
-	// Create a safe reference to the YAX object for use below.
-	/*Y = function (object) {
-		if (object instanceof Y) {
-			return object;
+	// Create a safe reference to the `Y` object for use below.
+	var Y = function (obj) {
+		if (obj instanceof Y) {
+			return obj;
 		}
 
 		if (!(this instanceof Y)) {
-			return new Y(object);
+			return new Y(obj);
 		}
 
-		this._WRAPPED = object;
-	};*/
+		this._wrapped = obj;
+	};
 
 	//---
 
@@ -196,6 +177,7 @@
 	if (typeof exports !== 'undefined') {
 		if (typeof module !== 'undefined' && module.exports) {
 			// exports = module.exports = Y;
+			// module.exports = Y;
 			module.exports = Y;
 		}
 
@@ -206,29 +188,9 @@
 
 	//---
 
-	Y.ENV = {};
-
-	//---
-
 	Y.toString = function () {
-		return '[YAX]';
+		return '[YAX]: Library';
 	};
-
-	//---
-
-	if (isNode) {
-		isNode = true;
-
-		Console.info('[INFO] Running YAX.JS in "Node" Environment!');
-	} else {
-		isNode = false;
-
-		Y.win = this;
-		Y.doc = Y.win.document;
-		Y.loc = Y.win.location;
-
-		Console.info('[INFO] Running YAX.JS in "Browser" Environment!');
-	}
 
 	//---
 
@@ -270,16 +232,23 @@
 		return array;
 	};
 
+	Object.setPrototypeOf = Object.setPrototypeOf || function (obj, proto) {
+		/*jshint -W103 */
+		obj.__proto__ = proto;
+		
+		return obj;
+	};
+
 	//---
 
 	Y._INFO = {};
 
 	//---
 
-	Y.VERSION = Y._INFO.VERSION = 0.20;
-	Y._INFO.BUILD = 1000;
-	Y._INFO.STATUS = 'DEV';
-	Y._INFO.CODENAME = 'RAGHDA';
+	Y.VERSION = 0.20;
+	Y.BUILD = 1000;
+	Y.STATUS = 'DEV';
+	Y.CODENAME = 'RAGHDA';
 
 	Y.hasOwnProp = ({}).hasOwnProperty;
 
@@ -320,15 +289,23 @@
 	Y.G.IndexOf = ArrayProto.indexOf;
 	Y.G.Push = ArrayProto.push;
 
-	/** @namespace root.R */
-	/** @namespace root.D */
-	Y.require = root.R || require || null;
-	Y.define = root.D || define || null;
+	Y.require = root.require || require || null;
+	Y.define = root.define || define || null;
 
 	//---
 
-	/** @namespace define.amd */
+	if (isNode) {
+		isNode = true;
+		console.info('[INFO] Running YAX.JS in "Node" Environment!');
+	} else {
+		isNode = false;
+		Y.WIN = this;
+		Y.DOC = Y.WIN.document;
+		console.info('[INFO] Running YAX.JS in "Browser" Environment!');
+	}
 
+
+	/** @namespace define.amd */
 	// AMD registration happens at the end for compatibility with AMD loaders
 	// that may not enforce next-turn semantics on modules. Even though general
 	// practice for AMD registration is to be anonymous, YAX registers
@@ -340,14 +317,11 @@
 		define('YAX', [], function () {
 			return Y;
 		});
+
+		isNode = true;
 	} else {
 		expose();
 	}
-
-	//---
-
-	delete root.R;
-	delete root.D;
 
 	//---
 
@@ -392,56 +366,54 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-(function(undef) {
+(function () {
 
 	//---
 
 	'use strict';
 
 	var classToType = {};
-	var False = false;
-	var obj = Object.prototype;
-	var hasOwn = obj.hasOwnProperty;
-	var Console = console;
-
+	
 	//---
 
 	/**
 	 * isFloat
 	 */
-	function isFloat(variable) {
+	Y.isFloat = function isFloat(variable) {
 		// return + variable === variable && (!isFinite(variable) || !!(variable % 1));
 		// return + variable === variable && (!isFinite(variable) || !!(variable % 1));
 		// return variable === +variable && variable !== (variable|0);
-		return variable !== '' && !isNaN(variable) && Math.round(variable) !==
-			variable;
-	}
+		return variable !== '' && !isNaN(variable) &&
+			Math.round(variable) !== variable;
+	};
 
 	/**
 	 * getType
 	 *
 	 * Get the type of
 	 */
-	function getType(variable) {
-		var str = typeof variable,
-			name,
-			getFuncName = function(func) {
-				name = (/\W*function\s+([\w\$]+)\s*\(/).exec(func);
+	Y.typeOf = function getType(variable) {
+		var str = typeof variable;
+		var name;
+		var getFuncName = function(func) {
+			name = (/\W*function\s+([\w\$]+)\s*\(/).exec(func);
 
-				if (!name) {
-					return '(Anonymous)';
-				}
+			if (!name) {
+				return '(Anonymous)';
+			}
 
-				return name[1];
-			};
+			return name[1];
+		};
 
 		if (str === 'object') {
 			if (variable !== null) {
 				// From: http://javascript.crockford.com/remedial.html
-				if (typeof variable.length === 'number' && !(variable.propertyIsEnumerable(
-						'length')) && typeof variable.splice === 'function') {
+				if (typeof variable.length === 'number' &&
+					!(variable.propertyIsEnumerable('length')) &&
+					typeof variable.splice === 'function') {
 					str = 'array';
-				} else if (variable.constructor && getFuncName(variable.constructor)) {
+				} else if (variable.constructor &&
+					getFuncName(variable.constructor)) {
 					name = getFuncName(variable.constructor);
 
 					if (name === 'Date') {
@@ -458,11 +430,11 @@
 			}
 		} else if (str === 'number') {
 			// str = this.is_float(variable) ? 'double' : 'integer';
-			str = isFloat(variable) ? 'double' : 'integer';
+			str = Y.isFloat(variable) ? 'double' : 'integer';
 		}
 
 		return str;
-	}
+	};
 
 	/**
 	 * type
@@ -472,27 +444,36 @@
 	 * @param    variable object Variable to get type
 	 * @return    string The object type
 	 */
-	function type(variable) {
-		var myType, myToString;
+	Y.type = function type(variable) {
+		var _type;
+		var __ToString = classToType.toString;
 
-		myToString = classToType.toString;
-
-		// console.log(classToType);
-
+		/*jshint -W041 */
 		if (variable === null) {
-			myType = String(variable);
-		} else if (({})[myToString.call(variable)]) {
-			// myType = myToString.call(variable);
-			myType = classToType[myToString.call(variable)];
-		} else if (([])[myToString.call(variable)]) {
-			// myType = myToString.call(object);
-			myType = classToType[myToString.call(variable)];
+			_type = String(variable);
+		} else if (({})[__ToString.call(variable)]) {
+			_type = classToType[__ToString.call(variable)];
+		} else if (([])[__ToString.call(variable)]) {
+			_type = classToType[__ToString.call(variable)];
 		} else {
-			myType = typeof variable;
+			_type = typeof variable;
 		}
 
-		return myType.toString().toLowerCase();
-	}
+		/*if (variable === null) {
+			_type = String(variable);
+		} else if (typeof variable === 'object' ||
+			typeof variable === 'function') {
+			_type = classToType[__ToString.call(variable)] || 'object';
+		} else if (({})[__ToString.call(variable)]) {
+			_type = classToType[__ToString.call(variable)];
+		} else if (([])[__ToString.call(variable)]) {
+			_type = classToType[__ToString.call(variable)];
+		} else {
+			_type = typeof variable;
+		}*/
+
+		return _type.toString().toLowerCase();
+	};
 
 	/**
 	 * isString
@@ -502,21 +483,23 @@
 	 * @param    object object Variable to check
 	 * @return    boolean TRUE|FALSE
 	 */
-	function isString(object) {
-		return type(object) === 'string';
-	}
+	Y.isString = function isString(object) {
+		return Y.type(object) === 'string';
+	};
 
 	/**
-	 * is
+	 * isObject
 	 *
-	 * Checks if the given object is an
+	 * Checks if the given var is an object
 	 *
 	 * @param    object object Variable to check
 	 * @return    boolean TRUE|FALSE
 	 */
-	function isObject(object) {
-		return type(object) === 'object';
-	}
+	Y.isObject = function isObject(object) {
+		//var _type = typeof object;
+		//return _type === 'function' || (_type === 'object' && !!object);
+		return Y.type(object) === 'object';
+	};
 
 	/**
 	 * isWindow
@@ -526,9 +509,9 @@
 	 * @param    object object Variable to check
 	 * @return    boolean TRUE|FALSE
 	 */
-	function isWindow(object) {
+	Y.isWindow = function isWindow(object) {
 		return object !== null && object === object.window;
-	}
+	};
 
 	/**
 	 * isPlainObject
@@ -538,34 +521,32 @@
 	 * @param    object object Variable to check
 	 * @return    boolean TRUE|FALSE
 	 */
-	function isPlainObject(object) {
-		return isObject(object) && !isWindow(object) && 
+	Y.isPlainObject = function isPlainObject(object) {
+		return Y.isObject(object) && !Y.isWindow(object) &&
 			Object.getPrototypeOf(object) === Object.prototype;
-	}
+	};
+
+	Y.isEmptyObject = function isEmptyObject(object) {
+		var name;
+
+		for (name in object) {
+			if (object.hasOwnProperty(name)) {
+				return false;
+			}
+		}
+
+		return true;
+	};
 
 	/**
 	 * isArray
-	 *
 	 * Checks if the given object is an Array
-	 *
-	 * @param    object object Variable to check
-	 * @return    boolean TRUE|FALSE
+	 * @return    boolean
 	 */
-	function isArray(object) {
-		return Array.isArray(object);
-	}
-
-	/**
-	 * isFunction
-	 *
-	 * Checks if the given object is a Function
-	 *
-	 * @param    object object Variable to check
-	 * @return    boolean TRUE|FALSE
-	 */
-	function isFunction(object) {
-		return type(object) === 'function';
-	}
+	Y.isArray = Array.isArray || function (object) {
+		// return Array.isArray(object);
+		return Y.G.ToString.call(object) === '[object Array]';
+	};
 
 	/**
 	 * isNumber
@@ -575,28 +556,28 @@
 	 * @param    object object Variable to check
 	 * @return    boolean TRUE|FALSE
 	 */
-	function isNumber(object) {
+	Y.isNumber = function isNumber(object) {
 		// return !isNaN(parseFloat(object)) && isFinite(object);
 		return !isNaN(parseFloat(object)) && isFinite(object);
-	}
+	};
 
 	/**
 	 * isInteger
 	 *
 	 * Checks if the given variable is an integer
 	 */
-	function isInteger(variable) {
-		return !isFloat(variable);
-	}
+	Y.isInteger = function isInteger(variable) {
+		return !Y.isFloat(variable);
+	};
 
 	/**
-	 * isInteger
+	 * isDouble
 	 *
 	 * Checks if the given variable is an integer
 	 */
-	function isDouble(variable) {
-		return isFloat(variable);
-	}
+	Y.isDouble = function isDouble(variable) {
+		return Y.isFloat(variable);
+	};
 
 	/**
 	 * isUndefined
@@ -606,23 +587,19 @@
 	 * @param    variable object Variable to check
 	 * @return    boolean if TRUE| string object type if FALSE
 	 */
-	function isUndefined(variable) {
-		// return type(variable) === type();
-		// return type(variable) === 'undefined';
-		return type(variable) === type(undef);
-	}
+	Y.isUndefined = function isUndefined(variable) {
+		// return Y.type(variable) === Y.type();
+		return Y.type(variable) === 'undefined';
+	};
 
 	/**
 	 * isDefined
-	 *
 	 * Checks if the given object is Undefined
-	 *
-	 * @param    object object Variable to check
-	 * @return    boolean if TRUE| string object type if FALSE
+	 * @return    boolean
 	 */
-	function isDefined(object) {
-		return type(object) !== 'undefined';
-	}
+	Y.isDefined = function isDefined(variable) {
+		return Y.type(variable) !== 'undefined';
+	};
 
 	/**
 	 * likeArray
@@ -632,10 +609,10 @@
 	 * @param    object object Variable to check
 	 * @return    boolean TRUE|FALSE
 	 */
-	function likeArray(object) {
-		// return type(object.length) === 'number';
-		return isNumber(object.length);
-	}
+	Y.likeArray = function likeArray(object) {
+		// return Y.type(object.length) === 'number';
+		return Y.isNumber(object.length);
+	};
 
 	/**
 	 * isArraylike
@@ -645,11 +622,11 @@
 	 * @param    object object Variable to check
 	 * @return    boolean TRUE|FALSE
 	 */
-	function isArraylike(object) {
+	Y.isArraylike = function isArraylike(object) {
 		var len = object.length;
-		var _type = type(object);
+		var _type = Y.type(object);
 
-		if (_type === 'function' || isWindow(obj)) {
+		if (_type === 'function' || Y.isWindow(object)) {
 			return false;
 		}
 
@@ -660,9 +637,13 @@
 		/*return _type === 'array' || len === 0 ||
 			(typeof len === 'number' && len > 0) && (len - 1) in object;*/
 
-		return isArray(object) || !(isFunction(object) ||
-			!((len === 0 || isNumber(len)) && len > 0 && object.hasOwnProperty(len - 1)));
-	}
+		return _type === 'array' || len === 0 ||
+			((typeof len === 'number' && len > 0) &&
+				object.hasOwnProperty(len - 1));
+
+		/*return isArray(object) || !(isFunction(object) ||
+			!((len === 0 || isNumber(len)) && len > 0 && object.hasOwnProperty(len - 1)));*/
+	};
 
 	/**
 	 * isNull
@@ -672,9 +653,9 @@
 	 * @param    object object Variable to check
 	 * @return   boolean TRUE|FALSE
 	 */
-	function isNull(object) {
-		return type(object) === type(null);
-	}
+	Y.isNull = function isNull(object) {
+		return Y.type(object) === Y.type(null);
+	};
 
 	/**
 	 * isEmpty
@@ -684,7 +665,7 @@
 	 * @param    object object Variable to check
 	 * @return   boolean TRUE|FALSE
 	 */
-	function isObjectEmpty(object) {
+	Y.isObjectEmpty = function isObjectEmpty(object) {
 		var name;
 
 		for (name in object) {
@@ -694,7 +675,7 @@
 		}
 
 		return true;
-	}
+	};
 
 	/**
 	 * getContainsWordCharRegEx
@@ -744,13 +725,13 @@
 	 * @param    object object Variable to check
 	 * @return   boolean TRUE|FALSE
 	 */
-	function isFunctionEmpty(object) {
+	Y.isFunctionEmpty = function isFunctionEmpty(object) {
 		var array, body;
 
 		// Only get RegExs when needed
 		array = getGetFunctionBodyRegEx().exec(object);
 
-		if (array && array.length > 1 && array[1] !== undef) {
+		if (array && array.length > 1 && array[1] !== undefined) {
 
 			body = array[1].replace(getRemoveCodeCommentsRegEx(), '');
 
@@ -760,7 +741,7 @@
 		}
 
 		return true;
-	}
+	};
 
 	/**
 	 * isBool
@@ -770,17 +751,17 @@
 	 * @param    object object Variable to check
 	 * @return   boolean TRUE|FALSE
 	 */
-	function isBool(object) {
-		return type(object) === 'boolean';
-	}
+	Y.isBool = Y.isBoolean = function isBool(object) {
+		return Y.type(object) === 'boolean';
+	};
 
-	function isFalse(variable) {
-		return isBool(variable) && variable === false;
-	}
+	Y.isFalse = function isFalse(variable) {
+		return Y.isBool(variable) && variable === false;
+	};
 
-	function isTrue(variable) {
-		return isBool(variable) && variable === true;
-	}
+	Y.isTrue = function isTrue(variable) {
+		return Y.isBool(variable) && variable === true;
+	};
 
 	/**
 	 * isEmpty
@@ -790,8 +771,8 @@
 	 * @param    value Variable to check
 	 * @return   boolean TRUE|FALSE
 	 */
-	function isEmpty(value) {
-		var key, x, length, empty = [undef, null, false, 0, '', '0'];
+	Y.isEmpty = function isEmpty(value) {
+		var key, x, length, empty = [undefined, null, false, 0, '', '0'];
 
 		for (x = 0, length = empty.length; x < length; x++) {
 			if (value === empty[x]) {
@@ -799,7 +780,7 @@
 			}
 		}
 
-		if (isObject(value)) {
+		if (Y.isObject(value)) {
 			for (key in value) {
 				if (value.hasOwnProperty(key)) {
 					return false;
@@ -810,37 +791,28 @@
 		}
 
 		return false;
-	}
+	};
 
-	function empty() {
+	Y.empty = (function empty() {
 		var str = ' ';
 
 		return str.trim();
-	}
+	}());
 
 	/**
 	 * inArray
-	 *
-	 * @return    array
+	 * @return
 	 */
-	function inArray(element, array, num) {
-		// return array === null ? -1 : EmptyArray.indexOf.call(array, element, num);
-		// return EmptyArray.indexOf.call(array, element, num);
-
-		var result;
-
-		if (isNull(array)) {
-			result = -1;
-		} else {
-			result = Y.G.ArrayProto.indexOf.call(array, element, num);
+	Y.inArray = function inArray(element, array, num) {
+		if (Y.isNull(array)) {
+			return -1;
 		}
 
-		return result;
-	}
+		return Y.G.IndexOf.call(array, element, num);
+	};
 
 	/**
-	 * inArray
-	 *
+	 * inArrayOther
 	 * @return    array
 	 */
 	function inArrayOther(needle, haystack, argStrict) {
@@ -871,19 +843,17 @@
 		return result;
 	}
 
-	function isSet() {
-		var arg = arguments,
-			len = arg.length,
-			x = 0;
-		// undef;
+	Y.isSet = function isSet() {
+		var arg = arguments;
+		var len = arg.length;
+		var x = 0;
 
 		if (len === 0) {
 			throw new Error('Empty isSet!');
 		}
 
 		while (x !== len) {
-			// if (arg[x] === undef || arg[x] === null) {
-			if (isUndefined(arg[x]) || isNull(arg[x])) {
+			if (Y.isUndefined(arg[x]) || Y.isNull(arg[x])) {
 				return false;
 			}
 
@@ -891,7 +861,7 @@
 		}
 
 		return true;
-	}
+	};
 
 	/**
 	 * isDocument
@@ -901,25 +871,39 @@
 	 * @param    variable object Variable to check
 	 * @return   boolean TRUE|FALSE
 	 */
-	function isDocument(variable) {
+	Y.isDocument = function isDocument(variable) {
 		var result;
 
-		if (isNull(variable) || !isObject(variable)) {
+		if (Y.isNull(variable) || !Y.isObject(variable)) {
 			result = false;
 		} else if (variable.nodeType === variable.DOCUMENT_NODE) {
 			result = true;
 		}
 
 		return result;
-	}
+	};
 
-	function hasProp(obj, prop) {
-		return hasOwn.call(obj, prop);
+	Y.makeArray = function makeArray(arr, results) {
+		var ret = results || [];
+
+		if (arr !== null) {
+			if (Y.isArraylike(arr)) {
+				Y.merge(ret, typeof arr === 'string' ? [arr] : arr);
+			} else {
+				Y.G.Push.call(ret, arr);
+			}
+		}
+
+		return ret;
+	};
+
+	function hasProp(object, prop) {
+		return Y.hasOwn.call(object, prop);
 	}
 
 	function hasProperty(object, property) {
-		if (isSet(object) && isSet(property)) {
-			return isSet(object[property]);
+		if (Y.isSet(object) && Y.isSet(property)) {
+			return Y.isSet(object[property]);
 		}
 	}
 
@@ -966,17 +950,17 @@
 		var tmp = {},
 			x, n;
 
-		if (type && isNumber(type) && type === 1 && !data) {
+		if (type && Y.isNumber(type) && type === 1 && !data) {
 			for (x = 0; x < array.length; ++x) {
-				if (!isUndefined(array[x]) && !isUndefined(array[x][0]) && !isUndefined(
+				if (!Y.isUndefined(array[x]) && !Y.isUndefined(array[x][0]) && !Y.isUndefined(
 						array[x][1])) {
 					tmp[(array[x][0]).toString()] = array[x][1];
 				}
 			}
 		} else {
 			for (n = 0; n < array.length; ++n) {
-				if (!isUndefined(array[n])) {
-					if (!data || !isNull(data)) {
+				if (!Y.isUndefined(array[n])) {
+					if (!data || !Y.isNull(data)) {
 						tmp[(array[n][0]).toString()] = array[n][1];
 					} else {
 						// tmp[array[n]] = null;
@@ -994,7 +978,7 @@
 			x;
 
 		for (x = 0; x < array.length; ++x) {
-			if (!isUndefined(array[x])) {
+			if (!Y.isUndefined(array[x])) {
 				if (data !== null) {
 					tmp[array[x]] = data;
 				} else {
@@ -1010,7 +994,7 @@
 		var tmp = [],
 			x, n;
 
-		if (type && isNumber(type) && type === 1) {
+		if (type && Y.isNumber(type) && type === 1) {
 			for (x in object) {
 				// if (Y.hasOwn.call(object, x)) {
 				if (object.hasOwnProperty(x)) {
@@ -1036,7 +1020,7 @@
 		// temp['__proto__'] = array['__proto__'];
 
 		for (x = 0; x < array.length; ++x) {
-			if (isDefined(array[x])) {
+			if (Y.isDefined(array[x])) {
 				temp[x] = array[x];
 				// temp['__proto__'] = array['__proto__'];
 			}
@@ -1070,7 +1054,7 @@
 		var num, result;
 
 		try {
-			if (isSet(value)) {
+			if (Y.isSet(value)) {
 				if (value === 'true') {
 					result = true;
 				} else if (value === 'false') {
@@ -1124,13 +1108,13 @@
 		}
 
 		// Array/Hashes/s
-		if (isObject(object)) {
+		if (Y.isObject(object)) {
 			for (item in object) {
 				if (object.hasOwnProperty(item)) {
 					value = object[item];
 
 					// If it is an array,
-					if (isObject(value)) {
+					if (Y.isObject(value)) {
 						dumpedText += levelPadding + "'" + item + "' ...\n";
 						dumpedText += variableDump(value, level + 1);
 					} else {
@@ -1140,8 +1124,8 @@
 			}
 			// Stings/Chars/Numbers etc.
 		} else {
-			dumpedText = '===>' + object + '<===(' + type(object) + ')';
-			// dumpedText = '==>' + object + '<==(' + type(object) + ')';
+			dumpedText = '===>' + object + '<===(' + Y.type(object) + ')';
+			// dumpedText = '==>' + object + '<==(' + Y.type(object) + ')';
 		}
 
 		return dumpedText;
@@ -1153,25 +1137,25 @@
 		});
 	}
 
-	function merge(first, second) {
-		var l = second.length,
-			i = first.length,
-			j = 0;
+	Y.merge = function merge(first, second) {
+		var len = second.length;
+		var x = first.length;
+		var n = 0;
 
-		if (isNumber(l)) {
-			for (null; j < l; j++) {
-				first[i++] = second[j];
+		if (Y.isNumber(len)) {
+			for (len; n < len; n++) {
+				first[x++] = second[n];
 			}
 		} else {
-			while (!isUndefined(second[j])) {
-				first[i++] = second[j++];
+			while (!Y.isUndefined(second[n])) {
+				first[x++] = second[n++];
 			}
 		}
 
-		first.length = i;
+		first.length = x;
 
 		return first;
-	}
+	};
 
 	function unique(array) {
 		return Y.G.Filter.call(array, function(item, index) {
@@ -1183,74 +1167,186 @@
 		return string.toCamel();
 	}
 
-	function randomNumber(min, max) {
-		return Math.floor(Math.random() * (max - min + 1) + min);
-	}
-
-	function grep(elements, callback) {
-		return Y.G.Filter.call(elements, callback);
-	}
-
-	function every(array, func) {
-		var x, n;
-
-		for (x = 0, n = array.length; x < n; ++x) {
-			if (!func(array[x])) {
-				return False;
-			}
+	Y.random = function random(min, max) {
+		if (max === null) {
+			max = min;
+			min = 0;
 		}
 
-		return 1;
-	}
+		// return Math.floor(Math.random() * (max - min + 1) + min);
+		return min + Math.floor(Math.random() * (max - min + 1));
+	};
 
-	function foreach(array, func) {
-		every(array, function(element) {
-			return !func(element);
-		});
-	}
+	Y.grep = function grep(elements, callback) {
+		return Y.G.Filter.call(elements, callback);
+	};
 
-	function each(elements, callback) {
-		var i, key;
+	// Internal function that returns an efficient (for current engines) version
+	// of the passed-in callback, to be repeatedly applied in other YAX
+	// functions.
+	var createCallback = function (func, context, argc) {
+		if (context === undefined) {
+			return func;
+		}
 
-		if (likeArray(elements)) {
-			for (i = 0; i < elements.length; i++) {
-				if (callback.call(elements[i], i, elements[i]) === false) {
-					return elements;
+		var tmp = (argc === null ? 3 : argc);
+
+		switch (tmp) {
+			case 1:
+				return function(value) {
+					return func.call(context, value);
+				};
+
+			case 2:
+				return function(value, other) {
+					return func.call(context, value, other);
+				};
+
+			case 3:
+				return function(value, index, collection) {
+					return func.call(context, value, index, collection);
+				};
+
+			case 4:
+				return function(accumulator, value, index, collection) {
+					return func.call(context, accumulator, value, index, collection);
+				};
+		}
+
+		return function() {
+			return func.apply(context, arguments);
+		};
+	};
+
+	Y.each = function each(object, callback, args) {
+		var value;
+		var x = 0;
+		var length = object.length;
+		var _isArray = Y.isArraylike(object);
+
+		if (args) {
+			if (_isArray) {
+				for (x; x < length; x++) {
+					value = callback.apply(object[x], args);
+
+					if (value === false) {
+						break;
+					}
+				}
+			} else {
+				for (x in object) {
+					if (object.hasOwnProperty(x)) {
+						value = callback.apply(object[x], args);
+
+						if (value === false) {
+							break;
+						}
+					}
 				}
 			}
+
+		// A special, fast, case for the most common use of each
 		} else {
-			for (key in elements) {
-				if (elements.hasOwnProperty(key)) {
-					if (callback.call(elements[key], key, elements[key]) === false) {
-						return elements;
+			if (_isArray) {
+				for (x; x < length; x++) {
+					value = callback.call(object[x], x, object[x]);
+
+					if (value === false) {
+						break;
+					}
+				}
+			} else {
+				for (x in object) {
+					if (object.hasOwnProperty(x)) {
+						value = callback.call(object[x], x, object[x]);
+
+						if (value === false) {
+							break;
+						}
 					}
 				}
 			}
 		}
 
-		return elements;
-	}
+		return object;
+	};
 
-	function extend(object) {
-		if (!isObject(object) && !isFunction(object)) {
+	// The cornerstone, an `each` implementation, aka `forEach`.
+	// Handles raw objects in addition to array-likes. Treats all
+	// sparse array-likes as if they were dense.
+	Y.forEach = function forEach (object, iteratee, context) {
+		/*jshint -W041 */
+		if (object == null) {
 			return object;
 		}
 
-		var source, prop, x, length = arguments.length;
+		var x = 0;
+		var length = object.length;
 
-		for (x = 1; x < length; x++) {
+		iteratee = createCallback(iteratee, context);
+
+		if (length === +length) {
+			for (x; x < length; x++) {
+				iteratee(object[x], x, object);
+			}
+		} else {
+			var keys = Y.keys(object);
+
+			for (x, length = keys.length; x < length; x++) {
+				iteratee(object[keys[x]], keys[x], object);
+			}
+		}
+
+		return object;
+	};
+
+	// A mostly-internal function to generate callbacks that can be applied
+	// to each element in a collection, returning the desired result — either
+	// identity, an arbitrary callback, a property matcher, or a property accessor.
+	Y.iteratee = function (value, context, argc) {
+		if (value === null) {
+			return Y.identity;
+		}
+
+		if (Y.isFunction(value)) {
+			return createCallback(value, context, argc);
+		}
+
+		if (Y.isObject(value)) {
+			return Y.matches(value);
+		}
+
+		return Y.property(value);
+	};
+
+	Y.extend = function extend (object) {
+		if (!Y.isObject(object) && !Y.isFunction(object)) {
+			return object;
+		}
+
+		var source, prop, x = 1,
+			length = arguments.length;
+
+		// Extend Y itself if only one argument is passed
+		if (length === x) {
+			object = this;
+			// i = i - 1;
+			--x;
+		}
+
+		for (x; x < length; x++) {
 			source = arguments[x];
 
 			for (prop in source) {
-				//if (Y.hasOwn.call(source, prop)) {
 				if (source.hasOwnProperty(prop)) {
+					// if (source.hasOwnProperty(prop)) {
 					object[prop] = source[prop];
 				}
 			}
 		}
 
 		return object;
-	}
+	};
 
 	function configSet() {
 		var args = Y.G.Slice.call(arguments);
@@ -1267,7 +1363,7 @@
 
 		setArray = function(_oldValue, _newValue) {
 			// Although these are set individually, they are all accumulated
-			if (isUndefined(_oldValue)) {
+			if (Y.isUndefined(_oldValue)) {
 				self._CONFIG_STORAGE[varName].LOCAL_VALUE = [];
 			}
 
@@ -1293,9 +1389,9 @@
 		var varName = args[0];
 
 		if (Y._CONFIG_STORAGE &&
-			Y._CONFIG_STORAGE[varName] && !isUndefined(Y._CONFIG_STORAGE[varName].LOCAL_VALUE)) {
+			Y._CONFIG_STORAGE[varName] && !Y.isUndefined(Y._CONFIG_STORAGE[varName].LOCAL_VALUE)) {
 
-			if (isNull(Y._CONFIG_STORAGE[varName].LOCAL_VALUE)) {
+			if (Y.isNull(Y._CONFIG_STORAGE[varName].LOCAL_VALUE)) {
 				return '';
 			}
 
@@ -1309,91 +1405,97 @@
 
 	//---
 
-	/*jshint unused: true */
-	each([
+	/*each([
 		'Boolean',
-		'Number',
+		'RegExp',
+		'Error',
+		'global',
+		'Date',
+		'Error',
+		'HTMLDocument'
+	], function(x, name) {
+		classToType['[object ' + name + ']'] = name.toLowerCase();
+	});*/
+
+	Y.forEach([
+		'HTMLDocument',
+		'Arguments',
 		'String',
 		'Function',
 		'Array',
-		'Date',
-		'RegExp',
 		'Object',
 		'Error',
+		'Boolean',
+		'RegExp',
+		'Error',
 		'global',
-		'HTMLDocument'
-	], function(index, name) {
+		'Date',
+		'Error'
+	], function (name) {
 		classToType['[object ' + name + ']'] = name.toLowerCase();
 	});
 
+	Y.forEach([
+		'Arguments',
+//		'Function',
+//		'String',
+//		'Number',
+//		'Date',
+		'RegExp'
+	], function (name) {
+		Y['is' + name] = function (object) {
+			return Y.G.ObjProto.toString.call(object) === '[object ' + name + ']';
+		};
+	});
+
+	// Define a fallback version of the method in browsers (ahem, IE), where
+	// there isn't any inspectable "Arguments" type.
+	if (!Y.isArguments(arguments)) {
+		Y.isArguments = function (object) {
+			return Y.has(object, 'callee');
+		};
+	}
+
+	// Optimize `isFunction` if appropriate.
+	if (typeof (/./) !== 'function') {
+		Y.isFunction = function (object) {
+			return Y.type(object) === 'function';
+		};
+	}
+
+	// Is the given value `NaN`? (NaN is the only number which does not equal itself).
+	Y.isNaN = function (object) {
+		return Y.isNumber(object) && object != +object;
+	};
+
+	// Is a given value a DOM element?
+	Y.isElement = function isElement (object) {
+		return !!(object && object.nodeType === 1);
+	};
+
+	// Is a given object a finite number?
+	Y.isFinite = function (object) {
+		return isFinite(object) && !isNaN(parseFloat(object));
+	};
+
+	// Is the given value `NaN`? (NaN is the only number which does not equal itself).
+	Y.isNaN = function (object) {
+		return Y.isNumber(object) && object !== +object;
+	};
+
+	// Is a given value a boolean?
+	Y.isBoolean = function (object) {
+		return object === true || object === false ||
+			Y.G.ObjProto.toString.call(object) === '[object Boolean]';
+	};
+
 	//---
 
-	extend(Y, {
-		grep: grep,
-		merge: merge,
+	Y.extend({
 		setConfig: configSet,
 		getConfig: configGet,
-		each: each,
-		foreach: foreach,
-		every: every,
-		classToType: classToType,
-		extend: function(object) {
-			if (!isObject(object) && !isFunction(object)) {
-				return object;
-			}
-
-			var source, prop, x = 1,
-				length = arguments.length;
-
-			// Extend Y itself if only one argument is passed
-			if (length === x) {
-				object = this;
-				// i = i - 1;
-				--x;
-			}
-
-			for (x; x < length; x++) {
-				source = arguments[x];
-
-				for (prop in source) {
-					if (source.hasOwnProperty(prop)) {
-						// if (source.hasOwnProperty(prop)) {
-						object[prop] = source[prop];
-					}
-				}
-			}
-
-			return object;
-		},
 		callProperty: getOwn,
 		variableDump: variableDump,
-		type: type,
-		getType: getType,
-		isArray: isArray,
-		isFloat: isFloat,
-		isArraylike: isArraylike,
-		isObject: isObject,
-		isFunction: isFunction,
-		isWindow: isWindow,
-		isDocument: isDocument,
-		isString: isString,
-		isPlainObject: isPlainObject,
-		isUndefined: isUndefined,
-		isDefined: isDefined,
-		likeArray: likeArray,
-		isNull: isNull,
-		isObjectEmpty: isObjectEmpty,
-		empty: empty,
-		isEmpty: isEmpty,
-		isFunctionEmpty: isFunctionEmpty,
-		isBool: isBool,
-		isFalse: isFalse,
-		isTrue: isTrue,
-		isNumber: isNumber,
-		isNumeric: isNumber,
-		isInteger: isInteger,
-		isDouble: isDouble,
-		inArray: inArray,
 		inArrayOther: inArrayOther,
 		unique: unique,
 		compact: compact,
@@ -1402,141 +1504,110 @@
 		toCamel: toCamel,
 		toDash: toDash,
 		toArray: toArray,
-		randomNumber: randomNumber,
 		dasherise: dasherise,
 		deserialiseValue: deserialiseValue,
 		arrayToObject: arrayToObject,
 		objectToArray: objectToArray,
 		intoArray: intoArray,
 		toObject: toObject,
-		isSet: isSet,
-		makeArray: function(arrayLikeThing) {
-			return Y.G.Slice.call(arrayLikeThing);
-		},
 		inject: inject,
-		hasProperty: hasProperty,
-		size: function () {
-			return this.keys(this).length;
-		}
+		hasProperty: hasProperty
 	});
 
 	//--
 
-	if (Y.isSet(Console)) {
-		var warn = Console.warn;
-		var log = Console.log;
-		var error = Console.error;
-		var info = Console.info;
-		var trace = Console.trace;
+	if (Y.isSet(console)) {
+		var warn = console.warn;
+		var log = console.log;
+		var error = console.error;
+		var info = console.info;
 
-		Y.warn = Function.prototype.bind.call(warn, Console);
-		Y.log = Function.prototype.bind.call(log, Console);
-		Y.error = Function.prototype.bind.call(error, Console);
-		Y.info = Function.prototype.bind.call(info, Console);
-		Y.trace = Function.prototype.bind.call(trace, Console);
+		Y.WARN = Function.prototype.bind.call(warn, console);
+		Y.LOG = Function.prototype.bind.call(log, console);
+		Y.ERROR = Function.prototype.bind.call(error, console);
+		Y.INFO = Function.prototype.bind.call(info, console);
 	} else {
-		Y.warn = Y.noop;
-		Y.log = Y.noop;
-		Y.error = Y.noop;
-		Y.info = Y.noop;
-		Y.trace = Y.noop;
+		Y.WARN = Y.noop;
+		Y.LOG = Y.noop;
+		Y.ERROR = Y.noop;
+		Y.INFO = Y.noop;
 	}
-
-	Y.warn.toString = function() {
-		return '[YAX::Console::Warn]';
-	};
-
-	Y.log.toString = function() {
-		return '[YAX::Console::Log]';
-	};
-
-	Y.error.toString = function() {
-		return '[YAX::Console::Error]';
-	};
-
-	Y.info.toString = function() {
-		return '[YAX::Console::Info]';
-	};
-
-	Y.trace.toString = function() {
-		return '[YAX::Console::trace]';
-	};
 
 	//---
 
 	// Shortcut function for checking if an object has a given property directly
 	// on itself (in other words, not on a prototype).
-	Y.has = function(obj, key) {
-		return obj !== null && Y.hasOwn.call(obj, key);
-		// return obj !== null && obj.hasOwnProperty(key);
+	Y.has = function(object, key) {
+		return object !== null && Y.hasOwn.call(object, key);
+		// return object !== null && object.hasOwnProperty(key);
 	};
 
 	// Retrieve the names of an object's properties.
 	// Delegates to **ECMAScript 5**'s native `.keys`
-	Y.keys = function(obj) {
+	Y.keys = function(object) {
 		var key;
 
-		if (!isObject(obj) && !isFunction(obj)) {
+		if (!Y.isObject(object) && !Y.isFunction(object)) {
 			return [];
 		}
 
 		if (Object.keys) {
-			return Object.keys(obj);
+			return Object.keys(object);
 		}
 
 		var keys = [];
 
-		for (key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				if (Y.has(obj, key)) {
+		for (key in object) {
+			if (object.hasOwnProperty(key)) {
+				if (Y.has(object, key)) {
 					keys.push(key);
 				}
 			}
 		}
 
-		//keys.sort();
+		// keys.sort();
 
-		//return keys;
-		return keys.sort();
+		return keys;
+		// return keys.sort();
 	};
 
 	// Retrieve the values of an object's properties.
-	Y.values = function(obj) {
-		var keys = Y.keys(obj);
+	Y.values = function(object) {
+		var keys = Y.keys(object);
 		var length = keys.length;
 		var values = new Array(length);
 		var x;
 
 		for (x = 0; x < length; x++) {
-			values[x] = obj[keys[x]];
+			values[x] = object[keys[x]];
 		}
 
 		return values;
 	};
 
 	// Convert an object into a list of `[key, value]` pairs.
-	Y.pairs = function(obj) {
-		var keys = Y.keys(obj);
+	Y.pairs = function(object) {
+		var keys = Y.keys(object);
 		var length = keys.length;
 		var pairs = new Array(length);
 		var x;
 
 		for (x = 0; x < length; x++) {
-			pairs[x] = [keys[x], obj[keys[x]]];
+			pairs[x] = [keys[x], object[keys[x]]];
 		}
 
 		return pairs;
 	};
 
 	// Invert the keys and values of an object. The values must be serializable.
-	Y.invert = function(obj) {
+	Y.invert = function(object) {
 		var result = {};
-		var keys = Y.keys(obj);
+		var keys = Y.keys(object);
 		var x;
 		var length;
 
 		for (x = 0, length = keys.length; x < length; x++) {
-			result[obj[keys[x]]] = keys[x];
+			result[object[keys[x]]] = keys[x];
 		}
 
 		return result;
@@ -1544,13 +1615,13 @@
 
 	// Return a sorted list of the function names available on the object.
 	// Aliased as `methods`
-	Y.functions = Y.methods = function(obj) {
+	Y.functions = Y.methods = function(object) {
 		var names = [];
 		var key;
 
-		for (key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				if (isFunction(obj[key])) {
+		for (key in object) {
+			if (object.hasOwnProperty(key)) {
+				if (Y.isFunction(object[key])) {
 					names.push(key);
 				}
 			}
@@ -1583,7 +1654,7 @@
 		var replaceRegexp = new RegExp(source, 'g');
 
 		return function(string) {
-			string = string === null ? '' : Y.empty() + string;
+			string = string === null ? '' : Y.empty + string;
 			return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
 		};
 	};
@@ -1591,17 +1662,38 @@
 	Y.escape = createEscaper(escapeMap);
 	Y.unescape = createEscaper(unescapeMap);
 
+	// If the value of the named `property` is a function then invoke it with the
+	// `object` as context; otherwise, return it.
+	Y.result = function (object, property) {
+		if (object === null) {
+			return undefined;
+		}
+
+		var value = object[property];
+
+		return Y.isFunction(value) ? object[property]() : value;
+	};
+
+	// Generate a unique integer id (unique within the entire client session).
+	// Useful for temporary DOM ids.
+	var idCounter = 0;
+
+	Y.uniqueId = function (prefix) {
+		var id = ++idCounter + Y.empty;
+		return prefix ? prefix + id : id;
+	};
+
 	//---
 
 	// Fill in a given object with default properties.
-	Y.defaults = function(obj) {
+	Y.defaults = function(object) {
 		var x;
 		var length;
 		var source;
 		var prop;
 
-		if (!isObject(obj)) {
-			return obj;
+		if (!Y.isObject(object)) {
+			return object;
 		}
 
 		for (x = 1, length = arguments.length; x < length; x++) {
@@ -1609,19 +1701,19 @@
 
 			for (prop in source) {
 				if (source.hasOwnProperty(prop)) {
-					// if (obj[prop] === eval('void 0')) {
-					// if (obj[prop] === void 0) {
-					if (obj[prop] === undefined) {
-						obj[prop] = source[prop];
+					// if (object[prop] === eval('void 0')) {
+					// if (object[prop] === void 0) {
+					if (object[prop] === undefined) {
+						object[prop] = source[prop];
 					}
 				}
 			}
 		}
 
-		return obj;
+		return object;
 	};
 
-	// By default, Underscore uses ERB-style template delimiters, change the
+	// By default, YAX uses ERB-style template delimiters, change the
 	// following template settings to use alternative delimiters.
 	Y.Settings.Template = {
 		evaluate: /<%([\s\S]+?)%>/g,
@@ -1652,7 +1744,7 @@
 	};
 
 	// JavaScript micro-templating, similar to John Resig's implementation.
-	// Underscore templating handles arbitrary delimiters, preserves whitespace,
+	// YAX templating handles arbitrary delimiters, preserves whitespace,
 	// and correctly escapes quotes within interpolated code.
 	// NB: `oldSettings` only exists for backwards compatibility.
 	Y.template = function(text, settings, oldSettings) {
@@ -1691,7 +1783,7 @@
 
 		// If a variable is not specified, place data values in local scope.
 		if (!settings.variable) {
-			source = 'with (obj || {}) {\n' + source + '}\n';
+			source = 'with (object || {}) {\n' + source + '}\n';
 		}
 
 		source = 'var __t, __p = \'\', __j = Array.prototype.join, ' +
@@ -1702,7 +1794,7 @@
 
 		try {
 			/*jshint -W054 */
-			render = new Function(settings.variable || 'obj', 'Y', source);
+			render = new Function(settings.variable || 'object', 'Y', source);
 		} catch (e) {
 			e.source = source;
 			throw e;
@@ -1716,18 +1808,111 @@
 
 		// Provide the compiled source as a convenience for precompilation.
 		/** @namespace settings.variable */
-		var argument = settings.variable || 'obj';
+		var argument = settings.variable || 'object';
 
 		template.source = 'function(' + argument + '){\n' + source + '}';
 
 		return template;
 	};
 
+	Y.size = function (object) {
+		if (Y.isNull(object)) {
+			return 0;
+		}
+
+		return object.length === +object.length ? object.length : Y.keys(object).length;
+	};
+
 	//---
 
+	Y.property = function (key) {
+		return function (object) {
+			return object[key];
+		};
+	};
 
-	Y.setConfig('YAX.Core.Use.Console', false);
-	Y.setConfig('extension', 'YAX.Core.Use.Console');
+	//---
+
+	// Add a "chain" function. Start chaining a wrapped YAX object.
+	Y.chain = function (object) {
+		var _Y = Y;
+		var instance = _Y(object);
+
+		instance._chain = true;
+
+		return instance;
+	};
+
+	// OOP
+	// ---------------
+	// If YAX is called as a function, it returns a wrapped object that
+	// can be used OO-style. This wrapper holds altered versions of all the
+	// YAX functions. Wrapped objects may be chained.
+
+	// Helper function to continue chaining intermediate results.
+	var result = function (instance, object) {
+		var _Y = Y;
+		return instance._chain ? _Y(object).chain() : object;
+	};
+
+	// Add your own custom functions to the YAX object.
+	Y.mixin = function (object) {
+		Y.forEach(Y.methods(object), function(name) {
+			var func = Y[name] = object[name];
+
+			Y.prototype[name] = function() {
+				var args = [this._wrapped];
+
+				Y.G.Push.apply(args, arguments);
+
+				return result(this, func.apply(Y, args));
+			};
+		});
+	};
+
+	// Add all of the YAX functions to the wrapper object.
+	Y.mixin(Y);
+
+	// Add all mutator Array functions to the wrapper.
+	Y.forEach(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function (name) {
+		var method = Y.G.ArrayProto[name];
+
+		Y.prototype[name] = function() {
+			var object = this._wrapped;
+
+			method.apply(object, arguments);
+
+			if ((name === 'shift' || name === 'splice') && object.length === 0) {
+				delete object[0];
+			}
+
+			return result(this, object);
+		};
+	});
+
+	// Add all accessor Array functions to the wrapper.
+	Y.forEach(['concat', 'join', 'slice'], function (name) {
+		var method =  Y.G.ArrayProto[name];
+
+		Y.prototype[name] = function() {
+			return result(this, method.apply(this._wrapped, arguments));
+		};
+	});
+
+	// Extracts the result from a wrapped and chained object.
+	Y.prototype.value = function() {
+		return this._wrapped;
+	};
+
+	// Keep the identity function around for default iteratees.
+	Y.identity = function (value) {
+		return value;
+	};
+
+	//---
+
+	Y.setConfig('YAX.Core.Use.console', false);
+	Y.setConfig('extension', 'YAX.Core.Use.console');
 
 	//---
 
@@ -1738,16 +1923,15 @@
 //---
 
 /**
- * YAX Regex Object
+ * YAX Config
  */
-
-//---
 
 /*jslint indent: 4 */
 /*jslint white: true */
 /*jshint eqeqeq: false */
-/*jshint strict: false */
-/*global Y, YAX */
+/*jshint undef: true */
+/*jshint unused: true */
+/*global Y, YAX, exports, define, module */
 
 (function () {
 
@@ -1755,85 +1939,11 @@
 
 	'use strict';
 
-	Y.RegEx = {
-		scriptReplacement: /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-
-		scriptTypeReplacement: /^(?:text|application)\/javascript/i,
-
-		xmlTypeReplacement: /^(?:text|application)\/xml/i,
-
-		jsonTypeReplacement: /^(?:text|application)\/json/i,
-
-		jsonType: 'application/json, text/json',
-
-		htmlType: 'text/html',
-
-		blankReplacement: /^\s*$/,
-
-		FragmentReplacement: /^\s*<(\w+|!)[^>]*>/,
-
-		SingleTagReplacement: /^<(\w+)\s*\/?>(?:<\/\1>|)$/,
-
-		TagExpanderReplacement:
-			/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
-
-		ReadyReplacement: /complete|loaded|interactive/,
-
-		SimpleSelectorReplacement: /^[\w\-]*$/,
-
-		RootNodeReplacement: /^(?:body|html)$/i,
-
-		SelectorGroupReplacement: /(([\w#:.~>+()\s\-]+|\*|\[.*?\])+)\s*(,|$)/g,
-
-		FilterReplacement: new RegExp('(.*):(\\w+)(?:\\(([^)]+)\\))?$\\s*'),
-
-		ChildReplacement: /^\s*>/,
-
-		// Matching numbers
-		pnum: /[+\-]?(?:\d*\.|)\d+(?:[eE][+\-]?\d+|)/.source,
-
-		// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
-		// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
-		rdisplayswap: /^(none|table(?!-c[ea]).+)/,
-
-		rmargin: /^margin/,
-
-		rquickExpr: /^(?:\s*(<[\w\W]+>)[^>]*|#([\w\-]*))$/,
-
-		rsingleTag: (/^<(\w+)\s*\/?>(?:<\/\1>|)$/),
-
-		rhtml: /<|&#?\w+;/,
-
-		rtagName: /<([\w:]+)/,
-
-		rnoInnerhtml: /<(?:script|style|link)/i,
-
-		rxhtmlTag: /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
-
-		rscriptType: /^$|\/(?:java|ecma)script/i,
-
-		rcheckableType: (/^(?:checkbox|radio)$/i),
-
-		risSimple: /^.[^:#\[\.,]*$/,
-
-		rchecked: /checked\s*(?:[^=]|=\s*.checked.)/i,
-
-		rcleanScript: /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g
-	};
-
-	Y.extend(Y.RegEx, {
-		rnumsplit: new RegExp('^(' + Y.RegEx.pnum + ')(.*)$', 'i'),
-
-		rnumnonpx: new RegExp('^(' + Y.RegEx.pnum + ')(?!px)[a-z%]+$', 'i'),
-
-		rrelNum: new RegExp('^([+-])=(' + Y.RegEx.pnum + ')', 'i')
-	});
-
 	//---
 
 }());
 
-// FILE: ./Source/Core/Regex.js
+// FILE: ./Source/Core/Contrib/Config.js
 
 //---
 
@@ -1854,8 +1964,9 @@
 	'use strict';
 
 	Y.extend({
-		now: Date.now,
-		date: new Date(),
+		now: Date.now || function() {
+			return new Date().getTime();
+		},
 
 		/**
 		 * Delay
@@ -1898,11 +2009,11 @@
 					xml = temp.parseFromString(data, 'text/xml');
 				} catch (e) {
 					xml = undef;
-					Y.error(e);
+					Y.ERROR(e);
 				}
 
 				if (!xml || xml.getElementsByTagName('parsererror').length) {
-					Y.error('Invalid XML: ' + data);
+					Y.ERROR('Invalid XML: ' + data);
 				}
 
 				return xml;
@@ -1942,6 +2053,122 @@
 
 //---
 
+
+/**
+ * YAX Regex Object
+ */
+
+//---
+
+/*jslint indent: 4 */
+/*jslint white: true */
+/*jshint eqeqeq: false */
+/*jshint strict: false */
+/*global Y, YAX */
+
+(function () {
+
+	//---
+
+	'use strict';
+
+	Y.G.regexList = {
+		whitespace: "[\\x20\\t\\r\\n\\f]",
+
+		scriptReplacement: /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+
+		scriptTypeReplacement: /^(?:text|application)\/javascript/i,
+
+		xmlTypeReplacement: /^(?:text|application)\/xml/i,
+
+		jsonTypeReplacement: /^(?:text|application)\/json/i,
+
+		jsonType: 'application/json, text/json',
+
+		htmlType: 'text/html',
+
+		blankReplacement: /^\s*$/,
+
+		fragmentReplacement: /^\s*<(\w+|!)[^>]*>/,
+
+		singleTagReplacement: /^<(\w+)\s*\/?>(?:<\/\1>|)$/,
+
+		tagExpanderReplacement:
+			/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
+
+		readyReplacement: /complete|loaded|interactive/,
+
+		simpleSelectorReplacement: /^[\w\-]*$/,
+
+		rootNodeReplacement: /^(?:body|html)$/i,
+
+		selectorGroupReplacement: /(([\w#:.~>+()\s\-]+|\*|\[.*?\])+)\s*(,|$)/g,
+
+		filterReplacement: new RegExp('(.*):(\\w+)(?:\\(([^)]+)\\))?$\\s*'),
+
+		childReplacement: /^\s*>/,
+
+		// Matching numbers
+		num: /[+\-]?(?:\d*\.|)\d+(?:[eE][+\-]?\d+|)/.source,
+
+		// Swappable if display is none or starts with table except "table", "table-cell", or "table-caption"
+		// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
+		displaySwap: /^(none|table(?!-c[ea]).+)/,
+
+		margin: /^margin/,
+
+		quickExpr: /^(?:\s*(<[\w\W]+>)[^>]*|#([\w\-]*))$/,
+
+		singleTag: (/^<(\w+)\s*\/?>(?:<\/\1>|)$/),
+
+		html: /<|&#?\w+;/,
+
+		htmlTagName: /<([\w:]+)/,
+
+		noInnerHtml: /<(?:script|style|link)/i,
+
+		xhtmlTag: /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,
+
+		scriptType: /^$|\/(?:java|ecma)script/i,
+
+		checkableType: (/^(?:checkbox|radio)$/i),
+
+		isSimple: /^.[^:#\[\.,]*$/,
+
+		checked: /checked\s*(?:[^=]|=\s*.checked.)/i,
+
+		cleanScript: /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g,
+
+		keyEvent: /^key/,
+
+		mouseEvent: /^(?:mouse|pointer|contextmenu)|click/,
+
+		focusMorph: /^(?:focusinfocus|focusoutblur)$/,
+
+		typeNamespace: /^([^.]*)(?:\.(.+)|)$/,
+
+		notWhite: (/\S+/g),
+
+		ignoreProperties: /^([A-Z]|returnValue$|layer[XY]$)/,
+
+		selectorGroup: /(([\w#:.~>+()\s-]+|\*|\[.*?\])+)\s*(,|$)/g,
+	};
+
+	Y.extend(Y.G.regexList, {
+		numSplit: new RegExp('^(' + Y.G.regexList.num + ')(.*)$', 'i'),
+
+		numNonPx: new RegExp('^(' + Y.G.regexList.num + ')(?!px)[a-z%]+$', 'i'),
+
+		relNum: new RegExp('^([+-])=(' + Y.G.regexList.num + ')', 'i')
+	});
+
+	//---
+
+}());
+
+// FILE: ./Source/Core/RegexList.js
+
+//---
 
 /**
  * YAX Utilities and Tools
@@ -2170,6 +2397,16 @@
 
 	'use strict';
 
+	// Throw error if trying to call a super that doesn't exist.
+	var unImplementedSuper = function (method) {
+		throw 'Super does not implement this method: ' + method;
+	};
+
+	// Used to test if the method has a super.
+	var superTest = /\b_super\b/;
+
+	// Used to mark a function so it can be unwrapped.
+	var REF = '__extndmrk__';
 
 	/**
 	 * Y.Class powers the OOP facilities of the library.
@@ -2179,13 +2416,37 @@
 	//---
 
 	Y.Class.extend = function (properties) {
-		// Extended class with the new prototype
-		var newClass = function () {
+		var parent = this;
+		var child;
+		var property;
+		var _super = parent.prototype;
+
+		// Allow class inheritance.
+		// if (Y.isFunction(properties) && '__super__' in properties) {
+		if (Y.isFunction(properties) && properties.hasOwnProperty('__super__')) {
+			// Copy parent's prototype.
+			var mixin = {};
+			var attr;
+
+			for (attr in properties.prototype) {
+				if (attr !== 'constructor' &&
+					properties.prototype.hasOwnProperty(attr)) {
+					mixin[attr] = properties.prototype[attr];
+				}
+			}
+
+			properties = mixin;
+		}
+
+		// The constructor calls the init method - all construction logic happens
+		// in this method.
+		child = function () {
 			// Call the initialise constructor
 			if (this.initialise) {
 				this.initialise.apply(this, arguments);
 			}
 
+			/** @namespace this.construct */
 			// Call the construct constructor
 			if (this.construct) {
 				// this.construct.apply(this, arguments);
@@ -2196,6 +2457,12 @@
 			if (this._init) {
 				// this._init.apply(this, arguments);
 				return this._init.apply(this, arguments);
+			}
+
+			// Call the init constructor
+			if (this.init) {
+				// this.init.apply(this, arguments);
+				return this.init.apply(this, arguments);
 			}
 
 			// Call all constructor hooks
@@ -2209,22 +2476,21 @@
 		var len;
 
 		// jshint camelcase: false
-		var parentProto = newClass.__super__ = this.prototype;
-		var proto = Y.Util.create(parentProto);
+		var proto = Y.Util.create(parent);
 
-		proto.constructor = newClass;
+		proto.constructor = child;
 
-		newClass.prototype = proto;
+		child.prototype = proto;
 
 		// Inherit parent's statics
 		for (x in this) {
 			if (this.hasOwnProperty(x) && x !== 'prototype') {
-				newClass[x] = this[x];
+				child[x] = this[x];
 			}
 		}
 
 		if (properties._class_name) {
-			Y.extend(newClass, {
+			Y.extend(child, {
 				_class_name: properties._class_name.toString()
 			});
 
@@ -2234,7 +2500,7 @@
 		// Mix static properties into the class
 		/** @namespace properties._statics */
 		if (properties._statics) {
-			Y.extend(newClass, properties._statics);
+			Y.extend(child, properties._statics);
 			delete properties._statics;
 		}
 
@@ -2261,8 +2527,8 @@
 				return;
 			}
 
-			if (parentProto.callInitialHooks) {
-				parentProto.callInitialHooks.call(this);
+			if (parent.callInitialHooks) {
+				parent.callInitialHooks.call(this);
 			}
 
 			this.initialHooksCalled = true;
@@ -2272,7 +2538,87 @@
 			}
 		};
 
-		return newClass;
+		// Extend `extend` and `__super__` into child.
+		for (property in parent) {
+			if (parent.hasOwnProperty(property)) {
+				child[property] = parent[property];
+			}
+		}
+
+		// Set the prototype chain to inherit from `parent`, without calling
+		// `parent`'s constructor function.
+		var Surrogate = function () {
+			this.constructor = child;
+		};
+
+		Surrogate.prototype = parent.prototype;
+
+		child.prototype = new Surrogate();
+		child.prototype.__unwrappedSuper__ = {};
+
+		// Add prototype properties (instance properties) to the subclass, if supplied.
+		if (properties) {
+			// Extend parent prototypes into child.
+			for (property in properties) {
+				if (properties.hasOwnProperty(property)) {
+					child.prototype[property] = properties[property];
+				}
+			}
+
+			// A function wrapper which assigns this._super for the duration of the call,
+			// then marks the function so it can be unwrapped and re-wrapped for the next
+			// call which allows for proper multiple inheritance.
+			var functionWrapper = function (name, fn) {
+				var func = function class_super() {
+					var tmp = this._super;
+
+					// Add a new ._super() method that is the same method
+					// but on the super-class
+					this._super = _super[name] || unImplementedSuper(name);
+
+					// The method only need to be bound temporarily, so we
+					// remove it when we're done executing
+					var ret;
+
+					try {
+						ret = fn.apply(this, arguments);
+					} finally {
+
+						this._super = tmp;
+					}
+					return ret;
+				};
+
+				func[REF] = true;
+
+				return func;
+			};
+
+			var name;
+			var fun;
+
+			// Copy the properties over onto the new prototype
+			for (name in properties) {
+				if (properties.hasOwnProperty(name)) {
+					// Check if we're overwriting an existing function
+					if (Y.isFunction(properties[name]) && superTest.test(properties[name])) {
+						fun = child.prototype[name];
+
+						if (fun[REF]) {
+							properties[name] = child.prototype.__unwrappedSuper__[name];
+						}
+
+						child.prototype.__unwrappedSuper__[name] = properties[name];
+						child.prototype[name] = functionWrapper(name, properties[name]);
+					}
+				}
+			}
+		}
+
+		// Set a convenience property in case the parent's prototype is needed later.
+		child.__super__ = parent.prototype;
+
+		return child;
 	};
 
 	//---
@@ -2319,7 +2665,7 @@
 	//---
 
 	Y.Class.toString = function () {
-		return '[Y: Class' + (this._class_name ? '::' + this._class_name + ']' : ']');
+		return '[YAX] ' + (this._class_name ? '::' + this._class_name + '' : '');
 	};
 
 	//---

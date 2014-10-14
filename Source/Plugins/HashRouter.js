@@ -29,7 +29,7 @@
 
 	var defaultOptions = Y.Settings.DOM.router;
 
-	var location = Y.loc;
+	var location = window.location;
 	var router;
 
 	router = {
@@ -179,7 +179,7 @@
 			}
 
 			if (this.history.cache) {
-				history.cache.pushState({}, Y.doc.title, this.getHost() + path);
+				history.cache.pushState({}, document.title, this.getHost() + path);
 			} else {
 				location.hash = path;
 			}
@@ -217,7 +217,7 @@
 		},
 
 		getHost: function () {
-			return ((Y.doc.location + Y.empty()).replace(this.getPath() + this.getHash(),
+			return ((document.location + Y.empty).replace(this.getPath() + this.getHash(),
 				''));
 		},
 

@@ -16,7 +16,7 @@
 
 	var data = {},
 		dataAttr = Y.DOM.Function.data,
-		exp = Y.DOM.Expando,
+		exp = Y.DOM.expando,
 		rbrace = /(?:\{[\s\S]*\}|\[[\s\S]*\])$/,
 		rmultiDash = /([A-Z])/g;
 
@@ -30,7 +30,7 @@
 			}
 		});
 
-		this.Expando = Y.DOM.Expando;
+		this.expando = Y.DOM.expando;
 	}
 
 	Data.UID = 1;
@@ -58,7 +58,7 @@
 
 			var descriptor = {},
 			// Check if the owner object already has a cache key
-				unlock = owner[this.Expando];
+				unlock = owner[this.expando];
 
 			// If not, create one
 			if (!unlock) {
@@ -66,7 +66,7 @@
 
 				// Secure it in a non-enumerable, non-writable property
 				try {
-					descriptor[this.Expando] = {
+					descriptor[this.expando] = {
 						value: unlock
 					};
 					Object.defineProperties(owner, descriptor);
@@ -74,7 +74,7 @@
 					// Support: Android < 4
 					// Fallback to a less secure definition
 				} catch (e) {
-					descriptor[this.Expando] = unlock;
+					descriptor[this.expando] = unlock;
 					Y.extend(owner, descriptor);
 				}
 			}
@@ -198,12 +198,12 @@
 		},
 		hasData: function (owner) {
 			return !Y.isEmpty(
-					this.cache[owner[this.Expando]] || {}
+					this.cache[owner[this.expando]] || {}
 			);
 		},
 		discard: function (owner) {
-			if (owner[this.Expando]) {
-				delete this.cache[owner[this.Expando]];
+			if (owner[this.expando]) {
+				delete this.cache[owner[this.expando]];
 			}
 		}
 	};
@@ -247,7 +247,7 @@
 							data === "false" ? false :
 							data === "null" ? null :
 						// Only convert to a number if it doesn't change the string
-							+ data + Y.empty() === data ? +data :
+							+ data + Y.empty === data ? +data :
 						rbrace.test(data) ? JSON.parse(data) :
 							data;
 				} catch (e) {
@@ -331,7 +331,7 @@
 		return dataAttr.call(Y.DOM(node), name);
 	}
 
-	Y.DOM.Function.extend({
+	Y.extend(Y.DOM.Function, {
 		data: function (key, value) {
 			var attrs, name,
 				elem = this[0],
@@ -479,7 +479,7 @@
 	};
 
 	// Generate extended `remove` and `empty` functions
-	['remove', 'empty'].forEach(function (methodName) {
+	/*['remove', 'empty'].forEach(function (methodName) {
 		var origFn = Y.DOM.Function[methodName];
 
 		Y.DOM.Function[methodName] = function () {
@@ -493,7 +493,7 @@
 
 			return origFn.call(this);
 		};
-	});
+	});*/
 
 	//---
 

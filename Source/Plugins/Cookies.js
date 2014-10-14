@@ -26,9 +26,9 @@
 			 */
 			available: function () {
 				try {
-					return !!Y.UserAgent.Features.cookies;
+					return !!Y.UA.features.features.cookies;
 				} catch (e) {
-					Y.error(e);
+					Y.ERROR(e);
 					return false;
 				}
 			},
@@ -48,14 +48,14 @@
 				expire = '; expires=' + date.toUTCString();
 
 				if (Y.isString(name) && Y.isString(value)) {
-					Y.doc.cookie = name + '=' + value + expire + '; path=/';
+					document.cookie = name + '=' + value + expire + '; path=/';
 					return true;
 				}
 
 				if (Y.isObject(name) && Y.isUndefined(value)) {
 					for (key in name) {
 						if (name.hasOwnProperty(key)) {
-							Y.doc.cookie = key + '=' + name[key] + expire + '; path=/';
+							document.cookie = key + '=' + name[key] + expire + '; path=/';
 						}
 					}
 
@@ -72,7 +72,7 @@
 				var newName, cookieArray, x, cookie;
 
 				newName = name + '=';
-				cookieArray = Y.doc.cookie.split(';');
+				cookieArray = document.cookie.split(';');
 
 				for (x = 0; x < cookieArray.length; x++) {
 					cookie = cookieArray[x];

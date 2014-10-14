@@ -8,15 +8,14 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-(function () {
+(function (window) {
 
 	//---
 
 	'use strict';
 
 	var jsonpID = 0,
-		document = Y.doc,
-		window = Y.win,
+		document = window.document,
 		escape = encodeURIComponent,
 		allTypes = '*/'.concat('*');
 
@@ -141,19 +140,19 @@
 		//		}
 
 		if (mime) {
-			if (mime === Y.RegEx.htmlType) {
+			if (mime === Y.G.regexList.htmlType) {
 				return 'html';
 			}
 
-			if (mime === Y.RegEx.jsonTypeReplacement.test(mime)) {
+			if (mime === Y.G.regexList.jsonTypeReplacement.test(mime)) {
 				return 'json';
 			}
 
-			if (Y.RegEx.scriptTypeReplacement.test(mime)) {
+			if (Y.G.regexList.scriptTypeReplacement.test(mime)) {
 				return 'script';
 			}
 
-			if (Y.RegEx.xmlTypeReplacement.test(mime)) {
+			if (Y.G.regexList.xmlTypeReplacement.test(mime)) {
 				return 'xml';
 			}
 
@@ -244,7 +243,7 @@
 				script: 'text/javascript, application/javascript, application/x-javascript',
 				json: 'application/json, text/json',
 				xml: 'application/xml, text/xml',
-				html: Y.RegEx.htmlType,
+				html: Y.G.regexList.htmlType,
 				text: 'text/plain'
 			},
 			// Whether the request is to another domain
@@ -332,12 +331,12 @@
 					ajaxSuccess(responseData[0], xhr, options, deferred);
 				}
 
-				// Y.win[callbackName] = function (data) {
+				// window[callbackName] = function (data) {
 				//				window[callbackName] = function (data) {
 				//					ajaxSuccess(data, xhr, options);
 				//				};
 
-				Y.win[callbackName] = originalCallback;
+				window[callbackName] = originalCallback;
 
 				if (responseData && Y.isFunction(originalCallback)) {
 					originalCallback(responseData[0]);
@@ -351,7 +350,7 @@
 				return xhr;
 			}
 
-			Y.win[callbackName] = function () {
+			window[callbackName] = function () {
 				responseData = arguments;
 			};
 
@@ -402,11 +401,11 @@
 
 			if (!settings.crossDomain) {
 				settings.crossDomain = /^([\w\-]+:)?\/\/([^\/]+)/.test(settings.url) &&
-					RegExp.$2 !== Y.loc.host;
+					RegExp.$2 !== window.location.host;
 			}
 
 			if (!settings.url) {
-				settings.url = Y.loc.toString();
+				settings.url = window.location.toString();
 			}
 
 			serialiseData(settings);
@@ -430,7 +429,7 @@
 				return this.AjaxJSONP(settings, deferred);
 			}
 
-			//Y.log(dataType);
+			//Y.LOG(dataType);
 
 			mime = settings.accepts[dataType];
 
@@ -441,7 +440,7 @@
 				headers[name] = [name, value];
 			};
 
-			protocol = /^([\w\-]+:)\/\//.test(settings.url) ? RegExp.$1 : Y.loc.protocol;
+			protocol = /^([\w\-]+:)\/\//.test(settings.url) ? RegExp.$1 : window.location.protocol;
 
 			xhr = settings.xhr();
 
@@ -499,7 +498,7 @@
 
 			xhr.setRequestHeader = setHeader;
 
-			// Y.log(mime);
+			// Y.LOG(mime);
 
 			xhr.onreadystatechange = function () {
 				if (xhr.readyState == 4) {
@@ -509,7 +508,7 @@
 
 					var result, error = false;
 
-					// Y.log(xhr);
+					// Y.LOG(xhr);
 
 					if (
 						(xhr.status >= 200 && xhr.status < 300) ||
@@ -532,20 +531,20 @@
 							}
 
 							if (dataType === 'json') {
-								result = Y.RegEx.blankReplacement.test(result) ? 
+								result = Y.G.regexList.blankReplacement.test(result) ?
 									null : 
 									Y.parseJSON(result);
 							}
 						} catch (err) {
 							error = err;
-							// Y.error(err);
+							// Y.ERROR(err);
 						}
 
 						if (error) {
-							//Y.error(error);
+							//Y.ERROR(error);
 							ajaxError(error, 'parsererror', xhr, settings, deferred);
 						} else {
-							//Y.error(result);
+							//Y.ERROR(result);
 							ajaxSuccess(result, xhr, settings, deferred);
 						}
 					} else {
@@ -613,6 +612,7 @@
 		post: Y.DOM.Post,
 		ajax: Y.DOM.Ajax,
 		JSON: Y.DOM.getJSON,
+		XML: Y.DOM.getXML,
 		Script: Y.DOM.getScript,
 		ajaxJSONP: Y.DOM.AjaxJSONP,
 		ajaxSettings: Y.DOM.AjaxSettings
@@ -638,7 +638,7 @@
 
 		options.success = function (response) {
 			self.html(selector ? 
-				Y.DOM('<div>').html(response.replace(Y.RegEx.scriptReplacement, '')).find(selector) : 
+				Y.DOM('<div>').html(response.replace(Y.G.regexList.scriptReplacement, '')).find(selector) :
 				response);
 
 			if (callback) {
@@ -668,7 +668,7 @@
 
 	//---
 
-}());
+}(window));
 
 // FILE: ./Source/Modules/Node/Ajax.js
 

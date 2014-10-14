@@ -21,7 +21,7 @@
 
 	// Inspired by http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 	function getPrefixed(name) {
-		return Y.win['webkit' + name] || Y.win['moz' + name] || Y.win['ms' + name];
+		return window['webkit' + name] || window['moz' + name] || window['ms' + name];
 	}
 
 	// Fallback for IE 7-8
@@ -31,34 +31,34 @@
 
 		lastTime = time + timeToCall;
 
-		return Y.win.setTimeout(func, timeToCall);
+		return window.setTimeout(func, timeToCall);
 	}
 
-	requestFunction = Y.win.requestAnimationFrame ||
+	requestFunction = window.requestAnimationFrame ||
 		getPrefixed('RequestAnimationFrame') ||
 		timeoutDefer;
 
 	// cancelFunction = window.cancelAnimationFrame ||
 	// cancelFunction = window.cancelRequestAnimationFrame ||
-	cancelFunction = Y.callProperty(Y.win, 'cancelAnimationFrame') ||
+	cancelFunction = Y.callProperty(window, 'cancelAnimationFrame') ||
 		getPrefixed('CancelAnimationFrame') ||
 		getPrefixed('CancelRequestAnimationFrame') ||
 
 		function (id) {
-			Y.win.clearTimeout(id);
+			window.clearTimeout(id);
 		};
 
 	Y.Util.requestAnimationFrame = function (func, context, immediate, element) {
 		if (immediate && requestFunction === timeoutDefer) {
 			func.call(context);
 		} else {
-			return requestFunction.call(Y.win, Y.Bind(func, context), element);
+			return requestFunction.call(window, Y.Bind(func, context), element);
 		}
 	};
 
 	Y.Util.cancelAnimationFrame = function (id) {
 		if (id) {
-			cancelFunction.call(Y.win, id);
+			cancelFunction.call(window, id);
 		}
 	};
 

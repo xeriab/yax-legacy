@@ -127,7 +127,7 @@
 			 */
 			encode: function (stream) {
 				if (this.data.length === 0) {
-					return Y.empty();
+					return Y.empty;
 				}
 
 				var data = this.data,

@@ -19,9 +19,9 @@
 	function consoleOutput(e) {
 		if (e.data.color) {
 			var style = 'color:' + e.data.color;
-			Y.log('%c' + e.type + ' on ' + this.tagName, style);
+			Y.LOG('%c' + e.type + ' on ' + this.tagName, style);
 		} else {
-			Y.log(e.type + ' on ' + this.tagName);
+			Y.LOG(e.type + ' on ' + this.tagName);
 		}
 	}
 
@@ -52,7 +52,7 @@
 		return this;
 	};
 
-	Y.win.EventLogger = {
+	window.EventLogger = {
 		start: function (selector, event, color) {
 			var fontColor = Y.isString(color) ? color : '';
 

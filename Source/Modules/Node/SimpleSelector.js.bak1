@@ -97,7 +97,7 @@
 		// Quote the hash in `a[href^=#]` expression
 		selector = selector.replace(/\=#\]/g, '="#"]');
 
-		var filter, argument, match = Y.RegEx.FilterReplacement.exec(selector), num;
+		var filter, argument, match = Y.G.regexList.filterReplacement.exec(selector), num;
 
 		if (match && Filters.hasOwnProperty(match[2])) {
 			filter = Filters[match[2]];
@@ -127,7 +127,7 @@
 			try {
 				if (!_selector && filter) {
 					_selector = '*';
-				} else if (Y.RegEx.ChildReplacement.test(_selector)) {
+				} else if (Y.G.regexList.childReplacement.test(_selector)) {
 					// support "> *" child queries by tagging the parent node with a
 					// unique class and prepending that classname onto the selector
 					taggedParent = Y.DOM(node).addClass(classTag);
@@ -154,7 +154,7 @@
 
 				//nodes = oldQSA(node, _selector);
 			} catch (e) {
-				Y.error('Error performing selector: %o', selector);
+				Y.ERROR('Error performing selector: %o', selector);
 				throw e;
 			} finally {
 				if (taggedParent) {

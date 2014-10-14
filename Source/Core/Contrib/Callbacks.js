@@ -14,8 +14,6 @@
 
 	'use strict';
 
-	var rnotwhite = (/\S+/g);
-
 	// String to Object options format cache
 	var optionsCache = {};
 
@@ -23,7 +21,7 @@
 	function createOptions (options) {
 		var object = optionsCache[options] = {};
 
-		Y.each(options.match(rnotwhite) || [], function(_, flag) {
+		Y.each(options.match(Y.G.regexList.notWhite) || [], function(_, flag) {
 			object[flag] = true;
 		});
 
@@ -50,7 +48,7 @@
 			options = Y.extend({}, options);
 		}
 
-		// Y.log(options);
+		// Y.LOG(options);
 
 		// Last fire value (for non-forgettable lists)
 		var memory,

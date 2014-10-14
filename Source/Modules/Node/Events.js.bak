@@ -8,11 +8,14 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-(function (window, document, undef) {
+(function (undef) {
 
 	//---
 
 	'use strict';
+
+	var document = document;
+	var window = window;
 
 	var YID = 1;
 
@@ -188,6 +191,40 @@
 			return new Y.DOM.Event(src, props);
 		}
 
+		/*var event;
+		var name;
+		var bubbles;
+
+		if (!Y.isString(src)) {
+			props = src;
+			src = props.type;
+		}
+
+		event = document.createEvent(specialEvents[src] || 'Events');
+
+		bubbles = true;
+
+		if (props) {
+			for (name in props) {
+				if (props.hasOwnProperty(name)) {
+					if (name === 'bubbles') {
+						bubbles = Y.isSet(props[name]);
+					} else {
+						event[name] = props[name];
+					}
+				}
+			}
+
+			Y.DOM.extend(this, props);
+		}
+
+		event.initEvent(src, bubbles, true);
+
+		return compatible(event);*/
+
+		//---
+
+
 		//---
 
 		// Event object
@@ -204,7 +241,7 @@
 			} else {
 				this.isDefaultPrevented = returnFalse();
 			}
-			// Event type
+		// Event type
 		} else {
 			this.type = src;
 		}
@@ -427,9 +464,9 @@
 				.on(el, 'MozMousePixelScroll', stop);
 		},
 
-//		disableClickPropagation: function (el) {
-//
-//		},
+		disableClickPropagation: function (el) {
+
+		},
 
 //		disableClickPropagation: function (el) {
 //			var stop = Y.DOM.Event.stopPropagation, i;
@@ -1301,12 +1338,16 @@
 
 	//---
 
-	Y.DOM.proxy = Y.DOM.Proxy = $.proxy = function (callback, context) {
+	Y.DOM.proxy = Y.DOM.Proxy = function (callback, context) {
 		var result, proxyFn, args;
 
-		args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
+		/*var _in = function (arg1, arg2) {
+			return (arg1 in arg2);
+		};*/
+
+		// args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
 		// args = _in(2, arguments) && Y.G.Slice.call(arguments, 2);
-		// args = Y.G.Slice.call(arguments, 2);
+		args = Y.G.Slice.call(arguments, 2);
 
 		if (Y.isFunction(callback)) {
 
@@ -1655,6 +1696,10 @@
 			return arguments.length > 0 ?
 				this.on(name, null, data, callback) :
 				this.trigger(name);
+
+			/*return callback ?
+				this.bind(name, callback) :
+				this.trigger(name);*/
 		};
 	});
 
@@ -1688,6 +1733,25 @@
 		};
 	});
 
+	// Generate extended `remove` and `empty` functions
+	/*['remove', 'empty'].forEach(function (method) {
+		var origFn = Y.DOM.fn[method];
+
+		Y.DOM.fn[method] = function () {
+			var elements = this.find('*');
+
+			if (method === 'remove') {
+				elements = elements.add(this);
+			}
+
+			elements.forEach(function (element) {
+				Y.DOM.event.remove(element);
+			});
+
+			return origFn.call(this);
+		};
+	});*/
+
 	//---
 
 	// Support: Firefox, Chrome, Safari
@@ -1708,11 +1772,8 @@
 						attaches = Y.DOM.dataPrivative.access(doc, fix);
 
 					if (!attaches) {
-						//doc.addEventListener(orig, handler, true);
-
-						YAX.DOM.Event.add(doc, orig, handler, true);
+						doc.addEventListener(orig, handler, true);
 					}
-
 					Y.DOM.dataPrivative.access(doc, fix, (attaches || 0) + 1);
 				},
 
@@ -1721,11 +1782,7 @@
 						attaches = Y.DOM.dataPrivative.access(doc, fix) - 1;
 
 					if (!attaches) {
-
-						// doc.removeEventListener(orig, handler, true);
-
-						YAX.DOM.Event.remove(doc, orig, handler, true);
-
+						doc.removeEventListener(orig, handler, true);
 						Y.DOM.dataPrivative.remove(doc, fix);
 
 					} else {
@@ -1789,7 +1846,7 @@
 
 	//---
 
-	/*['remove', 'empty'].forEach(function (method) {
+	['remove', 'empty'].forEach(function (method) {
 		var origFn = Y.DOM.fn[method];
 
 		Y.DOM.fn[method] = function () {
@@ -1805,11 +1862,11 @@
 
 			return origFn.call(this);
 		};
-	});*/
+	});
 
 	//---
 
-}(window, document));
+}());
 
 // FILE: ./Source/Modules/Node/Events.js
 

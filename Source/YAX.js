@@ -7,12 +7,16 @@
 /*jshint eqeqeq: false */
 /*jshint undef: true */
 /*jshint unused: true */
-/*global exports, define, module */
+/*jshint strict: false */
+/*global exports, module */
 
 (function () {
+
+	//---
+
 	// 'use strict';
 
-	var Y = {};
+	// var Y = {};
 
 	var isNode = false;
 
@@ -21,6 +25,11 @@
 
 	// Save the previous value of the `Y` or `YAX` variable.
 	var previousYax = root.Y || root.YAX || null;
+
+	/*jshint -W079 */
+	/*jshint -W020 */
+	var require = null;
+	var define = null;
 
 	// Save bytes in the minified (but not gzipped) version:
 	var ArrayProto = Array.prototype;
@@ -35,22 +44,116 @@
 	var toString = ObjProto.toString;
 	var HasOwnProperty = ObjProto.hasOwnProperty;
 
-	var Console = root.console;
+	//---
+
+	(function () {
+		var modules = {};
+
+		// Stack of moduleIds currently being built.
+		var requireStack = [];
+
+		// Map of module ID -> index into requireStack of modules currently being built.
+		var inProgressModules = {};
+
+		var SEPARATOR = '.';
+
+		function build(module) {
+			var factory = module.factory;
+
+			var localRequire = function (id) {
+				var resultantId = id;
+
+				//Its a relative path, so lop off the last portion and add the id (minus './')
+				if (id.charAt(0) === '.') {
+					resultantId = module.id.slice(0, module.id.lastIndexOf(SEPARATOR)) +
+						SEPARATOR + id.slice(2);
+				}
+
+				return require(resultantId);
+			};
+
+			module.exports = {};
+
+			delete module.factory;
+
+			factory(localRequire, module.exports, module);
+
+			return module.exports;
+		}
+
+		require = function (id) {
+			if (!modules[id]) {
+				throw 'module ' + id + ' not found';
+			}
+
+			if (inProgressModules.hasOwnProperty(id)) {
+				var cycle = requireStack.slice(inProgressModules[id])
+					.join('->') + '->' + id;
+
+				throw 'Cycle in require graph: ' + cycle;
+			}
+
+			if (modules[id].factory) {
+				try {
+					inProgressModules[id] = requireStack.length;
+					requireStack.push(id);
+
+					return build(modules[id]);
+				} finally {
+					delete inProgressModules[id];
+
+					requireStack.pop();
+				}
+			}
+
+			return modules[id].exports;
+		};
+
+		define = function (id, factory) {
+			if (modules[id]) {
+				throw 'module ' + id + ' already defined';
+			}
+
+			modules[id] = {
+				id: id,
+				factory: factory
+			};
+		};
+
+		define.remove = function (id) {
+			delete modules[id];
+		};
+
+		define.moduleMap = modules;
+	}());
 
 	//---
 
-	// Create a safe reference to the YAX object for use below.
-	/*Y = function (object) {
-		if (object instanceof Y) {
-			return object;
+	// Export for use in node
+	if (typeof module === 'object' && typeof require === 'function') {
+		module.exports.require = require;
+		module.exports.define = define;
+	}
+
+	//---
+
+	root.require = require;
+	root.define = define;
+
+	//---
+
+	// Create a safe reference to the `Y` object for use below.
+	var Y = function (obj) {
+		if (obj instanceof Y) {
+			return obj;
 		}
 
 		if (!(this instanceof Y)) {
-			return new Y(object);
+			return new Y(obj);
 		}
 
-		this._WRAPPED = object;
-	};*/
+		this._wrapped = obj;
+	};
 
 	//---
 
@@ -74,6 +177,7 @@
 	if (typeof exports !== 'undefined') {
 		if (typeof module !== 'undefined' && module.exports) {
 			// exports = module.exports = Y;
+			// module.exports = Y;
 			module.exports = Y;
 		}
 
@@ -84,29 +188,9 @@
 
 	//---
 
-	Y.ENV = {};
-
-	//---
-
 	Y.toString = function () {
-		return '[YAX]';
+		return '[YAX]: Library';
 	};
-
-	//---
-
-	if (isNode) {
-		isNode = true;
-
-		Console.info('[INFO] Running YAX.JS in "Node" Environment!');
-	} else {
-		isNode = false;
-
-		Y.win = this;
-		Y.doc = Y.win.document;
-		Y.loc = Y.win.location;
-
-		Console.info('[INFO] Running YAX.JS in "Browser" Environment!');
-	}
 
 	//---
 
@@ -148,16 +232,23 @@
 		return array;
 	};
 
+	Object.setPrototypeOf = Object.setPrototypeOf || function (obj, proto) {
+		/*jshint -W103 */
+		obj.__proto__ = proto;
+		
+		return obj;
+	};
+
 	//---
 
 	Y._INFO = {};
 
 	//---
 
-	Y.VERSION = Y._INFO.VERSION = 0.20;
-	Y._INFO.BUILD = 1000;
-	Y._INFO.STATUS = 'DEV';
-	Y._INFO.CODENAME = 'RAGHDA';
+	Y.VERSION = 0.20;
+	Y.BUILD = 1000;
+	Y.STATUS = 'DEV';
+	Y.CODENAME = 'RAGHDA';
 
 	Y.hasOwnProp = ({}).hasOwnProperty;
 
@@ -198,15 +289,23 @@
 	Y.G.IndexOf = ArrayProto.indexOf;
 	Y.G.Push = ArrayProto.push;
 
-	/** @namespace root.R */
-	/** @namespace root.D */
-	Y.require = root.R || require || null;
-	Y.define = root.D || define || null;
+	Y.require = root.require || require || null;
+	Y.define = root.define || define || null;
 
 	//---
 
-	/** @namespace define.amd */
+	if (isNode) {
+		isNode = true;
+		console.info('[INFO] Running YAX.JS in "Node" Environment!');
+	} else {
+		isNode = false;
+		Y.WIN = this;
+		Y.DOC = Y.WIN.document;
+		console.info('[INFO] Running YAX.JS in "Browser" Environment!');
+	}
 
+
+	/** @namespace define.amd */
 	// AMD registration happens at the end for compatibility with AMD loaders
 	// that may not enforce next-turn semantics on modules. Even though general
 	// practice for AMD registration is to be anonymous, YAX registers
@@ -218,14 +317,11 @@
 		define('YAX', [], function () {
 			return Y;
 		});
+
+		isNode = true;
 	} else {
 		expose();
 	}
-
-	//---
-
-	delete root.R;
-	delete root.D;
 
 	//---
 

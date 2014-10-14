@@ -9,7 +9,7 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-(function (undef) {
+(function (window, document, undef) {
 
 	//---
 
@@ -23,8 +23,6 @@
 			O: 'o',
 			ms: 'MS'
 		},
-
-		document = Y.doc,
 		testEl = document.createElement('div'),
 		supportedTransforms =
 		/^((translate|rotate|scale)(X|Y|Z|3d)?|matrix(3d)?|perspective|skew(X|Y)?)$/i,
@@ -424,7 +422,7 @@
 
 	//---
 
-}());
+}(window, document));
 
 // FILE: ./Source/Modules/Node/Fx.js
 

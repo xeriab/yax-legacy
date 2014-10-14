@@ -67,10 +67,10 @@
 
 							return _value;
 						} catch (er) {
-							Y.error(er);
+							Y.ERROR(er);
 						}
 
-						Y.error(err);
+						Y.ERROR(err);
 					}
 
 					return value;
@@ -101,7 +101,7 @@
 					}
 
 					value.value = domParser.call(
-						(Y.hasOwn.call(global, 'DOMParser') && (new DOMParser())) || Y.win,
+						(Y.hasOwn.call(global, 'DOMParser') && (new DOMParser())) || window,
 						value.value,
 						'text/xml'
 					);

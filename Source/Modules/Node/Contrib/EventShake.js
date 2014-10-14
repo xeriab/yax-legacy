@@ -15,8 +15,8 @@
 
 	'use strict';
 
-	/** @namespace Y.win.DeviceMotionEvent */
-	if (!Y.isUndefined(Y.win.DeviceMotionEvent)) {
+	/** @namespace window.DeviceMotionEvent */
+	if (!Y.isUndefined(window.DeviceMotionEvent)) {
 		Y.DOM.Function.onshake = function (callb, sens) {
 			// Shake sensitivity (a lower number is more sensitive)
 			var sensitivity = sens || 20,

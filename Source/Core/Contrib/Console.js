@@ -139,11 +139,11 @@
 		],
 
 		CONSOLE: {
-			ERROR: Y.error,
-			WARN: Y.warn,
-			INFO: Y.info,
-			DEBUG: Y.log,
-			LOG: Y.log
+			ERROR: Y.ERROR,
+			WARN: Y.WARN,
+			INFO: Y.INFO,
+			DEBUG: Y.LOG,
+			LOG: Y.LOG
 		},
 
 		_init: function () {
@@ -434,7 +434,7 @@
 		}
 
 		/*_log: function () {
-			return Y.log.apply(this, Y.makeArray(arguments));
+			return Y.LOG.apply(this, Y.makeArray(arguments));
 		},
 
 		log: function () {
@@ -462,21 +462,21 @@
 	//---
 
 	// Overrides some key "YAX" Object methods
-	Y.error = function (message) {
+	Y.ERROR = function (message) {
 		if (arguments.length > 0 && Y.Console.isLevelVisible(Y.Console.LEVELS.ERROR)) {
 			Y.Console.CONSOLE.ERROR.apply(this, Y.Console.decorateArgs(arguments, Y.Console.LEVELS.ERROR));
 			Y.Console.invokeOnOutput(message, Y.Console.LEVELS.ERROR);
 		}
 	};
 
-	Y.warn = function (message) {
+	Y.WARN = function (message) {
 		if (arguments.length > 0 && Y.Console.isLevelVisible(Y.Console.LEVELS.WARN)) {
 			Y.Console.CONSOLE.WARN.apply(this, Y.Console.decorateArgs(arguments, Y.Console.LEVELS.WARN));
 			Y.Console.invokeOnOutput(message, Y.Console.LEVELS.WARN);
 		}
 	};
 
-	Y.info = function (message) {
+	Y.INFO = function (message) {
 		if (arguments.length > 0 && Y.Console.isLevelVisible(Y.Console.LEVELS.INFO)) {
 			Y.Console.CONSOLE.INFO.apply(this, Y.Console.decorateArgs(arguments, Y.Console.LEVELS.INFO));
 			Y.Console.invokeOnOutput(message, Y.Console.LEVELS.INFO);
@@ -490,7 +490,7 @@
 		}
 	};
 
-	Y.log = function () {
+	Y.LOG = function () {
 		/*if (arguments.length > 0) {
 			Y.Console.CONSOLE.LOG.apply(this, arguments);
 		}*/

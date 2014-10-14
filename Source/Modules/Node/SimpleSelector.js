@@ -9,32 +9,41 @@
 /*jslint node: false */
 /*global YAX, Y */
 
-(function ($) {
+(function () {
 
 	//---
 
 	'use strict';
 
-	var YAXDOM = $.YAXDOM;
+	var yDOM = Y.DOM;
 
-	// var tmpYaxDom = $;
+	// var tmpYaxDom = Y.DOM;
 
-	var oldQSA = YAXDOM.QSA;
-	var oldMatches = YAXDOM.Matches;
-	var classTag = $.classTag;
+	var oldQSA = yDOM.qsa;
+	var oldMatches = yDOM.matches;
+	var classTag = Y.DOM.classTag;
 	var Filters;
 
 	//---
 
+	Y.DOM.expr.match = {};
+
+	Y.DOM.expr.match.needsContext = new RegExp( "^" + Y.G.regexList.whitespace +
+		"*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" +
+		Y.G.regexList.whitespace + "*((?:-\\d)?\\d*)" + Y.G.regexList.whitespace +
+		"*\\)|)(?=[^-]|$)", "i" );
+
+	//---
+
 	function visible(element) {
-		element = $(element);
+		element = Y.DOM(element);
 		return !!(element.width() || element.height()) && element.css('display') !== 'none';
 	}
 
 	// Complex selectors are not supported:
 	//   li:has(label:contains("foo")) + li:has(label:contains("bar"))
 	//   ul.inner:first > li
-	Filters = $.Expr[':'] = $.expr[':'] = {
+	Filters = Y.DOM.Expr[':'] = Y.DOM.expr[':'] = {
 		visible: function () {
 			if (visible(this)) {
 				return this;
@@ -74,12 +83,12 @@
 			}
 		},
 		contains: function (index, _, text) {
-			if ($(this).text().indexOf(text) > -1) {
+			if (Y.DOM(this).text().indexOf(text) > -1) {
 				return this;
 			}
 		},
 		has: function (index, _, selector) {
-			if ($.YAXDOM.QSA(this, selector).length) {
+			if (Y.DOM.qsa(this, selector).length) {
 				return this;
 			}
 		}
@@ -89,7 +98,7 @@
 		// Quote the hash in `a[href^=#]` expression
 		selector = selector.replace(/\=#\]/g, '="#"]');
 
-		var filter, argument, match = Y.RegEx.FilterReplacement.exec(selector), num;
+		var filter, argument, match = Y.G.regexList.filterReplacement.exec(selector), num;
 
 		if (match && Filters.hasOwnProperty(match[2])) {
 			filter = Filters[match[2]];
@@ -110,23 +119,23 @@
 		return callback(selector, filter, argument);
 	}
 
-	YAXDOM.QSA = function (node, selector) {
+	yDOM.qsa = function (node, selector) {
 		var taggedParent, nodes;
 
 		return process(selector, function (_selector, filter, argument) {
 			try {
 				if (!_selector && filter) {
 					_selector = '*';
-				} else if (Y.RegEx.ChildReplacement.test(_selector)) {
+				} else if (Y.G.regexList.childReplacement.test(_selector)) {
 					// support "> *" child queries by tagging the parent node with a
 					// unique class and prepending that classname onto the selector
-					taggedParent = $(node).addClass(classTag);
+					taggedParent = Y.DOM(node).addClass(classTag);
 					_selector = '.' + classTag + ' ' + _selector;
 				}
 
 				nodes = oldQSA(node, _selector);
 			} catch (e) {
-				Y.error('Error performing selector: %o', selector);
+				Y.ERROR('Error performing selector: %o', selector);
 				throw e;
 			} finally {
 				if (taggedParent) {
@@ -135,13 +144,13 @@
 			}
 
 			return !filter ? nodes :
-				Y.unique($.map(nodes, function (n, i) {
+				Y.unique(Y.DOM.map(nodes, function (n, i) {
 					return filter.call(n, i, nodes, argument);
 				}));
 		});
 	};
 
-	YAXDOM.Matches = function (node, selector) {
+	yDOM.matches = function (node, selector) {
 		return process(selector, function (_selector, filter, argument) {
 			return (!_selector || oldMatches(node, _selector)) && (!filter || filter.call(node, null, argument) === node);
 		});
@@ -149,7 +158,7 @@
 
 	//---
 
-}($));
+}());
 
 // FILE: ./Source/Modules/Node/SimpleSelector.js
 

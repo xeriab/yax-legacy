@@ -15,8 +15,9 @@
 	'use strict';
 
 	Y.extend({
-		now: Date.now,
-		date: new Date(),
+		now: Date.now || function() {
+			return new Date().getTime();
+		},
 
 		/**
 		 * Delay
@@ -59,11 +60,11 @@
 					xml = temp.parseFromString(data, 'text/xml');
 				} catch (e) {
 					xml = undef;
-					Y.error(e);
+					Y.ERROR(e);
 				}
 
 				if (!xml || xml.getElementsByTagName('parsererror').length) {
-					Y.error('Invalid XML: ' + data);
+					Y.ERROR('Invalid XML: ' + data);
 				}
 
 				return xml;

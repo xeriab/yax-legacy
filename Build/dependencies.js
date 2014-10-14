@@ -7,14 +7,18 @@
 var Dependencies = {
 	'Core': {
 		src: [
-			'Require.js',
+			// 'Require.js',
+
 			'YAX.js',
 
 			'Core/Constants.js',
 
 			'Core/Core.js',
-			'Core/Regex.js',
+
+			'Core/Contrib/Config.js',
+
 			'Core/Global.js',
+			'Core/RegexList.js',
 			'Core/Utility.js',
 			'Core/Class.js',
 			'Core/Evented.js',
@@ -35,14 +39,18 @@ var Dependencies = {
 
 	'Extended Core': {
 		src: [
-			'Require.js',
+			// 'Require.js',
+
 			'YAX.js',
 
 			'Core/Constants.js',
 
 			'Core/Core.js',
-			'Core/Regex.js',
+
+			'Core/Contrib/Config.js',
+
 			'Core/Global.js',
+			'Core/RegexList.js',
 			'Core/Utility.js',
 			'Core/Class.js',
 			'Core/Evented.js',
@@ -63,11 +71,13 @@ var Dependencies = {
 
 	'Node': {
 		src: [
+			'Modules/EnvDetector.js',
 			'Modules/Utility.js',
 
 			'Modules/Node/Node.js',
 			'Modules/Node/SimpleSelector.js',
 			// 'Modules/Node/SizzleSelector.js',
+
 			'Modules/Node/Data.js',
 			'Modules/Node/Events.js',
 			'Modules/Node/Ajax.js',
@@ -75,8 +85,46 @@ var Dependencies = {
 			'Modules/Node/FxMethods.js',
 			'Modules/Node/Form.js',
 
-			'Modules/UserAgentDetector.js',
 
+			// These file are not part of Node but you can
+			// add them to empower YAX.Node with some useful stuff :)
+
+			// 'Modules/Node/Contrib/EventPress.js',
+			// 'Modules/Node/Contrib/EventTouch.js',
+			// 'Modules/Node/Contrib/EventShake.js',
+			// 'Modules/Node/Contrib/EventGesture.js',
+			// 'Modules/Node/Contrib/Assets.js',
+			// 'Modules/Node/Contrib/Stack.js',
+
+			'Modules/Node/Extra.js',
+
+			// 'Modules/Node/Contrib/EventLogger.js',
+
+			// 'Support/Compatibility.js',
+
+			'Support/IE.js'
+		],
+
+		desc: 'Node/DOM module.',
+
+		extended_desc: ''
+	},
+
+	'Extended Node': {
+		src: [
+			'Modules/EnvDetector.js',
+			'Modules/Utility.js',
+
+			'Modules/Node/Node.js',
+			'Modules/Node/SimpleSelector.js',
+			'Modules/Node/SizzleSelector.js',
+
+			'Modules/Node/Data.js',
+			'Modules/Node/Events.js',
+			'Modules/Node/Ajax.js',
+			'Modules/Node/Fx.js',
+			'Modules/Node/FxMethods.js',
+			'Modules/Node/Form.js',
 
 			// These file are not part of Node but you can
 			// add them to empower YAX.Node with some useful stuff :)
@@ -95,50 +143,6 @@ var Dependencies = {
 			'Support/Compatibility.js',
 
 			'Support/IE.js'
-
-			// 'Modules/Node/Contrib/EventSpecial.js'
-		],
-
-		desc: 'Node/DOM module.',
-
-		extended_desc: ''
-	},
-
-	'Extended Node': {
-		src: [
-			'Modules/Utility.js',
-
-			'Modules/Node/Node.js',
-			// 'Modules/Node/SimpleSelector.js',
-			'Modules/Node/SizzleSelector.js',
-			'Modules/Node/Data.js',
-			'Modules/Node/TestEvents.js',
-			'Modules/Node/Ajax.js',
-			'Modules/Node/Fx.js',
-			'Modules/Node/FxMethods.js',
-			'Modules/Node/Form.js',
-
-			'Modules/UserAgentDetector.js',
-
-			// These file are not part of Node but you can
-			// add them to empower YAX.Node with some useful stuff :)
-
-			// 'Modules/Node/Contrib/EventPress.js',
-			// 'Modules/Node/Contrib/EventTouch.js',
-			// 'Modules/Node/Contrib/EventShake.js',
-			// 'Modules/Node/Contrib/EventGesture.js',
-			// 'Modules/Node/Contrib/Assets.js',
-			// 'Modules/Node/Contrib/Stack.js',
-
-			'Modules/Node/Extra.js',
-
-			'Modules/Node/Contrib/EventLogger.js',
-
-			'Support/Compatibility.js',
-
-			'Support/IE.js'
-
-			// 'Modules/Node/Contrib/EventSpecial.js'
 		],
 
 		desc: 'Node/DOM module.',

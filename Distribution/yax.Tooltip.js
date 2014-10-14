@@ -54,12 +54,12 @@
 		},
 
 		show: function () {
-			Y.DOM(this.element).css('cursor', 'pointer');
+			$(this.element).css('cursor', 'pointer');
 
 			// Close all other Tooltips
-			// Y.DOM('div.yax-tooltip').hide();
-			Y.DOM('div.yax-tooltip').remove();
-			Y.win.clearTimeout(this.delay);
+			// $('div.yax-tooltip').hide();
+			$('div.yax-tooltip').remove();
+			window.clearTimeout(this.delay);
 			this.setContent();
 			this.setPositions();
 
@@ -84,18 +84,18 @@
 
 		addAnimation: function () {
 			switch (this.options.animation) {
-			case 'none':
-				break;
+				case 'none':
+					break;
 
-			case 'fadeIn':
-				this.Tooltip.addClass('animated');
-				this.Tooltip.addClass('fadeIn');
-				break;
+				case 'fadeIn':
+					this.Tooltip.addClass('animated');
+					this.Tooltip.addClass('fadeIn');
+					break;
 
-			case 'flipIn':
-				this.Tooltip.addClass('animated');
-				this.Tooltip.addClass('flipIn');
-				break;
+				case 'flipIn':
+					this.Tooltip.addClass('animated');
+					this.Tooltip.addClass('flipIn');
+					break;
 			}
 		},
 
@@ -114,21 +114,21 @@
 			}
 
 			if (this.content.charAt(0) === '#') {
-				Y.DOM(this.content).hide();
-				this.content = Y.DOM(this.content).html();
+				$(this.content).hide();
+				this.content = $(this.content).html();
 				this.contentType = 'html';
 			} else {
 				this.contentType = 'text';
 			}
 
 			// Create Tooltip container
-			this.Tooltip = Y.DOM('<div class="yax-tooltip ' +
-				this.options.theme + ' ' +
-				this.options.size + ' ' +
-				this.options.gravity +
-				'"><div class="tooltiptext">' +
-				this.content +
-				'</div><div class="tip"></div></div>'
+			this.Tooltip = $('<div class="yax-tooltip ' +
+					this.options.theme + ' ' +
+					this.options.size + ' ' +
+					this.options.gravity +
+					'"><div class="tooltiptext">' +
+					this.content +
+					'</div><div class="tip"></div></div>'
 			);
 
 			this.Tip = this.Tooltip.find('.tip');
@@ -147,9 +147,9 @@
 			}
 
 
-			// this.Tooltip.insertBefore(Y.DOM(this.element));
+			// this.Tooltip.insertBefore($(this.element));
 
-			// Y.DOM(this.element).parent().append(this.Tooltip);
+			// $(this.element).parent().append(this.Tooltip);
 
 			// this.element.append(this.Tooltip);
 
@@ -189,56 +189,56 @@
 				elemLeft = 0;
 			}
 
-			if (Y.DOM(Y.win).width() < this.Tooltip.width() * 1.5) {
-				this.Tooltip.css('max-width', Y.DOM(Y.win).width() / 2);
+			if ($(window).width() < this.Tooltip.width() * 1.5) {
+				this.Tooltip.css('max-width', $(window).width() / 2);
 			} else {
 				this.Tooltip.css('max-width', 340);
 			}
 
 			switch (this.options.gravity) {
 				case 'south':
-					leftPos = elemLeft + this.element.outerWidth() / 
+					leftPos = elemLeft + this.element.outerWidth() /
 						2 - this.Tooltip.outerWidth() / 2;
-					
-					topPos = elemTop - this.Tooltip.outerHeight() - 
+
+					topPos = elemTop - this.Tooltip.outerHeight() -
 						this.Tip.outerHeight() / 2;
-					
+
 					break;
 
 				case 'west':
-					leftPos = elemLeft + this.element.outerWidth() + 
+					leftPos = elemLeft + this.element.outerWidth() +
 						this.Tip.outerWidth() / 2;
-					
-					topPos = elemTop + this.element.outerHeight() / 
+
+					topPos = elemTop + this.element.outerHeight() /
 						2 - (this.Tooltip.outerHeight() /2);
-					
+
 					break;
 
 				case 'north':
-					leftPos = elemLeft + this.element.outerWidth() / 
+					leftPos = elemLeft + this.element.outerWidth() /
 						2 - (this.Tooltip.outerWidth() / 2);
-					
-					topPos = elemTop + this.element.outerHeight() + 
+
+					topPos = elemTop + this.element.outerHeight() +
 						this.Tip.outerHeight() / 2;
-					
+
 					break;
 
 				case 'east':
-					leftPos = elemLeft - this.Tooltip.outerWidth() - 
+					leftPos = elemLeft - this.Tooltip.outerWidth() -
 						this.Tip.outerWidth() / 2;
-					
-					topPos = elemTop + this.element.outerHeight() / 
+
+					topPos = elemTop + this.element.outerHeight() /
 						2 - this.Tooltip.outerHeight() / 2;
-					
+
 					break;
 
 				case 'center':
-					leftPos = elemLeft + this.element.outerWidth() / 
+					leftPos = elemLeft + this.element.outerWidth() /
 						2 - (this.Tooltip.outerWidth() / 2);
-					
-					topPos = elemTop + this.element.outerHeight() / 
+
+					topPos = elemTop + this.element.outerHeight() /
 						2 - this.Tip.outerHeight() / 2;
-					
+
 					break;
 			}
 
@@ -271,7 +271,7 @@
 					event.stopPropagation();
 				});
 
-				Y.DOM('html').click(function () {
+				$('html').click(function () {
 					self.hide();
 				});
 			}
@@ -331,11 +331,11 @@
 		}
 	};
 
-	Y.DOM.Function.tooltip = function (options) {
+	$.fn.Tooltip = function (options) {
 		options = Y.extend({}, pluginOptions, options);
 
 		return this.each(function () {
-			return new Tooltip(Y.DOM(this), options);
+			return new Tooltip($(this), options);
 		});
 	};
 

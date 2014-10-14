@@ -16,18 +16,18 @@
 	'use strict';
 
 	// Map over Yax.DOM in case of overwrite
-	var _YaxDOM = Y.win.Y.DOM;
+	var _YaxDOM = window.Y.DOM;
 
 	// Map over the $ in case of overwrite
-	var _$ = Y.win.$;
+	var _$ = window.$;
 
 	_YaxDOM.noConflict = function (deep) {
-		if (Y.win.$ === Y.DOM) {
-			Y.win.$ = _$;
+		if (window.$ === Y.DOM) {
+			window.$ = _$;
 		}
 
-		if (deep && Y.win.Y.DOM === Y.DOM) {
-			Y.win.Y.DOM = _YaxDOM;
+		if (deep && window.Y.DOM === Y.DOM) {
+			window.Y.DOM = _YaxDOM;
 		}
 
 		return Y.DOM;
@@ -60,8 +60,6 @@
 	Y.DOM.cssHooks = Y.DOM.CSS_Hooks;
 	Y.DOM.cssNumber = Y.DOM.CSS_Number;
 	Y.DOM.cssProps = Y.DOM.CSS_Properities;
-
-	Y.DOM.expando = Y.DOM.Expando;
 
 	// The deferred used on DOM ready
 	var readyList = null;
@@ -102,11 +100,11 @@
 				return;
 			}*/
 
-			// Y.log(wait === true ? --Y.DOM.readyWait : Y.DOM.isReady);
+			// Y.LOG(wait === true ? --Y.DOM.readyWait : Y.DOM.isReady);
 
 			tmp1 = (wait === true ? --Y.DOM.readyWait : Y.DOM.isReady);
 
-			// Y.log(tmp)
+			// Y.LOG(tmp)
 
 			// Abort if there are pending holds or we're already ready
 			if (tmp1) {
@@ -128,12 +126,12 @@
 			}
 
 			// If there are functions bound, to execute
-			readyList.resolveWith(Y.doc, [Y.DOM]);
+			readyList.resolveWith(document, [Y.DOM]);
 
 			// Trigger any bound ready events
 			if (Y.DOM.Function.triggerHandler) {
-				Y.DOM(Y.doc).triggerHandler('ready');
-				Y.DOM(Y.doc).off('ready');
+				Y.DOM(document).triggerHandler('ready');
+				Y.DOM(document).off('ready');
 			}
 		}
 	});
@@ -142,8 +140,8 @@
 	 * The ready event handler and self cleanup method
 	 */
 	function completed() {
-		Y.doc.removeEventListener('DOMContentLoaded', completed, false);
-		Y.win.removeEventListener('load', completed, false);
+		document.removeEventListener('DOMContentLoaded', completed, false);
+		window.removeEventListener('load', completed, false);
 		Y.DOM.ready();
 	}
 
@@ -154,15 +152,15 @@
 			// Catch cases where $(document).ready() is called after the browser event has already occurred.
 			// we once tried to use readyState 'interactive' here, but it caused issues like the one
 			// discovered by ChrisS here: http://bugs.jquery.com/ticket/12282#comment:15
-			if (Y.doc.readyState === 'complete') {
+			if (document.readyState === 'complete') {
 				// Handle it asynchronously to allow scripts the opportunity to delay ready
 				setTimeout(Y.DOM.ready);
 			} else {
 				// Use the handy event callback
-				Y.doc.addEventListener('DOMContentLoaded', completed, false);
+				document.addEventListener('DOMContentLoaded', completed, false);
 
-				// A fallback to Y.win.onload, that will always work
-				Y.win.addEventListener('load', completed, false);
+				// A fallback to window.onload, that will always work
+				window.addEventListener('load', completed, false);
 			}
 		}
 
@@ -174,53 +172,12 @@
 
 	//---
 
-	/*Y.DOM.event.simulate = function (type, elem, event, bubble) {
-		var e = Y.extend(new Y.DOM.Event(type), event, {
-			type: type,
-			isSimulated: true,
-			originalEvent: {},
-			bubbles: true
-		});
+	window.cordova = document.URL.indexOf('http://') === -1 &&
+		document.URL.indexOf('https://') === -1;
 
-		Y.DOM(elem).trigger(e);
-
-		if (e.isDefaultPrevented()) {
-			event.preventDefault();
-		}
-	};
-
-	Y.DOM.each({
-		focus: 'focusin',
-		blur: 'focusout'
-	}, function (orig, fix) {
-		var attaches = 0;
-
-		var handler = function (event) {
-			Y.DOM.event.simulate(fix, event.target, Y.extend({}, event), true);
-		};
-
-		Y.DOM.event.special[fix] = {
-			setup: function () {
-				if (attaches++ === 0) {
-					Y.doc.addEventListener(orig, handler, true);
-				}
-			},
-
-			teardown: function () {
-				if (--attaches === 0) {
-					Y.doc.removeEventListener(orig, handler, true);
-				}
-			}
-		};
-	});*/
-
-	//---
-
-	Y.win.cordova = document.URL.indexOf('http://') === -1 && Y.doc.URL.indexOf('https://') === -1;
-
-	if (Y.win.cordova === false) {
+	if (window.cordova === false) {
 		Y.DOM(function () {
-			Y.DOM(Y.doc).trigger('deviceready');
+			Y.DOM(document).trigger('deviceready');
 		});
 	}
 

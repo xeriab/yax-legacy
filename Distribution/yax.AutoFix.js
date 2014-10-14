@@ -16,20 +16,20 @@
 	'use strict';
 
 	Y.extend(Y.Settings.DOM, {
-		AutoFix: {
-			CustomOffset: true,
-			Manual: true,
-			OnlyInContainer: true
+		autoFix: {
+			customOffset: true,
+			manual: false,
+			onlyInContainer: true
 		}
 	});
 
-	var PluginOptions = Y.Settings.DOM.AutoFix;
+	var pluginOptions = Y.Settings.DOM.autoFix;
 
-	Y.DOM.Function.AutoFix = function (options) {
-		var settings = Y.extend(PluginOptions, options, {}),
+	Y.DOM.fn.autoFix = function (options) {
+		var settings = Y.extend(pluginOptions, options, {}),
 			el = Y.DOM(this),
 			curpos = el.position(),
-			offset = settings.CustomOffset,
+			offset = settings.customOffset,
 			pos = el.offset(),
 			fixAll;
 
@@ -56,9 +56,9 @@
 				offset = el.parent().offset().top;
 			}
 
-			if (Y.DOM(Y.doc).scrollTop() > offset &&
-				Y.DOM(Y.doc).scrollTop() <= (el.parent().height() +
-				(offset - Y.DOM(Y.win).height()))) {
+			if (Y.DOM(document).scrollTop() > offset &&
+				Y.DOM(document).scrollTop() <= (el.parent().height() +
+				(offset - Y.DOM(window).height()))) {
 				el.removeClass('_bottom').addClass('_fixed').css({
 					top: 0,
 					left: pos.left,
@@ -66,9 +66,9 @@
 					bottom: 'auto'
 				});
 			} else {
-				if (Y.DOM(Y.doc).scrollTop() > offset) {
-					if (settings.OnlyInContainer === true) {
-						if (Y.DOM(Y.doc).scrollTop() > (el.parent().height() - Y.DOM(Y.win).height())) {
+				if (Y.DOM(document).scrollTop() > offset) {
+					if (settings.onlyInContainer === true) {
+						if (Y.DOM(document).scrollTop() > (el.parent().height() - Y.DOM(window).height())) {
 							el.addClass('_bottom _fixed').removeAttr('style').css({
 								left: curpos.left
 							});
@@ -83,8 +83,8 @@
 			}
 		};
 
-		if (settings.Manual === false) {
-			Y.DOM(Y.win).scroll(function () {
+		if (settings.manual === false) {
+			Y.DOM(window).scroll(function () {
 				fixAll(el, settings, curpos, pos);
 			});
 		}
@@ -94,7 +94,7 @@
 
 }());
 
-// FILE: ./Source/Plugins/AutoFix/AutoFix.js
+// FILE: ./Source/Plugins/autoFix/autoFix.js
 
 //---
 

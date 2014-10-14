@@ -15,12 +15,12 @@
 	'use strict';
 
 	var
-		rkeyEvent = /^key/,
-		rmouseEvent = /^(?:mouse|pointer|contextmenu)|click/,
-		rfocusMorph = /^(?:focusinfocus|focusoutblur)$/,
-		rtypenamespace = /^([^.]*)(?:\.(.+)|)$/;
+		keyEvent = /^key/,
+		mouseEvent = /^(?:mouse|pointer|contextmenu)|click/,
+		focusMorph = /^(?:focusinfocus|focusoutblur)$/,
+		typeNamespace = /^([^.]*)(?:\.(.+)|)$/;
 
-	var rnotwhite = (/\S+/g);
+	var notWhite = (/\S+/g);
 
 	function returnTrue() {
 		return true;
@@ -34,7 +34,7 @@
 		try {
 			return document.activeElement;
 		} catch (err) {
-			Y.error(err);
+			Y.ERROR(err);
 		}
 	}
 
@@ -84,10 +84,10 @@
 			}
 
 			// Handle multiple events separated by a space
-			types = (types || "").match(rnotwhite) || [""];
+			types = (types || "").match(notWhite) || [""];
 			t = types.length;
 			while (t--) {
-				tmp = rtypenamespace.exec(types[t]) || [];
+				tmp = typeNamespace.exec(types[t]) || [];
 				type = origType = tmp[1];
 				namespaces = (tmp[2] || "").split(".").sort();
 
@@ -166,10 +166,10 @@
 			}
 
 			// Once for each type.namespace in types; type may be omitted
-			types = (types || "").match(rnotwhite) || [""];
+			types = (types || "").match(notWhite) || [""];
 			t = types.length;
 			while (t--) {
-				tmp = rtypenamespace.exec(types[t]) || [];
+				tmp = typeNamespace.exec(types[t]) || [];
 				type = origType = tmp[1];
 				namespaces = (tmp[2] || "").split(".").sort();
 
@@ -242,7 +242,7 @@
 			}
 
 			// focus/blur morphs to focusin/out; ensure we're not firing them right now
-			if (rfocusMorph.test(type + Y.DOM.event.triggered)) {
+			if (focusMorph.test(type + Y.DOM.event.triggered)) {
 				return;
 			}
 
@@ -288,7 +288,7 @@
 			if (!onlyHandlers && !special.noBubble && !Y.DOM.isWindow(elem)) {
 
 				bubbleType = special.delegateType || type;
-				if (!rfocusMorph.test(bubbleType + type)) {
+				if (!focusMorph.test(bubbleType + type)) {
 					cur = cur.parentNode;
 				}
 				for (; cur; cur = cur.parentNode) {
@@ -529,8 +529,8 @@
 
 			if (!fixHook) {
 				this.fixHooks[type] = fixHook =
-					rmouseEvent.test(type) ? this.mouseHooks :
-						rkeyEvent.test(type) ? this.keyHooks :
+					mouseEvent.test(type) ? this.mouseHooks :
+						keyEvent.test(type) ? this.keyHooks :
 						{};
 			}
 			copy = fixHook.props ? this.props.concat(fixHook.props) : this.props;
@@ -652,6 +652,7 @@
 
 			// Events bubbling up the document may have been marked as prevented
 			// by a handler lower down the tree; reflect the correct value.
+			/** @namespace src.defaultPrevented */
 			this.isDefaultPrevented = src.defaultPrevented ||
 				src.defaultPrevented === undef &&
 				// Support: Android<4.0
@@ -745,6 +746,8 @@
 		};
 	});
 
+	Y.DOM.support.focusinBubbles = 'onfocusin' in window;
+
 // Support: Firefox, Chrome, Safari
 // Create "bubbling" focus and blur events
 	if (!Y.DOM.support.focusinBubbles) {
@@ -758,23 +761,23 @@
 			Y.DOM.event.special[fix] = {
 				setup: function() {
 					var doc = this.ownerDocument || this,
-						attaches = dataPriv.access(doc, fix);
+						attaches = Y.DOM.dataPrivative.access(doc, fix);
 
 					if (!attaches) {
 						doc.addEventListener(orig, handler, true);
 					}
-					dataPriv.access(doc, fix, (attaches || 0) + 1);
+					Y.DOM.dataPrivative.access(doc, fix, (attaches || 0) + 1);
 				},
 				teardown: function() {
 					var doc = this.ownerDocument || this,
-						attaches = dataPriv.access(doc, fix) - 1;
+						attaches = Y.DOM.dataPrivative.access(doc, fix) - 1;
 
 					if (!attaches) {
 						doc.removeEventListener(orig, handler, true);
-						dataPriv.remove(doc, fix);
+						Y.DOM.dataPrivative.remove(doc, fix);
 
 					} else {
-						dataPriv.access(doc, fix, attaches);
+						Y.DOM.dataPrivative.access(doc, fix, attaches);
 					}
 				}
 			};
@@ -794,6 +797,7 @@
 					data = data || selector;
 					selector = undef;
 				}
+
 				for (type in types) {
 					this.on(type, selector, data, types[type], one);
 				}

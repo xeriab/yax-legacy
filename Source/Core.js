@@ -4,20 +4,18 @@
 /*jshint strict: false */
 /*global window, Y, YAX */
 
-// var JSDOM = require('jsdom')dom;
-// var Window = JSDOM('<html><body><div class="Test1">Test</div></body></html>').parentWindow;
+var JSDOM = require('jsdom').jsdom;
+var Window = JSDOM('<html><body><div class="Test1">Test</div></body></html>').parentWindow;
 
-require('./Require');
 
 require('./YAX');
 
-// Y.win = Window;
-// Y.doc = Y.win.document;
-// Y.loc = Y.win.location;
+Y.WIN = Window;
+Y.DOC = Window.document;
 
 require('./Core/Core');
 require('./Core/Constants');
-require('./Core/Regex');
+require('./Core/RegexList');
 require('./Core/Global');
 require('./Core/Utility');
 require('./Core/Class');
@@ -29,33 +27,22 @@ require('./Core/Contrib/Store');
 require('./Core/Contrib/Parser');
 require('./Core/Contrib/I18n');
 
-require('./Modules/EnvDetector');
+//require('./Modules/EnvDetector');
 
-// var root = module;
-
-//Y.define('Lumlim', function(require, exports, module) {
-//    var Lumlim = {
-//        VERSION: '0.1.9',
-//        NAME: 'App'
-//    };
+//Y.define('Lumlim', function (require, exports, module) {
+//	var Lumlim = {
+//		VERSION: '0.1.9',
+//		NAME: 'App'
+//	};
 //
-//    // module = root;
+//	module.exports = Lumlim;
 //
-//    module.exports = Lumlim;
+//	global.Lumlim = Lumlim;
 //
-//    return Lumlim;
+//	return Lumlim;
 //});
-
-// Y.require('Lumlim');
-
-//var lumlim_app = Y.require('Lumlim');
-
-//Y.log(Y._INFO.VERSION);
-//Y.log(Y._INFO.CODENAME);
-//Y.log(Y.keys(Y));
+//
+//Y.require('Lumlim');
 
 
-//Y.log(Y);
-
-Y.log(Y.Env);
-
+YAX.LOG(Y.DOC);

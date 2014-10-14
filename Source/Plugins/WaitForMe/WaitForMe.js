@@ -45,11 +45,11 @@
 		this.div = null;
 		this.content = null;
 
-		this.init();
+		this.runMe();
 	}
 
 	WaitForMe.prototype = {
-		init: function () {
+		runMe: function () {
 			this.setContent();
 			this._init_();
 			this.setEvents();
@@ -223,8 +223,8 @@
 				this.containerSize.height;
 
 			if (Y.isEmpty(this.options.width) && Y.isEmpty(this.options.height)) {
-				this.elementSize = Y.empty();
-				this.containerSize = Y.empty();
+				this.elementSize = Y.empty;
+				this.containerSize = Y.empty;
 			}
 
 			this.effects = Y.DOM('<div class="' + this.cssClass + '-progress ' + this
@@ -299,11 +299,11 @@
 			} else if (this.element.data('YAX-WaitForMe')) {
 				this.content = this.element.data('YAX-WaitForMe');
 			} else if (Y.isEmpty(this.options.content)) {
-				this.content = Y.empty();
+				this.content = Y.empty;
 			} else if (Y.isNull(this.options.content)) {
-				this.content = Y.empty();
+				this.content = Y.empty;
 			} else {
-				Y.error('No content for WaitForMe: ' + this.element.selector);
+				Y.ERROR('No content for WaitForMe: ' + this.element.selector);
 				return;
 			}
 

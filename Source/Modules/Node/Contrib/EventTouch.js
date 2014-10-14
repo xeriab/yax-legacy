@@ -22,7 +22,7 @@
 		longTapTimeout,
 		longTapDelay = 750,
 		gesture,
-		document = Y.doc;
+		document = document;
 
 	function swipeDirection(x1, x2, y1, y2) {
 		return Math.abs(x1 - x2) >= Math.abs(y1 - y2) ? (x1 - x2 > 0 ? 'Left' : 'Right') : (y1 - y2 > 0 ? 'Up' : 'Down');
@@ -86,8 +86,8 @@
 			deltaY = 0,
 			firstTouch,
 			isPointerType;
-		/** @namespace Y.win.hasOwnProperty */
-		if (Y.win.hasOwnProperty('MSGesture')) {
+		/** @namespace window.hasOwnProperty */
+		if (window.hasOwnProperty('MSGesture')) {
 			gesture = new MSGesture();
 			gesture.target = document.body;
 		}

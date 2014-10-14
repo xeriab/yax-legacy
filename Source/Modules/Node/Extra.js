@@ -104,7 +104,7 @@
 				handler.$timerID = callback.$timerID;
 
 				if (!element.$timers[label][callback.$timerID]) {
-					element.$timers[label][callback.$timerID] = Y.win.setInterval(handler,
+					element.$timers[label][callback.$timerID] = window.setInterval(handler,
 						interval);
 				}
 

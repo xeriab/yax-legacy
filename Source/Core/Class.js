@@ -14,6 +14,16 @@
 
 	'use strict';
 
+	// Throw error if trying to call a super that doesn't exist.
+	var unImplementedSuper = function (method) {
+		throw 'Super does not implement this method: ' + method;
+	};
+
+	// Used to test if the method has a super.
+	var superTest = /\b_super\b/;
+
+	// Used to mark a function so it can be unwrapped.
+	var REF = '__extndmrk__';
 
 	/**
 	 * Y.Class powers the OOP facilities of the library.
@@ -23,13 +33,37 @@
 	//---
 
 	Y.Class.extend = function (properties) {
-		// Extended class with the new prototype
-		var newClass = function () {
+		var parent = this;
+		var child;
+		var property;
+		var _super = parent.prototype;
+
+		// Allow class inheritance.
+		// if (Y.isFunction(properties) && '__super__' in properties) {
+		if (Y.isFunction(properties) && properties.hasOwnProperty('__super__')) {
+			// Copy parent's prototype.
+			var mixin = {};
+			var attr;
+
+			for (attr in properties.prototype) {
+				if (attr !== 'constructor' &&
+					properties.prototype.hasOwnProperty(attr)) {
+					mixin[attr] = properties.prototype[attr];
+				}
+			}
+
+			properties = mixin;
+		}
+
+		// The constructor calls the init method - all construction logic happens
+		// in this method.
+		child = function () {
 			// Call the initialise constructor
 			if (this.initialise) {
 				this.initialise.apply(this, arguments);
 			}
 
+			/** @namespace this.construct */
 			// Call the construct constructor
 			if (this.construct) {
 				// this.construct.apply(this, arguments);
@@ -40,6 +74,12 @@
 			if (this._init) {
 				// this._init.apply(this, arguments);
 				return this._init.apply(this, arguments);
+			}
+
+			// Call the init constructor
+			if (this.init) {
+				// this.init.apply(this, arguments);
+				return this.init.apply(this, arguments);
 			}
 
 			// Call all constructor hooks
@@ -53,22 +93,21 @@
 		var len;
 
 		// jshint camelcase: false
-		var parentProto = newClass.__super__ = this.prototype;
-		var proto = Y.Util.create(parentProto);
+		var proto = Y.Util.create(parent);
 
-		proto.constructor = newClass;
+		proto.constructor = child;
 
-		newClass.prototype = proto;
+		child.prototype = proto;
 
 		// Inherit parent's statics
 		for (x in this) {
 			if (this.hasOwnProperty(x) && x !== 'prototype') {
-				newClass[x] = this[x];
+				child[x] = this[x];
 			}
 		}
 
 		if (properties._class_name) {
-			Y.extend(newClass, {
+			Y.extend(child, {
 				_class_name: properties._class_name.toString()
 			});
 
@@ -78,7 +117,7 @@
 		// Mix static properties into the class
 		/** @namespace properties._statics */
 		if (properties._statics) {
-			Y.extend(newClass, properties._statics);
+			Y.extend(child, properties._statics);
 			delete properties._statics;
 		}
 
@@ -105,8 +144,8 @@
 				return;
 			}
 
-			if (parentProto.callInitialHooks) {
-				parentProto.callInitialHooks.call(this);
+			if (parent.callInitialHooks) {
+				parent.callInitialHooks.call(this);
 			}
 
 			this.initialHooksCalled = true;
@@ -116,7 +155,87 @@
 			}
 		};
 
-		return newClass;
+		// Extend `extend` and `__super__` into child.
+		for (property in parent) {
+			if (parent.hasOwnProperty(property)) {
+				child[property] = parent[property];
+			}
+		}
+
+		// Set the prototype chain to inherit from `parent`, without calling
+		// `parent`'s constructor function.
+		var Surrogate = function () {
+			this.constructor = child;
+		};
+
+		Surrogate.prototype = parent.prototype;
+
+		child.prototype = new Surrogate();
+		child.prototype.__unwrappedSuper__ = {};
+
+		// Add prototype properties (instance properties) to the subclass, if supplied.
+		if (properties) {
+			// Extend parent prototypes into child.
+			for (property in properties) {
+				if (properties.hasOwnProperty(property)) {
+					child.prototype[property] = properties[property];
+				}
+			}
+
+			// A function wrapper which assigns this._super for the duration of the call,
+			// then marks the function so it can be unwrapped and re-wrapped for the next
+			// call which allows for proper multiple inheritance.
+			var functionWrapper = function (name, fn) {
+				var func = function class_super() {
+					var tmp = this._super;
+
+					// Add a new ._super() method that is the same method
+					// but on the super-class
+					this._super = _super[name] || unImplementedSuper(name);
+
+					// The method only need to be bound temporarily, so we
+					// remove it when we're done executing
+					var ret;
+
+					try {
+						ret = fn.apply(this, arguments);
+					} finally {
+
+						this._super = tmp;
+					}
+					return ret;
+				};
+
+				func[REF] = true;
+
+				return func;
+			};
+
+			var name;
+			var fun;
+
+			// Copy the properties over onto the new prototype
+			for (name in properties) {
+				if (properties.hasOwnProperty(name)) {
+					// Check if we're overwriting an existing function
+					if (Y.isFunction(properties[name]) && superTest.test(properties[name])) {
+						fun = child.prototype[name];
+
+						if (fun[REF]) {
+							properties[name] = child.prototype.__unwrappedSuper__[name];
+						}
+
+						child.prototype.__unwrappedSuper__[name] = properties[name];
+						child.prototype[name] = functionWrapper(name, properties[name]);
+					}
+				}
+			}
+		}
+
+		// Set a convenience property in case the parent's prototype is needed later.
+		child.__super__ = parent.prototype;
+
+		return child;
 	};
 
 	//---
@@ -163,7 +282,7 @@
 	//---
 
 	Y.Class.toString = function () {
-		return '[Y: Class' + (this._class_name ? '::' + this._class_name + ']' : ']');
+		return '[YAX] ' + (this._class_name ? '::' + this._class_name + '' : '');
 	};
 
 	//---

@@ -40,7 +40,7 @@
 		return [selector, callback];
 	};
 
-	if (Y.UserAgent.Features.Touch) {
+	if (Y.UA.features.touch) {
 		ghosts = [];
 		callbacks = [];
 		handlers = [];

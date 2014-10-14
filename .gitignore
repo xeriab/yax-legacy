@@ -1,5 +1,9 @@
 .idea
-
 .node_modules
-
 node_modules
+Distribution/*
+Source/Core/Class.js.bak
+Source/Modules/Node/Node.js.bak
+Source/Modules/Node/Events.js1
+Source/Modules/Node/Events.js2
+Source/Modules/Node/Events.js.bak

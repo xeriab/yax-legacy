@@ -21,7 +21,7 @@
 		return node.hasOwnProperty('tagName') ? node : node.parentNode;
 	}
 
-	if (Y.UserAgent.OS.iOS) {
+	if (Y.UA.features.OS.osx) {
 		Y.DOM(document).bind('gesturestart', function (event) {
 			var now = Y.now();
 			// var delta = now - (gesture.last || now);

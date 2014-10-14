@@ -28,7 +28,7 @@
 			available: function () {
 				try {
 					// Firefox won't allow localStorage if cookies are disabled
-					if (Y.UserAgent.Features.LocalStorage) {
+					if (Y.UA.features.localStorage) {
 						// Safari's "Private" mode throws a QUOTA_EXCEEDED_ERR on setItem
 						localStorage.setItem('Y.Store.localStorage Availability test', true);
 						localStorage.removeItem('Y.Store.localStorage Availability test');
@@ -38,7 +38,7 @@
 
 					return false;
 				} catch (e) {
-					Y.error(e);
+					Y.ERROR(e);
 					return false;
 				}
 			},
@@ -54,17 +54,17 @@
 				} else {
 					var name;
 
-					Y.win.localStorage = {};
+					window.localStorage = {};
 
 					if (Y.isString(key) && Y.isString(value)) {
-						Y.win.localStorage[key] = value;
+						window.localStorage[key] = value;
 						return true;
 					}
 
 					if (Y.isObject(key) && Y.isUndefined(value)) {
 						for (name in key) {
 							if (key.hasOwnProperty(name)) {
-								Y.win.localStorage[name] = key[name];
+								window.localStorage[name] = key[name];
 							}
 						}
 
@@ -80,14 +80,14 @@
 					return localStorage.getItem(key);
 				}
 
-				return Y.win.localStorage[key];
+				return window.localStorage[key];
 			},
 
 			delete: function (key) {
 				if (this.available()) {
 					localStorage.removeItem(key);
 				} else {
-					delete Y.win.localStorage[key];
+					delete window.localStorage[key];
 				}
 			},
 
@@ -95,7 +95,7 @@
 				if (this.available()) {
 					localStorage.clear();
 				} else {
-					Y.win.localStorage = {};
+					window.localStorage = {};
 				}
 			}
 		}
