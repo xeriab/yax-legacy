@@ -7,8 +7,6 @@
 var Dependencies = {
 	'Core': {
 		src: [
-			// 'Require.js',
-
 			'YAX.js',
 
 			'Core/Constants.js',
@@ -39,8 +37,6 @@ var Dependencies = {
 
 	'Extended Core': {
 		src: [
-			// 'Require.js',
-
 			'YAX.js',
 
 			'Core/Constants.js',
