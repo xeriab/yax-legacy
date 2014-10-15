@@ -253,11 +253,6 @@
 	Y.hasOwnProp = ({}).hasOwnProperty;
 
 	/**
-	 * YAX._CONFIG_STORAGE
-	 */
-	Y._CONFIG_STORAGE = {};
-
-	/**
 	 * YAX._GLOBALS
 	 */
 	Y._GLOBALS = Y.G = {};
@@ -268,26 +263,25 @@
 	Y.Mixin = {};
 
 	/**
-	 * YAX.Settings
+	 * YAX._GLOBALS.regexList
 	 */
-	Y.Settings = {};
+	Y.G.regexList = {};
 
 	//---
 
-	Y.G.isNodeJs = isNode;
-	Y.G.Push = Push;
-	Y.G.Slice = Slice;
-	Y.G.Concat = Concat;
-	Y.G.ToString = toString;
-	Y.G.Filter = Filter;
+	Y.G.isNode = isNode;
+	Y.G.push = Push;
+	Y.G.slice = Slice;
+	Y.G.concat = Concat;
+	Y.G.toString = toString;
+	Y.G.filter = Filter;
 
 	Y.hasOwn = HasOwnProperty;
 
 	Y.G.FuncProto = FuncProto;
 	Y.G.ArrayProto = ArrayProto;
 	Y.G.ObjProto = ObjProto;
-	Y.G.IndexOf = ArrayProto.indexOf;
-	Y.G.Push = ArrayProto.push;
+	Y.G.indexOf = ArrayProto.indexOf;
 
 	Y.require = root.require || require || null;
 	Y.define = root.define || define || null;
@@ -304,7 +298,6 @@
 		console.info('[INFO] Running YAX.JS in "Browser" Environment!');
 	}
 
-
 	/** @namespace define.amd */
 	// AMD registration happens at the end for compatibility with AMD loaders
 	// that may not enforce next-turn semantics on modules. Even though general
@@ -315,6 +308,10 @@
 	// anonymous define() is called outside of a loader request.
 	if (typeof define === 'function' && define.amd) {
 		define('YAX', [], function () {
+			return Y;
+		});
+		
+		define('Y', [], function () {
 			return Y;
 		});
 
