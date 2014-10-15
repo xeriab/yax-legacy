@@ -98,9 +98,9 @@ exports.build = function (callback, compsBase32, buildName) {
 
 	var outro = '\n}());\n\n// END\n';
 
-//	var newSrc = copy + intro + combineFiles(files) + outro;
+	// var newSrc = copy + intro + combineFiles(files) + outro;
 
-//	var newSrc = copy + combineFiles(files);
+	// var newSrc = copy + combineFiles(files);
 
 	var newSrc = combineFiles(files);
 
