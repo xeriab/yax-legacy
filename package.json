@@ -1,7 +1,9 @@
 {
 	"name": "YAX.JS",
-	"version": "0.19.0",
-	"description": "Yet another extensible Javascript library.",
+
+	"version": "0.20.0",
+
+	"description": "Yet another extensible Javascript Library and Framework.",
 	
 	"devDependencies": {
 		"jake": "~0.7.6",
@@ -9,8 +11,9 @@
 		"uglify-js": "~2.4.8"
 	},
 	
-	"main": "Distribution/yax.core-src.js",
-	"style": "Distribution/yax.core-src.css",
+	"main": "Distribution/yax.Core.js",
+
+	"style": "",
 	
 	"scripts": {
 		"test": "jake test",
