@@ -214,7 +214,7 @@
 
 	Y.extend(Y.DOM.Function, {
 		role: function () {
-			var args = Y.G.Slice.call(arguments);
+			var args = Y.G.slice.call(arguments);
 			var data;
 
 			if (args[0] === undefined || args[0] === null) {
