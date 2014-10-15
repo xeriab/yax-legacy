@@ -2,11 +2,12 @@
 /*jslint white: true */
 /*jshint eqeqeq: false */
 /*jshint strict: false */
-/*global window, Y, YAX */
+/*global window, Y, YAX, require */
+
+
 
 var JSDOM = require('jsdom').jsdom;
 var Window = JSDOM('<html><body><div class="Test1">Test</div></body></html>').parentWindow;
-
 
 require('./YAX');
 
@@ -44,5 +45,4 @@ require('./Core/Contrib/I18n');
 //
 //Y.require('Lumlim');
 
-
-YAX.LOG(Y.DOC);
+//Y.LOG(Y.keys(Y));
