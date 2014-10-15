@@ -16,19 +16,19 @@
 
 	var YID = 1;
 
-	var hover = {
+	/*var hover = {
 		mouseenter: 'mouseover',
 		mouseleave: 'mouseout'
-	};
+	};*/
 
 	var inputEvents = ['focus', 'blur'];
 
-	var focus = {
+	/*var focus = {
 		focus: 'focusin',
 		blur: 'focusout'
-	};
+	};*/
 
-	var focusinSupported = Y.hasOwn.call(window, 'onfocusin');
+	// var focusinSupported = Y.hasOwn.call(window, 'onfocusin');
 
 	var eventMethods = {
 		preventDefault: 'isDefaultPrevented',
@@ -116,13 +116,13 @@
 		});
 	}
 
-	function eventCapture(handler, captureSetting) {
+	/*function eventCapture(handler, captureSetting) {
 		return !(!handler.del || !(!focusinSupported && Y.hasProperty(focus, handler.e))) || Y.isSet(captureSetting);
 	}
 
 	function realEvent(type) {
 		return hover[type] || (focusinSupported && focus[type]) || type;
-	}
+	}*/
 
 	function compatible(event, source) {
 		if (source || !event.isDefaultPrevented) {
@@ -544,79 +544,6 @@
 	Y.extend(Y.DOM.event, {
 		global: {},
 
-		//---
-
-		add_: function (element, types, callback, data, selector, delegator, capture) {
-			var set = eventHandlers(element);
-			var _callback;
-
-			types.split(/\s/).forEach(function (event) {
-				if (event === 'ready') {
-					return Y.DOM(document).ready(callback);
-				}
-
-				var handler = parse(event);
-
-				handler.callback = callback;
-				handler.selector = selector;
-
-				// Emulate mouseenter, mouseleave
-				if (Y.hasOwn.call(hover, handler.e)) {
-					//if (handler.e in hover) {
-					callback = function (e) {
-						var related = e.relatedTarget;
-
-						if (!related || (related !== this && !Y.DOM.contains(this, related))) {
-							return handler.callback.apply(this, arguments);
-						}
-					};
-				}
-
-				handler.del = delegator;
-
-				_callback = delegator || callback;
-
-				handler.proxy = function (e) {
-					e = compatible(e);
-
-					if (e.isImmediatePropagationStopped()) {
-						return;
-					}
-
-					e.data = data;
-
-					var result = _callback.apply(element, e._args === undef ? [e] : [e].concat(e._args));
-
-					if (result === false) {
-						e.preventDefault();
-						e.stopPropagation();
-					}
-
-					return result;
-				};
-
-				handler.i = set.length;
-
-				set.push(handler);
-
-				if (Y.hasProperty(element, 'addEventListener')) {
-					Y.DOM.Event.add(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
-				}
-			});
-		},
-
-		remove_: function (element, events, func, selector, capture) {
-			(events || '').split(/\s/).forEach(function (event) {
-				findHandlers(element, event, func, selector).forEach(function (handler) {
-					delete eventHandlers(element)[handler.i];
-
-					if (Y.hasProperty(element, 'removeEventListener')) {
-						Y.DOM.Event.remove(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
-					}
-				});
-			});
-		},
-
 		add: function(elem, types, handler, data, selector) {
 			var handleObjIn, eventHandle, tmp,
 				events, t, handleObj,
@@ -766,6 +693,8 @@
 				// Unbind all events (on this namespace, if provided) for the element
 				if (!type) {
 					for (type in events) {
+						/** @namespace events.hasOwnProperty */
+						// if (Y.hasOwn.call(events, type)) {
 						if (events.hasOwnProperty(type)) {
 							Y.DOM.event.remove(elem, type + types[t], handler, selector, true);
 						}
@@ -975,8 +904,8 @@
 			event = Y.DOM.event.fix(event);
 
 			var i, j, ret, matched, handleObj,
-				handlerQueue = [],
-				args = Y.G.Slice.call(arguments),
+				handlerQueue,
+				args = Y.G.slice.call(arguments),
 				handlers = (Y.DOM.data_priv.get(this, 'events') || {})[event.type] || [],
 				special = Y.DOM.event.special[event.type] || {};
 
@@ -1161,8 +1090,9 @@
 				// Add which for click: 1 === left; 2 === middle; 3 === right
 				// Note: button is not normalized, so don't use it
 				if (!event.which && button !== undef) {
-					/*jshint -W016 */
-					event.which = (button & 1 ? 1 : (button & 2 ? 3 : (button & 4 ? 2 : 0)));
+					/* jshint -W016 */
+					// event.which = (button & 1 ? 1 : (button & 2 ? 3 : (button & 4 ? 2 : 0)));
+					event.which = (button && 1 ? 1 : (button && 2 ? 3 : (button && 4 ? 2 : 0)));
 				}
 
 				return event;
@@ -1301,17 +1231,17 @@
 
 	//---
 
-	Y.DOM.proxy = Y.DOM.Proxy = $.proxy = function (callback, context) {
+	Y.DOM.proxy = function proxy(callback, context) {
 		var result, proxyFn, args;
 
-		args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
-		// args = _in(2, arguments) && Y.G.Slice.call(arguments, 2);
-		// args = Y.G.Slice.call(arguments, 2);
+		// args = (2 in arguments) && Y.G.slice.call(arguments, 2);
+		// args = _in(2, arguments) && Y.G.slice.call(arguments, 2);
+		args = Y.G.slice.call(arguments, 2);
 
 		if (Y.isFunction(callback)) {
 
 			proxyFn = function () {
-				return callback.apply(context, args ? args.concat(Y.G.Slice.call(arguments)) : arguments);
+				return callback.apply(context, args ? args.concat(Y.G.slice.call(arguments)) : arguments);
 			};
 
 			proxyFn.YID = yID(callback);
@@ -1324,9 +1254,9 @@
 
 			if (args) {
 				args.unshift(callback[context], callback);
-				result = Y.DOM.Proxy.apply(null, args);
+				result = Y.DOM.proxy.apply(null, args);
 			} else {
-				result = Y.DOM.Proxy.apply(callback[context], callback);
+				result = Y.DOM.proxy.apply(callback[context], callback);
 			}
 		} else {
 			throw new TypeError('expected function');
@@ -1486,7 +1416,7 @@
 							liveFired: element
 						});
 
-						return (autoRemove || callback).apply(match, [evt].concat(Y.G.Slice.call(arguments, 1)));
+						return (autoRemove || callback).apply(match, [evt].concat(Y.G.slice.call(arguments, 1)));
 					}
 				};
 			}
