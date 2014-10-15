@@ -7,7 +7,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global YAX, Y */
+/*global YAX, Y, $, DeviceMotionEvent */
 
 (function () {
 
@@ -17,7 +17,7 @@
 
 	/** @namespace window.DeviceMotionEvent */
 	if (!Y.isUndefined(window.DeviceMotionEvent)) {
-		Y.DOM.Function.onshake = function (callb, sens) {
+		$.fn.onshake = function (callb, sens) {
 			// Shake sensitivity (a lower number is more sensitive)
 			var sensitivity = sens || 20,
 				checkDelay = 150,
@@ -59,7 +59,7 @@
 			checkDeviceMotion();
 		};
 	} else {
-		Y.DOM.Function.onshake = Y.noop;
+		$.fn.onshake = Y.noop;
 	}
 
 	//---

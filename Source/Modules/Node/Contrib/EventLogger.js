@@ -8,7 +8,7 @@
 /*jshint -W084 */
 /*jshint -W040 */
 /*jslint node: false */
-/*global YAX, Y */
+/*global YAX, Y, $ */
 
 (function () {
 
@@ -27,34 +27,48 @@
 
 	function getCollectionObj(selector) {
 		var obj = {};
-		switch (typeof selector) {
+		
+		/*switch (typeof selector) {
 			case 'string':
-				obj = Y.DOM(selector);
+				obj = $(selector);
 				break;
 			case 'object':
 				obj = selector;
 				break;
+		}*/
+
+		switch (Y.typeOf(selector)) {
+			case 'string':
+				obj = $(selector);
+				break;
+
+			case 'object':
+				obj = selector;
+				break;
 		}
+		
 		return obj;
 	}
 
-	Y.DOM.Function.EventLoggerStart = function (event, color) {
-		var fontColor = Y.isString(color) ? color : '';
+	$.fn.eventLoggerStart = function (event, color) {
+		var fontColor = Y.isString(color) ? color : Y.empty;
 
-		this.on(event, {color: fontColor}, consoleOutput);
+		this.on(event, {
+			color: fontColor
+		}, consoleOutput);
 
 		return this;
 	};
 
-	Y.DOM.Function.EventLoggerEnd = function (event) {
+	$.fn.eventLoggerEnd = function (event) {
 		this.off(event, consoleOutput);
 
 		return this;
 	};
 
-	window.EventLogger = {
+	window.eventLogger = {
 		start: function (selector, event, color) {
-			var fontColor = Y.isString(color) ? color : '';
+			var fontColor = Y.isString(color) ? color : Y.empty;
 
 			var obj = getCollectionObj(selector);
 
@@ -64,6 +78,7 @@
 
 			return obj;
 		},
+
 		end: function (selector, event) {
 			var obj = getCollectionObj(selector);
 

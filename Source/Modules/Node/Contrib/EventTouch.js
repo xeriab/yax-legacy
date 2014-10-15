@@ -7,7 +7,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global YAX, Y, MSGesture */
+/*global YAX, Y, $, MSGesture */
 
 (function () {
 
@@ -21,8 +21,7 @@
 		swipeTimeout,
 		longTapTimeout,
 		longTapDelay = 750,
-		gesture,
-		document = document;
+		gesture;
 
 	function swipeDirection(x1, x2, y1, y2) {
 		return Math.abs(x1 - x2) >= Math.abs(y1 - y2) ? (x1 - x2 > 0 ? 'Left' : 'Right') : (y1 - y2 > 0 ? 'Up' : 'Down');
@@ -77,24 +76,23 @@
 		return (e.type === 'pointer' + type || e.type.toLowerCase() === 'mspointer' + type);
 	}
 
-	// console.log(Y.DOM(document))
+	// console.log($(document))
 
-	Y.DOM(document).ready(function () {
+	$(document).ready(function () {
 		var now,
 			delta,
 			deltaX = 0,
 			deltaY = 0,
 			firstTouch,
 			isPointerType;
-		/** @namespace window.hasOwnProperty */
-		if (window.hasOwnProperty('MSGesture')) {
+		if (Y.hasOwn.call(window, 'MSGesture')) {
 			gesture = new MSGesture();
 			gesture.target = document.body;
 		}
 
 		/** @namespace e.velocityX */
 		/** @namespace e.velocityY */
-		Y.DOM(document)
+		$(document)
 			.bind('MSGestureEnd', function (e) {
 
 				var swipeDirectionFromVelocity = e.velocityX > 1 ? 'Right' : e.velocityX < -1 ? 'Left' : e.velocityY > 1 ? 'Down' : e.velocityY < -1 ? 'Up' : null;
@@ -122,7 +120,7 @@
 
 				now = Date.now();
 				delta = now - (touch.last || now);
-				touch.el = Y.DOM(firstTouch.target.hasOwnProperty('tagName') ? firstTouch.target : firstTouch.target.parentNode);
+				touch.el = $(firstTouch.target.hasOwnProperty('tagName') ? firstTouch.target : firstTouch.target.parentNode);
 
 				if (touchTimeout) {
 					clearTimeout(touchTimeout);
@@ -195,7 +193,7 @@
 
 							// trigger universal 'tap' with the option to cancelTouch()
 							// (cancelTouch cancels processing of single vs double taps for faster 'tap' response)
-							var event = Y.DOM.Event('tap');
+							var event = $.Event('tap');
 							event.cancelTouch = cancelAll;
 							touch.el.trigger(event);
 
@@ -235,7 +233,7 @@
 
 		// scrolling the window indicates intention of the user
 		// to scroll, not tap or swipe, so cancel all ongoing events
-		Y.DOM(window).on('scroll', cancelAll);
+		$(window).on('scroll', cancelAll);
 	});
 
 	[
@@ -249,7 +247,7 @@
 		'singleTap',
 		'longTap'
 	].forEach(function (event) {
-		Y.DOM.Function[event] = function (callback) {
+		$.fn[event] = function (callback) {
 			return this.bind(event, callback);
 		};
 	});
