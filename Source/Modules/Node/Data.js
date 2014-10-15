@@ -8,17 +8,17 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-(function (undef) {
+(function () {
 
 	//---
 
 	'use strict';
 
-	var data = {},
-		dataAttr = Y.DOM.Function.data,
-		exp = Y.DOM.expando,
-		rbrace = /(?:\{[\s\S]*\}|\[[\s\S]*\])$/,
-		rmultiDash = /([A-Z])/g;
+	var data = {};
+	var dataAttr = Y.DOM.Function.data;
+	var exp = Y.DOM.expando;
+
+	//---
 
 	function Data() {
 		// Support: Android < 4,
@@ -86,16 +86,17 @@
 
 			return unlock;
 		},
+		
 		set: function (owner, data, value) {
 			var prop,
 			// There may be an unlock assigned to this node,
-			// if there is no entry for this "owner", create one inline
+			// if there is no entry for this 'owner', create one inline
 			// and set the unlock as though an owner entry had always existed
 				unlock = this.key(owner),
 				cache = this.cache[unlock];
 
 			// Handle: [ owner, key, value ] args
-			if (typeof data === "string") {
+			if (typeof data === 'string') {
 				cache[data] = value;
 
 				// Handle: [ owner, { properties } ] args
@@ -114,6 +115,7 @@
 			}
 			return cache;
 		},
+		
 		get: function (owner, key) {
 			// Either a valid cache is found, or will be created.
 			// New caches will be created and the unlock returned,
@@ -121,9 +123,10 @@
 			// empty data object. A valid owner object must be provided.
 			var cache = this.cache[this.key(owner)];
 
-			return key === undef ?
+			return key === undefined ?
 				cache : cache[key];
 		},
+		
 		access: function (owner, key, value) {
 			var stored;
 			// In cases where either:
@@ -131,18 +134,18 @@
 			//   1. No key was specified
 			//   2. A string key was specified, but no value provided
 			//
-			// Take the "read" path and allow the get method to determine
+			// Take the 'read' path and allow the get method to determine
 			// which value to return, respectively either:
 			//
 			//   1. The entire cache object
 			//   2. The data stored at the key
 			//
-			if (key === undef ||
-				((key && typeof key === "string") && value === undef)) {
+			if (key === undefined ||
+				((key && typeof key === 'string') && value === undefined)) {
 
 				stored = this.get(owner, key);
 
-				return stored !== undef ?
+				return stored !== undefined ?
 					stored : this.get(owner, Y.camelise(key));
 			}
 
@@ -154,23 +157,24 @@
 			//
 			this.set(owner, key, value);
 
-			// Since the "set" path can have two possible entry points
+			// Since the 'set' path can have two possible entry points
 			// return the expected data based on which path was taken[*]
-			return value !== undef ? value : key;
+			return value !== undefined ? value : key;
 		},
+		
 		remove: function (owner, key) {
 			var i, name, camel,
 				unlock = this.key(owner),
 				cache = this.cache[unlock];
 
-			if (key === undef) {
+			if (key === undefined) {
 				this.cache[unlock] = {};
 
 			} else {
 				// Support array or space separated string of keys
 				if (Y.isArray(key)) {
-					// If "name" is an array of keys...
-					// When data is initially created, via ("key", "val") signature,
+					// If 'name' is an array of keys...
+					// When data is initially created, via ('key', 'val') signature,
 					// keys will be converted to camelCase.
 					// Since there is no way to tell _how_ a key was added, remove
 					// both plain key and camelCase key. #12786
@@ -196,30 +200,39 @@
 				}
 			}
 		},
+		
 		hasData: function (owner) {
 			return !Y.isEmpty(
 					this.cache[owner[this.expando]] || {}
 			);
 		},
+		
 		discard: function (owner) {
 			if (owner[this.expando]) {
 				delete this.cache[owner[this.expando]];
 			}
 		}
 	};
+	
+	//---
 
 	// These may be used throughout the YAX core codebase
 	Y.DOM.dataUser = Y.DOM.data_user = new Data();
 	Y.DOM.dataPrivative = Y.DOM.data_priv = new Data();
+	
+	//---
 
 	Y.extend(Y.DOM, {
 		acceptData: Data.accepts,
+		
 		hasData: function (elem) {
 			return Y.DOM.dataUser.hasData(elem) || Y.DOM.dataPrivative.hasData(elem);
 		},
+		
 		data: function (elem, name, data) {
 			return Y.DOM.dataUser.access(elem, name, data);
 		},
+		
 		removeData: function (elem, name) {
 			Y.DOM.dataUser.remove(elem, name);
 		},
@@ -227,28 +240,31 @@
 		_data: function (elem, name, data) {
 			return Y.DOM.dataPrivative.access(elem, name, data);
 		},
+		
 		_removeData: function (elem, name) {
 			Y.DOM.dataPrivative.remove(elem, name);
 		}
 	});
+	
+	//---
 
 	function dataAttribute(elem, key, data) {
 		var name;
 
 		// If nothing was found internally, try to fetch any
 		// data from the HTML5 data-* attribute
-		if (data === undef && elem.nodeType === 1) {
-			name = "data-" + key.replace(rmultiDash, "-$1").toLowerCase();
+		if (data === undefined && elem.nodeType === 1) {
+			name = 'data-' + key.replace(Y.G.regexList.multiDash, '-$1').toLowerCase();
 			data = elem.getAttribute(name);
 
-			if (typeof data === "string") {
+			if (typeof data === 'string') {
 				try {
-					data = data === "true" ? true :
-							data === "false" ? false :
-							data === "null" ? null :
+					data = data === 'true' ? true :
+							data === 'false' ? false :
+							data === 'null' ? null :
 						// Only convert to a number if it doesn't change the string
 							+ data + Y.empty === data ? +data :
-						rbrace.test(data) ? JSON.parse(data) :
+								Y.G.regexList.brace.test(data) ? JSON.parse(data) :
 							data;
 				} catch (e) {
 					console.log(e);
@@ -257,14 +273,14 @@
 				// Make sure we set the data so it isn't changed later
 				Y.DOM.dataUser.set(elem, key, data);
 			} else {
-				data = undef;
+				data = undefined;
 			}
 		}
 
 		return data;
 	}
 
-	// Read all "data-*" attributes from a node
+	// Read all 'data-*' attributes from a node
 	function attributeData(node) {
 		var store = {};
 
@@ -296,7 +312,7 @@
 			store = data[id];
 		}
 
-		if (name !== undef) {
+		if (name !== undefined) {
 			store[Y.camelise(name)] = value;
 		}
 
@@ -306,13 +322,13 @@
 	// Get value from node:
 	// 1. first try key as given,
 	// 2. then try Camelised key,
-	// 3. fall back to reading "data-*" attribute.
+	// 3. fall back to reading 'data-*' attribute.
 	function getData(node, name) {
 		var id = node[exp],
 			store = id && data[id],
 			camelName;
 
-		if (name === undef) {
+		if (name === undefined) {
 			return store || setData(node);
 		}
 
@@ -340,23 +356,23 @@
 			var self = this;
 
 			// Gets all values
-			if (key === undef) {
+			if (key === undefined) {
 				if (this.length) {
 					datao = Y.DOM.dataUser.get(elem);
 
-					if (elem.nodeType === 1 && !Y.DOM.dataPrivative.get(elem, "hasDataAttrs")) {
+					if (elem.nodeType === 1 && !Y.DOM.dataPrivative.get(elem, 'hasDataAttrs')) {
 						attrs = elem.attributes;
 
 						for (i; i < attrs.length; i++) {
 							name = attrs[i].name;
 
-							if (name.indexOf("data-") === 0) {
+							if (name.indexOf('data-') === 0) {
 								name = Y.camelise(name.slice(5));
 								dataAttribute(elem, name, datao[name]);
 							}
 						}
 
-						Y.DOM.dataPrivative.set(elem, "hasDataAttrs", true);
+						Y.DOM.dataPrivative.set(elem, 'hasDataAttrs', true);
 					}
 				}
 
@@ -364,7 +380,7 @@
 			}
 
 			// Sets multiple values
-			if (typeof key === "object") {
+			if (typeof key === 'object') {
 				return this.each(function () {
 					Y.DOM.dataUser.set(this, key);
 				});
@@ -376,29 +392,29 @@
 
 				// The calling YAX object (element matches) is not empty
 				// (and therefore has an element appears at this[ 0 ]) and the
-				// `value` parameter was not undef. An empty YAX object
-				// will result in `undef` for elem = this[ 0 ] which will
+				// `value` parameter was not undefined. An empty YAX object
+				// will result in `undefined` for elem = this[ 0 ] which will
 				// throw an exception if an attempt to read a data cache is made.
-				if (elem && value === undef) {
+				if (elem && value === undefined) {
 					// Attempt to get data from the cache
 					// with the key as-is
 					_data = Y.DOM.dataUser.get(elem, key);
 
-					if (_data !== undef) {
+					if (_data !== undefined) {
 						return _data;
 					}
 
 					// Attempt to get data from the cache
 					// with the key Camelised
 					_data = Y.DOM.dataUser.get(elem, camelKey);
-					if (_data !== undef) {
+					if (_data !== undefined) {
 						return _data;
 					}
 
-					// Attempt to "discover" the data in
+					// Attempt to 'discover' the data in
 					// HTML5 custom data-* attrs
-					_data = dataAttr(elem, camelKey, undef);
-					if (_data !== undef) {
+					_data = dataAttr(elem, camelKey, undefined);
+					if (_data !== undefined) {
 						return _data;
 					}
 
@@ -420,12 +436,13 @@
 					// *... In the case of properties that might _actually_
 					// have dashes, we need to also store a copy of that
 					// unchanged property.
-					if (key.indexOf("-") !== -1 && __data !== undef) {
+					if (key.indexOf('-') !== -1 && __data !== undefined) {
 						Y.DOM.dataUser.set(this, key, value);
 					}
 				});
 			}, null, value, arguments.length > 1, null, true);
 		},
+		
 		removeData: function (key) {
 			return this.each(function () {
 				Y.DOM.dataUser.remove(this, key);
@@ -447,7 +464,7 @@
 			} else {
 				// Get value from first element
 				if (this.length === 0) {
-					result = undef;
+					result = undefined;
 				} else {
 					result = getData(this[0], name);
 				}
@@ -479,7 +496,7 @@
 	};
 
 	// Generate extended `remove` and `empty` functions
-	/*['remove', 'empty'].forEach(function (methodName) {
+	['remove', 'empty'].forEach(function (methodName) {
 		var origFn = Y.DOM.Function[methodName];
 
 		Y.DOM.Function[methodName] = function () {
@@ -493,7 +510,7 @@
 
 			return origFn.call(this);
 		};
-	});*/
+	});
 
 	//---
 
