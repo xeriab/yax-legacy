@@ -117,16 +117,6 @@
 
 	var classTag = 'YAX' + Y.now();
 
-	var cssNumber = {
-		'column-count': 1,
-		'columns': 1,
-		'font-weight': 1,
-		'line-height': 1,
-		'opacity': 1,
-		'z-index': 1,
-		'zoom': 1
-	};
-
 	//---
 
 	yDOM = function(selector, context) {
@@ -141,10 +131,6 @@
 	$ = yDOM;
 
 	// BEGIN OF [Private Functions]
-
-	function maybeAddPx(name, value) {
-		return (typeof value == "number" && !cssNumber[Y.dasherise(name)]) ? value + "px" : value;
-	}
 
 	function defaultDisplay(nodeName) {
 		var element;
@@ -234,7 +220,7 @@
 	// because jsdom on node.js will be bitch and break without it.
 
 	function getStyles() {
-		var args = Y.G.Slice.call(arguments);
+		var args = Y.G.slice.call(arguments);
 
 		if (!Y.isUndefined(args[0])) {
 			// return window.getComputedStyle(element, null);
@@ -243,7 +229,7 @@
 	}
 
 	function getDocStyles() {
-		var args = Y.G.Slice.call(arguments);
+		var args = Y.G.slice.call(arguments);
 
 		if (!Y.isUndefined(args[0])) {
 			// return window.getComputedStyle(element, null);
@@ -395,7 +381,7 @@
 
 	function children(element) {
 		return element.hasOwnProperty('children') ?
-			Y.G.Slice.call(element.children) :
+			Y.G.slice.call(element.children) :
 			map(element.childNodes, function(node) {
 				if (node.nodeType === 1) {
 					return node;
@@ -620,7 +606,7 @@
 
 			container.innerHTML = Y.empty + html;
 
-			dom = Y.each(Y.G.Slice.call(container.childNodes), function() {
+			dom = Y.each(Y.G.slice.call(container.childNodes), function() {
 				container.removeChild(this);
 			});
 		}
@@ -741,7 +727,7 @@
 			result = (!Y.isUndefined(element) && element.nodeType !== 1 &&
 					element.nodeType !== 9) ? [] :
 
-				Y.G.Slice.call(
+				Y.G.slice.call(
 					isSimple && !maybeID ?
 					// If it's simple, it could be a class
 					maybeClass ? element.getElementsByClassName(nameOnly) :
@@ -758,8 +744,8 @@
 	yDOM.Y = function(dom, selector) {
 		dom = dom || [];
 		/* jshint -W103 */
-		//dom.__proto__ = $.Function;
-		dom.__proto__ = Y.extend(dom.__proto__, $.Function);
+		dom.__proto__ = $.Function;
+		// dom.__proto__ = Y.extend(dom.__proto__, $.Function);
 		dom.selector = selector || Y.empty;
 
 		return dom;
@@ -817,10 +803,10 @@
 			// copy over these useful array functions.
 			forEach: Y.G.ArrayProto.forEach,
 			reduce: Y.G.ArrayProto.reduce,
-			push: Y.G.Push,
+			push: Y.G.push,
 			sort: Y.G.ArrayProto.sort,
-			indexOf: Y.G.IndexOf,
-			concat: Y.G.Concat,
+			indexOf: Y.G.indexOf,
+			concat: Y.G.concat,
 			extend: Y.extend,
 			// `map` and `slice` in the jQuery API work differently
 			// from their array counterparts
@@ -830,7 +816,7 @@
 				}));
 			},
 			slice: function() {
-				return $(Y.G.Slice.apply(this, arguments));
+				return $(Y.G.slice.apply(this, arguments));
 				// return $.pushStack(Slice.apply(this, arguments));
 			},
 			ready: function(callback) {
@@ -858,7 +844,7 @@
 			},
 			toArray: function() {
 				// return this.get();
-				return Y.G.Slice.call(this);
+				return Y.G.slice.call(this);
 			},
 			size: function() {
 				return this.length;
@@ -873,7 +859,7 @@
 			error: function(message) {
 				throw new Error(message);
 			},
-			each_: function(callback, args) {
+			each_: function(callback) {
 				Y.G.ArrayProto.every.call(this, function(elem, index) {
 					return callback.call(elem, index, elem) !== false;
 				});
@@ -888,7 +874,7 @@
 					return this.not(this.not(selector));
 				}
 
-				return $(Y.G.Filter.call(this, function(element) {
+				return $(Y.G.filter.call(this, function(element) {
 					return yDOM.matches(element, selector);
 				}));
 			},
@@ -910,7 +896,7 @@
 					});
 				} else {
 					excludes = Y.isString(selector) ? this.filter(selector) :
-						(Y.likeArray(selector) && Y.isFunction(selector.item)) ? Y.G.Slice
+						(Y.likeArray(selector) && Y.isFunction(selector.item)) ? Y.G.slice
 						.call(selector) : $(selector);
 
 					this.forEach(function(elem) {
@@ -1068,12 +1054,12 @@
 			},
 			contents: function() {
 				return this.map(function() {
-					return Y.G.Slice.call(this.childNodes);
+					return Y.G.slice.call(this.childNodes);
 				});
 			},
 			siblings: function(selector) {
 				return filtered(this.map(function(i, elem) {
-					return Y.G.Filter.call(children(elem.parentNode), function(child) {
+					return Y.G.filter.call(children(elem.parentNode), function(child) {
 						return child !== elem;
 					});
 				}), selector);
@@ -2276,10 +2262,6 @@
 			return this;
 		};
 	});
-
-	//---
-
-	Y.Settings.DOM = {};
 
 	//---
 
