@@ -1,5 +1,5 @@
 /**
- * YAX Sizzle Selector [DOM/NODE]
+ * YAX Sizzle Support [DOM/NODE]
  */
 
 /*jslint indent: 4 */
@@ -1155,6 +1155,6 @@
 
 }());
 
-// FILE: ./Source/Modules/Node/SizzleSelector.js
+// FILE: ./Source/Modules/Node/SizzleSupport.js
 
 //---
