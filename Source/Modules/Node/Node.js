@@ -9,7 +9,7 @@
 /*jshint node: true */
 /*global Y, YAX */
 
-(function(window, document, undef) {
+(function(undef) {
 
 	//---
 
@@ -23,7 +23,9 @@
 
 	var idList;
 
-	var docElem = window.document.documentElement;
+	var document = window.document;
+
+	var docElem = document.documentElement;
 
 	var elementDisplay = {};
 
@@ -132,22 +134,6 @@
 
 	// BEGIN OF [Private Functions]
 
-	function defaultDisplay(nodeName) {
-		var element;
-		var display;
-
-		if (!elementDisplay[nodeName]) {
-			element = document.createElement(nodeName);
-			document.body.appendChild(element);
-			display = getComputedStyle(element, '').getPropertyValue("display");
-			element.parentNode.removeChild(element);
-			display === "none" && (display = "block");
-			elementDisplay[nodeName] = display;
-		}
-
-		return elementDisplay[nodeName];
-	}
-
 	function functionArgument(context, argument, index, payload) {
 		return Y.isFunction(argument) ? argument.call(context, index, payload) :
 			argument;
@@ -242,6 +228,23 @@
 			element.defaultView;
 	}
 
+	function defaultDisplay(nodeName) {
+		var element;
+		var display;
+
+		if (!elementDisplay[nodeName]) {
+			element = document.createElement(nodeName);
+			document.body.appendChild(element);
+			// display = getComputedStyle(element, '').getPropertyValue("display");
+			display = getDocStyles(element).getPropertyValue("display");
+			element.parentNode.removeChild(element);
+			display === "none" && (display = "block");
+			elementDisplay[nodeName] = display;
+		}
+
+		return elementDisplay[nodeName];
+	}
+
 	// Given a selector, splits it into groups. Necessary because naively
 	// splitting on commas will do the wrong thing.
 	//
@@ -266,8 +269,6 @@
 	function hasCombinator(selector) {
 		return selector.match(/[\s>~+]/);
 	}
-
-
 
 	function flatten(array) {
 		var result, len = array.length;
@@ -808,6 +809,7 @@
 			indexOf: Y.G.indexOf,
 			concat: Y.G.concat,
 			extend: Y.extend,
+
 			// `map` and `slice` in the jQuery API work differently
 			// from their array counterparts
 			map: function(callback) {
@@ -815,10 +817,12 @@
 					return callback.call(elem, i, elem);
 				}));
 			},
+
 			slice: function() {
-				return $(Y.G.slice.apply(this, arguments));
-				// return $.pushStack(Slice.apply(this, arguments));
+				// return $(Y.G.slice.apply(this, arguments));
+				return $.pushStack(Y.G.slice.apply(this, arguments));
 			},
+
 			ready: function(callback) {
 				// need to check if document.body exists for IE as that browser reports
 				// document ready when it hasn't yet created the body element
@@ -943,7 +947,7 @@
 						});
 					});
 				} else if (this.length === 1) {
-						result = $(yDOM.qsa(this[0], selector));
+					result = $(yDOM.qsa(this[0], selector));
 				} else {
 					/*result = this.map(function() {
 						return yDOM.qsa(this, selector);
@@ -962,14 +966,27 @@
 
 					var findBySelector = function findBySelector(elem, selector, slow) {
 						if (elem.length == 1) {
-							if (slow) elem.addClass(classTag);
+							if (slow) {
+								elem.addClass(classTag);
+							}
+
 							result = $(yDOM.qsa(elem[0], selector));
-							if (slow) elem.removeClass(classTag);
+
+							if (slow) {
+								elem.removeClass(classTag);
+							}
 						} else {
 							result = elem.map(function() {
-								if (slow) $(this).addClass(classTag);
+								if (slow) {
+									$(this).addClass(classTag);
+								}
+
 								var result = yDOM.qsa(this, selector);
-								if (slow) $(this).removeClass(classTag);
+
+								if (slow) {
+									$(this).removeClass(classTag);
+								}
+
 								return result;
 							});
 						}
@@ -989,7 +1006,9 @@
 						} finally {
 							// If an error was thrown, we should assume that the class name
 							// cleanup didn't happen, and do it ourselves.
-							if (error) $('.' + classTag).removeClass(classTag);
+							if (error) {
+								$('.' + classTag).removeClass(classTag);
+							}
 						}
 					} else {
 						result = findBySelector(this, selector, slow);
@@ -2279,7 +2298,7 @@
 
 	//---
 
-}(window, document));
+}());
 
 // FILE: ./Source/Modules/Node/Node.js
 
