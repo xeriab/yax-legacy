@@ -55,14 +55,14 @@
 
 		// Bind a function to be called with a given context
 		bind: function (func, object) {
-			var args = Y.G.Slice.call(arguments, 2);
+			var args = Y.G.slice.call(arguments, 2);
 
 			if (func.bind) {
-				return func.bind.apply(func, Y.G.Slice.call(arguments, 1));
+				return func.bind.apply(func, Y.G.slice.call(arguments, 1));
 			}
 
 			return function () {
-				return func.apply(object, args.length ? args.concat(Y.G.Slice.call(arguments)) : arguments);
+				return func.apply(object, args.length ? args.concat(Y.G.slice.call(arguments)) : arguments);
 			};
 		},
 
