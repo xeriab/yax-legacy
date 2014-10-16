@@ -49,7 +49,7 @@
 				var fns = arguments, context, values;
 
 				return newDeferred(function (defer) {
-					Y.each(tuples, function (x, tuple) {
+					Y.forEach(tuples, function (tuple, x) {
 						var fn = Y.isFunction(fns[x]) && fns[x];
 						deferred[tuple[1]](function () {
 							var returned = fn && fn.apply(this, arguments);
@@ -85,7 +85,7 @@
 		// Keep pipe for back-compat
 		promise.pipe = promise.then;
 
-		Y.each(tuples, function (x, tuple) {
+		Y.forEach(tuples, function (tuple, x) {
 			var list = tuple[2],
 				stateString = tuple[3];
 
