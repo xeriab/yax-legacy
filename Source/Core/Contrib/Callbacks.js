@@ -21,7 +21,11 @@
 	function createOptions (options) {
 		var object = optionsCache[options] = {};
 
-		Y.each(options.match(Y.G.regexList.notWhite) || [], function(_, flag) {
+		/*Y.each(options.match(Y.G.regexList.notWhite) || [], function(_, flag) {
+			object[flag] = true;
+		});*/
+
+		Y.forEach(options.match(Y.G.regexList.notWhite) || [], function(flag) {
 			object[flag] = true;
 		});
 
@@ -115,7 +119,7 @@
 					var start = list.length,
 						add;
 					add = function (args) {
-						Y.each(args, function (_, arg) {
+						Y.forEach(args, function (arg) {
 							if (Y.isFunction(arg)) {
 								if (!options.unique || !Callbacks.has(arg)) {
 									list.push(arg);
@@ -140,7 +144,7 @@
 			},
 			remove: function () {
 				if (list) {
-					Y.each(arguments, function (_, arg) {
+					Y.forEach(arguments, function (arg) {
 						var index = 0;
 						while ((index = Y.inArray(arg, list, index)) > -1) {
 							list.splice(index, 1);
