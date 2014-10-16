@@ -45,7 +45,7 @@
 	//---
 
 	// Cross-browser XML parsing
-	if (!Y.G.isNodeJs) {
+	if (!Y.G.isNode) {
 		Y.extend({
 			parseXML: function (data) {
 				if (!data || !Y.isString(data)) {
@@ -73,7 +73,7 @@
 	}
 
 	Y.extend({
-		lowerCaseFirst: function (string) {
+		lcfirst: function (string) {
 			string += this.empty();
 
 			var t = string.charAt(0).toLowerCase();
@@ -81,7 +81,7 @@
 			return t + string.substr(1);
 		},
 
-		upperCaseFirst: function (string) {
+		ucfirst: function (string) {
 			string += this.empty();
 
 			var t = string.charAt(0).toUpperCase();
@@ -89,7 +89,7 @@
 			return t + string.substr(1);
 		},
 
-		upperCaseWords: function (string) {
+		ucwords: function (string) {
 			return (string + this.empty()).replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function ($1) {
 				return $1.toUpperCase();
 			});
