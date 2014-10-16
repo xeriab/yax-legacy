@@ -179,23 +179,9 @@
 		},
 
 		_init: function () {
-			var args = Y.G.Slice.call(arguments),
+			var args = Y.G.slice.call(arguments),
 				len = args.length,
 				x = 0;
-//				tmpFunc;
-
-//			tmpFunc = function (variable) {
-//				var t = Y.strReplace('-', ' ', variable);
-//
-//				t = Y.upperCaseWords(t);
-//				t = Y.strReplace(' ', '', t);
-//
-//				return t;
-//			};
-
-//			for (x; x < len; x++) {
-//				this.loaded_driver = this.drivers[tmpFunc(args[x])];
-//			}
 
 			if (len === 1) {
 				// this[args[0]] = this.drivers[args[0]];

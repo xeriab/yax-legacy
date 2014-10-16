@@ -118,7 +118,7 @@
 	//---
 
 	Y.When = function (sub) {
-		var resolveValues = Y.G.Slice.call(arguments),
+		var resolveValues = Y.G.slice.call(arguments),
 			len = resolveValues.length,
 			x = 0,
 			remain = len !== 1 || (sub && Y.isFunction(sub.promise)) ? len : 0,
@@ -128,7 +128,7 @@
 				return function (value) {
 					ctx[x] = this;
 
-					val[x] = arguments.length > 1 ? Y.G.Slice.call(arguments) : value;
+					val[x] = arguments.length > 1 ? Y.G.slice.call(arguments) : value;
 
 					var tmp = --remain;
 

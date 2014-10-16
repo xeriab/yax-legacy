@@ -20,7 +20,7 @@
 		drivers: {},
 
 		_init: function () {
-			var args = Y.G.Slice.call(arguments),
+			var args = Y.G.slice.call(arguments),
 				len = args.length,
 				x = 0;
 
