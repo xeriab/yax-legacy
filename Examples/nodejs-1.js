@@ -9,24 +9,24 @@
 var JSDOM = require('jsdom').jsdom;
 var Window = JSDOM('<html><body><div class="Test1">Test</div></body></html>').parentWindow;
 
-require('./YAX');
+require('./../Source/YAX');
 
 Y.WIN = Window;
 Y.DOC = Window.document;
 
-require('./Core/Core');
-require('./Core/Constants');
-require('./Core/RegexList');
-require('./Core/Global');
-require('./Core/Utility');
-require('./Core/Class');
-require('./Core/Evented');
+require('./../Source/Core/Core');
+require('./../Source/Core/Constants');
+require('./../Source/Core/RegexList');
+require('./../Source/Core/Global');
+require('./../Source/Core/Utility');
+require('./../Source/Core/Class');
+require('./../Source/Core/Evented');
 
-require('./Core/Contrib/Callbacks');
-require('./Core/Contrib/Deferred');
-require('./Core/Contrib/Store');
-require('./Core/Contrib/Parser');
-require('./Core/Contrib/I18n');
+require('./../Source/Core/Contrib/Callbacks');
+require('./../Source/Core/Contrib/Deferred');
+require('./../Source/Core/Contrib/Store');
+require('./../Source/Core/Contrib/Parser');
+require('./../Source/Core/Contrib/I18n');
 
 //require('./Modules/EnvDetector');
 
