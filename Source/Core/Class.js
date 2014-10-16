@@ -34,7 +34,7 @@
 
 	Y.Class.extend = function (properties) {
 		var parent = this;
-		var child;
+		var newClass;
 		var property;
 		var _super = parent.prototype;
 
@@ -57,7 +57,7 @@
 
 		// The constructor calls the init method - all construction logic happens
 		// in this method.
-		child = function () {
+		newClass = function () {
 			// Call the initialise constructor
 			if (this.initialise) {
 				this.initialise.apply(this, arguments);
@@ -95,19 +95,19 @@
 		// jshint camelcase: false
 		var proto = Y.Util.create(parent);
 
-		proto.constructor = child;
+		proto.constructor = newClass;
 
-		child.prototype = proto;
+		newClass.prototype = proto;
 
 		// Inherit parent's statics
 		for (x in this) {
 			if (this.hasOwnProperty(x) && x !== 'prototype') {
-				child[x] = this[x];
+				newClass[x] = this[x];
 			}
 		}
 
 		if (properties._class_name) {
-			Y.extend(child, {
+			Y.extend(newClass, {
 				_class_name: properties._class_name.toString()
 			});
 
@@ -117,7 +117,7 @@
 		// Mix static properties into the class
 		/** @namespace properties._statics */
 		if (properties._statics) {
-			Y.extend(child, properties._statics);
+			Y.extend(newClass, properties._statics);
 			delete properties._statics;
 		}
 
@@ -155,30 +155,30 @@
 			}
 		};
 
-		// Extend `extend` and `__super__` into child.
+		// Extend `extend` and `__super__` into newClass.
 		for (property in parent) {
 			if (parent.hasOwnProperty(property)) {
-				child[property] = parent[property];
+				newClass[property] = parent[property];
 			}
 		}
 
 		// Set the prototype chain to inherit from `parent`, without calling
 		// `parent`'s constructor function.
 		var Surrogate = function () {
-			this.constructor = child;
+			this.constructor = newClass;
 		};
 
 		Surrogate.prototype = parent.prototype;
 
-		child.prototype = new Surrogate();
-		child.prototype.__unwrappedSuper__ = {};
+		newClass.prototype = new Surrogate();
+		newClass.prototype.__unwrappedSuper__ = {};
 
 		// Add prototype properties (instance properties) to the subclass, if supplied.
 		if (properties) {
-			// Extend parent prototypes into child.
+			// Extend parent prototypes into newClass.
 			for (property in properties) {
 				if (properties.hasOwnProperty(property)) {
-					child.prototype[property] = properties[property];
+					newClass.prototype[property] = properties[property];
 				}
 			}
 
@@ -219,23 +219,23 @@
 				if (properties.hasOwnProperty(name)) {
 					// Check if we're overwriting an existing function
 					if (Y.isFunction(properties[name]) && superTest.test(properties[name])) {
-						fun = child.prototype[name];
+						fun = newClass.prototype[name];
 
 						if (fun[REF]) {
-							properties[name] = child.prototype.__unwrappedSuper__[name];
+							properties[name] = newClass.prototype.__unwrappedSuper__[name];
 						}
 
-						child.prototype.__unwrappedSuper__[name] = properties[name];
-						child.prototype[name] = functionWrapper(name, properties[name]);
+						newClass.prototype.__unwrappedSuper__[name] = properties[name];
+						newClass.prototype[name] = functionWrapper(name, properties[name]);
 					}
 				}
 			}
 		}
 
 		// Set a convenience property in case the parent's prototype is needed later.
-		child.__super__ = parent.prototype;
+		newClass.__super__ = parent.prototype;
 
-		return child;
+		return newClass;
 	};
 
 	//---
@@ -264,7 +264,7 @@
 	// Add a constructor hook
 	// (Function) || (String, args...)
 	Y.Class.addInitialHook = function (func) {
-		var args = Y.G.Slice.call(arguments, 1);
+		var args = Y.G.slice.call(arguments, 1);
 		var init;
 
 		if (Y.isFunction(func)) {
@@ -282,7 +282,7 @@
 	//---
 
 	Y.Class.toString = function () {
-		return '[YAX] ' + (this._class_name ? '::' + this._class_name + '' : '');
+		return '[YAX] ' + (this._class_name ? '::' + this._class_name + Y.empty : '');
 	};
 
 	//---
