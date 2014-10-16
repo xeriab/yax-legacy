@@ -13,7 +13,7 @@
 
 .yax-tooltip.small {
 	max-width: 150px;
-	padding: 2px 5px;
+	/*padding: 2px 5px;*/
 	border-radius: 2px;
 	font-size: 13px;
 }
@@ -167,17 +167,19 @@
 
 /* confirm */
 .yax-tooltip ul.confirm {
-	display: inline-block;
+	display: block;
 	margin: 5px auto;
+	/*margin: 5px 0 0 0;*/
 	list-style-type: none;
+	position: relative;
 }
 
 .yax-tooltip ul.confirm li {
 	float: left;
 	min-width: 25px;
 	margin: 5px;
-	padding: 10px;
-	border-radius: 3px;
+	padding: 2px 5px;
+	display: block;
 }
 
 /* themes */
@@ -190,6 +192,7 @@
 .yax-tooltip.dark .tooltiptext {
 	color: rgba(255, 255, 240, .9);
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, .5);
+	padding: 2px 5px;
 }
 
 .yax-tooltip.light {

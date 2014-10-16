@@ -253,11 +253,6 @@
 	Y.hasOwnProp = ({}).hasOwnProperty;
 
 	/**
-	 * YAX._CONFIG_STORAGE
-	 */
-	Y._CONFIG_STORAGE = {};
-
-	/**
 	 * YAX._GLOBALS
 	 */
 	Y._GLOBALS = Y.G = {};
@@ -268,26 +263,25 @@
 	Y.Mixin = {};
 
 	/**
-	 * YAX.Settings
+	 * YAX._GLOBALS.regexList
 	 */
-	Y.Settings = {};
+	Y.G.regexList = {};
 
 	//---
 
-	Y.G.isNodeJs = isNode;
-	Y.G.Push = Push;
-	Y.G.Slice = Slice;
-	Y.G.Concat = Concat;
-	Y.G.ToString = toString;
-	Y.G.Filter = Filter;
+	Y.G.isNode = isNode;
+	Y.G.push = Push;
+	Y.G.slice = Slice;
+	Y.G.concat = Concat;
+	Y.G.toString = toString;
+	Y.G.filter = Filter;
 
 	Y.hasOwn = HasOwnProperty;
 
 	Y.G.FuncProto = FuncProto;
 	Y.G.ArrayProto = ArrayProto;
 	Y.G.ObjProto = ObjProto;
-	Y.G.IndexOf = ArrayProto.indexOf;
-	Y.G.Push = ArrayProto.push;
+	Y.G.indexOf = ArrayProto.indexOf;
 
 	Y.require = root.require || require || null;
 	Y.define = root.define || define || null;
@@ -304,7 +298,6 @@
 		console.info('[INFO] Running YAX.JS in "Browser" Environment!');
 	}
 
-
 	/** @namespace define.amd */
 	// AMD registration happens at the end for compatibility with AMD loaders
 	// that may not enforce next-turn semantics on modules. Even though general
@@ -315,6 +308,10 @@
 	// anonymous define() is called outside of a loader request.
 	if (typeof define === 'function' && define.amd) {
 		define('YAX', [], function () {
+			return Y;
+		});
+		
+		define('Y', [], function () {
 			return Y;
 		});
 
@@ -545,7 +542,7 @@
 	 */
 	Y.isArray = Array.isArray || function (object) {
 		// return Array.isArray(object);
-		return Y.G.ToString.call(object) === '[object Array]';
+		return Y.G.toString.call(object) === '[object Array]';
 	};
 
 	/**
@@ -808,7 +805,7 @@
 			return -1;
 		}
 
-		return Y.G.IndexOf.call(array, element, num);
+		return Y.G.indexOf.call(array, element, num);
 	};
 
 	/**
@@ -890,7 +887,7 @@
 			if (Y.isArraylike(arr)) {
 				Y.merge(ret, typeof arr === 'string' ? [arr] : arr);
 			} else {
-				Y.G.Push.call(ret, arr);
+				Y.G.push.call(ret, arr);
 			}
 		}
 
@@ -914,7 +911,7 @@
 	}
 
 	function inject(object, childName) {
-		var args = Y.G.Slice.call(arguments, 2);
+		var args = Y.G.slice.call(arguments, 2);
 		object[childName] = args[0];
 	}
 
@@ -1132,7 +1129,7 @@
 	}
 
 	function compact(array) {
-		return Y.G.Filter.call(array, function(item) {
+		return Y.G.filter.call(array, function(item) {
 			return item !== null;
 		});
 	}
@@ -1158,7 +1155,7 @@
 	};
 
 	function unique(array) {
-		return Y.G.Filter.call(array, function(item, index) {
+		return Y.G.filter.call(array, function(item, index) {
 			return array.indexOf(item) === index;
 		});
 	}
@@ -1178,7 +1175,7 @@
 	};
 
 	Y.grep = function grep(elements, callback) {
-		return Y.G.Filter.call(elements, callback);
+		return Y.G.filter.call(elements, callback);
 	};
 
 	// Internal function that returns an efficient (for current engines) version
@@ -1348,59 +1345,6 @@
 		return object;
 	};
 
-	function configSet() {
-		var args = Y.G.Slice.call(arguments);
-
-		var varName = args[0];
-		var newValue = args[1];
-		var oldValue;
-		var self = Y;
-		var setArray;
-
-		Y._CONFIG_STORAGE[varName] = Y._CONFIG_STORAGE[varName] || {};
-
-		oldValue = Y._CONFIG_STORAGE[varName].LOCAL_VALUE;
-
-		setArray = function(_oldValue, _newValue) {
-			// Although these are set individually, they are all accumulated
-			if (Y.isUndefined(_oldValue)) {
-				self._CONFIG_STORAGE[varName].LOCAL_VALUE = [];
-			}
-
-			self._CONFIG_STORAGE[varName].LOCAL_VALUE.push(_newValue);
-		};
-
-		switch (varName) {
-			case 'extension':
-				setArray(oldValue, newValue);
-				break;
-
-			default:
-				Y._CONFIG_STORAGE[varName].LOCAL_VALUE = newValue;
-				break;
-		}
-
-		return oldValue;
-	}
-
-	function configGet() {
-		var args = Y.G.Slice.call(arguments);
-
-		var varName = args[0];
-
-		if (Y._CONFIG_STORAGE &&
-			Y._CONFIG_STORAGE[varName] && !Y.isUndefined(Y._CONFIG_STORAGE[varName].LOCAL_VALUE)) {
-
-			if (Y.isNull(Y._CONFIG_STORAGE[varName].LOCAL_VALUE)) {
-				return '';
-			}
-
-			return Y._CONFIG_STORAGE[varName].LOCAL_VALUE;
-		}
-
-		return '';
-	}
-
 	// END OF [Private Functions]
 
 	//---
@@ -1492,8 +1436,6 @@
 	//---
 
 	Y.extend({
-		setConfig: configSet,
-		getConfig: configGet,
 		callProperty: getOwn,
 		variableDump: variableDump,
 		inArrayOther: inArrayOther,
@@ -1534,6 +1476,30 @@
 	}
 
 	//---
+
+}());
+
+// FILE: ./Source/Core/Core.js
+
+//---
+
+/**
+ * YAX Extra
+ */
+
+/*jslint indent: 4 */
+/*jslint white: true */
+/*jshint eqeqeq: false */
+/*jshint undef: true */
+/*jshint unused: true */
+/*global Y */
+
+(function () {
+
+	//---
+
+	'use strict';
+
 
 	// Shortcut function for checking if an object has a given property directly
 	// on itself (in other words, not on a prototype).
@@ -1715,13 +1681,13 @@
 
 	// By default, YAX uses ERB-style template delimiters, change the
 	// following template settings to use alternative delimiters.
-	Y.Settings.Template = {
+	Y.G.regexList.template = {
 		evaluate: /<%([\s\S]+?)%>/g,
 		interpolate: /<%=([\s\S]+?)%>/g,
 		escape: /<%-([\s\S]+?)%>/g
 	};
 
-	// When customizing `Y.Settings.Template`, if you don't want to define an
+	// When customizing `Y.G.regexList.template`, if you don't want to define an
 	// interpolation, evaluation or escaping regex, we need one that is
 	// guaranteed not to match.
 	var noMatch = /(.)^/;
@@ -1752,7 +1718,7 @@
 			settings = oldSettings;
 		}
 
-		settings = Y.defaults({}, settings, Y.Settings.Template);
+		settings = Y.defaults({}, settings, Y.G.regexList.template);
 
 		// Combine delimiters into one regular expression via alternation.
 		var matcher = new RegExp([
@@ -1863,7 +1829,7 @@
 			Y.prototype[name] = function() {
 				var args = [this._wrapped];
 
-				Y.G.Push.apply(args, arguments);
+				Y.G.push.apply(args, arguments);
 
 				return result(this, func.apply(Y, args));
 			};
@@ -1911,39 +1877,9 @@
 
 	//---
 
-	Y.setConfig('YAX.Core.Use.console', false);
-	Y.setConfig('extension', 'YAX.Core.Use.console');
-
-	//---
-
 }());
 
-// FILE: ./Source/Core/Core.js
-
-//---
-
-/**
- * YAX Config
- */
-
-/*jslint indent: 4 */
-/*jslint white: true */
-/*jshint eqeqeq: false */
-/*jshint undef: true */
-/*jshint unused: true */
-/*global Y, YAX, exports, define, module */
-
-(function () {
-
-	//---
-
-	'use strict';
-
-	//---
-
-}());
-
-// FILE: ./Source/Core/Contrib/Config.js
+// FILE: ./Source/Core/Extra.js
 
 //---
 
@@ -1994,7 +1930,7 @@
 	//---
 
 	// Cross-browser XML parsing
-	if (!Y.G.isNodeJs) {
+	if (!Y.G.isNode) {
 		Y.extend({
 			parseXML: function (data) {
 				if (!data || !Y.isString(data)) {
@@ -2022,7 +1958,7 @@
 	}
 
 	Y.extend({
-		lowerCaseFirst: function (string) {
+		lcfirst: function (string) {
 			string += this.empty();
 
 			var t = string.charAt(0).toLowerCase();
@@ -2030,7 +1966,7 @@
 			return t + string.substr(1);
 		},
 
-		upperCaseFirst: function (string) {
+		ucfirst: function (string) {
 			string += this.empty();
 
 			var t = string.charAt(0).toUpperCase();
@@ -2038,7 +1974,7 @@
 			return t + string.substr(1);
 		},
 
-		upperCaseWords: function (string) {
+		ucwords: function (string) {
 			return (string + this.empty()).replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function ($1) {
 				return $1.toUpperCase();
 			});
@@ -2053,6 +1989,397 @@
 
 //---
 
+
+/**
+ * YAX Config
+ */
+
+/*jslint indent: 4 */
+/*jslint white: true */
+/*jshint eqeqeq: false */
+/*jshint unused: true */
+/*global Y */
+
+(function () {
+
+	//---
+
+	'use strict';
+
+	function Config() {
+		var args = Y.G.slice.call(arguments);
+
+		Object.defineProperty(this.STORAGE = {}, 0, {
+			get: function () {
+				return {};
+			}
+		});
+
+		/*this.EXPANDO = 'YAX' + (Y.VERSION.toString() +
+			Y.random(1000000, 20000000)).replace(/\D/g, Y.empty);*/
+
+		this.dl = null;
+
+		if (Y.isUndefined(args)) {
+			return this.STORAGE;
+		}
+	}
+
+	Config.prototype = {
+		set: function setConfig() {
+			var args = Y.G.slice.call(arguments);
+
+			var key = args[0];
+			var tmpKey = key.split(':');
+			var newVal = args[1];
+
+			var oldVal;
+			var self = this;
+			var setArr;
+
+			if (tmpKey && tmpKey.length > 1 && tmpKey.length == 2) {
+				this.STORAGE[tmpKey[0]] = this.STORAGE[tmpKey[0]] || {};
+
+				oldVal = this.STORAGE[tmpKey[0]].LOCAL_VALUE[tmpKey[1]];
+
+				setArr = function setArr(_oldVal) {
+					// Although these are set individually, they are all accumulated
+					if (Y.isUndefined(_oldVal)) {
+						self.STORAGE[tmpKey[0]].LOCAL_VALUE[tmpKey[1]] = [];
+					}
+
+					self.STORAGE[tmpKey[0]].LOCAL_VALUE.push(newVal);
+				};
+
+				switch (key) {
+					case 'EXTENSION':
+					case 'extension':
+						// This function is only experimental in YAX.js
+						if (Y.isFunction(this.dl)) {
+							this.dl(newVal);
+						}
+
+						setArr(oldVal, newVal);
+
+						break;
+
+					default:
+						this.STORAGE[tmpKey[0]].LOCAL_VALUE[tmpKey[1]] = newVal;
+						break;
+				}
+
+				return oldVal;
+			}
+
+			this.STORAGE[key] = this.STORAGE[key] || {};
+
+			oldVal = this.STORAGE[key].LOCAL_VALUE;
+
+			setArr = function setArr(_oldVal) {
+				// Although these are set individually, they are all accumulated
+				if (Y.isUndefined(_oldVal)) {
+					self.STORAGE[key].LOCAL_VALUE = [];
+				}
+
+				self.STORAGE[key].LOCAL_VALUE.push(newVal);
+			};
+
+			switch (key) {
+				case 'EXTENSION':
+				case 'extension':
+					// This function is only experimental in YAX.js
+					if (Y.isFunction(this.dl)) {
+						this.dl(newVal);
+					}
+
+					setArr(oldVal, newVal);
+
+					break;
+
+				default:
+					this.STORAGE[key].LOCAL_VALUE = newVal;
+					break;
+			}
+
+			return oldVal;
+		},
+
+		setGlobal: function setGlobal() {
+			var args = Y.G.slice.call(arguments);
+
+			var key = args[0];
+			var tmpKey = key.split(':');
+			var newVal = args[1];
+
+			var oldVal;
+			var self = this;
+			var setArr;
+
+			if (tmpKey && tmpKey.length > 1 && tmpKey.length == 2) {
+				this.STORAGE[tmpKey[0]] = this.STORAGE[tmpKey[0]] || {};
+
+				oldVal = this.STORAGE[tmpKey[0]].GLOBAL_VALUE[tmpKey[1]];
+
+				setArr = function setArr(_oldVal) {
+					// Although these are set individually, they are all accumulated
+					if (Y.isUndefined(_oldVal)) {
+						self.STORAGE[tmpKey[0]].GLOBAL_VALUE[tmpKey[1]] = [];
+					}
+
+					self.STORAGE[tmpKey[0]].GLOBAL_VALUE.push(newVal);
+				};
+
+				switch (key) {
+					case 'EXTENSION':
+					case 'extension':
+						// This function is only experimental in YAX.js
+						if (Y.isFunction(this.dl)) {
+							this.dl(newVal);
+						}
+
+						setArr(oldVal, newVal);
+
+						break;
+
+					default:
+						this.STORAGE[tmpKey[0]].GLOBAL_VALUE[tmpKey[1]] = newVal;
+						break;
+				}
+
+				return oldVal;
+			}
+
+			this.STORAGE[key] = this.STORAGE[key] || {};
+
+			oldVal = this.STORAGE[key].GLOBAL_VALUE;
+
+			setArr = function setArr(_oldVal) {
+				// Although these are set individually, they are all accumulated
+				if (Y.isUndefined(_oldVal)) {
+					self.STORAGE[key].GLOBAL_VALUE = [];
+				}
+
+				self.STORAGE[key].GLOBAL_VALUE.push(newVal);
+			};
+
+			switch (key) {
+				case 'EXTENSION':
+				case 'extension':
+					// This function is only experimental in YAX.js
+					if (Y.isFunction(this.dl)) {
+						this.dl(newVal);
+					}
+
+					setArr(oldVal, newVal);
+
+					break;
+
+				default:
+					this.STORAGE[key].GLOBAL_VALUE = newVal;
+					break;
+			}
+
+			return oldVal;
+		},
+
+		get: function getConfig() {
+			var args = Y.G.slice.call(arguments);
+
+			var key = args[0];
+			var tmpKey = key.split(':');
+
+			if (tmpKey && tmpKey.length > 1 && tmpKey.length == 2) {
+				if (this.STORAGE &&
+					this.STORAGE[tmpKey[0]] &&
+					!Y.isUndefined(this.STORAGE[tmpKey[0]].LOCAL_VALUE)) {
+
+					if (Y.isNull(this.STORAGE[tmpKey[0]].LOCAL_VALUE)) {
+						return Y.empty;
+					}
+
+					return this.STORAGE[tmpKey[0]].LOCAL_VALUE[tmpKey[1]];
+				}
+			}
+
+			if (this.STORAGE &&
+				this.STORAGE[key] &&
+				!Y.isUndefined(this.STORAGE[key].LOCAL_VALUE)) {
+
+				if (Y.isNull(this.STORAGE[key].LOCAL_VALUE)) {
+					return Y.empty;
+				}
+
+				return this.STORAGE[key].LOCAL_VALUE;
+			}
+
+			return Y.empty;
+		},
+
+		getGlobal: function getGlobal() {
+			var args = Y.G.slice.call(arguments);
+
+			var key = args[0];
+			var tmpKey = key.split(':');
+
+			if (tmpKey && tmpKey.length > 1 && tmpKey.length == 2) {
+				if (this.STORAGE &&
+					this.STORAGE[tmpKey[0]] &&
+					!Y.isUndefined(this.STORAGE[tmpKey[0]].GLOBAL_VALUE)) {
+
+					if (Y.isNull(this.STORAGE[tmpKey[0]].GLOBAL_VALUE)) {
+						return Y.empty;
+					}
+
+					return this.STORAGE[tmpKey[0]].GLOBAL_VALUE[tmpKey[1]];
+				}
+			}
+
+			if (this.STORAGE &&
+				this.STORAGE[key] &&
+				!Y.isUndefined(this.STORAGE[key].GLOBAL_VALUE)) {
+
+				if (Y.isNull(this.STORAGE[key].GLOBAL_VALUE)) {
+					return Y.empty;
+				}
+
+				return this.STORAGE[key].GLOBAL_VALUE;
+			}
+
+			return Y.empty;
+		},
+
+		getAll: function getAllConfig() {
+			var args = Y.G.slice.call(arguments);
+
+			var extension = args[0];
+			var details = args[1];
+			var keyVals = args[2];
+
+			var key = '';
+			var cfg = {};
+			var noDetails = {};
+			var extPattern;
+
+			var tmp;
+
+			// BEGIN REDUNDANT
+			this.STORAGE = this.STORAGE || {};
+			// END REDUNDANT
+
+			if (extension) {
+				extPattern = new RegExp('^' + extension + '\\.');
+
+				for (key in this.STORAGE) {
+					if (this.STORAGE.hasOwnProperty(key)) {
+						extPattern.lastIndex = 0;
+
+						if (extPattern.test(key)) {
+							cfg[key] = this.STORAGE[key];
+						}
+					}
+				}
+			} else {
+				for (key in this.STORAGE) {
+					if (this.STORAGE.hasOwnProperty(key)) {
+						cfg[key] = this.STORAGE[key];
+					}
+				}
+			}
+
+			// Default is true
+			if (details !== false) {
+				// {GLOBAL_VALUE: '', LOCAL_VALUE: '', ACCESS: ''};
+				return cfg;
+			}
+
+			for (key in cfg) {
+				if (cfg.hasOwnProperty(key)) {
+					noDetails[key] = cfg[key].LOCAL_VALUE;
+				}
+			}
+
+			if (Y.isSet(keyVals) && Y.isTrue(keyVals)) {
+				for (key in cfg) {
+					if (cfg.hasOwnProperty(key)) {
+						tmp = key.split('.');
+						noDetails[tmp[tmp.length - 1]] = cfg[key].LOCAL_VALUE;
+					}
+				}
+
+				return noDetails;
+			}
+
+			return noDetails;
+		},
+
+		remove: function removeConfig() {
+			var args = Y.G.slice.call(arguments);
+
+			var key = args[0];
+
+			if (this.STORAGE &&
+				this.STORAGE[key] &&
+				!Y.isUndefined(this.STORAGE[key].LOCAL_VALUE)) {
+
+				if (Y.isNull(this.STORAGE[key].LOCAL_VALUE)) {
+					return Y.empty;
+				}
+
+				// return this.STORAGE[key].LOCAL_VALUE;
+				delete this.STORAGE[key];
+			}
+
+			return Y.empty;
+		},
+
+		restore: function restoreConfig() {
+			var args = Y.G.slice.call(arguments);
+
+			var key = args[0];
+
+			if (this.STORAGE &&
+				this.STORAGE[key] &&
+				!Y.isUndefined(this.STORAGE[key])) {
+				this.STORAGE[key].LOCAL_VALUE = this.STORAGE[key].GLOBAL_VALUE;
+			}
+		},
+
+		alter: function alterConfig() {
+			var args = Y.G.slice.call(arguments);
+
+			var key = args[0];
+			var value = args[1];
+
+			return this.set(key, value);
+		}
+	};
+
+	//---
+
+	Y.config = Y.C = new Config();
+
+	//---
+
+	/*var _CoreConsole = {
+		'Console.Log.Extended': true,
+		'Console.Level': null,
+		'Console.Colored': false,
+		'Console.Colored.Message': false,
+		'Console.Print.Level': true,
+		'Console.Timed': false,
+		'Console.On.Output': null
+	};
+
+	Y.C.set('yax.core.console', _CoreConsole);
+	Y.C.set('extension', 'yax.core.console');*/
+
+	//---
+
+}());
+
+// FILE: ./Source/Core/Contrib/Config.js
+
+//---
 
 /**
  * YAX Regex Object
@@ -2072,7 +2399,7 @@
 
 	'use strict';
 
-	Y.G.regexList = {
+	Y.extend(Y.G.regexList, {
 		whitespace: "[\\x20\\t\\r\\n\\f]",
 
 		scriptReplacement: /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
@@ -2151,14 +2478,26 @@
 
 		ignoreProperties: /^([A-Z]|returnValue$|layer[XY]$)/,
 
-		selectorGroup: /(([\w#:.~>+()\s-]+|\*|\[.*?\])+)\s*(,|$)/g,
-	};
+		selectorGroup: /(([\w#:.~>+()\s\-]+|\*|\[.*?\])+)\s*(,|$)/g,
+
+		multiDash: /([A-Z])/g,
+
+		brace: /(?:\{[\s\S]*\}|\[[\s\S]*\])$/,
+
+		hashStrip: /^#!*/,
+
+		namedArgument: /:([\w\d]+)/g,
+
+		argumentSplat: /\*([\w\d]+)/g,
+
+		escape: /[\-\[\]{}()+?.,\\\^$|#\s]/g
+	});
+
+	//---
 
 	Y.extend(Y.G.regexList, {
 		numSplit: new RegExp('^(' + Y.G.regexList.num + ')(.*)$', 'i'),
-
 		numNonPx: new RegExp('^(' + Y.G.regexList.num + ')(?!px)[a-z%]+$', 'i'),
-
 		relNum: new RegExp('^([+-])=(' + Y.G.regexList.num + ')', 'i')
 	});
 
@@ -2227,14 +2566,14 @@
 
 		// Bind a function to be called with a given context
 		bind: function (func, object) {
-			var args = Y.G.Slice.call(arguments, 2);
+			var args = Y.G.slice.call(arguments, 2);
 
 			if (func.bind) {
-				return func.bind.apply(func, Y.G.Slice.call(arguments, 1));
+				return func.bind.apply(func, Y.G.slice.call(arguments, 1));
 			}
 
 			return function () {
-				return func.apply(object, args.length ? args.concat(Y.G.Slice.call(arguments)) : arguments);
+				return func.apply(object, args.length ? args.concat(Y.G.slice.call(arguments)) : arguments);
 			};
 		},
 
@@ -2417,7 +2756,7 @@
 
 	Y.Class.extend = function (properties) {
 		var parent = this;
-		var child;
+		var newClass;
 		var property;
 		var _super = parent.prototype;
 
@@ -2440,7 +2779,7 @@
 
 		// The constructor calls the init method - all construction logic happens
 		// in this method.
-		child = function () {
+		newClass = function () {
 			// Call the initialise constructor
 			if (this.initialise) {
 				this.initialise.apply(this, arguments);
@@ -2478,19 +2817,19 @@
 		// jshint camelcase: false
 		var proto = Y.Util.create(parent);
 
-		proto.constructor = child;
+		proto.constructor = newClass;
 
-		child.prototype = proto;
+		newClass.prototype = proto;
 
 		// Inherit parent's statics
 		for (x in this) {
 			if (this.hasOwnProperty(x) && x !== 'prototype') {
-				child[x] = this[x];
+				newClass[x] = this[x];
 			}
 		}
 
 		if (properties._class_name) {
-			Y.extend(child, {
+			Y.extend(newClass, {
 				_class_name: properties._class_name.toString()
 			});
 
@@ -2500,7 +2839,7 @@
 		// Mix static properties into the class
 		/** @namespace properties._statics */
 		if (properties._statics) {
-			Y.extend(child, properties._statics);
+			Y.extend(newClass, properties._statics);
 			delete properties._statics;
 		}
 
@@ -2538,30 +2877,30 @@
 			}
 		};
 
-		// Extend `extend` and `__super__` into child.
+		// Extend `extend` and `__super__` into newClass.
 		for (property in parent) {
 			if (parent.hasOwnProperty(property)) {
-				child[property] = parent[property];
+				newClass[property] = parent[property];
 			}
 		}
 
 		// Set the prototype chain to inherit from `parent`, without calling
 		// `parent`'s constructor function.
 		var Surrogate = function () {
-			this.constructor = child;
+			this.constructor = newClass;
 		};
 
 		Surrogate.prototype = parent.prototype;
 
-		child.prototype = new Surrogate();
-		child.prototype.__unwrappedSuper__ = {};
+		newClass.prototype = new Surrogate();
+		newClass.prototype.__unwrappedSuper__ = {};
 
 		// Add prototype properties (instance properties) to the subclass, if supplied.
 		if (properties) {
-			// Extend parent prototypes into child.
+			// Extend parent prototypes into newClass.
 			for (property in properties) {
 				if (properties.hasOwnProperty(property)) {
-					child.prototype[property] = properties[property];
+					newClass.prototype[property] = properties[property];
 				}
 			}
 
@@ -2602,23 +2941,23 @@
 				if (properties.hasOwnProperty(name)) {
 					// Check if we're overwriting an existing function
 					if (Y.isFunction(properties[name]) && superTest.test(properties[name])) {
-						fun = child.prototype[name];
+						fun = newClass.prototype[name];
 
 						if (fun[REF]) {
-							properties[name] = child.prototype.__unwrappedSuper__[name];
+							properties[name] = newClass.prototype.__unwrappedSuper__[name];
 						}
 
-						child.prototype.__unwrappedSuper__[name] = properties[name];
-						child.prototype[name] = functionWrapper(name, properties[name]);
+						newClass.prototype.__unwrappedSuper__[name] = properties[name];
+						newClass.prototype[name] = functionWrapper(name, properties[name]);
 					}
 				}
 			}
 		}
 
 		// Set a convenience property in case the parent's prototype is needed later.
-		child.__super__ = parent.prototype;
+		newClass.__super__ = parent.prototype;
 
-		return child;
+		return newClass;
 	};
 
 	//---
@@ -2647,7 +2986,7 @@
 	// Add a constructor hook
 	// (Function) || (String, args...)
 	Y.Class.addInitialHook = function (func) {
-		var args = Y.G.Slice.call(arguments, 1);
+		var args = Y.G.slice.call(arguments, 1);
 		var init;
 
 		if (Y.isFunction(func)) {
@@ -2665,7 +3004,7 @@
 	//---
 
 	Y.Class.toString = function () {
-		return '[YAX] ' + (this._class_name ? '::' + this._class_name + '' : '');
+		return '[YAX] ' + (this._class_name ? '::' + this._class_name + Y.empty : '');
 	};
 
 	//---

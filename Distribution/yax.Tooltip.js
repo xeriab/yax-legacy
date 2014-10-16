@@ -7,7 +7,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global Y, YAX */
+/*global Y, YAX, $ */
 
 (function () {
 
@@ -15,27 +15,23 @@
 
 	'use strict';
 
-	Y.extend(Y.Settings.DOM, {
-		tooltip: {
-			opacity: 1,
-			content: '',
-			size: 'small',
-			gravity: 'north',
-			theme: 'dark',
-			trigger: 'hover',
-			animation: 'flipIn',
-			confirm: false,
-			yes: 'Yes',
-			no: 'No',
-			finalMessage: '',
-			finalMessageDuration: 500,
-			onYes: Y.noop,
-			onNo: Y.noop,
-			container: 'body'
-		}
-	});
+	Y.config.set('yax.plugins.tooltip.opacity', 1);
+	Y.config.set('yax.plugins.tooltip.content', '');
+	Y.config.set('yax.plugins.tooltip.size', 'small');
+	Y.config.set('yax.plugins.tooltip.gravity', 'north');
+	Y.config.set('yax.plugins.tooltip.theme', 'dark');
+	Y.config.set('yax.plugins.tooltip.trigger', 'hover');
+	Y.config.set('yax.plugins.tooltip.animation', 'flipIn');
+	Y.config.set('yax.plugins.tooltip.confirm', false);
+	Y.config.set('yax.plugins.tooltip.yes', 'Yes');
+	Y.config.set('yax.plugins.tooltip.no', 'No');
+	Y.config.set('yax.plugins.tooltip.finalMessage', '');
+	Y.config.set('yax.plugins.tooltip.finalMessageDuration', 500);
+	Y.config.set('yax.plugins.tooltip.onYes', Y.noop);
+	Y.config.set('yax.plugins.tooltip.onNo', Y.noop);
+	Y.config.set('yax.plugins.tooltip.container', 'body');
 
-	var pluginOptions = Y.Settings.DOM.tooltip;
+	var pluginOptions = Y.config.getAll('yax.plugins.tooltip', false, true);
 
 	function Tooltip(element, options) {
 		this.element = element;
@@ -133,26 +129,11 @@
 
 			this.Tip = this.Tooltip.find('.tip');
 
-
-			// this.Tooltip.insertBefore(this.element.parent());
-
-			// this.options.container ? this.Tooltip.prependTo(this.options.container) : this.Tooltip.insertAfter(this.element.parent());
 			if (this.options.container !== '' || this.options.container) {
 				this.Tooltip.prependTo(this.options.container);
-				// this.Tooltip.appendTo(this.options.container);
 			} else {
-				// this.Tooltip.insertAfter(this.element.parent());
-				// this.Tooltip.insertBefore(this.element.parent());
 				this.Tooltip.insertBefore(this.element.parent());
 			}
-
-
-			// this.Tooltip.insertBefore($(this.element));
-
-			// $(this.element).parent().append(this.Tooltip);
-
-			// this.element.append(this.Tooltip);
-
 
 			// Adjust size for html Tooltip
 			if (this.contentType === 'html') {
@@ -170,7 +151,8 @@
 
 		getPosition: function () {
 			var element = this.element[0];
-			return Y.extend({}, (Y.isFunction(element.getBoundingClientRect)) ? element.getBoundingClientRect() : {
+			return Y.extend({}, (Y.isFunction(element.getBoundingClientRect)) ?
+				element.getBoundingClientRect() : {
 				width: element.offsetWidth,
 				height: element.offsetHeight
 			}, this.element.offset());
@@ -286,9 +268,14 @@
 		},
 
 		addConfirm: function () {
-			this.Tooltip.append('<ul class="confirm"><li class="yax-tooltip-yes">' +
-				this.options.yes + '</li><li class="yax-tooltip-no">' + this.options.no +
-				'</li></ul>');
+			this.Tooltip.append(
+				'<ul class="confirm"><li class="yax-tooltip-yes">' +
+				this.options.yes +
+				'</li><li class="yax-tooltip-no">' +
+				this.options.no +
+				'</li></ul>'
+			);
+
 			this.setConfirmEvents();
 		},
 
@@ -299,6 +286,7 @@
 				self.onYes();
 				event.stopPropagation();
 			});
+
 			this.Tooltip.find('li.yax-tooltip-no').click(function (event) {
 				self.onNo();
 				event.stopPropagation();

@@ -1,5 +1,5 @@
 /**
- * YAX Hash/Router [DOM/NODE][Plugin]
+ * YAX Hash/Router [DOM/NODE][PLUGIN]
  */
 
 /*jslint indent: 4 */
@@ -7,27 +7,20 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global Y, YAX */
+/*global Y, YAX, $ */
 
-(function (global) {
+(function () {
 
 	//---
 
 	'use strict';
 
-	// Plugin information
+	Y.config.set('yax.plugins.hashrouter.defaultPath', '/');
+	Y.config.set('yax.plugins.hashrouter.before', Y.noop);
+	Y.config.set('yax.plugins.hashrouter.on', Y.noop);
+	Y.config.set('yax.plugins.hashrouter.notFound', Y.noop);
 
-	// Default options for the Plugin
-	Y.extend(Y.Settings.DOM, {
-		router: {
-			defaultPath: '/',
-			before: Y.noop,
-			on: Y.noop,
-			notFound: Y.noop
-		}
-	});
-
-	var defaultOptions = Y.Settings.DOM.router;
+	var pluginOptions = Y.config.getAll('yax.plugins.hashrouter', false, true);
 
 	var location = window.location;
 	var router;
@@ -40,19 +33,12 @@
 
 		previous: null,
 
-		hashRegex: {
-			hashStrip: /^#!*/,
-			namedArgument: /:([\w\d]+)/g,
-			argumentSplat: /\*([\w\d]+)/g,
-			escape: /[\-\[\]{}()+?.,\\\^$|#\s]/g
-		},
-
 		config: function (options) {
 			var option;
 
 			for (option in options) {
 				if (options.hasOwnProperty(option)) {
-					defaultOptions[option] = options[option];
+					pluginOptions[option] = options[option];
 				} // END if
 			} // END for
 
@@ -62,11 +48,11 @@
 		history: {
 			cache: false,
 			// support: ('history' in global)
-			support: Y.hasOwn.call(global, 'history')
+			support: Y.hasOwn.call(window, 'history')
 		},
 
 		array: function (args) {
-			return Y.G.Slice.call(args, 0);
+			return Y.G.slice.call(args, 0);
 		},
 
 		go: function (path) {
@@ -120,8 +106,9 @@
 				}
 			} else {
 				if (Y.isString(path)) {
-					path = path.replace(this.hashRegex.escape, '\\$&').replace(this.hashRegex
-						.namedArgument, '([^\/]*)').replace(this.hashRegex.argumentSplat,
+					path = path.replace(Y.G.regexList.escape, '\\$&')
+						.replace(Y.G.regexList.namedArgument, '([^\/]*)')
+						.replace(Y.G.regexList.argumentSplat,
 						'(.*?)');
 					temp = new RegExp('^' + path + '$');
 				}
@@ -141,9 +128,9 @@
 			}
 
 			if (this.history.cache) {
-				Y.DOM(global).bind('popstate', this.change);
+				$(window).bind('popstate', this.change);
 			} else {
-				Y.DOM(global).bind('hashchange', this.change);
+				$(window).bind('hashchange', this.change);
 			}
 
 			this.proxyAll('change');
@@ -153,9 +140,9 @@
 
 		unbind: function () {
 			if (this.history) {
-				Y.DOM(global).unbind('popstate', this.change);
+				$(window).unbind('popstate', this.change);
 			} else {
-				Y.DOM(global).unbind('hashchange', this.change);
+				$(window).unbind('hashchange', this.change);
 			}
 		},
 
@@ -217,16 +204,21 @@
 		},
 
 		getHost: function () {
-			return ((document.location + Y.empty).replace(this.getPath() + this.getHash(),
-				''));
+			return (
+				(document.location + Y.empty)
+				.replace(this.getPath() + this.getHash(), '')
+			);
 		},
 
 		getFragment: function () {
-			return this.getHash().replace(this.hashRegex.hashStrip, '');
+			return this.getHash().replace(Y.G.regexList.hashStrip, '');
 		},
 
 		change: function () {
-			var path = (router.history.cache ? router.getPath() : router.getFragment()),
+			var path = (router.history.cache ?
+					router.getPath() :
+					router.getFragment()),
+
 				hash = router.getHash(),
 				found = false,
 				current = router.current,
@@ -239,7 +231,7 @@
 			router.Path = path;
 
 			if (!hash) {
-				hash = defaultOptions.defaultPath;
+				hash = pluginOptions.defaultPath;
 			} // END if
 
 			if (current && current !== router.previous) {
@@ -262,28 +254,28 @@
 
 				if (Y.isString(path)) {
 					if (path.toLowerCase() === hash.toLowerCase().slice(1)) {
-						defaultOptions.before.call(router, path);
+						pluginOptions.before.call(router, path);
 						// route['Function'].call(router);
 						/** @namespace route.Function.call */
 						route.Function.call(router);
-						defaultOptions.on.call(router, path);
+						pluginOptions.on.call(router, path);
 						found = true;
 					} // END if
 				} else {
 					matches = hash.match(path);
 
 					if (matches) {
-						defaultOptions.before.call(router, path, matches);
+						pluginOptions.before.call(router, path, matches);
 						// route['Function'].apply(router, matches);
 						route.Function.apply(router, matches);
-						defaultOptions.on.call(router, path, matches);
+						pluginOptions.on.call(router, path, matches);
 						found = true;
 					} // END if
 				} // END if
 			} // END for
 
 			if (!found) {
-				defaultOptions.notFound.call(router);
+				pluginOptions.notFound.call(router);
 			} // END if
 
 			return router;
@@ -291,11 +283,11 @@
 	}; // END OF router CLASS
 
 	// Assign the router class to YAX's and Window global
-	Y.DOM.router = router;
+	$.hashRouter = window.hashRouter = router;
 
 	//---
 
-}(this));
+}());
 
 // FILE: ./Source/Plugins/HashRouter.js
 

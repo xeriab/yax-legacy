@@ -525,16 +525,6 @@
 
 	var classTag = 'YAX' + Y.now();
 
-	var cssNumber = {
-		'column-count': 1,
-		'columns': 1,
-		'font-weight': 1,
-		'line-height': 1,
-		'opacity': 1,
-		'z-index': 1,
-		'zoom': 1
-	};
-
 	//---
 
 	yDOM = function(selector, context) {
@@ -549,10 +539,6 @@
 	$ = yDOM;
 
 	// BEGIN OF [Private Functions]
-
-	function maybeAddPx(name, value) {
-		return (typeof value == "number" && !cssNumber[Y.dasherise(name)]) ? value + "px" : value;
-	}
 
 	function defaultDisplay(nodeName) {
 		var element;
@@ -642,7 +628,7 @@
 	// because jsdom on node.js will be bitch and break without it.
 
 	function getStyles() {
-		var args = Y.G.Slice.call(arguments);
+		var args = Y.G.slice.call(arguments);
 
 		if (!Y.isUndefined(args[0])) {
 			// return window.getComputedStyle(element, null);
@@ -651,7 +637,7 @@
 	}
 
 	function getDocStyles() {
-		var args = Y.G.Slice.call(arguments);
+		var args = Y.G.slice.call(arguments);
 
 		if (!Y.isUndefined(args[0])) {
 			// return window.getComputedStyle(element, null);
@@ -803,7 +789,7 @@
 
 	function children(element) {
 		return element.hasOwnProperty('children') ?
-			Y.G.Slice.call(element.children) :
+			Y.G.slice.call(element.children) :
 			map(element.childNodes, function(node) {
 				if (node.nodeType === 1) {
 					return node;
@@ -1028,7 +1014,7 @@
 
 			container.innerHTML = Y.empty + html;
 
-			dom = Y.each(Y.G.Slice.call(container.childNodes), function() {
+			dom = Y.each(Y.G.slice.call(container.childNodes), function() {
 				container.removeChild(this);
 			});
 		}
@@ -1149,7 +1135,7 @@
 			result = (!Y.isUndefined(element) && element.nodeType !== 1 &&
 					element.nodeType !== 9) ? [] :
 
-				Y.G.Slice.call(
+				Y.G.slice.call(
 					isSimple && !maybeID ?
 					// If it's simple, it could be a class
 					maybeClass ? element.getElementsByClassName(nameOnly) :
@@ -1166,8 +1152,8 @@
 	yDOM.Y = function(dom, selector) {
 		dom = dom || [];
 		/* jshint -W103 */
-		//dom.__proto__ = $.Function;
-		dom.__proto__ = Y.extend(dom.__proto__, $.Function);
+		dom.__proto__ = $.Function;
+		// dom.__proto__ = Y.extend(dom.__proto__, $.Function);
 		dom.selector = selector || Y.empty;
 
 		return dom;
@@ -1225,10 +1211,10 @@
 			// copy over these useful array functions.
 			forEach: Y.G.ArrayProto.forEach,
 			reduce: Y.G.ArrayProto.reduce,
-			push: Y.G.Push,
+			push: Y.G.push,
 			sort: Y.G.ArrayProto.sort,
-			indexOf: Y.G.IndexOf,
-			concat: Y.G.Concat,
+			indexOf: Y.G.indexOf,
+			concat: Y.G.concat,
 			extend: Y.extend,
 			// `map` and `slice` in the jQuery API work differently
 			// from their array counterparts
@@ -1238,7 +1224,7 @@
 				}));
 			},
 			slice: function() {
-				return $(Y.G.Slice.apply(this, arguments));
+				return $(Y.G.slice.apply(this, arguments));
 				// return $.pushStack(Slice.apply(this, arguments));
 			},
 			ready: function(callback) {
@@ -1266,7 +1252,7 @@
 			},
 			toArray: function() {
 				// return this.get();
-				return Y.G.Slice.call(this);
+				return Y.G.slice.call(this);
 			},
 			size: function() {
 				return this.length;
@@ -1281,7 +1267,7 @@
 			error: function(message) {
 				throw new Error(message);
 			},
-			each_: function(callback, args) {
+			each_: function(callback) {
 				Y.G.ArrayProto.every.call(this, function(elem, index) {
 					return callback.call(elem, index, elem) !== false;
 				});
@@ -1296,7 +1282,7 @@
 					return this.not(this.not(selector));
 				}
 
-				return $(Y.G.Filter.call(this, function(element) {
+				return $(Y.G.filter.call(this, function(element) {
 					return yDOM.matches(element, selector);
 				}));
 			},
@@ -1318,7 +1304,7 @@
 					});
 				} else {
 					excludes = Y.isString(selector) ? this.filter(selector) :
-						(Y.likeArray(selector) && Y.isFunction(selector.item)) ? Y.G.Slice
+						(Y.likeArray(selector) && Y.isFunction(selector.item)) ? Y.G.slice
 						.call(selector) : $(selector);
 
 					this.forEach(function(elem) {
@@ -1476,12 +1462,12 @@
 			},
 			contents: function() {
 				return this.map(function() {
-					return Y.G.Slice.call(this.childNodes);
+					return Y.G.slice.call(this.childNodes);
 				});
 			},
 			siblings: function(selector) {
 				return filtered(this.map(function(i, elem) {
-					return Y.G.Filter.call(children(elem.parentNode), function(child) {
+					return Y.G.filter.call(children(elem.parentNode), function(child) {
 						return child !== elem;
 					});
 				}), selector);
@@ -2687,10 +2673,6 @@
 
 	//---
 
-	Y.Settings.DOM = {};
-
-	//---
-
 	$.globalEval = globalEval;
 	$.getStyles = getStyles;
 	$.getDocStyles = getDocStyles;
@@ -2888,17 +2870,17 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-(function (undef) {
+(function () {
 
 	//---
 
 	'use strict';
 
-	var data = {},
-		dataAttr = Y.DOM.Function.data,
-		exp = Y.DOM.expando,
-		rbrace = /(?:\{[\s\S]*\}|\[[\s\S]*\])$/,
-		rmultiDash = /([A-Z])/g;
+	var data = {};
+	var dataAttr = Y.DOM.Function.data;
+	var exp = Y.DOM.expando;
+
+	//---
 
 	function Data() {
 		// Support: Android < 4,
@@ -2966,16 +2948,17 @@
 
 			return unlock;
 		},
+		
 		set: function (owner, data, value) {
 			var prop,
 			// There may be an unlock assigned to this node,
-			// if there is no entry for this "owner", create one inline
+			// if there is no entry for this 'owner', create one inline
 			// and set the unlock as though an owner entry had always existed
 				unlock = this.key(owner),
 				cache = this.cache[unlock];
 
 			// Handle: [ owner, key, value ] args
-			if (typeof data === "string") {
+			if (typeof data === 'string') {
 				cache[data] = value;
 
 				// Handle: [ owner, { properties } ] args
@@ -2994,6 +2977,7 @@
 			}
 			return cache;
 		},
+		
 		get: function (owner, key) {
 			// Either a valid cache is found, or will be created.
 			// New caches will be created and the unlock returned,
@@ -3001,9 +2985,10 @@
 			// empty data object. A valid owner object must be provided.
 			var cache = this.cache[this.key(owner)];
 
-			return key === undef ?
+			return key === undefined ?
 				cache : cache[key];
 		},
+		
 		access: function (owner, key, value) {
 			var stored;
 			// In cases where either:
@@ -3011,18 +2996,18 @@
 			//   1. No key was specified
 			//   2. A string key was specified, but no value provided
 			//
-			// Take the "read" path and allow the get method to determine
+			// Take the 'read' path and allow the get method to determine
 			// which value to return, respectively either:
 			//
 			//   1. The entire cache object
 			//   2. The data stored at the key
 			//
-			if (key === undef ||
-				((key && typeof key === "string") && value === undef)) {
+			if (key === undefined ||
+				((key && typeof key === 'string') && value === undefined)) {
 
 				stored = this.get(owner, key);
 
-				return stored !== undef ?
+				return stored !== undefined ?
 					stored : this.get(owner, Y.camelise(key));
 			}
 
@@ -3034,23 +3019,24 @@
 			//
 			this.set(owner, key, value);
 
-			// Since the "set" path can have two possible entry points
+			// Since the 'set' path can have two possible entry points
 			// return the expected data based on which path was taken[*]
-			return value !== undef ? value : key;
+			return value !== undefined ? value : key;
 		},
+		
 		remove: function (owner, key) {
 			var i, name, camel,
 				unlock = this.key(owner),
 				cache = this.cache[unlock];
 
-			if (key === undef) {
+			if (key === undefined) {
 				this.cache[unlock] = {};
 
 			} else {
 				// Support array or space separated string of keys
 				if (Y.isArray(key)) {
-					// If "name" is an array of keys...
-					// When data is initially created, via ("key", "val") signature,
+					// If 'name' is an array of keys...
+					// When data is initially created, via ('key', 'val') signature,
 					// keys will be converted to camelCase.
 					// Since there is no way to tell _how_ a key was added, remove
 					// both plain key and camelCase key. #12786
@@ -3076,30 +3062,39 @@
 				}
 			}
 		},
+		
 		hasData: function (owner) {
 			return !Y.isEmpty(
 					this.cache[owner[this.expando]] || {}
 			);
 		},
+		
 		discard: function (owner) {
 			if (owner[this.expando]) {
 				delete this.cache[owner[this.expando]];
 			}
 		}
 	};
+	
+	//---
 
 	// These may be used throughout the YAX core codebase
 	Y.DOM.dataUser = Y.DOM.data_user = new Data();
 	Y.DOM.dataPrivative = Y.DOM.data_priv = new Data();
+	
+	//---
 
 	Y.extend(Y.DOM, {
 		acceptData: Data.accepts,
+		
 		hasData: function (elem) {
 			return Y.DOM.dataUser.hasData(elem) || Y.DOM.dataPrivative.hasData(elem);
 		},
+		
 		data: function (elem, name, data) {
 			return Y.DOM.dataUser.access(elem, name, data);
 		},
+		
 		removeData: function (elem, name) {
 			Y.DOM.dataUser.remove(elem, name);
 		},
@@ -3107,28 +3102,31 @@
 		_data: function (elem, name, data) {
 			return Y.DOM.dataPrivative.access(elem, name, data);
 		},
+		
 		_removeData: function (elem, name) {
 			Y.DOM.dataPrivative.remove(elem, name);
 		}
 	});
+	
+	//---
 
 	function dataAttribute(elem, key, data) {
 		var name;
 
 		// If nothing was found internally, try to fetch any
 		// data from the HTML5 data-* attribute
-		if (data === undef && elem.nodeType === 1) {
-			name = "data-" + key.replace(rmultiDash, "-$1").toLowerCase();
+		if (data === undefined && elem.nodeType === 1) {
+			name = 'data-' + key.replace(Y.G.regexList.multiDash, '-$1').toLowerCase();
 			data = elem.getAttribute(name);
 
-			if (typeof data === "string") {
+			if (typeof data === 'string') {
 				try {
-					data = data === "true" ? true :
-							data === "false" ? false :
-							data === "null" ? null :
+					data = data === 'true' ? true :
+							data === 'false' ? false :
+							data === 'null' ? null :
 						// Only convert to a number if it doesn't change the string
 							+ data + Y.empty === data ? +data :
-						rbrace.test(data) ? JSON.parse(data) :
+								Y.G.regexList.brace.test(data) ? JSON.parse(data) :
 							data;
 				} catch (e) {
 					console.log(e);
@@ -3137,14 +3135,14 @@
 				// Make sure we set the data so it isn't changed later
 				Y.DOM.dataUser.set(elem, key, data);
 			} else {
-				data = undef;
+				data = undefined;
 			}
 		}
 
 		return data;
 	}
 
-	// Read all "data-*" attributes from a node
+	// Read all 'data-*' attributes from a node
 	function attributeData(node) {
 		var store = {};
 
@@ -3176,7 +3174,7 @@
 			store = data[id];
 		}
 
-		if (name !== undef) {
+		if (name !== undefined) {
 			store[Y.camelise(name)] = value;
 		}
 
@@ -3186,13 +3184,13 @@
 	// Get value from node:
 	// 1. first try key as given,
 	// 2. then try Camelised key,
-	// 3. fall back to reading "data-*" attribute.
+	// 3. fall back to reading 'data-*' attribute.
 	function getData(node, name) {
 		var id = node[exp],
 			store = id && data[id],
 			camelName;
 
-		if (name === undef) {
+		if (name === undefined) {
 			return store || setData(node);
 		}
 
@@ -3220,23 +3218,23 @@
 			var self = this;
 
 			// Gets all values
-			if (key === undef) {
+			if (key === undefined) {
 				if (this.length) {
 					datao = Y.DOM.dataUser.get(elem);
 
-					if (elem.nodeType === 1 && !Y.DOM.dataPrivative.get(elem, "hasDataAttrs")) {
+					if (elem.nodeType === 1 && !Y.DOM.dataPrivative.get(elem, 'hasDataAttrs')) {
 						attrs = elem.attributes;
 
 						for (i; i < attrs.length; i++) {
 							name = attrs[i].name;
 
-							if (name.indexOf("data-") === 0) {
+							if (name.indexOf('data-') === 0) {
 								name = Y.camelise(name.slice(5));
 								dataAttribute(elem, name, datao[name]);
 							}
 						}
 
-						Y.DOM.dataPrivative.set(elem, "hasDataAttrs", true);
+						Y.DOM.dataPrivative.set(elem, 'hasDataAttrs', true);
 					}
 				}
 
@@ -3244,7 +3242,7 @@
 			}
 
 			// Sets multiple values
-			if (typeof key === "object") {
+			if (typeof key === 'object') {
 				return this.each(function () {
 					Y.DOM.dataUser.set(this, key);
 				});
@@ -3256,29 +3254,29 @@
 
 				// The calling YAX object (element matches) is not empty
 				// (and therefore has an element appears at this[ 0 ]) and the
-				// `value` parameter was not undef. An empty YAX object
-				// will result in `undef` for elem = this[ 0 ] which will
+				// `value` parameter was not undefined. An empty YAX object
+				// will result in `undefined` for elem = this[ 0 ] which will
 				// throw an exception if an attempt to read a data cache is made.
-				if (elem && value === undef) {
+				if (elem && value === undefined) {
 					// Attempt to get data from the cache
 					// with the key as-is
 					_data = Y.DOM.dataUser.get(elem, key);
 
-					if (_data !== undef) {
+					if (_data !== undefined) {
 						return _data;
 					}
 
 					// Attempt to get data from the cache
 					// with the key Camelised
 					_data = Y.DOM.dataUser.get(elem, camelKey);
-					if (_data !== undef) {
+					if (_data !== undefined) {
 						return _data;
 					}
 
-					// Attempt to "discover" the data in
+					// Attempt to 'discover' the data in
 					// HTML5 custom data-* attrs
-					_data = dataAttr(elem, camelKey, undef);
-					if (_data !== undef) {
+					_data = dataAttr(elem, camelKey, undefined);
+					if (_data !== undefined) {
 						return _data;
 					}
 
@@ -3300,12 +3298,13 @@
 					// *... In the case of properties that might _actually_
 					// have dashes, we need to also store a copy of that
 					// unchanged property.
-					if (key.indexOf("-") !== -1 && __data !== undef) {
+					if (key.indexOf('-') !== -1 && __data !== undefined) {
 						Y.DOM.dataUser.set(this, key, value);
 					}
 				});
 			}, null, value, arguments.length > 1, null, true);
 		},
+		
 		removeData: function (key) {
 			return this.each(function () {
 				Y.DOM.dataUser.remove(this, key);
@@ -3327,7 +3326,7 @@
 			} else {
 				// Get value from first element
 				if (this.length === 0) {
-					result = undef;
+					result = undefined;
 				} else {
 					result = getData(this[0], name);
 				}
@@ -3359,7 +3358,7 @@
 	};
 
 	// Generate extended `remove` and `empty` functions
-	/*['remove', 'empty'].forEach(function (methodName) {
+	['remove', 'empty'].forEach(function (methodName) {
 		var origFn = Y.DOM.Function[methodName];
 
 		Y.DOM.Function[methodName] = function () {
@@ -3373,7 +3372,7 @@
 
 			return origFn.call(this);
 		};
-	});*/
+	});
 
 	//---
 
@@ -3401,19 +3400,19 @@
 
 	var YID = 1;
 
-	var hover = {
+	/*var hover = {
 		mouseenter: 'mouseover',
 		mouseleave: 'mouseout'
-	};
+	};*/
 
 	var inputEvents = ['focus', 'blur'];
 
-	var focus = {
+	/*var focus = {
 		focus: 'focusin',
 		blur: 'focusout'
-	};
+	};*/
 
-	var focusinSupported = Y.hasOwn.call(window, 'onfocusin');
+	// var focusinSupported = Y.hasOwn.call(window, 'onfocusin');
 
 	var eventMethods = {
 		preventDefault: 'isDefaultPrevented',
@@ -3501,13 +3500,13 @@
 		});
 	}
 
-	function eventCapture(handler, captureSetting) {
+	/*function eventCapture(handler, captureSetting) {
 		return !(!handler.del || !(!focusinSupported && Y.hasProperty(focus, handler.e))) || Y.isSet(captureSetting);
 	}
 
 	function realEvent(type) {
 		return hover[type] || (focusinSupported && focus[type]) || type;
-	}
+	}*/
 
 	function compatible(event, source) {
 		if (source || !event.isDefaultPrevented) {
@@ -3929,79 +3928,6 @@
 	Y.extend(Y.DOM.event, {
 		global: {},
 
-		//---
-
-		add_: function (element, types, callback, data, selector, delegator, capture) {
-			var set = eventHandlers(element);
-			var _callback;
-
-			types.split(/\s/).forEach(function (event) {
-				if (event === 'ready') {
-					return Y.DOM(document).ready(callback);
-				}
-
-				var handler = parse(event);
-
-				handler.callback = callback;
-				handler.selector = selector;
-
-				// Emulate mouseenter, mouseleave
-				if (Y.hasOwn.call(hover, handler.e)) {
-					//if (handler.e in hover) {
-					callback = function (e) {
-						var related = e.relatedTarget;
-
-						if (!related || (related !== this && !Y.DOM.contains(this, related))) {
-							return handler.callback.apply(this, arguments);
-						}
-					};
-				}
-
-				handler.del = delegator;
-
-				_callback = delegator || callback;
-
-				handler.proxy = function (e) {
-					e = compatible(e);
-
-					if (e.isImmediatePropagationStopped()) {
-						return;
-					}
-
-					e.data = data;
-
-					var result = _callback.apply(element, e._args === undef ? [e] : [e].concat(e._args));
-
-					if (result === false) {
-						e.preventDefault();
-						e.stopPropagation();
-					}
-
-					return result;
-				};
-
-				handler.i = set.length;
-
-				set.push(handler);
-
-				if (Y.hasProperty(element, 'addEventListener')) {
-					Y.DOM.Event.add(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
-				}
-			});
-		},
-
-		remove_: function (element, events, func, selector, capture) {
-			(events || '').split(/\s/).forEach(function (event) {
-				findHandlers(element, event, func, selector).forEach(function (handler) {
-					delete eventHandlers(element)[handler.i];
-
-					if (Y.hasProperty(element, 'removeEventListener')) {
-						Y.DOM.Event.remove(element, realEvent(handler.e), handler.proxy, eventCapture(handler, capture));
-					}
-				});
-			});
-		},
-
 		add: function(elem, types, handler, data, selector) {
 			var handleObjIn, eventHandle, tmp,
 				events, t, handleObj,
@@ -4151,6 +4077,8 @@
 				// Unbind all events (on this namespace, if provided) for the element
 				if (!type) {
 					for (type in events) {
+						/** @namespace events.hasOwnProperty */
+						// if (Y.hasOwn.call(events, type)) {
 						if (events.hasOwnProperty(type)) {
 							Y.DOM.event.remove(elem, type + types[t], handler, selector, true);
 						}
@@ -4360,8 +4288,8 @@
 			event = Y.DOM.event.fix(event);
 
 			var i, j, ret, matched, handleObj,
-				handlerQueue = [],
-				args = Y.G.Slice.call(arguments),
+				handlerQueue,
+				args = Y.G.slice.call(arguments),
 				handlers = (Y.DOM.data_priv.get(this, 'events') || {})[event.type] || [],
 				special = Y.DOM.event.special[event.type] || {};
 
@@ -4546,8 +4474,9 @@
 				// Add which for click: 1 === left; 2 === middle; 3 === right
 				// Note: button is not normalized, so don't use it
 				if (!event.which && button !== undef) {
-					/*jshint -W016 */
-					event.which = (button & 1 ? 1 : (button & 2 ? 3 : (button & 4 ? 2 : 0)));
+					/* jshint -W016 */
+					// event.which = (button & 1 ? 1 : (button & 2 ? 3 : (button & 4 ? 2 : 0)));
+					event.which = (button && 1 ? 1 : (button && 2 ? 3 : (button && 4 ? 2 : 0)));
 				}
 
 				return event;
@@ -4686,17 +4615,17 @@
 
 	//---
 
-	Y.DOM.proxy = Y.DOM.Proxy = $.proxy = function (callback, context) {
+	Y.DOM.proxy = function proxy(callback, context) {
 		var result, proxyFn, args;
 
-		args = (2 in arguments) && Y.G.Slice.call(arguments, 2);
-		// args = _in(2, arguments) && Y.G.Slice.call(arguments, 2);
-		// args = Y.G.Slice.call(arguments, 2);
+		// args = (2 in arguments) && Y.G.slice.call(arguments, 2);
+		// args = _in(2, arguments) && Y.G.slice.call(arguments, 2);
+		args = Y.G.slice.call(arguments, 2);
 
 		if (Y.isFunction(callback)) {
 
 			proxyFn = function () {
-				return callback.apply(context, args ? args.concat(Y.G.Slice.call(arguments)) : arguments);
+				return callback.apply(context, args ? args.concat(Y.G.slice.call(arguments)) : arguments);
 			};
 
 			proxyFn.YID = yID(callback);
@@ -4709,9 +4638,9 @@
 
 			if (args) {
 				args.unshift(callback[context], callback);
-				result = Y.DOM.Proxy.apply(null, args);
+				result = Y.DOM.proxy.apply(null, args);
 			} else {
-				result = Y.DOM.Proxy.apply(callback[context], callback);
+				result = Y.DOM.proxy.apply(callback[context], callback);
 			}
 		} else {
 			throw new TypeError('expected function');
@@ -4871,7 +4800,7 @@
 							liveFired: element
 						});
 
-						return (autoRemove || callback).apply(match, [evt].concat(Y.G.Slice.call(arguments, 1)));
+						return (autoRemove || callback).apply(match, [evt].concat(Y.G.slice.call(arguments, 1)));
 					}
 				};
 			}
@@ -6767,7 +6696,7 @@
 
 	Y.extend(Y.DOM.Function, {
 		role: function () {
-			var args = Y.G.Slice.call(arguments);
+			var args = Y.G.slice.call(arguments);
 			var data;
 
 			if (args[0] === undefined || args[0] === null) {
@@ -6787,6 +6716,198 @@
 // FILE: ./Source/Modules/Node/Extra.js
 
 //---
+
+/**
+ * YAX Compatibilities [DOM/NODE]
+ */
+
+/*jslint indent: 4 */
+/*jslint white: true */
+/*jshint eqeqeq: false */
+/*jshint strict: false */
+/*jshint node: true */
+/*global Y, YAX */
+
+(function () {
+
+	//---
+
+	'use strict';
+
+	// Map over Yax.DOM in case of overwrite
+	var _YaxDOM = window.Y.DOM;
+
+	// Map over the $ in case of overwrite
+	var _$ = window.$;
+
+	_YaxDOM.noConflict = function (deep) {
+		if (window.$ === Y.DOM) {
+			window.$ = _$;
+		}
+
+		if (deep && window.Y.DOM === Y.DOM) {
+			window.Y.DOM = _YaxDOM;
+		}
+
+		return Y.DOM;
+	};
+
+	//---
+
+	// Y.G.Compatibility = true;
+
+	// Y.DOM._temp = {};
+
+	Y.DOM.camelCase = Y.camelise;
+	Y.DOM.isReady = true;
+	Y.DOM.isArray = Y.isArray;
+	Y.DOM.isFunction = Y.isFunction;
+	Y.DOM.isWindow = Y.isWindow;
+	Y.DOM.trim = Y.trim;
+	Y.DOM.type = Y.type;
+	Y.DOM.isNumeric = Y.isNumeric;
+	Y.DOM.isEmptyObject = Y.isObjectEmpty;
+	Y.DOM.noop = Y.noop;
+	Y.DOM.grep = Y.grep;
+	Y.DOM.merge = Y.merge;
+
+	Y.DOM.when = Y.When;
+
+	Y.DOM.Deferred = Y.G.Deferred;
+	Y.DOM.Callbacks = Y.G.Callbacks;
+
+	Y.DOM.cssHooks = Y.DOM.CSS_Hooks;
+	Y.DOM.cssNumber = Y.DOM.CSS_Number;
+	Y.DOM.cssProps = Y.DOM.CSS_Properities;
+
+	// The deferred used on DOM ready
+	var readyList = null;
+
+	Y.DOM.Function.ready = function (callback) {
+		// Add the callback
+//		Y.DOM.ready.promise().done(callback);
+
+		Y.DOM.ready.promise().done(callback);
+
+		return this;
+	};
+
+	Y.DOM.extend({
+		// Is the DOM ready to be used? Set to true once it occurs.
+		isReady: false,
+
+		// A counter to track how many items to wait for before
+		// the ready event fires. See #6781
+		readyWait: 1,
+
+		// Hold (or release) the ready event
+		holdReady: function (hold) {
+			if (hold) {
+				Y.DOM.readyWait++;
+			} else {
+				Y.DOM.ready(true);
+			}
+		},
+
+		// Handle when the DOM is ready
+		ready: function (wait) {
+			var tmp1;
+			var tmp2;
+
+			// Abort if there are pending holds or we're already ready
+			/*if (wait === true ? --Y.DOM.readyWait : Y.DOM.isReady) {
+				return;
+			}*/
+
+			// Y.LOG(wait === true ? --Y.DOM.readyWait : Y.DOM.isReady);
+
+			tmp1 = (wait === true ? --Y.DOM.readyWait : Y.DOM.isReady);
+
+			// Y.LOG(tmp)
+
+			// Abort if there are pending holds or we're already ready
+			if (tmp1) {
+				return;
+			}
+
+			// Remember that the DOM is ready
+			Y.DOM.isReady = true;
+
+			// If a normal DOM Ready event fired, decrement, and wait if need be
+			/*if (wait !== true && --Y.DOM.readyWait > 0) {
+				return;
+			}*/
+
+			tmp2 = (wait !== true && --Y.DOM.readyWait > 0);
+
+			if (tmp2) {
+				return;
+			}
+
+			// If there are functions bound, to execute
+			readyList.resolveWith(document, [Y.DOM]);
+
+			// Trigger any bound ready events
+			if (Y.DOM.Function.triggerHandler) {
+				Y.DOM(document).triggerHandler('ready');
+				Y.DOM(document).off('ready');
+			}
+		}
+	});
+
+	/**
+	 * The ready event handler and self cleanup method
+	 */
+	function completed() {
+		document.removeEventListener('DOMContentLoaded', completed, false);
+		window.removeEventListener('load', completed, false);
+		Y.DOM.ready();
+	}
+
+	Y.DOM.ready.promise = function (obj) {
+		if (!readyList) {
+			readyList = Y.DOM.Deferred();
+
+			// Catch cases where $(document).ready() is called after the browser event has already occurred.
+			// we once tried to use readyState 'interactive' here, but it caused issues like the one
+			// discovered by ChrisS here: http://bugs.jquery.com/ticket/12282#comment:15
+			if (document.readyState === 'complete') {
+				// Handle it asynchronously to allow scripts the opportunity to delay ready
+				setTimeout(Y.DOM.ready);
+			} else {
+				// Use the handy event callback
+				document.addEventListener('DOMContentLoaded', completed, false);
+
+				// A fallback to window.onload, that will always work
+				window.addEventListener('load', completed, false);
+			}
+		}
+
+		return readyList.promise(obj);
+	};
+
+	// Kick off the DOM ready check even if the user does not
+	Y.DOM.ready.promise();
+
+	//---
+
+	window.cordova = document.URL.indexOf('http://') === -1 &&
+		document.URL.indexOf('https://') === -1;
+
+	if (window.cordova === false) {
+		Y.DOM(function () {
+			Y.DOM(document).trigger('deviceready');
+		});
+	}
+
+	//---
+
+}());
+
+// FILE: ./Source/Support/Compatibility.js
+
+//---
+
 
 /**
  * YAX IE10+ Support [DOM/NODE]
