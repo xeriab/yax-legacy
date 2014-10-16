@@ -9,7 +9,7 @@ Y.DOM(document).ready(function () {
 	var Button = Y.DOM('.button');
 	var TestOneImage = Y.DOM('#TestOneImage');
 
-	TestOneImage.attr('src', '../../../../Media/yax_js_logo_01-o.svg');
+	TestOneImage.attr('src', '../../../../Media/yax_js_logo_01.svg');
 
 	TestOneImage.width(115);
 
