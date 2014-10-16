@@ -10,12 +10,11 @@ var Dependencies = {
 			'YAX.js',
 
 			'Core/Constants.js',
-
 			'Core/Core.js',
-
+			'Core/Extra.js',
+			'Core/Global.js',
 			'Core/Contrib/Config.js',
 
-			'Core/Global.js',
 			'Core/RegexList.js',
 			'Core/Utility.js',
 			'Core/Class.js',
@@ -40,12 +39,11 @@ var Dependencies = {
 			'YAX.js',
 
 			'Core/Constants.js',
-
 			'Core/Core.js',
-
+			'Core/Extra.js',
+			'Core/Global.js',
 			'Core/Contrib/Config.js',
 
-			'Core/Global.js',
 			'Core/RegexList.js',
 			'Core/Utility.js',
 			'Core/Class.js',
@@ -72,7 +70,7 @@ var Dependencies = {
 
 			'Modules/Node/Node.js',
 			'Modules/Node/SimpleSelector.js',
-			// 'Modules/Node/SizzleSelector.js',
+			// 'Modules/Node/SizzleSupport.js',
 
 			'Modules/Node/Data.js',
 			'Modules/Node/Events.js',
@@ -96,7 +94,7 @@ var Dependencies = {
 
 			// 'Modules/Node/Contrib/EventLogger.js',
 
-			// 'Support/Compatibility.js',
+			'Support/Compatibility.js',
 
 			'Support/IE.js'
 		],
@@ -113,7 +111,7 @@ var Dependencies = {
 
 			'Modules/Node/Node.js',
 			'Modules/Node/SimpleSelector.js',
-			'Modules/Node/SizzleSelector.js',
+			'Modules/Node/SizzleSupport.js',
 
 			'Modules/Node/Data.js',
 			'Modules/Node/Events.js',
