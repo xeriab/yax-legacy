@@ -24,10 +24,6 @@ Y.DOM(document).ready(function () {
 		animation: 'flipIn'
 	});
 
-	var onYes = function onYes () {
-		alert('YES');
-	};
-
 	Button.Tooltip({
 		content: 'Testing Tooltips!',
 		gravity: 'west',
@@ -35,13 +31,13 @@ Y.DOM(document).ready(function () {
 		animation: 'flipIn'
 	});
 
-	Wrapper.WaitForMe();
+	// Wrapper.WaitForMe();
 
-	var closeWaitForMe = function closeWaitForMe () {
+	/*var closeWaitForMe = function closeWaitForMe () {
 		Wrapper.WaitForMe('close');
-	};
+	};*/
 
-	Wrapper.oneTime(1000, 'closeWaitForMe', closeWaitForMe);
+	// Wrapper.oneTime(1000, 'closeWaitForMe', closeWaitForMe);
 
 	// Y.LOG(Wrapper);
 
@@ -66,11 +62,84 @@ Y.DOM(document).ready(function () {
 	// var compiledTemplate = Y.template('Hello <%= text %>');
 	// Y.LOG(compiledTemplate({text: 'World!'}));
 
-	/*var url1 = 'http://0.0.0.0:1988/package.json';
+	// var url1 = 'http://0.0.0.0:1988/package.json';
 
-	Y.DOM.JSON(url1, function (data) {
+	/*Y.DOM.JSON(url1, function (data) {
 		Y.LOG(data);
 	});*/
+
+	/*Y.DOM.Ajax({
+		type: 'GET',
+
+		url: url1,
+
+		data: null,
+
+		dataType: 'json',
+
+		timeout: 300,
+
+		// cache: true,
+
+		// global: true,
+
+		// crossDomain: false,
+
+		contentType: 'text/plain',
+
+		xhrFields: {
+			withCredentials: false
+		},
+
+		success: function (data) {
+			Y.LOG(data);
+		},
+
+		beforeSend: function () {
+			Wrapper.WaitForMe();
+			// Y.LOG('AJAX BEFORE SEND: ', arguments);
+		},
+
+		complete: function () {
+			Wrapper.WaitForMe('close');
+			// Y.LOG('AJAX COMPLETE: ', arguments);
+			// Y.LOG('AJAX COMPLETED');
+		}
+	});*/
+
+	/*Y.DOM(document).ajaxStart(function () {
+		Wrapper.WaitForMe();
+	});
+
+	Y.DOM(document).ajaxComplete(function () {
+		Wrapper.WaitForMe('close');
+	});
+
+	Y.DOM(document).ajaxSuccess(function () {
+		Wrapper.WaitForMe('close');
+	});
+
+	var log = Y.bind(console.log, console);
+
+	Y.delay(log, 1000, 'logged later');
+
+	Y.defer(function () {
+		alert('deferred');
+	});
+
+	var throttled = Y.throttle(closeWaitForMe, 100);
+
+	Y.DOM(window).scroll(throttled);
+
+	Y.LOG(Y.object(['moe', 'larry', 'curly'], [30, 40, 50]));
+
+	Y.LOG(Y.map([1, 2, 3], function(num) {
+		return num * 3;
+	}));*/
+
+
+
+
 
 
 });
