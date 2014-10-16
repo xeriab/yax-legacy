@@ -671,9 +671,9 @@
 		return temp;
 	}
 
-	function toArray(string) {
+	/*function toArray(string) {
 		return string.toArray();
-	}
+	}*/
 
 	/**
 	 * deserialiseValue
@@ -1026,7 +1026,7 @@
 
 	Y.forEach([
 		'Arguments',
-//		'Function',
+		'Function',
 //		'String',
 //		'Number',
 //		'Date',
@@ -1090,7 +1090,6 @@
 		toUnderscore: toUnderscore,
 		toCamel: toCamel,
 		toDash: toDash,
-		toArray: toArray,
 		dasherise: dasherise,
 		deserialiseValue: deserialiseValue,
 		arrayToObject: arrayToObject,
