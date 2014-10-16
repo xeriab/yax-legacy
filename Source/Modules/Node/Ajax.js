@@ -251,7 +251,7 @@
 			// Default timeout
 			timeout: 0,
 			// Whether data should be serialized to string
-			processData: true,
+			processData: false,
 			// Whether the browser should be allowed to cache GET responses
 			cache: true
 		},
