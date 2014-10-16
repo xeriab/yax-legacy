@@ -14,9 +14,8 @@
 
 	'use strict';
 
-	var escape = encodeURIComponent;
-
-	//---
+	// Reusable constructor function for prototype setting.
+	var rcfunc = function () {};
 
 	// BEGIN OF [Private Functions]
 
@@ -54,24 +53,48 @@
 		},
 
 		// Bind a function to be called with a given context
-		bind: function (func, object) {
+		bind: function (callback, object) {
 			var args = Y.G.slice.call(arguments, 2);
+			var bound;
 
-			if (func.bind) {
-				return func.bind.apply(func, Y.G.slice.call(arguments, 1));
+			if (Y.G.FuncProto.bind && callback.bind === Y.G.FuncProto.bind) {
+				return Y.G.FuncProto.bind.apply(callback, Y.G.slice.call(arguments, 1));
 			}
 
-			return function () {
-				return func.apply(object, args.length ? args.concat(Y.G.slice.call(arguments)) : arguments);
+			if (!Y.isFunction(callback)) {
+				throw new TypeError('Bind must be called on a function');
+			}
+
+			bound = function () {
+				if (!(this instanceof bound)) {
+					// return callback.apply(object, args.concat(Y.G.slice.call(arguments)));
+					return callback.apply(object, args.length ? args.concat(Y.G.slice.call(arguments)) : arguments);
+				}
+
+				rcfunc.prototype = callback.prototype;
+
+				var self = new rcfunc();
+
+				rcfunc.prototype = null;
+
+				var result = callback.apply(self, args.concat(Y.G.slice.call(arguments)));
+
+				if (Y.isObject(result)) {
+					return result;
+				}
+
+				return self;
 			};
+
+			return bound;
 		},
 
 		// Return a function that won't be called more often than the given interval
-		throttle: function (func, time, context) {
-			var lock,
-				args,
-				wrapperFunc,
-				later;
+		throttle: function (callback, wait, context) {
+			var lock;
+			var args;
+			var wrapperFunc;
+			var later;
 
 			later = function () {
 				// Reset lock and call if queued
@@ -90,10 +113,69 @@
 
 				} else {
 					// Call and lock until later
-					func.apply(context, arguments);
-					setTimeout(later, time);
+					callback.apply(context, arguments);
+					setTimeout(later, wait);
 					lock = true;
 				}
+			};
+
+			return wrapperFunc;
+		},
+
+		// Return a function that won't be called more often than the given interval
+		newThrottle: function (callback, wait, options) {
+			// var lock;
+			var args;
+			var wrapperFunc;
+			var later;
+			var context;
+			var result;
+			var timeout = null;
+			var previous = 0;
+
+			if (!options) {
+				options = {};
+			}
+
+			later = function () {
+				/** @namespace options.leading */
+				/** @namespace options.trailing */
+				previous = options.leading === false ? 0 : Y.now();
+				timeout = null;
+				result = callback.apply(context, args);
+
+				if (!timeout) {
+					context = args = null;
+				}
+			};
+
+			wrapperFunc = function () {
+				var now = Y.now();
+
+				if (!previous && options.leading === false) {
+					previous = now;
+				}
+
+				var remaining = wait - (now - previous);
+
+				context = this;
+
+				args = arguments;
+
+				if (remaining <= 0 || remaining > wait) {
+					clearTimeout(timeout);
+					timeout = null;
+					previous = now;
+					result = callback.apply(context, args);
+
+					if (!timeout) {
+						context = args = null;
+					}
+				} else if (!timeout && options.trailing !== false) {
+					timeout = setTimeout(later, remaining);
+				}
+
+				return result;
 			};
 
 			return wrapperFunc;
@@ -139,7 +221,7 @@
 			var x;
 
 			if (!object.hasOwnProperty('Options')) {
-				object.Options = object.Options ? Y.Util.Create(object.Options) : {};
+				object.Options = object.Options ? Y.Util.create(object.Options) : {};
 			}
 
 			for (x in options) {
@@ -179,7 +261,7 @@
 				}
 				// Recurse into nested objects
 				else if (Y.isArray(type) || (!traditional && Y.isObject(type))) {
-					Y.Util.Serialise(parameters, value, traditional, key);
+					Y.Util.serialise(parameters, value, traditional, key);
 				} else {
 					parameters.add(key, value);
 				}
