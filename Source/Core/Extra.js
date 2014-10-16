@@ -202,6 +202,13 @@
 		escape: /<%-([\s\S]+?)%>/g
 	};
 
+	// Another YAX template delimiters
+	/*Y.G.regexList.template = {
+		evaluate: /\{\{([\s\S]+?)\}\}/g,
+		interpolate: /\{\{=([\s\S]+?)\}\}/g,
+		escape: /\{\{-([\s\S]+?)\}\}/g
+	};*/
+
 	// When customizing `Y.G.regexList.template`, if you don't want to define an
 	// interpolation, evaluation or escaping regex, we need one that is
 	// guaranteed not to match.
@@ -237,7 +244,9 @@
 
 		// Combine delimiters into one regular expression via alternation.
 		var matcher = new RegExp([
-			(settings.escape || noMatch).source, (settings.interpolate || noMatch).source, (settings.evaluate || noMatch).source
+			(settings.escape || noMatch).source,
+			(settings.interpolate || noMatch).source,
+			(settings.evaluate || noMatch).source
 		].join('|') + '|$', 'g');
 
 		// Compile the template source, escaping string literals appropriately.
@@ -388,6 +397,68 @@
 	// Keep the identity function around for default iteratees.
 	Y.identity = function (value) {
 		return value;
+	};
+
+	// Return the results of applying the iteratee to each element.
+	Y.map = Y.collect = function(object, iteratee, context) {
+		if (object === null) {
+			return [];
+		}
+
+		iteratee = Y.iteratee(iteratee, context);
+
+		var keys = object.length !== +object.length && Y.keys(object);
+		var length = (keys || object).length;
+		var results = new Array(length);
+		var currentKey;
+		var index;
+
+		for (index = 0; index < length; index++) {
+			currentKey = keys ? keys[index] : index;
+			results[index] = iteratee(object[currentKey], currentKey, object);
+		}
+		
+		return results;
+	};
+
+	// Safely create a real, live array from anything iterable.
+	Y.toArray = function(object) {
+		if (!object) {
+			return [];
+		}
+
+		if (Y.isArray(object)) {
+			return Y.G.slice.call(object);
+		}
+
+		if (object.length === +object.length) {
+			return Y.map(object, Y.identity);
+		}
+
+		return Y.values(object);
+	};
+
+	// Converts lists into objects. Pass either a single array of `[key, value]`
+	// pairs, or two parallel arrays of the same length -- one of keys, and one of
+	// the corresponding values.
+	Y.object = function(list, values) {
+		if (list === null) {
+			return {};
+		}
+
+		var res = {};
+		var x;
+		var length;
+
+		for (x = 0, length = list.length; x < length; x++) {
+			if (values) {
+				res[list[x]] = values[x];
+			} else {
+				res[list[x][0]] = list[x][1];
+			}
+		}
+
+		return res;
 	};
 
 	//---
