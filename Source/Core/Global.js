@@ -19,15 +19,7 @@
 			return new Date().getTime();
 		},
 
-		/**
-		 * Delay
-		 *
-		 * A sleep() like function
-		 *
-		 * @param    milliseconds Time in milliseconds
-		 * @return    void
-		 */
-		delay: function (milliseconds) {
+		/*delay: function (milliseconds) {
 			var self = this;
 			var start = self.now;
 			var x;
@@ -37,6 +29,22 @@
 					break;
 				}
 			}
+		},*/
+
+		// Delays a function for the given number of milliseconds, and then calls
+		// it with the arguments supplied.
+		delay: function (callback, wait) {
+			var args = Y.G.slice.call(arguments, 2);
+
+			return setTimeout(function () {
+				return callback.apply(null, args);
+			}, wait);
+		},
+
+		// Defers a function, scheduling it to run after the current call stack has
+		// cleared.
+		defer: function (callback) {
+			return Y.delay.apply(Y, [callback, 1].concat(Y.G.slice.call(arguments, 1)));
 		},
 
 		parseJSON: JSON.parse
