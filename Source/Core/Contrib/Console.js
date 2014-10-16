@@ -147,26 +147,26 @@
 		},
 
 		_init: function () {
-			Y.setConfig('Console.Log.Extended', true);
-			Y.setConfig('Console.Level', this.LEVELS.DEBUG);
-			Y.setConfig('Console.Colored', false);
-			Y.setConfig('Console.Message.Colored', false);
-			Y.setConfig('Console.Print.Level', true);
-			Y.setConfig('Console.Timed', false);
-			Y.setConfig('Console.On.Output', null);
+			Y.config.set('Console.Log.Extended', true);
+			Y.config.set('Console.Level', this.LEVELS.DEBUG);
+			Y.config.set('Console.Colored', false);
+			Y.config.set('Console.Message.Colored', false);
+			Y.config.set('Console.Print.Level', true);
+			Y.config.set('Console.Timed', false);
+			Y.config.set('Console.On.Output', null);
 		},
 
 		setLevel: function (level) {
-			Y.setConfig('Console.Level', level);
+			Y.config.set('Console.Level', level);
 		},
 
 		getLevel: function () {
-			return Y.getConfig('Console.Level');
+			return Y.config.get('Console.Level');
 		},
 
 		getLevelName: function (level) {
 			if (!Y.isSet(level)) {
-				return this.LEVEL_NAMES[Y.getConfig('Console.Level')];
+				return this.LEVEL_NAMES[Y.config.get('Console.Level')];
 			}
 
 			return this.LEVEL_NAMES[level];
@@ -174,66 +174,66 @@
 
 		getLevelColor: function (level) {
 			if (!Y.isSet(level)) {
-				return this.LEVEL_COLORS[Y.getConfig('Console.Level')];
+				return this.LEVEL_COLORS[Y.config.get('Console.Level')];
 			}
 
 			return this.LEVEL_COLORS[level];
 		},
 
 		isLevelVisible: function (levelToCompare) {
-			return Y.getConfig('Console.Level') >= levelToCompare;
+			return Y.config.get('Console.Level') >= levelToCompare;
 		},
 
 		// Enable/Disable Colored Output
 		enableColor: function () {
-			Y.setConfig('Console.Colored', true);
+			Y.config.set('Console.Colored', true);
 		},
 
 		disableColor: function () {
-			Y.setConfig('Console.Colored', false);
+			Y.config.set('Console.Colored', false);
 		},
 
 		isColored: function () {
-			return Y.getConfig('Console.Colored');
+			return Y.config.get('Console.Colored');
 		},
 
 		// Enable/Disable Colored Message Output
 		enableMessageColor: function () {
-			Y.setConfig('Console.Message.Colored', true);
+			Y.config.set('Console.Message.Colored', true);
 		},
 
 		disableMessageColor: function () {
-			Y.setConfig('Console.Message.Colored', false);
+			Y.config.set('Console.Message.Colored', false);
 		},
 
 		isMessageColored: function () {
-			return Y.getConfig('Console.Message.Colored');
+			return Y.config.get('Console.Message.Colored');
 		},
 
 		// Enable/Disable Level Printing in Output
 		enableLevelMessage: function () {
-			Y.setConfig('Console.Print.Level', true);
+			Y.config.set('Console.Print.Level', true);
 		},
 
 		disableMessageMessage: function () {
-			Y.setConfig('Console.Print.Level', false);
+			Y.config.set('Console.Print.Level', false);
 		},
 
 		isLevelMessagePrinted: function () {
-			return Y.getConfig('Console.Print.Level');
+			return Y.config.get('Console.Print.Level');
 		},
 
 		// Enable/Disable Timestamped Output
 		enableTimestamp: function () {
-			Y.setConfig('Console.Timed', true);
+			Y.config.set('Console.Timed', true);
 		},
 
 		disableTimestamp: function () {
-			Y.setConfig('Console.Timed', false);
+			Y.config.set('Console.Timed', false);
 		},
 
 		isTimestamped: function () {
-			return Y.getConfig('Console.Timed');
+			return Y.config.get('Console.Timed');
 		},
 
 		/**
@@ -241,7 +241,7 @@
 		 * Callback: `function(formattedMessage, levelName)`
 		 */
 		onOutput: function (callback) {
-			Y.setConfig('Console.On.Output', callback);
+			Y.config.set('Console.On.Output', callback);
 		},
 
 		/**
@@ -317,7 +317,7 @@
 		 * @returns Array of Arguments, decorated.
 		 */
 		decorateArgs: function (argsArray, level) {
-			var args = Y.G.Slice.call(argsArray, 1),
+			var args = Y.G.slice.call(argsArray, 1),
 				message = argsArray[0],
 				levelMessage;
 
@@ -378,11 +378,11 @@
 			var formattedMessage,
 				levelName;
 
-			if (!Y.isNull(Y.getConfig('Console.On.Output')) && Y.isFunction(Y.getConfig('Console.On.Output'))) {
+			if (!Y.isNull(Y.config.get('Console.On.Output')) && Y.isFunction(Y.config.get('Console.On.Output'))) {
 				levelName = this.getLevelName(level);
 				formattedMessage = this.formatMessage(message, levelName);
 
-				Y.getConfig('Console.On.Output').call(null, formattedMessage, levelName);
+				Y.config.get('Console.On.Output').call(null, formattedMessage, levelName);
 			}
 		},
 
