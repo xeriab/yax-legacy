@@ -16,7 +16,7 @@
 
 	'use strict';
 
-	Y.G.regexList = {
+	Y.extend(Y.G.regexList, {
 		whitespace: "[\\x20\\t\\r\\n\\f]",
 
 		scriptReplacement: /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
@@ -95,14 +95,26 @@
 
 		ignoreProperties: /^([A-Z]|returnValue$|layer[XY]$)/,
 
-		selectorGroup: /(([\w#:.~>+()\s-]+|\*|\[.*?\])+)\s*(,|$)/g,
-	};
+		selectorGroup: /(([\w#:.~>+()\s\-]+|\*|\[.*?\])+)\s*(,|$)/g,
+
+		multiDash: /([A-Z])/g,
+
+		brace: /(?:\{[\s\S]*\}|\[[\s\S]*\])$/,
+
+		hashStrip: /^#!*/,
+
+		namedArgument: /:([\w\d]+)/g,
+
+		argumentSplat: /\*([\w\d]+)/g,
+
+		escape: /[\-\[\]{}()+?.,\\\^$|#\s]/g
+	});
+
+	//---
 
 	Y.extend(Y.G.regexList, {
 		numSplit: new RegExp('^(' + Y.G.regexList.num + ')(.*)$', 'i'),
-
 		numNonPx: new RegExp('^(' + Y.G.regexList.num + ')(?!px)[a-z%]+$', 'i'),
-
 		relNum: new RegExp('^([+-])=(' + Y.G.regexList.num + ')', 'i')
 	});
 
