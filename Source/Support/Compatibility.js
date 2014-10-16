@@ -66,10 +66,7 @@
 
 	Y.DOM.Function.ready = function (callback) {
 		// Add the callback
-//		Y.DOM.ready.promise().done(callback);
-
 		Y.DOM.ready.promise().done(callback);
-
 		return this;
 	};
 
@@ -95,16 +92,7 @@
 			var tmp1;
 			var tmp2;
 
-			// Abort if there are pending holds or we're already ready
-			/*if (wait === true ? --Y.DOM.readyWait : Y.DOM.isReady) {
-				return;
-			}*/
-
-			// Y.LOG(wait === true ? --Y.DOM.readyWait : Y.DOM.isReady);
-
 			tmp1 = (wait === true ? --Y.DOM.readyWait : Y.DOM.isReady);
-
-			// Y.LOG(tmp)
 
 			// Abort if there are pending holds or we're already ready
 			if (tmp1) {
@@ -113,11 +101,6 @@
 
 			// Remember that the DOM is ready
 			Y.DOM.isReady = true;
-
-			// If a normal DOM Ready event fired, decrement, and wait if need be
-			/*if (wait !== true && --Y.DOM.readyWait > 0) {
-				return;
-			}*/
 
 			tmp2 = (wait !== true && --Y.DOM.readyWait > 0);
 
@@ -158,7 +141,6 @@
 			} else {
 				// Use the handy event callback
 				document.addEventListener('DOMContentLoaded', completed, false);
-
 				// A fallback to window.onload, that will always work
 				window.addEventListener('load', completed, false);
 			}
