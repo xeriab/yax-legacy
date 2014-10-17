@@ -50,11 +50,11 @@
 		},
 
 		show: function () {
-			$(this.element).css('cursor', 'pointer');
+			Y.DOM(this.element).css('cursor', 'pointer');
 
 			// Close all other Tooltips
-			// $('div.yax-tooltip').hide();
-			$('div.yax-tooltip').remove();
+			// Y.DOM('div.yax-tooltip').hide();
+			Y.DOM('div.yax-tooltip').remove();
 			window.clearTimeout(this.delay);
 			this.setContent();
 			this.setPositions();
@@ -110,15 +110,15 @@
 			}
 
 			if (this.content.charAt(0) === '#') {
-				$(this.content).hide();
-				this.content = $(this.content).html();
+				Y.DOM(this.content).hide();
+				this.content = Y.DOM(this.content).html();
 				this.contentType = 'html';
 			} else {
 				this.contentType = 'text';
 			}
 
 			// Create Tooltip container
-			this.Tooltip = $('<div class="yax-tooltip ' +
+			this.Tooltip = Y.DOM('<div class="yax-tooltip ' +
 					this.options.theme + ' ' +
 					this.options.size + ' ' +
 					this.options.gravity +
@@ -171,8 +171,8 @@
 				elemLeft = 0;
 			}
 
-			if ($(window).width() < this.Tooltip.width() * 1.5) {
-				this.Tooltip.css('max-width', $(window).width() / 2);
+			if (Y.DOM(window).width() < this.Tooltip.width() * 1.5) {
+				this.Tooltip.css('max-width', Y.DOM(window).width() / 2);
 			} else {
 				this.Tooltip.css('max-width', 340);
 			}
@@ -253,7 +253,7 @@
 					event.stopPropagation();
 				});
 
-				$('html').click(function () {
+				Y.DOM('html').click(function () {
 					self.hide();
 				});
 			}
@@ -319,11 +319,11 @@
 		}
 	};
 
-	$.fn.Tooltip = function (options) {
+	Y.DOM.Function.Tooltip = function (options) {
 		options = Y.extend({}, pluginOptions, options);
 
 		return this.each(function () {
-			return new Tooltip($(this), options);
+			return new Tooltip(Y.DOM(this), options);
 		});
 	};
 
