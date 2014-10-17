@@ -15,12 +15,10 @@
 
 	'use strict';
 
-	var yDOM = Y.DOM;
-
 	// var tmpYaxDom = Y.DOM;
 
-	var oldQSA = yDOM.qsa;
-	var oldMatches = yDOM.matches;
+	var oldQSA = Y.DOM.qsa;
+	var oldMatches = Y.DOM.matches;
 	var classTag = Y.DOM.classTag;
 	var Filters;
 
@@ -119,7 +117,7 @@
 		return callback(selector, filter, argument);
 	}
 
-	yDOM.qsa = function (node, selector) {
+	Y.DOM.qsa = function (node, selector) {
 		var taggedParent, nodes;
 
 		return process(selector, function (_selector, filter, argument) {
@@ -150,7 +148,7 @@
 		});
 	};
 
-	yDOM.matches = function (node, selector) {
+	Y.DOM.matches = function (node, selector) {
 		return process(selector, function (_selector, filter, argument) {
 			return (!_selector || oldMatches(node, _selector)) && (!filter || filter.call(node, null, argument) === node);
 		});
