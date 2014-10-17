@@ -68,9 +68,8 @@ var Dependencies = {
 			'Modules/EnvDetector.js',
 			'Modules/Utility.js',
 
-			'Modules/Node/Node.js',
+			'Modules/Node/NeoNode.js',
 			'Modules/Node/SimpleSelector.js',
-			// 'Modules/Node/SizzleSupport.js',
 
 			'Modules/Node/Data.js',
 			'Modules/Node/Events.js',
