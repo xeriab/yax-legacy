@@ -258,7 +258,7 @@
 		selector.replace(Y.G.regexList.selectorGroup, function(m, unit) {
 			results.push(unit.trim());
 		});
-		
+
 		return results;
 	}
 
@@ -772,7 +772,7 @@
 	/**
 	 * Y.domNode is a DOM class that $ classes inherit from.
 	 */
-	Y.domNode = Y.Class.extend({
+	Y.DomNode = Y.Class.extend({
 		_class_name: 'DOM',
 
 		_init: function() {
@@ -819,8 +819,8 @@
 			},
 
 			slice: function() {
-				// return $(Y.G.slice.apply(this, arguments));
-				return $.pushStack(Y.G.slice.apply(this, arguments));
+				return $(Y.G.slice.apply(this, arguments));
+				// return $.pushStack(Y.G.slice.apply(this, arguments));
 			},
 
 			ready: function(callback) {
@@ -912,6 +912,7 @@
 
 				return $(nodes);
 			},
+
 			has: function(selector) {
 				return this.filter(function() {
 					return Y.isObject(selector) ?
@@ -919,13 +920,16 @@
 						$(this).find(selector).size();
 				});
 			},
+
 			eq: function(index) {
 				return index === -1 ? this.slice(index) : this.slice(index, +index + 1);
 			},
+
 			first: function() {
 				var elem = this[0];
 				return elem && !Y.isObject(elem) ? elem : $(elem);
 			},
+
 			last: function() {
 				var elem = this[this.length - 1];
 				return elem && !Y.isObject(elem) ? elem : $(elem);
@@ -936,23 +940,15 @@
 				var self = this;
 				var error = false;
 
-				if (!selector) {
-					result = [];
-				} else if (Y.isObject(selector)) {
-					result = $(selector).filter(function() {
+				if (Y.isObject(selector)) {
+					result = $(selector).filter(function () {
 						var node = this;
 
 						return Y.G.ArrayProto.some.call(self, function(parent) {
 							return $.contains(parent, node);
 						});
 					});
-				} else if (this.length === 1) {
-					result = $(yDOM.qsa(this[0], selector));
 				} else {
-					/*result = this.map(function() {
-						return yDOM.qsa(this, selector);
-					});*/
-				
 					var slow = false;
 
 					selector = splitSelector(selector).map(function(unit) {
@@ -1033,6 +1029,31 @@
 
 				return $(node);
 			},
+
+			constructor: $,
+
+			parentsUntil_: function (selector, context) {
+				var nodes = this;
+				var collection = false;
+				var parents = [];
+
+				if (Y.isObject(selector)) {
+					collection = $(selector);
+				}
+
+				/*jshint -W083 */
+				while (nodes.length > 0) {
+					nodes = $.map(nodes, function (node) {
+						while (node && !(collection ? collection.indexOf(node) >= 0 : $.matches(node, selector))) {
+							node = node !== context && !Y.isDocument(node) && node.parentNode;
+							parents.push(node);
+						}
+					});
+				}
+
+				return $(parents);
+			},
+
 			parents: function(selector) {
 				var ancestors = [],
 					nodes = this,
@@ -1453,21 +1474,11 @@
 			},
 
 			index: function(element) {
-				//				if (!element) {
-				//					return (this[0] && this[0].parentNode) ? this.first().prevAll().length : -1;
-				//				}
-
-				//				return this.indexOf($(element)[0]);
-
-				//				if (Y.isString(element)) {
-				//					return this.indexOf.call($(element), this[0]);
-				//				}
-
-				//				return this.indexOf.call(this, element.YAXDOM ? element[0] : element);
-
-				return element ? this.indexOf($(element)[0]) : this.parent().children()
-					.indexOf(this[0]);
+				return element ?
+					this.indexOf($(element)[0]) :
+					this.parent().children().indexOf(this[0]);
 			},
+
 			hasClass: function(name) {
 				if (!name) {
 					return false;
@@ -1727,6 +1738,9 @@
 			},
 			splice: [].splice
 		},
+
+		constructor: Y.DOM,
+
 		// Y.unique for each copy of YAX on the page
 		expando: 'YAX' + (Y.VERSION.toString() +
 			Y.random(1000, 7000)).replace(/\D/g, Y.empty),
@@ -1970,7 +1984,11 @@
 
 	//---
 
-	domNode = Y.domNode.prototype;
+	domNode = Y.DomNode.prototype;
+
+	//---
+
+
 
 	//---
 
@@ -2281,6 +2299,136 @@
 			return this;
 		};
 	});
+
+	//---
+
+	$.Function.pushStack = $.pushStack;
+
+	var guaranteedUnique = {
+		children: true,
+		contents: true,
+		next: true,
+		prev: true
+	};
+	var rparentsprev = /^(?:parents|prev(?:Until|All))/;
+
+
+	Y.extend($, {
+		dir: function(elem, dir, until) {
+			var matched = [],
+				truncate = until !== undefined;
+
+			while ((elem = elem[dir]) && elem.nodeType !== 9) {
+				if (elem.nodeType === 1) {
+					if (truncate && $(elem).is(until)) {
+						break;
+					}
+
+					matched.push(elem);
+				}
+			}
+
+			return matched;
+		},
+
+		sibling: function (n, elem) {
+			var matched = [];
+
+			for (n; n; n = n.nextSibling) {
+				if (n.nodeType === 1 && n !== elem) {
+					matched.push(n);
+				}
+			}
+
+			return matched;
+		}
+	});
+
+	function sibling (cur, dir) {
+		/*jshint -W035 */
+		while ((cur = cur[dir]) && cur.nodeType !== 1) {}
+		return cur;
+	}
+
+	Y.each(
+		{
+			parent: function(elem) {
+				var parent = elem.parentNode;
+				return parent && parent.nodeType !== 11 ? parent : null;
+			},
+			
+			parents: function(elem) {
+				return $.dir(elem, "parentNode");
+			},
+			
+			parentsUntil: function(elem, i, until) {
+				return $.dir(elem, "parentNode", until);
+			},
+			
+			next: function(elem) {
+				return sibling(elem, "nextSibling");
+			},
+			
+			prev: function(elem) {
+				return sibling(elem, "previousSibling");
+			},
+			
+			nextAll: function(elem) {
+				return $.dir(elem, "nextSibling");
+			},
+			
+			prevAll: function(elem) {
+				return $.dir(elem, "previousSibling");
+			},
+			
+			nextUntil: function(elem, i, until) {
+				return $.dir(elem, "nextSibling", until);
+			},
+			
+			prevUntil: function(elem, i, until) {
+				return $.dir(elem, "previousSibling", until);
+			},
+			
+			siblings: function(elem) {
+				return $.sibling((elem.parentNode || {}).firstChild, elem);
+			},
+			
+			children: function(elem) {
+				return $.sibling(elem.firstChild);
+			},
+			
+			contents: function(elem) {
+				return elem.contentDocument || $.merge([], elem.childNodes);
+			}
+		}, function (name, fn) {
+			$.Function[name] = function(until, selector) {
+				Y.LOG(until, selector)
+				var matched = $.map(this, fn, until);
+
+				if (name.slice(-5) !== "Until") {
+					selector = until;
+				}
+
+				if (selector && typeof selector === "string") {
+					matched = $.filter(selector, matched);
+				}
+
+				if (this.length > 1) {
+					// Remove duplicates
+					if (!guaranteedUnique[ name ]) {
+						Y.unique(matched);
+					}
+
+					// Reverse order for parents* and prev-derivatives
+					if (rparentsprev.test(name)) {
+						matched.reverse();
+					}
+				}
+
+				return this.pushStack(matched);
+			};
+		}
+	);
 
 	//---
 
