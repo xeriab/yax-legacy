@@ -23,12 +23,12 @@ Y.DOM(document).ready(function () {
 		marginTop: -13
 	});
 
-	/*TestOneImage.Tooltip({
+	TestOneImage.Tooltip({
 		content: 'Testing Tooltips!',
 		gravity: 'west',
 		theme: 'dark',
 		animation: 'flipIn'
-	});*/
+	});
 
 	/*Button.Tooltip({
 		content: 'Testing Tooltips!',
@@ -144,19 +144,11 @@ Y.DOM(document).ready(function () {
 	}));*/
 
 
-	Y.DOM('li.item-a')
-		.parentsUntil('.level-1')
-		.css('background-color', 'red');
+	//---
 
 
-	Y.DOM('li.item-2')
-		.parentsUntil('ul.level-1', '.yes')
-		.css('border', '3px solid green');
+	//---
 
-	/*Y.DOM('li.item-2')
-		.parentsUntil(Y.DOM('ul.level-1'), '.yes')
-		.css('border', '3px solid green');*/
 });
-
 
 //---
