@@ -496,7 +496,7 @@
 	};
 
 	// Generate extended `remove` and `empty` functions
-	['remove', 'empty'].forEach(function (methodName) {
+	/*['remove', 'empty'].forEach(function (methodName) {
 		var origFn = Y.DOM.Function[methodName];
 
 		Y.DOM.Function[methodName] = function () {
@@ -510,7 +510,7 @@
 
 			return origFn.call(this);
 		};
-	});
+	});*/
 
 	//---
 
