@@ -7,15 +7,15 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global Y, Y, Sizzle */
+/*global Y, YAX, Sizzle, $ */
 
-(function () {
+(function ($) {
 
 	//---
 
 	'use strict';
 
-	var yDOM = Y.DOM;
+	var yDOM = $;
 
 	var tmpYaxDom = Y.DOM;
 
@@ -27,7 +27,7 @@
 
 	//---
 
-	Y.DOM = function (selector, context) {
+	Y.DOM = function(selector, context) {
 		return new yDOM.init(selector, context);
 	};
 
@@ -122,7 +122,7 @@
 			if (proceed) {
 				classes = (value || "").match(notWhite) || [];
 
-				for (; i < len; i++) {
+				for (i; i < len; i++) {
 					elem = this[i];
 					// This expression is here for better compressibility (see addClass)
 					cur = elem.nodeType === 1 && (elem.className ?
@@ -220,7 +220,7 @@
 
 		// For internal use only.
 		// Behaves like an Array's method, not like a Y.DOM method.
-		push: Y.G.Push,
+		push: Y.G.push,
 		sort: Y.G.ArrayProto.sort,
 		splice: Y.G.ArrayProto.splice
 	};
@@ -321,7 +321,7 @@
 		}
 
 		return Y.grep(elements, function (elem) {
-			return (Y.G.IndexOf.call(qualifier, elem) >= 0) !== not;
+			return (Y.G.indexOf.call(qualifier, elem) >= 0) !== not;
 		});
 	}
 
@@ -519,26 +519,24 @@
 	Y.DOM.data_priv = tmpYaxDom.dataPrivative;
 	Y.DOM.data_user = tmpYaxDom.data_user;
 
-	//	Y.extend(Y.DOM, tmpYaxDom);
-
 	Y.G.regexList.scriptTypeMasked = /^true\/(.*)/;
 
 	// Replace/restore the type attribute of script elements for safe DOM manipulation
 	function disableScript(elem) {
-			elem.type = (elem.getAttribute("type") !== null) + "/" + elem.type;
-			return elem;
+		elem.type = (elem.getAttribute("type") !== null) + "/" + elem.type;
+		return elem;
 	}
 
 	function restoreScript(elem) {
-			var match = Y.G.regexList.scriptTypeMasked.exec(elem.type);
+		var match = Y.G.regexList.scriptTypeMasked.exec(elem.type);
 
-			if (match) {
-				elem.type = match[1];
-			} else {
-				elem.removeAttribute("type");
-			}
+		if (match) {
+			elem.type = match[1];
+		} else {
+			elem.removeAttribute("type");
+		}
 
-			return elem;
+		return elem;
 	}
 
 
@@ -599,8 +597,10 @@
 				pdataCur.events = {};
 
 				for (type in events) {
-					for (i = 0, l = events[type].length; i < l; i++) {
-						Y.DOM.event.add(dest, type, events[type][i]);
+					if (events.hasOwnProperty(type)) {
+						for (i = 0, l = events[type].length; i < l; i++) {
+							Y.DOM.event.add(dest, type, events[type][i]);
+						}
 					}
 				}
 			}
@@ -656,7 +656,7 @@
 		}
 
 		// Flatten any nested arrays
-		return Y.G.Concat.apply([], ret);
+		return Y.G.concat.apply([], ret);
 	};
 
 	(function () {
@@ -1027,7 +1027,7 @@
 
 		domManip: function (args, callback) {
 			// Flatten any nested arrays
-			args = Y.G.Concat.apply([], args);
+			args = Y.G.concat.apply([], args);
 
 			var fragment, first, scripts, hasScripts, node, doc,
 				i = 0,
@@ -1131,7 +1131,7 @@
 				Y.DOM(insert[i])[original](elems);
 				// Support: QtWebKit
 				// .get() because push.apply(_, arraylike) throws
-				Y.G.Push.apply(ret, elems.get());
+				Y.G.push.apply(ret, elems.get());
 			}
 
 			return this.pushStack(ret);
@@ -1142,18 +1142,14 @@
 
 	Y.DOM.globalEval = tmpYaxDom.globalEval;
 
-
-	// Y.DOM.yDOM = yDOM;
-
-	window.$ = Y.DOM = Y.DOM;
-
-	//---
+	/*jshint -W069 */
+	window.$ = Y.DOM;
 
 	return $;
 
 	//---
 
-}());
+}(Y.DOM));
 
 // FILE: ./Source/Modules/Node/SizzleSupport.js
 
