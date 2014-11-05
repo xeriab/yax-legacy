@@ -107,7 +107,13 @@
 
 		argumentSplat: /\*([\w\d]+)/g,
 
-		escape: /[\-\[\]{}()+?.,\\\^$|#\s]/g
+		escape: /[\-\[\]{}()+?.,\\\^$|#\s]/g,
+
+		float: /^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/,
+
+		class: /[\t\r\n\f]/g,
+
+		scriptTypeMasked: /^true\/(.*)/
 	});
 
 	//---
