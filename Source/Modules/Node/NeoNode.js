@@ -9,19 +9,19 @@
 /*jshint node: true */
 /*global Y, YAX */
 
-(function(undef) {
+(function(window, document, undef) {
 
 	//---
 
 	'use strict';
+
+	var yDOM = {};
 
 	var init;
 
 	var classList;
 
 	var idList;
-
-	var document = window.document;
 
 	var docElem = document.documentElement;
 
@@ -187,7 +187,7 @@
 		return origName;
 	}
 
-	// NOTE: I have included the "window" in window.getComputedStyle
+	// NOTE: I have included the 'window' in window.getComputedStyle
 	// because jsdom on node.js will be bitch and break without it.
 
 	function getStyles() {
@@ -220,10 +220,16 @@
 		if (!elementDisplay[nodeName]) {
 			element = document.createElement(nodeName);
 			document.body.appendChild(element);
-			// display = getComputedStyle(element, '').getPropertyValue("display");
-			display = getDocStyles(element).getPropertyValue("display");
+			// display = getComputedStyle(element, '').getPropertyValue('display');
+			display = getDocStyles(element).getPropertyValue('display');
 			element.parentNode.removeChild(element);
-			(display === "none") && (display = "block");
+
+			// (display === 'none') && (display = 'block');
+
+			if (display === 'none') {
+				display = 'block';
+			}
+
 			elementDisplay[nodeName] = display;
 		}
 
@@ -233,9 +239,9 @@
 	// Given a selector, splits it into groups. Necessary because naively
 	// splitting on commas will do the wrong thing.
 	// Examples:
-	// "div.foo" -> ["div.foo"]
-	// "div, p" -> ["div", "p"]
-	// "div[title='foo, bar'], p" -> ["div[title='foo, bar']", "p"]
+	// 'div.foo' -> ['div.foo']
+	// 'div, p' -> ['div', 'p']
+	// 'div[title='foo, bar'], p' -> ['div[title='foo, bar']', 'p']
 	function splitSelector(selector) {
 		var results = [];
 
@@ -247,7 +253,7 @@
 	}
 
 	// Checks whether the selector has a combinator in it. If not, it's a
-	// "simple selector" and can be optimized in some cases.
+	// 'simple selector' and can be optimized in some cases.
 	// This logic isn't exhaustive, but it doesn't have to be. False
 	// positives are OK.
 	function hasCombinator(selector) {
@@ -388,7 +394,7 @@
 			}
 
 			// Support: Safari 5.1
-			// A tribute to the "awesome hack by Dean Edwards"
+			// A tribute to the 'awesome hack by Dean Edwards'
 			// Safari 5.1.7 (at least) returns percentage for a larger set of values, but width seems to be reliably pixels
 			// this is against the CSSOM draft spec: http://dev.w3.org/csswg/cssom/#resolved-values
 			if (Y.G.regexList.numNonPx.test(ret) && Y.G.regexList.margin.test(name)) {
@@ -414,7 +420,7 @@
 	function setPositiveNumber(element, value, subtract) {
 		var matches = Y.G.regexList.numSplit.exec(value);
 		return matches ?
-			// Guard against undefined "subtract", e.g., when used as in CSS_Hooks
+			// Guard against undefined 'subtract', e.g., when used as in CSS_Hooks
 			Math.max(0, matches[1] - (subtract || 0)) + (matches[2] || 'px') :
 			value;
 	}
@@ -490,7 +496,7 @@
 			valueIsBorderBox = isBorderBox && (Y.DOM.Support.boxSizingReliable || val ===
 				element.style[name]);
 
-			// Normalize "", auto, and prepare for extra
+			// Normalize '', auto, and prepare for extra
 			val = parseFloat(val) || 0;
 		}
 
@@ -529,11 +535,11 @@
 	/**
 	 * @param selector
 	 * @param context
-	 * @returns {Y.DOM.Function.init}
-	 * @constructor init
+	 * @returns {yDOM.initilise}
+	 * @constructor initilise
 	 */
 	Y.DOM = function (selector, context) {
-		return new Y.DOM.Function.init(selector, context);
+		return yDOM.initilise(selector, context);
 	};
 
 	Y.DOM.Function = Y.DOM.prototype = {
@@ -647,7 +653,7 @@
 
 	//---
 
-	Y.DOM.matches = function matches(element, selector) {
+	yDOM.matches = function matches(element, selector) {
 		var result, matchesSelector, temp, parent;
 
 		if (!element || element.nodeType !== 1) {
@@ -674,9 +680,9 @@
 			(parent = tempParent).appendChild(element);
 		}
 
-		// result = ~Y.DOM.qsa(parent, selector).indexOf(element);
+		// result = ~yDOM.qsa(parent, selector).indexOf(element);
 		/* jshint -W052 */
-		result = ~Y.DOM.qsa(parent, selector).indexOf(element);
+		result = ~yDOM.qsa(parent, selector).indexOf(element);
 
 		// temp && tempParent.appendChild(element);
 
@@ -687,7 +693,7 @@
 		return result;
 	};
 
-	Y.DOM.fragment = function fragment(html, name, properties) {
+	yDOM.fragment = function fragment(html, name, properties) {
 		var dom, nodes, container;
 
 		// A special case optimization for a single tag
@@ -732,25 +738,27 @@
 		return dom;
 	};
 
-	init = Y.DOM.Function.init = function(selector, context) {
+	init = yDOM.initilise = function(selector, context) {
 		var dom;
 
 		// If nothing given, return an empty Y.DOM collection
 		if (!selector) {
 			// return Y.DOM.Y();
-			return this;
-		} else if (Y.isString(selector)) {
+			return yDOM.Y();
+		}
+
+		if (Y.isString(selector)) {
 			// Optimize for string selectors
 			selector = selector.trim();
 
 			// If it's a html Fragment, create nodes from it
 			// Note: In both Chrome 21 and Firefox 15, DOM error 12
 			// is thrown if the Fragment doesn't begin with <
-			// if (selector[0] === '<' && Y.G.regexList.fragmentReplacement.test(selector)) {
-			if (selector[0] === '<' && selector[selector.length - 1] === '>' &&
-				selector.length >= 3) {
-				Y.G.regexList.fragmentReplacement.test(selector);
-				dom = Y.DOM.fragment(selector, RegExp.$1, context);
+			if (selector[0] === '<' && Y.G.regexList.fragmentReplacement.test(selector)) {
+			// if (selector[0] === '<' && selector[selector.length - 1] === '>' &&
+				// selector.length >= 3) {
+				// Y.G.regexList.fragmentReplacement.test(selector);
+				dom = yDOM.fragment(selector, RegExp.$1, context);
 				// selector = selector.replace('<', '').replace('>', '');
 				selector = null;
 			} else if (context !== undef) {
@@ -758,7 +766,7 @@
 				return Y.DOM(context).find(selector);
 			} else {
 				// If it's a CSS selector, use it to select nodes.
-				dom = Y.DOM.qsa(document, selector);
+				dom = yDOM.qsa(document, selector);
 			}
 
 			dom = Y.isArraylike(dom) ? dom : [dom];
@@ -767,7 +775,7 @@
 		else if (Y.isFunction(selector)) {
 			return Y.DOM(document).ready(selector);
 			// If a YAX collection is given, just return it
-		} else if (Y.DOM.isY(selector)) {
+		} else if (yDOM.isY(selector)) {
 			return selector;
 		} else if (Y.isArraylike(selector)) {
 			dom = selector;
@@ -788,7 +796,7 @@
 			}
 			// If it's a html Fragment, create nodes from it
 		} else if (Y.G.regexList.fragmentReplacement.test(selector)) {
-			dom = Y.DOM.fragment(selector.trim(), RegExp.$1, context);
+			dom = yDOM.fragment(selector.trim(), RegExp.$1, context);
 			selector = null;
 			// If there's a context, create a collection on that context first, and select
 			// nodes from there
@@ -796,22 +804,22 @@
 			return Y.DOM(context).find(selector);
 			// And last but no least, if it's a CSS selector, use it to select nodes.
 		} else {
-			dom = Y.DOM.qsa(document, selector);
+			dom = yDOM.qsa(document, selector);
 		}
 
 		// Y.LOG(dom);
 
-		dom = dom || [];
+		// dom = dom || [];
 
-		Y.merge(this, dom);
+		// Y.merge(this, dom);
 
-		this.selector = selector || '';
+		// this.selector = selector || '';
 
 		// return Y.makeArray(dom, this);
-		// return this.Y(dom, selector);
+		return yDOM.Y(dom, selector);
 	};
 
-	Y.DOM.qsa = function qsa(element, selector) {
+	yDOM.qsa = function qsa(element, selector) {
 		var found, maybeID, maybeClass, nameOnly, isSimple, result;
 
 		if (selector[0] === '#') {
@@ -859,16 +867,16 @@
 		return result;
 	};
 
-	/*Y.DOM.Y = function(dom, selector) {
+	yDOM.Y = function(dom, selector) {
 		dom = dom || [];
 		// jshint -W103
 		dom.__proto__ = Y.DOM.Function;
 		dom.selector = selector || Y.empty;
 
 		return dom;
-	};*/
+	};
 
-	Y.DOM.isY = function(object) {
+	yDOM.isY = function(object) {
 		return object instanceof Y.DOM;
 	};
 
@@ -899,7 +907,7 @@
 	Y.DOM.extend({
 		// Unique for each copy of Y.DOM on the page
 		expando: 'YAX' + (Y.VERSION.toString() +
-			Y.random(1000, 7000)).replace(/\D/g, Y.empty),
+			Y.random(10000000, 200000000)).replace(/\D/g, Y.empty),
 
 		getStyle: function(elem, style) {
 			var value, css;
@@ -945,16 +953,16 @@
 			}
 
 			return Y.DOM(Y.G.filter.call(this, function(element) {
-				return Y.DOM.matches(element, selector);
+				return yDOM.matches(element, selector);
 			}));
 		},
-		
+
 		add: function(selector, context) {
 			return Y.DOM(Y.unique(this.concat(Y.DOM(selector, context))));
 		},
 
 		is: function(selector) {
-			return this.length > 0 && Y.DOM.matches(this[0], selector);
+			return this.length > 0 && yDOM.matches(this[0], selector);
 		},
 
 		not: function(selector) {
@@ -1021,7 +1029,7 @@
 							elem.addClass(classTag);
 						}
 
-						result = Y.DOM(Y.DOM.qsa(elem[0], selector));
+						result = Y.DOM(yDOM.qsa(elem[0], selector));
 
 						if (slow) {
 							elem.removeClass(classTag);
@@ -1032,7 +1040,7 @@
 								Y.DOM(this).addClass(classTag);
 							}
 
-							var _result = Y.DOM.qsa(this, selector);
+							var _result = yDOM.qsa(this, selector);
 
 							if (slow) {
 								Y.DOM(this).removeClass(classTag);
@@ -1078,7 +1086,7 @@
 			}
 
 			while (node && Y.isFalse(collection ? collection.indexOf(node) >= 0 :
-				Y.DOM.matches(node, selector))) {
+				yDOM.matches(node, selector))) {
 				node = node !== context && !Y.isDocument(node) && node.parentNode;
 			}
 
@@ -1366,6 +1374,44 @@
 					this.value = functionArgument(this, value, index, this.value);
 				});
 		},
+		
+		offset_: function(options) {
+			if (arguments.length) {
+				return options === undefined ?
+					this :
+					this.each(function(i) {
+						Y.DOM.offset.setOffset(this, options, i);
+					});
+			}
+
+			var docElem, win,
+				elem = this[ 0 ],
+				box = { top: 0, left: 0 },
+				doc = elem && elem.ownerDocument;
+
+			if (!doc) {
+				return;
+			}
+
+			docElem = doc.documentElement;
+
+			// Make sure it's not a disconnected DOM node
+			if (!Y.DOM.contains(docElem, elem)) {
+				return box;
+			}
+
+			// If we don't have gBCR, just use 0,0 rather than error
+			// BlackBerry 5, iOS 3 (original iPhone)
+			if (typeof elem.getBoundingClientRect !== typeof undefined) {
+				box = elem.getBoundingClientRect();
+			}
+			win = getWindow(doc);
+			return {
+				top: box.top + win.pageYOffset - docElem.clientTop,
+				left: box.left + win.pageXOffset - docElem.clientLeft
+			};
+		},
+		
 		offset: function(coordinates) {
 			if (coordinates) {
 				return this.each(function(index) {
@@ -1407,6 +1453,7 @@
 				height: Math.round(obj.height)
 			};
 		},
+
 		getOffset: function(options) {
 			if (arguments.length) {
 				return options === undef ?
@@ -1690,7 +1737,7 @@
 				};
 
 			// Fixed elements are offset from window (parentOffset = {top:0, left: 0}, because it is it's only offset parent
-			if (Y.DOM.CSS(element, 'position') === "fixed") {
+			if (Y.DOM.CSS(element, 'position') === 'fixed') {
 				// We assume that getBoundingClientRect is available when computed position is fixed
 				offset = element.getBoundingClientRect();
 
@@ -1701,20 +1748,20 @@
 				// Get correct offsets
 				offset = this.offset();
 
-				if (!Y.DOM.nodeName(offsetParent[0], "html")) {
+				if (!Y.DOM.nodeName(offsetParent[0], 'html')) {
 					parentOffset = offsetParent.offset();
 				}
 
 				// Add offsetParent borders
-				parentOffset.top += Y.DOM.CSS(offsetParent[0], "borderTopWidth", true);
-				parentOffset.left += Y.DOM.CSS(offsetParent[0], "borderLeftWidth", true);
+				parentOffset.top += Y.DOM.CSS(offsetParent[0], 'borderTopWidth', true);
+				parentOffset.left += Y.DOM.CSS(offsetParent[0], 'borderLeftWidth', true);
 			}
 
 			// Subtract parent offsets and element margins
 			return {
-				top: offset.top - parentOffset.top - Y.DOM.CSS(element, "marginTop",
+				top: offset.top - parentOffset.top - Y.DOM.CSS(element, 'marginTop',
 					true),
-				left: offset.left - parentOffset.left - Y.DOM.CSS(element, "marginLeft",
+				left: offset.left - parentOffset.left - Y.DOM.CSS(element, 'marginLeft',
 					true)
 			};
 		},
@@ -1757,8 +1804,8 @@
 			return this.map(function() {
 				var offsetParent = this.offsetParent || docElem;
 
-				while (offsetParent && 
-					(!Y.DOM.nodeName(offsetParent, 'html') && 
+				while (offsetParent &&
+					(!Y.DOM.nodeName(offsetParent, 'html') &&
 						Y.DOM.CSS(offsetParent, 'position') === 'static')) {
 					offsetParent = offsetParent.offsetParent;
 				}
@@ -1774,7 +1821,7 @@
 	});
 
 	//---
-	
+
 	Y.DOM.extend({
 		// Multifunctional method to get and set values of a collection
 		// The value/s can optionally be executed if it's a function
@@ -1874,7 +1921,7 @@
 				}
 			}
 		},
-		// Don't automatically add "px" to these possibly-unitless properties
+		// Don't automatically add 'px' to these possibly-unitless properties
 		CSS_Number: {
 			'columnCount': true,
 			'fillOpacity': true,
@@ -1887,18 +1934,18 @@
 			'zIndex': true,
 			'zoom': true
 		},
-		
+
 		// Add in properties whose names you wish to fix before
 		// setting or getting the value
 		CSS_Properities: {
 			// normalize float css property
 			'float': 'cssFloat'
 		},
-		
+
 		// Get and set the style property on a DOM DOM
 		Style: function(element, name, value, extra) {
 			// Don't set styles on text and comment nodes
-			if (!element || element.nodeType === 3 || 
+			if (!element || element.nodeType === 3 ||
 				element.nodeType === 8 || !element.style) {
 				return;
 			}
@@ -1966,7 +2013,7 @@
 				return style[name];
 			}
 		},
-		
+
 		CSS: function(element, name, extra, styles) {
 			var val, num, hooks,
 				origName = Y.camelise(name);
@@ -1989,7 +2036,7 @@
 				val = CCSS(element, name, styles);
 			}
 
-			// Converts "normal" to a computed value
+			// Converts 'normal' to a computed value
 			if (val === 'normal' && cssNormalTransform.hasOwnProperty(name)) {
 				val = cssNormalTransform[name];
 			}
@@ -2007,20 +2054,20 @@
 			setOffset: function(element, options, i) {
 				var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft,
 					calculatePosition,
-					position = Y.DOM.CSS(element, "position"),
+					position = Y.DOM.CSS(element, 'position'),
 					curElem = Y.DOM(element),
 					props = {};
 
 				// Set position first, in-case top/left are set even on static element
-				if (position === "static") {
-					element.style.position = "relative";
+				if (position === 'static') {
+					element.style.position = 'relative';
 				}
 
 				curOffset = curElem.offset();
-				curCSSTop = Y.DOM.CSS(element, "top");
-				curCSSLeft = Y.DOM.CSS(element, "left");
-				calculatePosition = (position === "absolute" || position === "fixed") &&
-					(curCSSTop + curCSSLeft).indexOf("auto") > -1;
+				curCSSTop = Y.DOM.CSS(element, 'top');
+				curCSSLeft = Y.DOM.CSS(element, 'left');
+				calculatePosition = (position === 'absolute' || position === 'fixed') &&
+					(curCSSTop + curCSSLeft) > -1;
 
 				// Need to be able to calculate position if either top or left is auto and position is either absolute or fixed
 				if (calculatePosition) {
@@ -2052,13 +2099,6 @@
 			}
 		}
 	});
-	
-	//---
-
-	Y.DOM.Support = Y.DOM.support = {};
-	Y.DOM.Expr = Y.DOM.expr = {};
-	Y.DOM.Map = Y.DOM.map = map;
-	Y.DOM.each = Y.each;
 
 	//---
 
@@ -2173,13 +2213,15 @@
 			};
 		});
 	});
-	
+
 	//---
 
 	// Generate the `after`, `prepend`, `before`, `append`,
 	// `insertAfter`, `insertBefore`, `appendTo`, and `prependTo` methods.
 	adjacencyOperators.forEach(function(operator, operatorIndex) {
 		var inside = operatorIndex % 2; //=> prepend, append
+		// var ancestor;
+		var tmpNode;
 
 		Y.DOM.Function[operator] = function() {
 			// Arguments can be nodes, arrays of nodes, YAX objects and HTML strings
@@ -2187,7 +2229,7 @@
 					return Y.isObject(arg) ||
 						Y.isArray(arg) ||
 						Y.isNull(arg) ?
-						arg : Y.DOM.fragment(arg);
+						arg : yDOM.fragment(arg);
 				}),
 				parent,
 				copyByClone = this.length > 1,
@@ -2200,7 +2242,7 @@
 			return this.each(function(tmp, target) {
 				parent = inside ? target : target.parentNode;
 
-				// Convert all methods to a "before" operation
+				// Convert all methods to a 'before' operation
 				target = operatorIndex === 0 ? target.nextSibling :
 						operatorIndex === 1 ? target.firstChild :
 						operatorIndex === 2 ? target :
@@ -2215,13 +2257,29 @@
 						return Y.DOM(node).remove();
 					}
 
-					if (parentInDocument) {
-						return parent.insertBefore(node[0], target);
+					// Y.LOG(Y.typeOf(node));
+
+					if (Y.isArray(node)) {
+						tmpNode = node[0];
 					}
 
-					// for (var ancestor = parent.parentNode; ancestor !== null && ancestor !== document.createElement; ancestor = ancestor.parentNode);
+					if (Y.isObject(node)) {
+						tmpNode = node[0];
+					}
 
-					traverseNode(parent.insertBefore(node, target), function(elem) {
+					if (Y.isElement(node)) {
+						tmpNode = node;
+					}
+
+					// Y.LOG(node);
+
+					if (parentInDocument) {
+						return parent.insertBefore(tmpNode, target);
+					}
+
+					// for (ancestor = parent.parentNode; ancestor !== null && ancestor !== document.createElement; ancestor = ancestor.parentNode);
+
+					traverseNode(parent.insertBefore(tmpNode, target), function(elem) {
 						if (Y.isNull(elem.nodeName) && elem.nodeName.toUpperCase() ===
 							'SCRIPT' && (!elem.type || elem.type === 'text/javascript')) {
 							if (!elem.src) {
@@ -2302,35 +2360,35 @@
 			},
 
 			parents: function(elem) {
-				return Y.DOM.dir(elem, "parentNode");
+				return Y.DOM.dir(elem, 'parentNode');
 			},
 
 			parentsUntil: function(elem, i, until) {
-				return Y.DOM.dir(elem, "parentNode", until);
+				return Y.DOM.dir(elem, 'parentNode', until);
 			},
 
 			next: function(elem) {
-				return sibling(elem, "nextSibling");
+				return sibling(elem, 'nextSibling');
 			},
 
 			prev: function(elem) {
-				return sibling(elem, "previousSibling");
+				return sibling(elem, 'previousSibling');
 			},
 
 			nextAll: function(elem) {
-				return Y.DOM.dir(elem, "nextSibling");
+				return Y.DOM.dir(elem, 'nextSibling');
 			},
 
 			prevAll: function(elem) {
-				return Y.DOM.dir(elem, "previousSibling");
+				return Y.DOM.dir(elem, 'previousSibling');
 			},
 
 			nextUntil: function(elem, i, until) {
-				return Y.DOM.dir(elem, "nextSibling", until);
+				return Y.DOM.dir(elem, 'nextSibling', until);
 			},
 
 			prevUntil: function(elem, i, until) {
-				return Y.DOM.dir(elem, "previousSibling", until);
+				return Y.DOM.dir(elem, 'previousSibling', until);
 			},
 
 			siblings: function(elem) {
@@ -2348,13 +2406,13 @@
 			Y.DOM.Function[name] = function(until, selector) {
 				var matched = Y.DOM.map(this, fn, until);
 
-				if (name.slice(-5) !== "Until") {
+				if (name.slice(-5) !== 'Until') {
 					selector = until;
 				}
 
 				if (selector && Y.isString(selector)) {
 					// matched = Y.DOM.filter(selector, matched);
-					matched = Y.DOM.matches(matched, selector);
+					matched = yDOM.matches(matched, selector);
 				}
 
 				if (this.length > 1) {
@@ -2390,7 +2448,7 @@
 		// jshint -W083
 		while (nodes.length > 0) {
 			nodes = Y.DOM.map(nodes, function (node) {
-				while (node && !(collection ? collection.indexOf(node) >= 0 : Y.DOM.matches(node, selector))) {
+				while (node && !(collection ? collection.indexOf(node) >= 0 : yDOM.matches(node, selector))) {
 					node = node !== context && !Y.isDocument(node) && node.parentNode;
 					parents.push(node);
 				}
@@ -2411,7 +2469,25 @@
 
 	//---
 
+	Y.DOM.contains = contains;
+
+	//---
+	
+	Y.DOM.Support = Y.DOM.support = {};
+	Y.DOM.Expr = Y.DOM.expr = {};
+	Y.DOM.map = map;
+	Y.DOM.each = Y.each;
+
+	Y.DOM.UUID = Y.DOM.uuid = 0;
+	Y.DOM.GUID = Y.DOM.guid = 0;
+
+	Y.DOM.Timers = Y.DOM.timers = [];
+
+	//---
+
 	Y.DOM.fn = Y.DOM.Function;
+
+	Y.DOM.yDOM = yDOM;
 
 	//---
 
@@ -2427,7 +2503,7 @@
 
 	//---
 
-}());
+}(window, window.document));
 
 // FILE: ./Source/Modules/Node/Node.js
 
