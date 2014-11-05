@@ -133,7 +133,7 @@
 				},
 
 				initialise: function () {
-					this.Load();
+					this.load();
 				},
 
 				save: function () {
@@ -155,21 +155,21 @@
 
 				set: function (key, value) {
 					this.cache[key] = value;
-					this.Save();
+					this.save();
 				},
 
 				get: function (key) {
 					return this.cache[key];
 				},
 
-				delete: function (key) {
+				'delete': function (key) {
 					try {
 						delete this.cache[key];
 					} catch (e) {
 						this.cache[key] = undef;
 					}
 
-					this.Save();
+					this.save();
 				},
 
 				flush: function () {
