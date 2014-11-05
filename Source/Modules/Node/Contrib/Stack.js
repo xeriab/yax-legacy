@@ -7,7 +7,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global YAX, Y, $ */
+/*global YAX, Y */
 
 (function () {
 
@@ -15,12 +15,12 @@
 
 	'use strict';
 
-	$.fn.end = function () {
-		return this.prev || $();
+	Y.DOM.Function.end = function () {
+		return this.prev || Y.DOM();
 	};
 
-	$.fn.andSelf = function () {
-		return this.add(this.prev || $());
+	Y.DOM.Function.andSelf = function () {
+		return this.add(this.prev || Y.DOM());
 	};
 
 	//---
@@ -39,9 +39,9 @@
 		'children',
 		'siblings'
 	].forEach(function (property) {
-		var callback = $.fn[property];
+		var callback = Y.DOM.Function[property];
 
-		$.fn[property] = function () {
+		Y.DOM.Function[property] = function () {
 			var ret = callback.apply(this, arguments);
 			ret.prev = this;
 			return ret;
