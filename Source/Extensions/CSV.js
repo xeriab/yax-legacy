@@ -22,8 +22,6 @@
 		return !Y.isUndefined(possible);
 	};
 
-	var FLOAT = /^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/;
-
 	/**
 	 * @return {boolean}
 	 */
@@ -35,7 +33,7 @@
 	var Builder = function (type, schema, sample, shouldCast) {
 		var code = "return ",
 			cast = shouldCast ? function (element, index) {
-				if (FLOAT.test(element)) {
+				if (Y.G.regexList.float.test(element)) {
 					return "Number(values[" + index + "]),";
 				}
 
@@ -325,6 +323,6 @@
 
 }());
 
-// FILE: ./Source/Plugins/CSV.js
+// FILE: ./Source/Extensions/CSV.js
 
 //---
