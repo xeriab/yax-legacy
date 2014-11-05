@@ -7,7 +7,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global YAX, Y, $ */
+/*global YAX, Y */
 
 (function () {
 
@@ -17,7 +17,7 @@
 
 	var cache = [], timeout;
 
-	$.fn.remove = function () {
+	Y.DOM.Function.remove = function () {
 		return this.each(function () {
 			if (this.parentNode) {
 				if (this.tagName === 'IMG') {
