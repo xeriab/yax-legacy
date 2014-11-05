@@ -18,7 +18,7 @@
 	// __proto__ doesn't exist on IE < 11, so redefine
 	// the Y.DOM.YAXDOM.Y function to use object extension instead
 	if (!('__proto__' in {})) {
-		Y.extend(Y.DOM, {
+		Y.extend(Y.DOM.yDOM, {
 			Y: function(dom, selector) {
 				dom = dom || [];
 
