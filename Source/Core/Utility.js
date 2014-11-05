@@ -49,6 +49,16 @@
 			// jshint camelcase: false
 			object.YID = object.YID || ++Y.Util.lastUID;
 
+			/*if (Y.isObject(object)) {
+				if (object.YID) {
+					return object.YID;
+				}
+
+				object.YID = ++Y.Util.lastUID;
+
+				return object.YID;
+			}*/
+
 			return object.YID;
 		},
 
