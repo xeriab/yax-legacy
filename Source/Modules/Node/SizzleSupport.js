@@ -1,5 +1,5 @@
 /**
- * YAX Sizzle Support [DOM/NODE]
+ * YAX Sizzle Selector [DOM/NODE]
  */
 
 /*jslint indent: 4 */
@@ -7,28 +7,50 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global Y, YAX, Sizzle, $ */
+/*global Y, Y, Sizzle */
 
-(function ($) {
+if (typeof Sizzle === 'undefined') {
+	throw new Error('YAX.JS DOM [Sizzle Support] requires YAX.DOM and Sizzle');
+}
+
+(function (window, document) {
 
 	//---
 
 	'use strict';
 
-	var yDOM = $;
+	var yDOM = Y.DOM.yDOM;
 
 	var tmpYaxDom = Y.DOM;
 
 	var rootYaxDom;
 
-	var version = '0.10';
+	var version = '0.15';
 
 	var classTag = 'YAX' + Y.now();
 
+	var ifffn;
+
+	var wrapMap = {
+		// Support: IE9
+		option: [1, '<select multiple="multiple">', '</select>'],
+		thead: [1, '<table>', '</table>'],
+		col: [2, '<table><colgroup>', '</colgroup></table>'],
+		tr: [2, '<table><tbody>', '</tbody></table>'],
+		td: [3, '<table><tbody><tr>', '</tr></tbody></table>'],
+		_default: [0, '', '']
+	};
+
+	// Support: IE9
+	wrapMap.optgroup = wrapMap.option;
+
+	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
+	wrapMap.th = wrapMap.td;
+
 	//---
 
-	Y.DOM = function(selector, context) {
-		return new yDOM.init(selector, context);
+	Y.DOM = function (selector, context) {
+		return new yDOM.initialise(selector, context);
 	};
 
 	//---
@@ -37,14 +59,63 @@
 
 	//---
 
+	// Implement the identical functionality for filter and not
+	ifffn = function ifffn (elements, qualifier, not) {
+		if (Y.isFunction(qualifier)) {
+			return Y.grep(elements, function (elem, x) {
+				/* jshint -W018 */
+				return !!qualifier.call(elem, x, elem) !== not;
+			});
+
+		}
+
+		if (qualifier.nodeType) {
+			return Y.grep(elements, function (elem) {
+				return (elem === qualifier) !== not;
+			});
+
+		}
+
+		if (typeof qualifier === "string") {
+			if (Y.G.regexList.isSimple.test(qualifier)) {
+				return Y.DOM.filter(qualifier, elements, not);
+			}
+
+			qualifier = Y.DOM.filter(qualifier, elements);
+		}
+
+		return Y.grep(elements, function (elem) {
+			return (Y.G.indexOf.call(qualifier, elem) >= 0) !== not;
+		});
+	};
+
+	//---
+
 	Y.DOM.classTag = classTag;
 
-	var rclass = /[\t\r\n\f]/g;
-	var notWhite = (/\S+/g);
+	//---
 
 	delete Y.DOM.Function.addClass;
 	delete Y.DOM.Function.removeClass;
 	delete Y.DOM.Function.hasClass;
+	delete Y.DOM.Function.toggleClass;
+	delete Y.DOM.Function.pushStack;
+	delete Y.DOM.Function.each;
+	delete Y.DOM.Function['YAX.DOM'];
+	delete Y.DOM.constructor;
+	delete Y.DOM.map;
+	delete Y.DOM.find;
+	delete Y.DOM.closest;
+	delete Y.DOM.has;
+	delete Y.DOM.index;
+	delete Y.DOM.add;
+
+	Y.DOM.expr.match = {};
+
+	Y.DOM.expr.match.needsContext = new RegExp("^" + Y.G.regexList.whitespace +
+		"*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" +
+		Y.G.regexList.whitespace + "*((?:-\\d)?\\d*)" + Y.G.regexList.whitespace +
+		"*\\)|)(?=[^-]|$)", "i");
 
 	Y.DOM.Function = Y.DOM.fn = Y.DOM.prototype = {
 		// The current version of Y.DOM being used
@@ -58,17 +129,34 @@
 		// The default length of a Y.DOM object is 0
 		length: 0,
 
-		pushStack: tmpYaxDom.pushStack,
+		each_: function(callback) {
+			Y.G.ArrayProto.every.call(this, function(elem, index) {
+				return callback.call(elem, index, elem) !== false;
+			});
 
-		//each: tmpYaxDom.each,
-		each: function (callback, args) {
-			return Y.each_(this, callback, args);
+			return this;
+		},
+
+		each: function(callback, args) {
+			return Y.each(this, callback, args);
+		},
+
+		pushStack: function(elems) {
+			// Build a new YAX matched element set
+			var ret = Y.merge(this.constructor(), elems);
+
+			// Add the old object onto the stack (as a reference)
+			ret.prevObject = this;
+			ret.context = this.context;
+
+			// Return the newly-formed element set
+			return ret;
 		},
 
 		addClass: function (value) {
 			var classes, elem, cur, clazz, j, finalValue,
 				proceed = typeof value === "string" && value,
-				i = 0,
+				x = 0,
 				len = this.length;
 
 			if (Y.isFunction(value)) {
@@ -79,14 +167,14 @@
 
 			if (proceed) {
 				// The disjunction here is for better compressibility (see removeClass)
-				classes = (value || "").match(notWhite) || [];
+				classes = (value || "").match(Y.G.regexList.notWhite) || [];
 
-				for (i; i < len; i++) {
-					elem = this[i];
+				for (x; x < len; x++) {
+					elem = this[x];
 					cur = elem.nodeType === 1 && (elem.className ?
-						(" " + elem.className + " ").replace(rclass, " ") :
+						(" " + elem.className + " ").replace(Y.G.regexList.class, " ") :
 						" "
-					);
+						);
 
 					if (cur) {
 						j = 0;
@@ -111,7 +199,7 @@
 		removeClass: function (value) {
 			var classes, elem, cur, clazz, j, finalValue,
 				proceed = arguments.length === 0 || typeof value === "string" && value,
-				i = 0,
+				x = 0,
 				len = this.length;
 
 			if (Y.isFunction(value)) {
@@ -120,13 +208,13 @@
 				});
 			}
 			if (proceed) {
-				classes = (value || "").match(notWhite) || [];
+				classes = (value || "").match(Y.G.regexList.notWhite) || [];
 
-				for (i; i < len; i++) {
-					elem = this[i];
+				for (; x < len; x++) {
+					elem = this[x];
 					// This expression is here for better compressibility (see addClass)
 					cur = elem.nodeType === 1 && (elem.className ?
-						(" " + elem.className + " ").replace(rclass, " ") : "");
+						(" " + elem.className + " ").replace(Y.G.regexList.class, " ") : "");
 
 					if (cur) {
 						j = 0;
@@ -152,27 +240,32 @@
 		toggleClass: function (value, stateVal) {
 			var type = typeof value;
 
-			if (typeof stateVal === "boolean" && type === "string") {
-				return stateVal ? this.addClass(value) : this.removeClass(value);
+			if (Y.isBoolean(stateVal) && Y.isString(type)) {
+				if (stateVal) {
+					return this.addClass(value);
+				} else {
+					return this.removeClass(value);
+				}
+
+				// return stateVal ? this.addClass(value) : this.removeClass(value);
 			}
 
 			if (Y.isFunction(value)) {
-				return this.each(function (i) {
-					Y.DOM(this).toggleClass(value.call(this, i, this.className, stateVal),
-						stateVal);
+				return this.each(function (x) {
+					Y.DOM(this).toggleClass(value.call(this, x, this.className, stateVal), stateVal);
 				});
 			}
 
 			return this.each(function () {
-				if (type === "string") {
-					// toggle individual class names
-					var className,
-						i = 0,
-						self = Y.DOM(this),
-						classNames = value.match(notWhite) || [];
+				if (Y.isString(type)) {
+					// Toggle individual class names
+					var className;
+					var x = 0;
+					var self = Y.DOM(this);
+					var classNames = value.match(Y.G.regexList.notWhite) || [];
 
-					while ((className = classNames[i++])) {
-						// check each className given, space separated list
+					while ((className = classNames[x++])) {
+						// Check each className given, space separated list
 						if (self.hasClass(className)) {
 							self.removeClass(className);
 						} else {
@@ -181,30 +274,29 @@
 					}
 
 					// Toggle whole class name
-				} else if (type === typeof undefined || type === "boolean") {
+				} else if (Y.isUndefined(type) || Y.isBoolean(type)) {
 					if (this.className) {
-						// store className if set
-						Y.DOM.data_priv.set(this, "__className__", this.className);
+						// Store className if set
+						Y.DOM.data_priv.set(this, '__className__', this.className);
 					}
 
 					// If the element has a class name or if we're passed "false",
 					// then remove the whole classname (if there was one, the above saved it).
 					// Otherwise bring back whatever was previously saved (if anything),
 					// falling back to the empty string if nothing was stored.
-					this.className = this.className || value === false ? "" : Y.DOM.data_priv
-						.get(this, "__className__") || "";
+					this.className = this.className || value === false ? '' : Y.DOM.data_priv.get(this, '__className__') || '';
 				}
 			});
 		},
 
 		hasClass: function (selector) {
-			var className = " " + selector + " ",
-				i = 0,
-				l = this.length;
+			var className = ' ' + selector + ' ';
+			var x = 0;
+			var y = this.length;
 
-			for (i; i < l; i++) {
-				if (this[i].nodeType === 1 && (" " + this[i].className + " ").replace(
-						rclass, " ").indexOf(className) >= 0) {
+			for (x; x < y; x++) {
+				if (this[x].nodeType === 1 && (' ' + this[x].className + ' ')
+					.replace(Y.G.regexList.class, ' ').indexOf(className) >= 0) {
 					return true;
 				}
 			}
@@ -213,15 +305,20 @@
 		},
 
 		map: function (callback) {
-			return this.pushStack(Y.DOM.map(this, function (elem, i) {
-				return callback.call(elem, i, elem);
+			return this.pushStack(Y.DOM.map(this, function (elem, x) {
+				return callback.call(elem, x, elem);
 			}));
 		},
 
 		// For internal use only.
 		// Behaves like an Array's method, not like a Y.DOM method.
+
+		forEach: Y.G.ArrayProto.forEach,
+		reduce: Y.G.ArrayProto.reduce,
 		push: Y.G.push,
 		sort: Y.G.ArrayProto.sort,
+		indexOf: Y.G.indexOf,
+		concat: Y.G.concat,
 		splice: Y.G.ArrayProto.splice
 	};
 
@@ -243,23 +340,6 @@
 	Y.DOM.contains = Sizzle.contains;
 
 	Y.G.regexList.rneedsContext = Y.DOM.expr.match.needsContext;
-
-	var wrapMap = {
-		// Support: IE9
-		option: [1, "<select multiple='multiple'>", "</select>"],
-		thead: [1, "<table>", "</table>"],
-		col: [2, "<table><colgroup>", "</colgroup></table>"],
-		tr: [2, "<table><tbody>", "</tbody></table>"],
-		td: [3, "<table><tbody><tr>", "</tr></tbody></table>"],
-
-		_default: [0, "", ""]
-	};
-
-	// Support: IE9
-	wrapMap.optgroup = wrapMap.option;
-
-	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
-	wrapMap.th = wrapMap.td;
 
 	Y.extend(Y.DOM.Function, tmpYaxDom.Function);
 
@@ -294,36 +374,6 @@
 
 		return Y.merge([], parsed.childNodes);
 	};
-
-	// Implement the identical functionality for filter and not
-	function winnow(elements, qualifier, not) {
-		if (Y.isFunction(qualifier)) {
-			return Y.grep(elements, function (elem, i) {
-				/* jshint -W018 */
-				return !!qualifier.call(elem, i, elem) !== not;
-			});
-
-		}
-
-		if (qualifier.nodeType) {
-			return Y.grep(elements, function (elem) {
-				return (elem === qualifier) !== not;
-			});
-
-		}
-
-		if (typeof qualifier === "string") {
-			if (Y.G.regexList.isSimple.test(qualifier)) {
-				return Y.DOM.filter(qualifier, elements, not);
-			}
-
-			qualifier = Y.DOM.filter(qualifier, elements);
-		}
-
-		return Y.grep(elements, function (elem) {
-			return (Y.G.indexOf.call(qualifier, elem) >= 0) !== not;
-		});
-	}
 
 	Y.DOM.filter = function (expr, elems, not) {
 		var elem = elems[0];
@@ -369,21 +419,21 @@
 		},
 
 		filter: function (selector) {
-			return this.pushStack(winnow(this, selector || [], false));
+			return this.pushStack(ifffn(this, selector || [], false));
 		},
 
 		not: function (selector) {
-			return this.pushStack(winnow(this, selector || [], true));
+			return this.pushStack(ifffn(this, selector || [], true));
 		},
 
 		is: function (selector) {
-			return !!winnow(
+			return !!ifffn(
 				this,
 				// If this is a positional/relative selector, check membership in the returned set
 				// so Y.DOM("p:first").is("p:last") won't return true for a doc with two "p".
-				typeof selector === "string" && Y.G.regexList.rneedsContext.test(selector) ?
-				Y.DOM(selector) :
-				selector || [],
+					typeof selector === "string" && Y.G.regexList.rneedsContext.test(selector) ?
+					Y.DOM(selector) :
+					selector || [],
 				false
 			).length;
 		}
@@ -393,7 +443,7 @@
 
 
 	// var init = Y.DOM.Function.init = function (selector, context) {
-	var init = yDOM.init = function (selector, context) {
+	var init = yDOM.initialise = function (selector, context) {
 		var match, element;
 
 		// HANDLE: Y.DOM(""), Y.DOM(null), Y.DOM(undefined), Y.DOM(false)
@@ -420,7 +470,7 @@
 					// Intentionally let the error be thrown if parseHTML is not present
 					Y.merge(this, Y.DOM.parseHTML(
 						match[1],
-						context && context.nodeType ? context.ownerDocument || context : document,
+							context && context.nodeType ? context.ownerDocument || context : document,
 						true
 					));
 
@@ -493,37 +543,34 @@
 	// Initialize central reference
 	rootYaxDom = Y.DOM(document);
 
-	Y.DOM.Support = Y.DOM.support = {};
+	// Y.DOM.Support = Y.DOM.support = {};
 
 	Y.DOM.Support = tmpYaxDom.Support;
 	Y.DOM.support = tmpYaxDom.Support;
 
-	Y.DOM.access = tmpYaxDom.Access;
-	Y.DOM.Access = tmpYaxDom.Access;
-	Y.DOM.style = tmpYaxDom.Style;
-	Y.DOM.Style = tmpYaxDom.Style;
-	Y.DOM.CSS = tmpYaxDom.CSS;
-	Y.DOM.css = tmpYaxDom.CSS;
+	Y.DOM.Access = Y.DOM.access = tmpYaxDom.Access;
+	Y.DOM.Style = Y.DOM.style = tmpYaxDom.Style;
+	Y.DOM.CSS = Y.DOM.css = tmpYaxDom.CSS;
 
-	Y.DOM.cssHooks = tmpYaxDom.CSS_Hooks;
-	Y.DOM.CSS_Hooks = tmpYaxDom.CSS_Hooks;
-	Y.DOM.cssNumber = tmpYaxDom.CSS_Number;
-	Y.DOM.CSS_Number = tmpYaxDom.CSS_Number;
-	Y.DOM.cssProps = tmpYaxDom.CSS_Properities;
-	Y.DOM.CSS_Properities = tmpYaxDom.CSS_Properities;
+	Y.DOM.CSS_Hooks = Y.DOM.cssHooks = tmpYaxDom.CSS_Hooks;
+	Y.DOM.CSS_Number = Y.DOM.cssNumber = tmpYaxDom.CSS_Number;
+	Y.DOM.CSS_Properities = Y.DOM.cssProps = tmpYaxDom.CSS_Properities;
 
-	Y.DOM.expando = tmpYaxDom.expando;
+	Y.DOM.Expando = Y.DOM.expando = tmpYaxDom.expando;
+
 	Y.DOM.nodeName = tmpYaxDom.nodeName;
+
 	Y.DOM.dataPrivative = tmpYaxDom.dataPrivative;
 	Y.DOM.dataUser = tmpYaxDom.dataUser;
 	Y.DOM.data_priv = tmpYaxDom.dataPrivative;
 	Y.DOM.data_user = tmpYaxDom.data_user;
 
-	Y.G.regexList.scriptTypeMasked = /^true\/(.*)/;
+	//	Y.extend(Y.DOM, tmpYaxDom);
 
-	// Replace/restore the type attribute of script elements for safe DOM manipulation
+	// Replace/restore the type attribute of 
+	// script elements for safe DOM manipulation
 	function disableScript(elem) {
-		elem.type = (elem.getAttribute("type") !== null) + "/" + elem.type;
+		elem.type = (elem.getAttribute('type') !== null) + '/' + elem.type;
 		return elem;
 	}
 
@@ -533,7 +580,7 @@
 		if (match) {
 			elem.type = match[1];
 		} else {
-			elem.removeAttribute("type");
+			elem.removeAttribute('type');
 		}
 
 		return elem;
@@ -544,9 +591,9 @@
 		// Support: IE9-11+
 		// Use typeof to avoid zero-argument method invocation on host objects (#15151)
 		var ret = !Y.isUndefined(context.getElementsByTagName) ?
-			context.getElementsByTagName(tag || "*") :
+			context.getElementsByTagName(tag || '*') :
 			!Y.isUndefined(context.querySelectorAll) ?
-			context.querySelectorAll(tag || "*") : [];
+				context.querySelectorAll(tag || '*') : [];
 
 		return (Y.isUndefined(tag) || tag) && Y.DOM.nodeName(context, tag) ?
 			Y.merge([context], ret) :
@@ -555,13 +602,13 @@
 
 	// Mark scripts as having already been evaluated
 	function setGlobalEval(elems, refElements) {
-		var i = 0,
-			l = elems.length;
+		var x = 0,
+			y = elems.length;
 
-		for (i; i < l; i++) {
+		for (x; x < y; x++) {
 			Y.DOM.dataPrivative.set(
-				elems[i], "globalEval", !refElements || Y.DOM.dataPrivative.get(
-					refElements[i], "globalEval")
+				elems[x], 'globalEval', !refElements || 
+					Y.DOM.dataPrivative.get(refElements[x], 'globalEval')
 			);
 		}
 	}
@@ -580,7 +627,7 @@
 	}
 
 	function cloneCopyEvent(src, dest) {
-		var i, l, type, pdataOld, pdataCur, udataOld, udataCur, events;
+		var x, y, type, pdataOld, pdataCur, udataOld, udataCur, events;
 
 		if (dest.nodeType !== 1) {
 			return;
@@ -597,10 +644,8 @@
 				pdataCur.events = {};
 
 				for (type in events) {
-					if (events.hasOwnProperty(type)) {
-						for (i = 0, l = events[type].length; i < l; i++) {
-							Y.DOM.event.add(dest, type, events[type][i]);
-						}
+					for (x = 0, y = events[type].length; x < y; x++) {
+						Y.DOM.event.add(dest, type, events[type][x]);
 					}
 				}
 			}
@@ -627,15 +672,15 @@
 
 	Y.DOM.map = function (elems, callback, arg) {
 		var value,
-			i = 0,
+			x = 0,
 			length = elems.length,
 			isArray = Y.isArraylike(elems),
 			ret = [];
 
 		// Go through the array, translating each of the items to their new values
 		if (isArray) {
-			for (i; i < length; i++) {
-				value = callback(elems[i], i, arg);
+			for (x; x < length; x++) {
+				value = callback(elems[x], x, arg);
 
 				if (value !== null) {
 					ret.push(value);
@@ -644,9 +689,9 @@
 
 			// Go through every key on the object,
 		} else {
-			for (i in elems) {
-				if (elems.hasOwnProperty(i)) {
-					value = callback(elems[i], i, arg);
+			for (x in elems) {
+				if (elems.hasOwnProperty(x)) {
+					value = callback(elems[x], x, arg);
 
 					if (value !== null) {
 						ret.push(value);
@@ -675,29 +720,29 @@
 
 		// Support: Safari 5.1, iOS 5.1, Android 4.x, Android 2.3
 		// old WebKit doesn't clone checked state correctly in fragments
-		Y.DOM.support.checkClone = div.cloneNode(true).cloneNode(true).lastChild.checked;
+		Y.DOM.Support.checkClone = div.cloneNode(true).cloneNode(true).lastChild.checked;
 
 		// Make sure textarea (and checkbox) defaultValue is properly cloned
 		// Support: IE9-IE11+
 		div.innerHTML = "<textarea>x</textarea>";
-		Y.DOM.support.noCloneChecked = !!div.cloneNode(true).lastChild.defaultValue;
+		Y.DOM.Support.noCloneChecked = !!div.cloneNode(true).lastChild.defaultValue;
 	}());
 
 	Y.DOM.clone = function (elem, dataAndEvents, deepDataAndEvents) {
-		var i, l, srcElements, destElements,
+		var x, y, srcElements, destElements,
 			clone = elem.cloneNode(true),
 			inPage = Y.DOM.contains(elem.ownerDocument, elem);
 
 		// Fix IE cloning issues
-		if (!Y.DOM.support.noCloneChecked && (elem.nodeType === 1 || elem.nodeType ===
-				11) && !Y.DOM.isXMLDoc(elem)) {
+		if (!Y.DOM.Support.noCloneChecked && (elem.nodeType === 1 || elem.nodeType ===
+			11) && !Y.DOM.isXMLDoc(elem)) {
 
 			// We eschew Sizzle here for performance reasons: http://jsperf.com/getall-vs-sizzle/2
 			destElements = getAll(clone);
 			srcElements = getAll(elem);
 
-			for (i = 0, l = srcElements.length; i < l; i++) {
-				fixInput(srcElements[i], destElements[i]);
+			for (x = 0, y = srcElements.length; x < y; x++) {
+				fixInput(srcElements[x], destElements[x]);
 			}
 		}
 
@@ -707,8 +752,8 @@
 				srcElements = srcElements || getAll(elem);
 				destElements = destElements || getAll(clone);
 
-				for (i = 0, l = srcElements.length; i < l; i++) {
-					cloneCopyEvent(srcElements[i], destElements[i]);
+				for (x = 0, y = srcElements.length; x < y; x++) {
+					cloneCopyEvent(srcElements[x], destElements[x]);
 				}
 			} else {
 				cloneCopyEvent(elem, clone);
@@ -729,11 +774,11 @@
 		var elem, tmp, tag, wrap, contains, j,
 			fragment = context.createDocumentFragment(),
 			nodes = [],
-			i = 0,
-			l = elems.length;
+			x = 0,
+			y = elems.length;
 
-		for (i; i < l; i++) {
-			elem = elems[i];
+		for (x; x < y; x++) {
+			elem = elems[x];
 
 			if (elem || elem === 0) {
 
@@ -779,9 +824,9 @@
 		// Remove wrapper from fragment
 		fragment.textContent = '';
 
-		i = 0;
+		x = 0;
 
-		while ((elem = nodes[i++])) {
+		while ((elem = nodes[x++])) {
 
 			// #4087 - If origin and destination elements are the same, and this is
 			// that element, do not do anything
@@ -830,10 +875,9 @@
 	Y.DOM.cleanData = function (elems) {
 		var data, elem, type, key,
 			special = Y.DOM.event.special,
-			i = 0;
+			x = 0;
 
-		for (null;
-			(elem = elems[i]) !== undefined; i++) {
+		for (null; (elem = elems[x]) !== undefined; x++) {
 			if (Y.DOM.acceptData(elem)) {
 				key = elem[Y.DOM.dataPrivative.expando];
 
@@ -912,13 +956,12 @@
 			});
 		},
 
-		removea: function (selector, keepData /* Internal Use Only */ ) {
+		remove: function (selector, keepData /* Internal Use Only */) {
 			var elem,
 				elems = selector ? Y.DOM.filter(selector, this) : this,
-				i = 0;
+				x = 0;
 
-			for (null;
-				(elem = elems[i]) !== null; i++) {
+			for (; (elem = elems[x]) != null || undefined; x++) {
 				if (!keepData && elem.nodeType === 1) {
 					Y.DOM.cleanData(getAll(elem));
 				}
@@ -934,17 +977,14 @@
 			return this;
 		},
 
-		emptya: function () {
-			var elem,
-				i = 0;
+		empty: function () {
+			var elem;
+			var x = 0;
 
-			for (null;
-				(elem = this[i]) !== null; i++) {
+			for (; (elem = this[x]) != null || undefined; x++) {
 				if (elem.nodeType === 1) {
-
 					// Prevent memory leaks
 					Y.DOM.cleanData(getAll(elem, false));
-
 					// Remove any remaining nodes
 					elem.textContent = "";
 				}
@@ -954,8 +994,8 @@
 		},
 
 		clone: function (dataAndEvents, deepDataAndEvents) {
-			dataAndEvents = dataAndEvents === null ? false : dataAndEvents;
-			deepDataAndEvents = deepDataAndEvents === null ? dataAndEvents :
+			dataAndEvents = dataAndEvents == null ? false : dataAndEvents;
+			deepDataAndEvents = deepDataAndEvents == null ? dataAndEvents :
 				deepDataAndEvents;
 
 			return this.map(function () {
@@ -966,8 +1006,8 @@
 		html: function (value) {
 			return Y.DOM.access(this, function (value) {
 				var elem = this[0] || {},
-					i = 0,
-					l = this.length;
+					x = 0,
+					y = this.length;
 
 				if (value === undefined && elem.nodeType === 1) {
 					return elem.innerHTML;
@@ -976,13 +1016,13 @@
 				// See if we can take a shortcut and just use innerHTML
 				if (typeof value === "string" && !Y.G.regexList.noInnerHtml.test(value) &&
 					!wrapMap[(Y.G.regexList.htmlTagName.exec(value) || ["", ""])[1].toLowerCase()]
-				) {
+					) {
 
 					value = value.replace(Y.G.regexList.xhtmlTag, "<$1></$2>");
 
 					try {
-						for (i; i < l; i++) {
-							elem = this[i] || {};
+						for (x; x < y; x++) {
+							elem = this[x] || {};
 
 							// Remove element nodes and prevent memory leaks
 							if (elem.nodeType === 1) {
@@ -1030,16 +1070,16 @@
 			args = Y.G.concat.apply([], args);
 
 			var fragment, first, scripts, hasScripts, node, doc,
-				i = 0,
-				l = this.length,
+				x = 0,
+				y = this.length,
 				set = this,
-				iNoClone = l - 1,
+				iNoClone = y - 1,
 				value = args[0],
 				isFunction = Y.isFunction(value);
 
 			// We can't cloneNode fragments that contain checked, in WebKit
 			if (isFunction ||
-				(l > 1 && typeof value === "string" && !Y.DOM.support.checkClone && Y.G.regexList
+				(y > 1 && typeof value === "string" && !Y.DOM.Support.checkClone && Y.G.regexList
 					.checked.test(value))) {
 				return this.each(function (index) {
 					var self = set.eq(index);
@@ -1050,7 +1090,7 @@
 				});
 			}
 
-			if (l) {
+			if (y) {
 				fragment = Y.DOM.buildFragment(args, this[0].ownerDocument, false, this);
 				first = fragment.firstChild;
 
@@ -1065,10 +1105,10 @@
 
 					// Use the original fragment for the last item instead of the first because it can end up
 					// being emptied incorrectly in certain situations (#8070).
-					for (i; i < l; i++) {
+					for (x; x < y; x++) {
 						node = fragment;
 
-						if (i !== iNoClone) {
+						if (x !== iNoClone) {
 							node = Y.DOM.clone(node, true, true);
 
 							// Keep references to cloned scripts for later restoration
@@ -1079,7 +1119,7 @@
 							}
 						}
 
-						callback.call(this[i], node, i);
+						callback.call(this[x], node, x);
 					}
 
 					if (hasScripts) {
@@ -1089,10 +1129,10 @@
 						Y.DOM.map(scripts, restoreScript);
 
 						// Evaluate executable scripts on first document insertion
-						for (i = 0; i < hasScripts; i++) {
-							node = scripts[i];
+						for (x = 0; x < hasScripts; x++) {
+							node = scripts[x];
 							if (Y.G.regexList.scriptType.test(node.type || "") && !Y.DOM.data_priv.access(
-									node, "globalEval") && Y.DOM.contains(doc, node)) {
+								node, "globalEval") && Y.DOM.contains(doc, node)) {
 
 								if (node.src) {
 									// Optional AJAX dependency, but won't run scripts if not present
@@ -1109,6 +1149,84 @@
 			}
 
 			return this;
+		},
+
+		has: function(target) {
+			var targets = Y.DOM(target, this),
+				y = targets.length;
+
+			return this.filter(function() {
+				var x = 0;
+				for (; x < y; x++) {
+					if (Y.DOM.contains(this, targets[x])) {
+						return true;
+					}
+				}
+			});
+		},
+
+		closest: function(selectors, context) {
+			var cur,
+				x = 0,
+				y = this.length,
+				matched = [],
+				pos = Y.G.regexList.rneedsContext.test(selectors) || typeof selectors !== "string" ?
+					Y.DOM(selectors, context || this.context) :
+					0;
+
+			for (; x < y; x++) {
+				for (cur = this[x]; cur && cur !== context; cur = cur.parentNode) {
+					// Always skip document fragments
+					if (cur.nodeType < 11 && (pos ?
+						pos.index(cur) > -1 :
+
+						// Don't pass non-elements to Sizzle
+						cur.nodeType === 1 &&
+						Y.DOM.find.matchesSelector(cur, selectors))) {
+
+						matched.push(cur);
+						break;
+					}
+				}
+			}
+
+			return this.pushStack(matched.length > 1 ? Y.DOM.unique(matched) : matched);
+		},
+
+		// Determine the position of an element within
+		// the matched set of elements
+		index: function(elem) {
+
+			// No argument, return index in parent
+			if (!elem) {
+				return (this[0] && this[0].parentNode) ? this.first().prevAll().length : -1;
+			}
+
+			// index in selector
+			if (typeof elem === "string") {
+				return indexOf.call(Y.DOM(elem), this[0]);
+			}
+
+			// Locate the position of the desired element
+			return indexOf.call(this,
+
+				// If it receives a Y.DOM object, the first element is used
+				elem['YAX.DOM'] ? elem[0] : elem
+			);
+		},
+
+		add: function(selector, context) {
+			return this.pushStack(
+				Y.DOM.unique(
+					Y.DOM.merge(this.get(), Y.DOM(selector, context))
+				)
+			);
+		},
+
+		addBack: function(selector) {
+			return this.add(selector == null ?
+					this.prevObject : this.prevObject.filter(selector)
+			);
 		}
 	});
 
@@ -1124,11 +1242,11 @@
 				ret = [],
 				insert = Y.DOM(selector),
 				last = insert.length - 1,
-				i = 0;
+				x = 0;
 
-			for (i; i <= last; i++) {
-				elems = i === last ? this : this.clone(true);
-				Y.DOM(insert[i])[original](elems);
+			for (x; x <= last; x++) {
+				elems = x === last ? this : this.clone(true);
+				Y.DOM(insert[x])[original](elems);
 				// Support: QtWebKit
 				// .get() because push.apply(_, arraylike) throws
 				Y.G.push.apply(ret, elems.get());
@@ -1142,15 +1260,19 @@
 
 	Y.DOM.globalEval = tmpYaxDom.globalEval;
 
-	/*jshint -W069 */
-	window.$ = Y.DOM;
 
-	return $;
+	// Y.DOM.yDOM = yDOM;
+
+	window.$ = Y.DOM;
 
 	//---
 
-}(Y.DOM));
+	return Y.DOM;
 
-// FILE: ./Source/Modules/Node/SizzleSupport.js
+	//---
+
+}(window, window.document));
+
+// FILE: ./Source/Modules/Node/SizzleSelector.js
 
 //---
