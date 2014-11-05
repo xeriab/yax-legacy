@@ -2036,24 +2036,24 @@
 	}
 
 	Y.extend({
-		lcfirst: function (string) {
-			string += this.empty();
+		lcFirst: function (string) {
+			string += this.empty;
 
 			var t = string.charAt(0).toLowerCase();
 
 			return t + string.substr(1);
 		},
 
-		ucfirst: function (string) {
-			string += this.empty();
+		ucFirst: function (string) {
+			string += this.empty;
 
 			var t = string.charAt(0).toUpperCase();
 
 			return t + string.substr(1);
 		},
 
-		ucwords: function (string) {
-			return (string + this.empty()).replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function ($1) {
+		ucWords: function (string) {
+			return (string + this.empty).replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function ($1) {
 				return $1.toUpperCase();
 			});
 		}
@@ -2108,25 +2108,33 @@
 			var args = Y.G.slice.call(arguments);
 
 			var key = args[0];
-			var tmpKey = key.split(':');
 			var newVal = args[1];
+			var globVal = args[2];
+			var valType = null;
+			var tmpKey = key.split(':');
 
 			var oldVal;
 			var self = this;
 			var setArr;
 
+			if (globVal && Y.isSet(globVal) && Y.isTrue(globVal)) {
+				valType = 'GLOBAL_VALUE';
+			} else {
+				valType = 'LOCAL_VALUE';
+			}
+
 			if (tmpKey && tmpKey.length > 1 && tmpKey.length == 2) {
 				this.STORAGE[tmpKey[0]] = this.STORAGE[tmpKey[0]] || {};
 
-				oldVal = this.STORAGE[tmpKey[0]].LOCAL_VALUE[tmpKey[1]];
+				oldVal = this.STORAGE[tmpKey[0]][valType][tmpKey[1]];
 
 				setArr = function setArr(_oldVal) {
 					// Although these are set individually, they are all accumulated
 					if (Y.isUndefined(_oldVal)) {
-						self.STORAGE[tmpKey[0]].LOCAL_VALUE[tmpKey[1]] = [];
+						self.STORAGE[tmpKey[0]][valType][tmpKey[1]] = [];
 					}
 
-					self.STORAGE[tmpKey[0]].LOCAL_VALUE.push(newVal);
+					self.STORAGE[tmpKey[0]][valType].push(newVal);
 				};
 
 				switch (key) {
@@ -2142,7 +2150,7 @@
 						break;
 
 					default:
-						this.STORAGE[tmpKey[0]].LOCAL_VALUE[tmpKey[1]] = newVal;
+						this.STORAGE[tmpKey[0]][valType][tmpKey[1]] = newVal;
 						break;
 				}
 
@@ -2151,15 +2159,15 @@
 
 			this.STORAGE[key] = this.STORAGE[key] || {};
 
-			oldVal = this.STORAGE[key].LOCAL_VALUE;
+			oldVal = this.STORAGE[key][valType];
 
 			setArr = function setArr(_oldVal) {
 				// Although these are set individually, they are all accumulated
 				if (Y.isUndefined(_oldVal)) {
-					self.STORAGE[key].LOCAL_VALUE = [];
+					self.STORAGE[key][valType] = [];
 				}
 
-				self.STORAGE[key].LOCAL_VALUE.push(newVal);
+				self.STORAGE[key][valType].push(newVal);
 			};
 
 			switch (key) {
@@ -2175,85 +2183,7 @@
 					break;
 
 				default:
-					this.STORAGE[key].LOCAL_VALUE = newVal;
-					break;
-			}
-
-			return oldVal;
-		},
-
-		setGlobal: function setGlobal() {
-			var args = Y.G.slice.call(arguments);
-
-			var key = args[0];
-			var tmpKey = key.split(':');
-			var newVal = args[1];
-
-			var oldVal;
-			var self = this;
-			var setArr;
-
-			if (tmpKey && tmpKey.length > 1 && tmpKey.length == 2) {
-				this.STORAGE[tmpKey[0]] = this.STORAGE[tmpKey[0]] || {};
-
-				oldVal = this.STORAGE[tmpKey[0]].GLOBAL_VALUE[tmpKey[1]];
-
-				setArr = function setArr(_oldVal) {
-					// Although these are set individually, they are all accumulated
-					if (Y.isUndefined(_oldVal)) {
-						self.STORAGE[tmpKey[0]].GLOBAL_VALUE[tmpKey[1]] = [];
-					}
-
-					self.STORAGE[tmpKey[0]].GLOBAL_VALUE.push(newVal);
-				};
-
-				switch (key) {
-					case 'EXTENSION':
-					case 'extension':
-						// This function is only experimental in YAX.js
-						if (Y.isFunction(this.dl)) {
-							this.dl(newVal);
-						}
-
-						setArr(oldVal, newVal);
-
-						break;
-
-					default:
-						this.STORAGE[tmpKey[0]].GLOBAL_VALUE[tmpKey[1]] = newVal;
-						break;
-				}
-
-				return oldVal;
-			}
-
-			this.STORAGE[key] = this.STORAGE[key] || {};
-
-			oldVal = this.STORAGE[key].GLOBAL_VALUE;
-
-			setArr = function setArr(_oldVal) {
-				// Although these are set individually, they are all accumulated
-				if (Y.isUndefined(_oldVal)) {
-					self.STORAGE[key].GLOBAL_VALUE = [];
-				}
-
-				self.STORAGE[key].GLOBAL_VALUE.push(newVal);
-			};
-
-			switch (key) {
-				case 'EXTENSION':
-				case 'extension':
-					// This function is only experimental in YAX.js
-					if (Y.isFunction(this.dl)) {
-						this.dl(newVal);
-					}
-
-					setArr(oldVal, newVal);
-
-					break;
-
-				default:
-					this.STORAGE[key].GLOBAL_VALUE = newVal;
+					this.STORAGE[key][valType] = newVal;
 					break;
 			}
 
@@ -2264,63 +2194,38 @@
 			var args = Y.G.slice.call(arguments);
 
 			var key = args[0];
+			var globVal = args[1];
+			var valType = null;
 			var tmpKey = key.split(':');
+
+			if (globVal && Y.isSet(globVal) && Y.isTrue(globVal)) {
+				valType = 'GLOBAL_VALUE';
+			} else {
+				valType = 'LOCAL_VALUE';
+			}
 
 			if (tmpKey && tmpKey.length > 1 && tmpKey.length == 2) {
 				if (this.STORAGE &&
 					this.STORAGE[tmpKey[0]] &&
-					!Y.isUndefined(this.STORAGE[tmpKey[0]].LOCAL_VALUE)) {
+					!Y.isUndefined(this.STORAGE[tmpKey[0]][valType])) {
 
-					if (Y.isNull(this.STORAGE[tmpKey[0]].LOCAL_VALUE)) {
+					if (Y.isNull(this.STORAGE[tmpKey[0]][valType])) {
 						return Y.empty;
 					}
 
-					return this.STORAGE[tmpKey[0]].LOCAL_VALUE[tmpKey[1]];
+					return this.STORAGE[tmpKey[0]][valType][tmpKey[1]];
 				}
 			}
 
 			if (this.STORAGE &&
 				this.STORAGE[key] &&
-				!Y.isUndefined(this.STORAGE[key].LOCAL_VALUE)) {
+				!Y.isUndefined(this.STORAGE[key][valType])) {
 
-				if (Y.isNull(this.STORAGE[key].LOCAL_VALUE)) {
+				if (Y.isNull(this.STORAGE[key][valType])) {
 					return Y.empty;
 				}
 
-				return this.STORAGE[key].LOCAL_VALUE;
-			}
-
-			return Y.empty;
-		},
-
-		getGlobal: function getGlobal() {
-			var args = Y.G.slice.call(arguments);
-
-			var key = args[0];
-			var tmpKey = key.split(':');
-
-			if (tmpKey && tmpKey.length > 1 && tmpKey.length == 2) {
-				if (this.STORAGE &&
-					this.STORAGE[tmpKey[0]] &&
-					!Y.isUndefined(this.STORAGE[tmpKey[0]].GLOBAL_VALUE)) {
-
-					if (Y.isNull(this.STORAGE[tmpKey[0]].GLOBAL_VALUE)) {
-						return Y.empty;
-					}
-
-					return this.STORAGE[tmpKey[0]].GLOBAL_VALUE[tmpKey[1]];
-				}
-			}
-
-			if (this.STORAGE &&
-				this.STORAGE[key] &&
-				!Y.isUndefined(this.STORAGE[key].GLOBAL_VALUE)) {
-
-				if (Y.isNull(this.STORAGE[key].GLOBAL_VALUE)) {
-					return Y.empty;
-				}
-
-				return this.STORAGE[key].GLOBAL_VALUE;
+				return this.STORAGE[key][valType];
 			}
 
 			return Y.empty;
@@ -2370,16 +2275,17 @@
 				return cfg;
 			}
 
-			for (key in cfg) {
+			/*for (key in cfg) {
 				if (cfg.hasOwnProperty(key)) {
 					noDetails[key] = cfg[key].LOCAL_VALUE;
 				}
-			}
+			}*/
 
-			if (Y.isSet(keyVals) && Y.isTrue(keyVals)) {
+			if (keyVals && Y.isSet(keyVals) && Y.isTrue(keyVals)) {
 				for (key in cfg) {
 					if (cfg.hasOwnProperty(key)) {
 						tmp = key.split('.');
+						// Y.LOG(tmp);
 						noDetails[tmp[tmp.length - 1]] = cfg[key].LOCAL_VALUE;
 					}
 				}
@@ -2418,6 +2324,7 @@
 			if (this.STORAGE &&
 				this.STORAGE[key] &&
 				!Y.isUndefined(this.STORAGE[key])) {
+				/** @namespace this.STORAGE[key].GLOBAL_VALUE */
 				this.STORAGE[key].LOCAL_VALUE = this.STORAGE[key].GLOBAL_VALUE;
 			}
 		},
@@ -2434,7 +2341,7 @@
 
 	//---
 
-	Y.config = Y.C = new Config();
+	Y.config = new Config();
 
 	//---
 
@@ -2448,8 +2355,8 @@
 		'Console.On.Output': null
 	};
 
-	Y.C.set('yax.core.console', _CoreConsole);
-	Y.C.set('extension', 'yax.core.console');*/
+	Y.config.set('yax.core.console', _CoreConsole);
+	Y.config.set('extension', 'yax.core.console');*/
 
 	//---
 
@@ -2568,7 +2475,13 @@
 
 		argumentSplat: /\*([\w\d]+)/g,
 
-		escape: /[\-\[\]{}()+?.,\\\^$|#\s]/g
+		escape: /[\-\[\]{}()+?.,\\\^$|#\s]/g,
+
+		float: /^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/,
+
+		class: /[\t\r\n\f]/g,
+
+		scriptTypeMasked: /^true\/(.*)/
 	});
 
 	//---
@@ -2637,6 +2550,16 @@
 		stamp: function (object) {
 			// jshint camelcase: false
 			object.YID = object.YID || ++Y.Util.lastUID;
+
+			/*if (Y.isObject(object)) {
+				if (object.YID) {
+					return object.YID;
+				}
+
+				object.YID = ++Y.Util.lastUID;
+
+				return object.YID;
+			}*/
 
 			return object.YID;
 		},
@@ -2914,6 +2837,10 @@
 
 	//---
 
+	Y.CLASSES = [];
+
+	//---
+
 	Y.Class.extend = function (properties) {
 		var parent = this;
 		var newClass;
@@ -2992,6 +2919,8 @@
 			Y.extend(newClass, {
 				_class_name: properties._class_name.toString()
 			});
+
+			Y.CLASSES.push(properties._class_name.toString());
 
 			delete properties._class_name;
 		}
@@ -3164,7 +3093,9 @@
 	//---
 
 	Y.Class.toString = function () {
-		return '[YAX] ' + (this._class_name ? '::' + this._class_name + Y.empty : '');
+		return '[YAX] Class:' +
+			(this._class_name ? Y.empty + this._class_name + Y.empty : Y.empty) +
+			' [C]';
 	};
 
 	//---
@@ -3191,260 +3122,270 @@
 
 	'use strict';
 
-	/**
-	 * Y.Events is a base class that YAEX classes inherit from to
-	 * handle custom events.
-	 */
-	Y.Evented = Y.Class.extend({
-		_class_name: 'Evented',
+	Y.define('YAX/Evented', function (require, exports, module) {
+		/**
+		 * Y.Events is a base class that YAEX classes inherit from to
+		 * handle custom events.
+		 */
+		var YAX_Evented = Y.Class.extend({
+			_class_name: 'Evented',
 
-		eventsArray: [],
+			eventsArray: [],
 
-		on: function (types, callback, context) {
-			var type, i, len;
-			// Types can be a map of types/handlers
-			if (Y.isObject(types)) {
-				for (type in types) {
-					if (Y.hasOwn.call(types, type)) {
-						// We don't process space-separated events here for performance;
-						// It's a hot path since Layer uses the on(obj) syntax
-						this._On(type, types[type], callback);
+			on: function (types, callback, context) {
+				var type, i, len;
+				// Types can be a map of types/handlers
+				if (Y.isObject(types)) {
+					for (type in types) {
+						if (Y.hasOwn.call(types, type)) {
+							// We don't process space-separated events here for performance;
+							// It's a hot path since Layer uses the on(obj) syntax
+							this._On(type, types[type], callback);
+						}
+					}
+
+				} else {
+					// types can be a string of space-separated words
+					types = Y.Util.splitWords(types);
+
+					for (i = 0, len = types.length; i < len; i++) {
+						this._On(types[i], callback, context);
 					}
 				}
 
-			} else {
-				// types can be a string of space-separated words
-				types = Y.Util.splitWords(types);
-
-				for (i = 0, len = types.length; i < len; i++) {
-					this._On(types[i], callback, context);
-				}
-			}
-
-			return this;
-		},
-
-		off: function (types, callback, context) {
-			var type, i, len;
-			if (!types) {
-				// Clear all listeners if called without arguments
-				delete this.eventsArray;
-			} else if (Y.isObject(types)) {
-				for (type in types) {
-					if (Y.hasOwn.call(types, type)) {
-						this._Off(type, types[type], callback);
-					}
-				}
-			} else {
-				types = Y.Util.splitWords(types);
-
-				for (i = 0, len = types.length; i < len; i++) {
-					this._Off(types[i], callback, context);
-				}
-			}
-
-			return this;
-		},
-
-		// Attach listener (without syntactic sugar now)
-		_On: function (type, callback, context) {
-			// var events = this.eventsArray = this.eventsArray || {},
-			var events = this.eventsArray || {},
-				contextId = context && context !== this && Y.stamp(context),
-				indexKey,
-				indexLenKey,
-				typeIndex,
-				id;
-
-			if (contextId) {
-				// Store listeners with custom context in a separate hash (if it has an id);
-				// gives a major performance boost when firing and removing events (e.g. on map object)
-
-				indexKey = type + '_idx';
-				indexLenKey = type + '_len';
-				typeIndex = events[indexKey] = events[indexKey] || {};
-				id = Y.stamp(callback) + '_' + contextId;
-
-				if (!typeIndex[id]) {
-					typeIndex[id] = {
-						callback: callback,
-						ctx: context
-					};
-
-					// Keep track of the number of keys in the index to quickly check if it's empty
-					events[indexLenKey] = (events[indexLenKey] || 0) + 1;
-				}
-
-			} else {
-				// Individual layers mostly use "this" for context and don't fire listeners too often
-				// so simple array makes the memory footprint better while not degrading performance
-				events[type] = events[type] || [];
-				events[type].push({callback: callback});
-			}
-		},
-
-		_Off: function (type, callback, context) {
-			var events = this.eventsArray,
-				indexKey = type + '_idx',
-				indexLenKey = type + '_len',
-				contextId,
-				listeners,
-				i,
-				len,
-				listener,
-				id;
-
-			if (!events) {
-				return;
-			}
-
-			if (!callback) {
-				// Clear all listeners for a type if function isn't specified
-				delete events[type];
-				delete events[indexKey];
-				delete events[indexLenKey];
-				return;
-			}
-
-			contextId = context && context !== this && Y.stamp(context);
-
-			if (contextId) {
-				id = Y.stamp(callback) + '_' + contextId;
-				listeners = events[indexKey];
-
-				if (listeners && listeners[id]) {
-					listener = listeners[id];
-					delete listeners[id];
-					events[indexLenKey]--;
-				}
-
-			} else {
-				listeners = events[type];
-
-				for (i = 0, len = listeners.length; i < len; i++) {
-					if (listeners[i].callback === callback) {
-						listener = listeners[i];
-						listeners.splice(i, 1);
-						break;
-					}
-				}
-			}
-
-			// Set the removed listener to noop so that's not called if remove happens in fire
-			if (listener) {
-				listener.callback = Y.noop;
-			}
-		},
-
-		fire: function (type, data, propagate) {
-			if (!this.listens(type, propagate)) {
 				return this;
-			}
+			},
 
-			var event = Y.extend({}, data, {type: type, target: this}),
-				events = this.eventsArray,
-				typeIndex,
-				i,
-				len,
-				listeners,
-				id;
+			off: function (types, callback, context) {
+				var type, i, len;
+				if (!types) {
+					// Clear all listeners if called without arguments
+					delete this.eventsArray;
+				} else if (Y.isObject(types)) {
+					for (type in types) {
+						if (Y.hasOwn.call(types, type)) {
+							this._Off(type, types[type], callback);
+						}
+					}
+				} else {
+					types = Y.Util.splitWords(types);
 
-			if (events) {
-				typeIndex = events[type + '_idx'];
+					for (i = 0, len = types.length; i < len; i++) {
+						this._Off(types[i], callback, context);
+					}
+				}
 
-				if (events[type]) {
-					// Make sure adding/removing listeners inside other listeners won't cause infinite loop
-					listeners = events[type].slice();
+				return this;
+			},
+
+			// Attach listener (without syntactic sugar now)
+			_On: function (type, callback, context) {
+				// var events = this.eventsArray = this.eventsArray || {},
+				var events = this.eventsArray || {},
+					contextId = context && context !== this && Y.stamp(context),
+					indexKey,
+					indexLenKey,
+					typeIndex,
+					id;
+
+				if (contextId) {
+					// Store listeners with custom context in a separate hash (if it has an id);
+					// gives a major performance boost when firing and removing events (e.g. on map object)
+
+					indexKey = type + '_idx';
+					indexLenKey = type + '_len';
+					typeIndex = events[indexKey] = events[indexKey] || {};
+					id = Y.stamp(callback) + '_' + contextId;
+
+					if (!typeIndex[id]) {
+						typeIndex[id] = {
+							callback: callback,
+							ctx: context
+						};
+
+						// Keep track of the number of keys in the index to quickly check if it's empty
+						events[indexLenKey] = (events[indexLenKey] || 0) + 1;
+					}
+
+				} else {
+					// Individual layers mostly use "this" for context and don't fire listeners too often
+					// so simple array makes the memory footprint better while not degrading performance
+					events[type] = events[type] || [];
+					events[type].push({callback: callback});
+				}
+			},
+
+			_Off: function (type, callback, context) {
+				var events = this.eventsArray,
+					indexKey = type + '_idx',
+					indexLenKey = type + '_len',
+					contextId,
+					listeners,
+					i,
+					len,
+					listener,
+					id;
+
+				if (!events) {
+					return;
+				}
+
+				if (!callback) {
+					// Clear all listeners for a type if function isn't specified
+					delete events[type];
+					delete events[indexKey];
+					delete events[indexLenKey];
+					return;
+				}
+
+				contextId = context && context !== this && Y.stamp(context);
+
+				if (contextId) {
+					id = Y.stamp(callback) + '_' + contextId;
+					listeners = events[indexKey];
+
+					if (listeners && listeners[id]) {
+						listener = listeners[id];
+						delete listeners[id];
+						events[indexLenKey]--;
+					}
+
+				} else {
+					listeners = events[type];
 
 					for (i = 0, len = listeners.length; i < len; i++) {
-						listeners[i].callback.call(this, event);
-					}
-				}
-
-				// Fire event for the context-indexed listeners as well
-				for (id in typeIndex) {
-					if (typeIndex.hasOwnProperty(id)) {
-						typeIndex[id].callback.call(typeIndex[id].ctx, event);
-					}
-				}
-			}
-
-			if (propagate) {
-				// Propagate the event to parents (set with addEventParent)
-				this.propagateEvent(event);
-			}
-
-			return this;
-		},
-
-		listens: function (type, propagate) {
-			var events = this.eventsArray, id;
-
-			if (events && (events[type] || events[type + '_len'])) {
-				return true;
-			}
-
-			if (propagate) {
-				// Also check parents for listeners if event propagates
-				for (id in this.eventParents) {
-					if (Y.hasOwn.call(this.eventParents, id)) {
-						if (this.eventParents[id].listens(type)) {
-							return true;
+						if (listeners[i].callback === callback) {
+							listener = listeners[i];
+							listeners.splice(i, 1);
+							break;
 						}
 					}
 				}
-			}
-			return false;
-		},
 
-		once: function (types, callback, context) {
-			var type, handler;
+				// Set the removed listener to noop so that's not called if remove happens in fire
+				if (listener) {
+					listener.callback = Y.noop;
+				}
+			},
 
-			if (typeof types === 'object') {
-				for (type in types) {
-					if (types.hasOwnProperty(type)) {
-						this.once(type, types[type], callback);
+			fire: function (type, data, propagate) {
+				if (!this.listens(type, propagate)) {
+					return this;
+				}
+
+				var event = Y.extend({}, data, {type: type, target: this}),
+					events = this.eventsArray,
+					typeIndex,
+					i,
+					len,
+					listeners,
+					id;
+
+				if (events) {
+					typeIndex = events[type + '_idx'];
+
+					if (events[type]) {
+						// Make sure adding/removing listeners inside other listeners won't cause infinite loop
+						listeners = events[type].slice();
+
+						for (i = 0, len = listeners.length; i < len; i++) {
+							listeners[i].callback.call(this, event);
+						}
+					}
+
+					// Fire event for the context-indexed listeners as well
+					for (id in typeIndex) {
+						if (typeIndex.hasOwnProperty(id)) {
+							typeIndex[id].callback.call(typeIndex[id].ctx, event);
+						}
 					}
 				}
+
+				if (propagate) {
+					// Propagate the event to parents (set with addEventParent)
+					this.propagateEvent(event);
+				}
+
 				return this;
-			}
+			},
 
-			handler = Y.Bind(function () {
-				this
-					.off(types, callback, context)
-					.off(types, handler, context);
-			}, this);
+			listens: function (type, propagate) {
+				var events = this.eventsArray, id;
 
-			// Add a listener that's executed once and removed after that
-			return this
-				.on(types, callback, context)
-				.on(types, handler, context);
-		},
+				if (events && (events[type] || events[type + '_len'])) {
+					return true;
+				}
 
-		// Adds a parent to propagate events to (when you fire with true as a 3rd argument)
-		addEventParent: function (obj) {
-			this.eventParents = this.eventParents || {};
-			this.eventParents[Y.stamp(obj)] = obj;
-			return this;
-		},
+				if (propagate) {
+					// Also check parents for listeners if event propagates
+					for (id in this.eventParents) {
+						if (Y.hasOwn.call(this.eventParents, id)) {
+							if (this.eventParents[id].listens(type)) {
+								return true;
+							}
+						}
+					}
+				}
+				return false;
+			},
 
-		removeEventParent: function (obj) {
-			if (this.eventParents) {
-				delete this.eventParents[Y.stamp(obj)];
-			}
-			return this;
-		},
+			once: function (types, callback, context) {
+				var type, handler;
 
-		propagateEvent: function (e) {
-			var id;
+				if (typeof types === 'object') {
+					for (type in types) {
+						if (types.hasOwnProperty(type)) {
+							this.once(type, types[type], callback);
+						}
+					}
+					return this;
+				}
 
-			for (id in this.eventParents) {
-				if (Y.hasOwn.call(this.eventParents, id)) {
-					this.eventParents[id].fire(e.type, Y.extend({layer: e.target}, e));
+				handler = Y.Bind(function () {
+					this
+						.off(types, callback, context)
+						.off(types, handler, context);
+				}, this);
+
+				// Add a listener that's executed once and removed after that
+				return this
+					.on(types, callback, context)
+					.on(types, handler, context);
+			},
+
+			// Adds a parent to propagate events to (when you fire with true as a 3rd argument)
+			addEventParent: function (obj) {
+				this.eventParents = this.eventParents || {};
+				this.eventParents[Y.stamp(obj)] = obj;
+				return this;
+			},
+
+			removeEventParent: function (obj) {
+				if (this.eventParents) {
+					delete this.eventParents[Y.stamp(obj)];
+				}
+				return this;
+			},
+
+			propagateEvent: function (e) {
+				var id;
+
+				for (id in this.eventParents) {
+					if (Y.hasOwn.call(this.eventParents, id)) {
+						this.eventParents[id].fire(e.type, Y.extend({
+							layer: e.target
+						}, e));
+					}
 				}
 			}
-		}
-	}); // END OF Y.Evented CLASS
+		}); // END OF YAX_Evented CLASS
+
+		module.exports = YAX_Evented;
+	});
+
+	//---
+
+	Y.Evented = Y.require('YAX/Evented');
 
 	//---
 
@@ -3468,7 +3409,7 @@
 //---
 
 /**
- * YAX i18n [Contrib]
+ * YAX I18n [Contrib]
  */
 
 /*jslint indent: 4 */
@@ -3484,320 +3425,328 @@
 
 	'use strict';
 
-	Y.i18n = function (text, langNumOrFormatting, numOrFormattingOrContext, formattingOrContext, context) {
-		var formatting;
-		var lang;
-		var num;
+	Y.define('YAX/I18n', function (require, exports, module) {
+		var YAX_I18n;
 
-		if (Y.isNull(context)) {
-			context = this.globalContext;
-		}
+		YAX_I18n = function (text, langNumOrFormatting, numOrFormattingOrContext, formattingOrContext, context) {
+			var formatting;
+			var lang;
+			var num;
 
-		if (Y.isObject(langNumOrFormatting)) {
-			lang = null;
-			num = null;
-			formatting = langNumOrFormatting;
-			context = numOrFormattingOrContext || this.globalContext;
-		} else {
-			if (Y.isNumber(langNumOrFormatting)) {
+			if (Y.isNull(context)) {
+				context = this.globalContext;
+			}
+
+			if (Y.isObject(langNumOrFormatting)) {
 				lang = null;
-				num = langNumOrFormatting;
-				formatting = numOrFormattingOrContext;
-				context = formattingOrContext || this.globalContext;
+				num = null;
+				formatting = langNumOrFormatting;
+				context = numOrFormattingOrContext || this.globalContext;
 			} else {
-				lang = langNumOrFormatting;
-				if (Y.isNumber(numOrFormattingOrContext)) {
-					num = numOrFormattingOrContext;
-					formatting = formattingOrContext;
-					var _context;
-					// context = context;
-					_context = context;
-					context = _context;
-				} else {
-					num = null;
+				if (Y.isNumber(langNumOrFormatting)) {
+					lang = null;
+					num = langNumOrFormatting;
 					formatting = numOrFormattingOrContext;
 					context = formattingOrContext || this.globalContext;
-				}
-			}
-		}
-
-		if (Y.isObject(text)) {
-			/** @namespace text.i18n */
-			if (Y.isObject(text.i18n)) {
-				text = text.i18n;
-			}
-
-			return Y.i18n.translateHash(text, context, lang);
-		}
-
-		return Y.i18n.translate(text, num, formatting, context, lang);
-	};
-
-	Y.i18n.globalContext = null;
-	Y.i18n.data = null;
-	Y.i18n.languageData = null;
-
-	Y.i18n.add = function (d, lang) {
-		var c, data, k,
-			v, _i, _len,
-			_ref, _ref1,
-			_results;
-
-		if (Y.isSet(lang)) {
-			Y.i18n.languageData[lang] = null;
-
-			if (Y.isNull(Y.i18n.languageData[lang])) {
-				Y.i18n.languageData[lang] = {
-					values: {},
-					contexts: []
-				};
-			}
-
-			data = Y.i18n.languageData[lang];
-		} else {
-			data = Y.i18n.data;
-		}
-
-		if (Y.isSet(d.values)) {
-			_ref = d.values;
-
-			for (k in _ref) {
-				if (_ref.hasOwnProperty(k)) {
-					v = _ref[k];
-
-					data.values[k] = v;
-				}
-			}
-		}
-
-		if (Y.isSet(d.contexts)) {
-			_ref1 = d.contexts;
-			_results = [];
-
-			for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-				c = _ref1[_i];
-				_results.push(data.contexts.push(c));
-			}
-
-			return _results;
-		}
-	};
-
-	Y.i18n.setContext = function (key, value) {
-		Y.i18n.globalContext[key] = value;
-		return Y.i18n.globalContext[key];
-	};
-
-	Y.i18n.clearContext = function (key) {
-		Y.i18n.globalContext[key] = null;
-		return Y.i18n.globalContext[key];
-	};
-
-	Y.i18n.reset = function () {
-		Y.i18n.data = {
-			values: {},
-			contexts: []
-		};
-
-		Y.i18n.globalContext = {};
-		Y.i18n.languageData = {};
-
-		return Y.i18n.languageData;
-	};
-
-	Y.i18n.resetData = function () {
-		Y.i18n.data = {
-			values: {},
-			contexts: []
-		};
-
-		Y.i18n.languageData = {};
-		return Y.i18n.languageData;
-	};
-
-	Y.i18n.resetContext = function () {
-		Y.i18n.globalContext = {};
-		return Y.i18n.globalContext;
-	};
-
-	Y.i18n.resetLanguage = function (lang) {
-		Y.i18n.languageData[lang] = null;
-		return Y.i18n.languageData[lang];
-	};
-
-	Y.i18n.translateHash = function (hash, context, language) {
-		var k, v;
-
-		for (k in hash) {
-			if (hash.hasOwnProperty(k)) {
-				v = hash[k];
-
-				if (Y.isString(v)) {
-					hash[k] = Y.i18n.translate(v, null, null, context, language);
-				}
-			}
-		}
-
-		return hash;
-	};
-
-	Y.i18n.translate = function (text, num, formatting, context, language) {
-		var contextData, data, result;
-
-		if (Y.isNull(context)) {
-			context = Y.i18n.globalContext;
-		}
-
-		if (!Y.isNull(language)) {
-			data = Y.i18n.languageData[language];
-		}
-
-		if (Y.isUndefined(data)) {
-			data = Y.i18n.data;
-		}
-
-		//if (data == null) {
-		//	data = Y.i18n.data;
-		//}
-
-		//if (data == null) {
-		//	return Y.i18n.useOriginalText(text, num, formatting);
-		//}
-
-		if (Y.isNull(data)) {
-			return Y.i18n.useOriginalText(text, num, formatting);
-		}
-
-		contextData = Y.i18n.getContextData(data, context);
-
-		if (!Y.isNull(contextData)) {
-			result = Y.i18n.findTranslation(text, num, formatting, contextData.values);
-		}
-
-		//if (result == null) {
-		//	result = Y.i18n.findTranslation(text, num, formatting, data.values);
-		//}
-
-		//if (result == null) {
-		//	return Y.i18n.useOriginalText(text, num, formatting);
-		//}
-
-		if (Y.isUndefined(result)) {
-			result = Y.i18n.findTranslation(text, num, formatting, data.values);
-		}
-
-		if (Y.isNull(result)) {
-			return Y.i18n.useOriginalText(text, num, formatting);
-		}
-
-		return result;
-	};
-
-	Y.i18n.translateHash = function (hash, context, language) {
-		var k, v;
-
-		for (k in hash) {
-			if (hash.hasOwnProperty(k)) {
-				v = hash[k];
-
-				if (Y.isString(v)) {
-					hash[k] = Y.i18n.translate(v, null, null, context, language);
-				}
-			}
-		}
-
-		return hash;
-	};
-
-	Y.i18n.findTranslation = function (text, num, formatting, data) {
-		var result, triple, value, _i, _len;
-		value = data[text];
-
-
-		if (Y.isNull(value)) {
-			return null;
-		}
-
-		if (Y.isNull(num)) {
-			if (Y.isString(value)) {
-				return Y.i18n.applyFormatting(value, num, formatting);
-			}
-		} else {
-			if (value instanceof Array || value.length) {
-				for (_i = 0, _len = value.length; _i < _len; _i++) {
-					triple = value[_i];
-
-					if ((num >= triple[0] || Y.isNull(triple[0])) && (num <= triple[1] ||
-						Y.isNull(triple[1]))) {
-						result = Y.i18n.applyFormatting(triple[2].replace("-%n", String(-num)),
-							num, formatting);
-						return Y.i18n.applyFormatting(result.replace("%n", String(num)), num,
-							formatting);
+				} else {
+					lang = langNumOrFormatting;
+					if (Y.isNumber(numOrFormattingOrContext)) {
+						num = numOrFormattingOrContext;
+						formatting = formattingOrContext;
+						var _context;
+						// context = context;
+						_context = context;
+						context = _context;
+					} else {
+						num = null;
+						formatting = numOrFormattingOrContext;
+						context = formattingOrContext || this.globalContext;
 					}
 				}
 			}
-		}
 
-		return null;
-	};
+			if (Y.isObject(text)) {
+				/** @namespace text.i18n */
+				if (Y.isObject(text.i18n)) {
+					text = text.i18n;
+				}
 
-	Y.i18n.getContextData = function (data, context) {
-		var c, equal, key,
-			value, _i, _len,
-			_ref, _ref1;
+				return YAX_I18n.translateHash(text, context, lang);
+			}
 
-		if (!Y.isSet(data.contexts) || Y.isNull(data.contexts)) {
-			return null;
-		}
+			return YAX_I18n.translate(text, num, formatting, context, lang);
+		};
 
-		_ref = data.contexts;
+		YAX_I18n.globalContext = null;
+		YAX_I18n.data = null;
+		YAX_I18n.languageData = null;
 
-		for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-			c = _ref[_i];
+		YAX_I18n.add = function (d, lang) {
+			var c, data, k,
+				v, _i, _len,
+				_ref, _ref1,
+				_results;
 
-			equal = true;
+			if (Y.isSet(lang)) {
+				YAX_I18n.languageData[lang] = null;
 
-			/** @namespace c.matches */
-			_ref1 = c.matches;
+				if (Y.isNull(YAX_I18n.languageData[lang])) {
+					YAX_I18n.languageData[lang] = {
+						values: {},
+						contexts: []
+					};
+				}
 
-			for (key in _ref1) {
-				if (_ref1.hasOwnProperty(key)) {
-					value = _ref1[key];
-					equal = equal && value === context[key];
+				data = YAX_I18n.languageData[lang];
+			} else {
+				data = YAX_I18n.data;
+			}
+
+			if (Y.isSet(d.values)) {
+				_ref = d.values;
+
+				for (k in _ref) {
+					if (_ref.hasOwnProperty(k)) {
+						v = _ref[k];
+
+						data.values[k] = v;
+					}
 				}
 			}
 
-			if (equal) {
-				return c;
+			if (Y.isSet(d.contexts)) {
+				_ref1 = d.contexts;
+				_results = [];
+
+				for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+					c = _ref1[_i];
+					_results.push(data.contexts.push(c));
+				}
+
+				return _results;
 			}
-		}
+		};
 
-		return null;
-	};
+		YAX_I18n.setContext = function (key, value) {
+			YAX_I18n.globalContext[key] = value;
+			return YAX_I18n.globalContext[key];
+		};
 
-	Y.i18n.useOriginalText = function (text, num, formatting) {
-		if (Y.isNull(num)) {
-			return Y.i18n.applyFormatting(text, num, formatting);
-		}
+		YAX_I18n.clearContext = function (key) {
+			YAX_I18n.globalContext[key] = null;
+			return YAX_I18n.globalContext[key];
+		};
 
-		return Y.i18n.applyFormatting(text.replace("%n", String(num)), num,
-			formatting);
-	};
+		YAX_I18n.reset = function () {
+			YAX_I18n.data = {
+				values: {},
+				contexts: []
+			};
 
-	Y.i18n.applyFormatting = function (text, num, formatting) {
-		var ind, regex;
+			YAX_I18n.globalContext = {};
+			YAX_I18n.languageData = {};
 
-		for (ind in formatting) {
-			if (formatting.hasOwnProperty(ind)) {
-				regex = new RegExp("%{" + ind + "}", "g");
-				text = text.replace(regex, formatting[ind]);
+			return YAX_I18n.languageData;
+		};
+
+		YAX_I18n.resetData = function () {
+			YAX_I18n.data = {
+				values: {},
+				contexts: []
+			};
+
+			YAX_I18n.languageData = {};
+			return YAX_I18n.languageData;
+		};
+
+		YAX_I18n.resetContext = function () {
+			YAX_I18n.globalContext = {};
+			return YAX_I18n.globalContext;
+		};
+
+		YAX_I18n.resetLanguage = function (lang) {
+			YAX_I18n.languageData[lang] = null;
+			return YAX_I18n.languageData[lang];
+		};
+
+		YAX_I18n.translateHash = function (hash, context, language) {
+			var k, v;
+
+			for (k in hash) {
+				if (hash.hasOwnProperty(k)) {
+					v = hash[k];
+
+					if (Y.isString(v)) {
+						hash[k] = YAX_I18n.translate(v, null, null, context, language);
+					}
+				}
 			}
-		}
 
-		return text;
-	};
+			return hash;
+		};
+
+		YAX_I18n.translate = function (text, num, formatting, context, language) {
+			var contextData, data, result;
+
+			if (Y.isNull(context)) {
+				context = YAX_I18n.globalContext;
+			}
+
+			if (!Y.isNull(language)) {
+				data = YAX_I18n.languageData[language];
+			}
+
+			if (Y.isUndefined(data)) {
+				data = YAX_I18n.data;
+			}
+
+			//if (data == null) {
+			//	data = YAX_I18n.data;
+			//}
+
+			//if (data == null) {
+			//	return YAX_I18n.useOriginalText(text, num, formatting);
+			//}
+
+			if (Y.isNull(data)) {
+				return YAX_I18n.useOriginalText(text, num, formatting);
+			}
+
+			contextData = YAX_I18n.getContextData(data, context);
+
+			if (!Y.isNull(contextData)) {
+				result = YAX_I18n.findTranslation(text, num, formatting, contextData.values);
+			}
+
+			//if (result == null) {
+			//	result = YAX_I18n.findTranslation(text, num, formatting, data.values);
+			//}
+
+			//if (result == null) {
+			//	return YAX_I18n.useOriginalText(text, num, formatting);
+			//}
+
+			if (Y.isUndefined(result)) {
+				result = YAX_I18n.findTranslation(text, num, formatting, data.values);
+			}
+
+			if (Y.isNull(result)) {
+				return YAX_I18n.useOriginalText(text, num, formatting);
+			}
+
+			return result;
+		};
+
+		YAX_I18n.translateHash = function (hash, context, language) {
+			var k, v;
+
+			for (k in hash) {
+				if (hash.hasOwnProperty(k)) {
+					v = hash[k];
+
+					if (Y.isString(v)) {
+						hash[k] = YAX_I18n.translate(v, null, null, context, language);
+					}
+				}
+			}
+
+			return hash;
+		};
+
+		YAX_I18n.findTranslation = function (text, num, formatting, data) {
+			var result, triple, value, _i, _len;
+			value = data[text];
+
+
+			if (Y.isNull(value)) {
+				return null;
+			}
+
+			if (Y.isNull(num)) {
+				if (Y.isString(value)) {
+					return YAX_I18n.applyFormatting(value, num, formatting);
+				}
+			} else {
+				if (value instanceof Array || value.length) {
+					for (_i = 0, _len = value.length; _i < _len; _i++) {
+						triple = value[_i];
+
+						if ((num >= triple[0] || Y.isNull(triple[0])) && (num <= triple[1] ||
+							Y.isNull(triple[1]))) {
+							result = YAX_I18n.applyFormatting(triple[2].replace("-%n", String(-num)),
+								num, formatting);
+							return YAX_I18n.applyFormatting(result.replace("%n", String(num)), num,
+								formatting);
+						}
+					}
+				}
+			}
+
+			return null;
+		};
+
+		YAX_I18n.getContextData = function (data, context) {
+			var c, equal, key,
+				value, _i, _len,
+				_ref, _ref1;
+
+			if (!Y.isSet(data.contexts) || Y.isNull(data.contexts)) {
+				return null;
+			}
+
+			_ref = data.contexts;
+
+			for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+				c = _ref[_i];
+
+				equal = true;
+
+				/** @namespace c.matches */
+				_ref1 = c.matches;
+
+				for (key in _ref1) {
+					if (_ref1.hasOwnProperty(key)) {
+						value = _ref1[key];
+						equal = equal && value === context[key];
+					}
+				}
+
+				if (equal) {
+					return c;
+				}
+			}
+
+			return null;
+		};
+
+		YAX_I18n.useOriginalText = function (text, num, formatting) {
+			if (Y.isNull(num)) {
+				return YAX_I18n.applyFormatting(text, num, formatting);
+			}
+
+			return YAX_I18n.applyFormatting(text.replace("%n", String(num)), num,
+				formatting);
+		};
+
+		YAX_I18n.applyFormatting = function (text, num, formatting) {
+			var ind, regex;
+
+			for (ind in formatting) {
+				if (formatting.hasOwnProperty(ind)) {
+					regex = new RegExp("%{" + ind + "}", "g");
+					text = text.replace(regex, formatting[ind]);
+				}
+			}
+
+			return text;
+		};
+
+		module.exports = YAX_I18n;
+	});
 
 	//---
+
+	Y.i18n = Y.require('YAX/I18n');
 
 	Y.i18n.reset();
 
@@ -3807,8 +3756,34 @@
 
 }());
 
-// FILE: ./Source/Core/Contrib/i18n.js
+// FILE: ./Source/Core/Contrib/I18n.js
 
 //---
 
+
+/**
+ * YAX Env./System/UserAgent Detector [DOM/NODE][CORE][MODULE]
+ */
+
+/*jslint indent: 4 */
+/*jslint white: true */
+/*jshint eqeqeq: false */
+/*jshint strict: false */
+/*global Y, YAX, module */
+
+(function () {
+
+	//---
+
+	'use strict';
+
+	
+
+	//---
+
+}());
+
+// FILE: ./Source/Modules/UserAgent.js
+
+//---
 

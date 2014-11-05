@@ -7,7 +7,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global Y, YAX, $ */
+/*global Y, YAX */
 
 (function () {
 
@@ -15,22 +15,22 @@
 
 	'use strict';
 
-	Y.config.set('yax.plugins.waitforme.opacity', 1);
-	Y.config.set('yax.plugins.waitforme.effect', 'bounce');
-	Y.config.set('yax.plugins.waitforme.content', '');
-	Y.config.set('yax.plugins.waitforme.background', 'rgba(245, 245, 245, .75)');
-	Y.config.set('yax.plugins.waitforme.color', 'rgba(10, 20, 30, .9)');
-	Y.config.set('yax.plugins.waitforme.width', 0);
-	Y.config.set('yax.plugins.waitforme.height', 0);
-	Y.config.set('yax.plugins.waitforme.container', 'body');
-	Y.config.set('yax.plugins.waitforme.trigger', 'close.yax.waitforme');
+	Y.config.set('WaitForMe.opacity', 1);
+	Y.config.set('WaitForMe.effect', 'bounce');
+	Y.config.set('WaitForMe.content', null);
+	Y.config.set('WaitForMe.background', 'rgba(245, 245, 245, .75)');
+	Y.config.set('WaitForMe.color', 'rgba(10, 20, 30, .9)');
+	Y.config.set('WaitForMe.width', 0);
+	Y.config.set('WaitForMe.height', 0);
+	Y.config.set('WaitForMe.container', 'body');
+	Y.config.set('WaitForMe.trigger', 'close.yax.waitforme');
 
-	var pluginOptions = Y.config.getAll('yax.plugins.waitforme', false, true);
+	var pluginOptions = Y.config.getAll('WaitForMe', false, true);
 
 	function WaitForMe(element, option) {
 		this.element = element;
 		this.options = option;
-		this.cssClass = 'js-waitforme';
+		this.cssClass = 'yax-waitforme';
 		this.effects = null;
 		this.effectElementCount = null;
 		this.createSubElement = false;
@@ -41,40 +41,41 @@
 		this.div = null;
 		this.content = null;
 
-		this.runMe();
+		this.run();
 	}
 
 	WaitForMe.prototype = {
-		runMe: function () {
+		run: function () {
 			this.setContent();
-			this._init_();
+			this.init();
 			this.setEvents();
 		},
 
-		Show: function () {
-			// $(this.element).css('cursor', 'none');
+		show: function () {
+			// Y.DOM(this.element).css('cursor', 'none');
 
-			// Close all other WaitForMe
-			$('div.js-waitforme').hide();
+			// close all other WaitForMe
+			Y.DOM('div.yax-waitforme').hide();
 			this.WaitForMe.css('display', 'block');
 		},
 
-		Hide: function () {
+		hide: function () {
 			this.WaitForMe.hide();
 			this.WaitForMe.css('display', 'none');
 		},
 
-		Toggle: function () {
+		toggle: function () {
 			if (this.WaitForMe.is(':visible')) {
-				this.Hide();
+				this.hide();
 			} else {
-				this.Show();
+				this.show();
 			}
 		},
 
-		_init_: function () {
+		init: function () {
 			var x;
 
+			/** @namespace this.options.effect */
 			switch (this.options.effect) {
 			case 'none':
 				this.effectElementCount = 0;
@@ -223,7 +224,7 @@
 				this.containerSize = Y.empty;
 			}
 
-			this.effects = $('<div class="' + this.cssClass + '-progress ' + this
+			this.effects = Y.DOM('<div class="' + this.cssClass + '-progress ' + this
 				.options.effect + '"></div>');
 
 			if (this.effectElementCount > 0) {
@@ -243,16 +244,16 @@
 
 				}
 
-				this.effects = $('<div class="' + this.cssClass + '-progress ' +
+				this.effects = Y.DOM('<div class="' + this.cssClass + '-progress ' +
 					this.options.effect + '" style="' + this.containerSize + '">' + this.effectElementHTML +
 					'</div>');
 
-				//				this.effects = $('<div></div>').addClass(this.cssClass + '-progress ' + this.options.effect).css(this.containerSize);
+				//				this.effects = Y.DOM('<div></div>').addClass(this.cssClass + '-progress ' + this.options.effect).css(this.containerSize);
 				//				this.effects.append(this.effectElementHTML);
 			}
 
 			if (this.options.content) {
-				this.content = $('<div class="' + this.cssClass +
+				this.content = Y.DOM('<div class="' + this.cssClass +
 					'-text" style="color: ' + this.options.color + ';">' + this.options.content +
 					'</div>');
 			}
@@ -261,14 +262,14 @@
 				this.element.find('> .' + this.cssClass).remove();
 			}
 
-			this.div = $('<div class="' + this.cssClass + '-content"></div>');
+			this.div = Y.DOM('<div class="' + this.cssClass + '-content"></div>');
 
 			this.div.append(this.effects, this.content);
 
 			this.div.appendTo(this.WaitForMe);
 
 			if (this.element[0].tagName === 'HTML') {
-				this.element = $('body');
+				this.element = Y.DOM('body');
 			}
 
 			this.element.addClass(this.cssClass + '-container').append(this.WaitForMe);
@@ -277,13 +278,17 @@
 				background: this.options.background
 			});
 
+			var tmp = this.element.find('.' + this.cssClass + '-content');
+
 			this.element.find('.' + this.cssClass + '-content').css({
-				marginTop: -this.element.find('.' + this.cssClass + '-content')
-					.outerHeight() / 2 + 'px'
+				/*marginTop: -this.element.find('.' + this.cssClass + '-content')
+					.outerHeight() / 2 + 'px'*/
+
+				marginTop: -(tmp.outerHeight() / 2 + 'px')
 			});
 		},
 
-		Close: function () {
+		close: function () {
 			this.element.removeClass(this.cssClass + '-container');
 			this.element.find('.' + this.cssClass).remove();
 		},
@@ -292,29 +297,31 @@
 			// Get WaitForMe content
 			if (this.options.content) {
 				this.content = this.options.content;
-			} else if (this.element.data('YAX-WaitForMe')) {
-				this.content = this.element.data('YAX-WaitForMe');
+			} else if (this.element.data('yax-waitforme')) {
+				this.content = this.element.data('yax-waitforme');
 			} else if (Y.isEmpty(this.options.content)) {
 				this.content = Y.empty;
 			} else if (Y.isNull(this.options.content)) {
 				this.content = Y.empty;
 			} else {
-				Y.ERROR('No content for WaitForMe: ' + this.element.selector);
+				Y.ERROR('No content for `YAX\'s` DOM WaitForMe Plugin: ' + this.element.selector);
 				return;
 			}
 
 			if (this.content.charAt(0) === '#') {
-				$(this.content).hide();
-				this.content = $(this.content).html();
+				Y.DOM(this.content).hide();
+				this.content = Y.DOM(this.content).html();
 				this.contentType = 'html';
 			} else {
 				this.contentType = 'text';
 			}
 
 			// Create WaitForMe container
-			this.WaitForMe = $('<div></div>').addClass(this.cssClass);
+			this.WaitForMe = Y.DOM('<div></div>').addClass(this.cssClass);
 
-			if (this.options.container) {
+			if ((!Y.isNull(this.options.container) ||
+				!Y.isEmpty(this.options.container)) &&
+				this.options.container) {
 				this.WaitForMe.prependTo(this.options.container);
 			} else {
 				this.WaitForMe.insertAfter(this.element.parent());
@@ -333,25 +340,25 @@
 
 			if (this.options.trigger === 'close.yax.waitforme') {
 				this.WaitForMe.on('close.yax.waitforme', function () {
-					self.Close();
+					self.close();
 				});
 
 				this.element.on('close.yax.waitforme', function () {
-					self.Close();
+					self.close();
 				});
 			}
 		}
 	};
 
-	$.fn.WaitForMe = function (option) {
+	Y.DOM.Function.WaitForMe = function (option) {
 		var options = Y.extend({}, pluginOptions, option);
 
 		if (option === 'close') {
-			return new WaitForMe($(this), options).Close();
+			return new WaitForMe(Y.DOM(this), options).close();
 		}
 
 		return this.each(function () {
-			return new WaitForMe($(this), options);
+			return new WaitForMe(Y.DOM(this), options);
 		});
 	};
 

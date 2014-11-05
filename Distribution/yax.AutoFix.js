@@ -7,7 +7,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global YAX, Y, $ */
+/*global YAX, Y */
 
 (function () {
 
@@ -15,15 +15,15 @@
 
 	'use strict';
 
-	Y.config.set('yax.plugins.autofix.customOffset', true);
-	Y.config.set('yax.plugins.autofix.manual', false);
-	Y.config.set('yax.plugins.tooltip.onlyInContainer', true);
+	Y.config.set('AutoFix.customOffset', true);
+	Y.config.set('AutoFix.manual', false);
+	Y.config.set('AutoFix.onlyInContainer', true);
 
-	var pluginOptions = Y.config.getAll('yax.plugins.autofix', false, true);
+	var pluginOptions = Y.config.getAll('AutoFix', false, true);
 
-	$.fn.AutoFix = function (options) {
+	Y.DOM.Function.AutoFix = function (options) {
 		var settings = Y.extend(pluginOptions, options, {}),
-			el = $(this),
+			el = Y.DOM(this),
 			curpos = el.position(),
 			offset = settings.customOffset,
 			pos = el.offset(),
@@ -31,8 +31,8 @@
 
 		el.addClass('yax-autofix');
 
-		$.fn.ManualFix = function () {
-			el = $(this);
+		Y.DOM.Function.ManualFix = function () {
+			el = Y.DOM(this);
 			pos = el.offset();
 
 			if (el.hasClass('_fixed')) {
@@ -52,9 +52,9 @@
 				offset = el.parent().offset().top;
 			}
 
-			if ($(document).scrollTop() > offset &&
-				$(document).scrollTop() <= (el.parent().height() +
-				(offset - $(window).height()))) {
+			if (Y.DOM(document).scrollTop() > offset &&
+				Y.DOM(document).scrollTop() <= (el.parent().height() +
+				(offset - Y.DOM(window).height()))) {
 				el.removeClass('_bottom').addClass('_fixed').css({
 					top: 0,
 					left: pos.left,
@@ -62,9 +62,9 @@
 					bottom: 'auto'
 				});
 			} else {
-				if ($(document).scrollTop() > offset) {
+				if (Y.DOM(document).scrollTop() > offset) {
 					if (settings.onlyInContainer === true) {
-						if ($(document).scrollTop() > (el.parent().height() - $(window).height())) {
+						if (Y.DOM(document).scrollTop() > (el.parent().height() - Y.DOM(window).height())) {
 							el.addClass('_bottom _fixed').removeAttr('style').css({
 								left: curpos.left
 							});
@@ -80,7 +80,7 @@
 		};
 
 		if (settings.manual === false) {
-			$(window).scroll(function () {
+			Y.DOM(window).scroll(function () {
 				fixAll(el, settings, curpos, pos);
 			});
 		}
