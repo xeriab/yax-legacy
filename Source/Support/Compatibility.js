@@ -122,7 +122,7 @@
 	/**
 	 * The ready event handler and self cleanup method
 	 */
-	function completed() {
+	function completed () {
 		document.removeEventListener('DOMContentLoaded', completed, false);
 		window.removeEventListener('load', completed, false);
 		Y.DOM.ready();
@@ -151,6 +151,80 @@
 
 	// Kick off the DOM ready check even if the user does not
 	Y.DOM.ready.promise();
+
+	//---
+
+	if (!Y.isDefined(window.Sizzle)) {
+		// Used by dateinput
+		Y.DOM.Function.clone = function(){
+			var ret = Y.DOM();
+			this.each(function(){
+				ret.push(this.cloneNode(true));
+			});
+
+			return ret;
+		};
+
+		var oldBind = Y.DOM.Function.bind;
+
+		Y.DOM.Function.bind = function (types, data, callback) {
+			var el = this;
+			// var $this = Y.DOM(el);
+			var specialEvent;
+
+			if (!Y.isSet(callback)) {
+				callback = data;
+				data = null;
+			}
+
+			if (Y.DOM.yDOM) {
+				Y.DOM.each(types.split(/\s/), function (i, types) {
+					types = types.split(/\./)[0];
+
+					var tmp = Y.hasOwn.call(Y.DOM.event.special, types);
+
+					if (tmp) {
+						specialEvent = Y.DOM.event.special[types];
+
+						/// init enable special events on Y.DOM
+						if (!specialEvent._init) {
+							specialEvent._init = true;
+
+							/// intercept and replace the special event handler to add functionality
+							specialEvent.originalHandler = specialEvent.handler;
+							specialEvent.handler = function () {
+
+								/// make event argument writable, like on jQuery
+								var args = Y.G.slice.call(arguments);
+
+								args[0] = Y.extend({}, args[0]);
+
+								/// define the event handle, Y.DOM.event.dispatch is only for newer versions of jQuery
+								Y.DOM.event.handle = function () {
+									/// make context of trigger the event element
+									var args_ = Y.G.slice.call(arguments);
+									var event = args_[0];
+									var $target = Y.DOM(event.target);
+
+									$target.trigger.apply($target, arguments);
+
+								};
+
+								specialEvent.originalHandler.apply(this, args);
+
+							};
+						}
+
+						specialEvent.setup.apply(el, [data]);
+					}
+				});
+			}
+
+			// return Y.DOM.Function.bindEvent.apply(this, [types, callback]);
+			return oldBind.apply(this, [types, callback]);
+		};
+	}
+
 
 	//---
 
