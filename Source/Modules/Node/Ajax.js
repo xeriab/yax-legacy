@@ -8,22 +8,21 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-(function (window) {
+(function (window, document) {
 
 	//---
 
 	'use strict';
 
-	var jsonpID = 0,
-		document = window.document,
-		escape = encodeURIComponent,
-		allTypes = '*/'.concat('*');
+	var jsonpID = 0;
+	var escape = encodeURIComponent;
+	var allTypes = '*/'.concat('*');
 
 	//---
 
 	// BEGIN OF [Private Functions]
 
-	Y.DOM.AjaxActive = Y.DOM.active = 0;
+	Y.DOM.ajaxActive = Y.DOM.active = 0;
 
 	// Trigger a custom event and return false if it was cancelled
 	function triggerAndReturn(context, event, data) {
@@ -197,12 +196,12 @@
 
 	//---
 
-	Y.DOM.AjaxSettings = {};
+	Y.DOM.AjaxSettings = Y.DOM.ajaxSettings = {};
 
 	//---
 
 	Y.extend(Y.DOM, {
-		AjaxSettings: {
+		ajaxSettings: {
 			// Default type of request
 			type: 'GET',
 			// Callback that is executed before request
@@ -389,10 +388,10 @@
 				name,
 				async;
 
-			for (key in this.AjaxSettings) {
-				if (this.AjaxSettings.hasOwnProperty(key)) {
+			for (key in this.ajaxSettings) {
+				if (this.ajaxSettings.hasOwnProperty(key)) {
 					if (settings[key] === undefined) {
-						settings[key] = this.AjaxSettings[key];
+						settings[key] = this.ajaxSettings[key];
 					}
 				}
 			}
@@ -609,13 +608,14 @@
 
 	Y.extend(Y.DOM, {
 		get: Y.DOM.Get,
+		ajaxGet: Y.DOM.Get,
 		post: Y.DOM.Post,
+		ajaxPost: Y.DOM.Post,
 		ajax: Y.DOM.Ajax,
-		JSON: Y.DOM.getJSON,
-		XML: Y.DOM.getXML,
-		Script: Y.DOM.getScript,
-		ajaxJSONP: Y.DOM.AjaxJSONP,
-		ajaxSettings: Y.DOM.AjaxSettings
+		ajaxJSON: Y.DOM.getJSON,
+		ajaxXML: Y.DOM.getXML,
+		ajaxScript: Y.DOM.getScript,
+		ajaxJSONP: Y.DOM.AjaxJSONP
 	});
 
 	//---
@@ -646,7 +646,7 @@
 			}
 		};
 
-		Y.DOM.Ajax(options);
+		Y.DOM.ajax(options);
 
 		return this;
 	};
@@ -657,10 +657,10 @@
 	 * Extend YAX's AJAX beforeSend method by setting an X-CSRFToken on any
 	 * 'unsafe' request methods.
 	 **/
-	Y.extend(Y.DOM.AjaxSettings, {
+	Y.extend(Y.DOM.ajaxSettings, {
 		beforeSend: function (xhr, settings) {
-			if (!(/^(GET|HEAD|OPTIONS|trace)$/.test(settings.type)) && sameOrigin(
-				settings.url)) {
+			if (!(/^(GET|HEAD|OPTIONS|trace)$/.test(settings.type)) &&
+				sameOrigin(settings.url)) {
 				xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
 			}
 		}
@@ -668,7 +668,23 @@
 
 	//---
 
-}(window));
+	// Attach a bunch of functions for handling common AJAX events
+	Y.forEach([
+		'ajaxStart',
+		'ajaxStop',
+		'ajaxComplete',
+		'ajaxError',
+		'ajaxSuccess',
+		'ajaxSend'
+	], function(name) {
+		Y.DOM.Function[name] = function(callback) {
+			return this.on(name, callback);
+		};
+	});
+
+	//---
+
+}(window, window.document));
 
 // FILE: ./Source/Modules/Node/Ajax.js
 
