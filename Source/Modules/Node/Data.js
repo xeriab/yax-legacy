@@ -14,13 +14,7 @@
 
 	'use strict';
 
-	var data = {};
-	var dataAttr = Y.DOM.Function.data;
-	var exp = Y.DOM.expando;
-
-	//---
-
-	function Data() {
+	function Data () {
 		// Support: Android < 4,
 		// Old WebKit does not have .preventExtensions/freeze method,
 		// return new empty object instead with no [[set]] accessor
@@ -219,33 +213,7 @@
 	// These may be used throughout the YAX core codebase
 	Y.DOM.dataUser = Y.DOM.data_user = new Data();
 	Y.DOM.dataPrivative = Y.DOM.data_priv = new Data();
-	
-	//---
 
-	Y.extend(Y.DOM, {
-		acceptData: Data.accepts,
-		
-		hasData: function (elem) {
-			return Y.DOM.dataUser.hasData(elem) || Y.DOM.dataPrivative.hasData(elem);
-		},
-		
-		data: function (elem, name, data) {
-			return Y.DOM.dataUser.access(elem, name, data);
-		},
-		
-		removeData: function (elem, name) {
-			Y.DOM.dataUser.remove(elem, name);
-		},
-
-		_data: function (elem, name, data) {
-			return Y.DOM.dataPrivative.access(elem, name, data);
-		},
-		
-		_removeData: function (elem, name) {
-			Y.DOM.dataPrivative.remove(elem, name);
-		}
-	});
-	
 	//---
 
 	function dataAttribute(elem, key, data) {
@@ -279,75 +247,36 @@
 
 		return data;
 	}
+	
+	//---
 
-	// Read all 'data-*' attributes from a node
-	function attributeData(node) {
-		var store = {};
+	Y.DOM.extend({
+		acceptData: Data.accepts,
+		
+		hasData: function (elem) {
+			return Y.DOM.dataUser.hasData(elem) || Y.DOM.dataPrivative.hasData(elem);
+		},
+		
+		data: function (elem, name, data) {
+			return Y.DOM.dataUser.access(elem, name, data);
+		},
+		
+		removeData: function (elem, name) {
+			Y.DOM.dataUser.remove(elem, name);
+		},
 
-		Y.each(node.attributes || Y.G.ArrayProto, function (i, attr) {
-			if (attr.name.indexOf('data-') === 0) {
-				store[Y.camelise(attr.name.replace('data-', ''))] =
-					Y.deserialiseValue(attr.value);
-			}
-		});
-
-		return store;
-	}
-
-	// Store value under Camelised key on node
-	function setData(node, name, value) {
-		var id, store;
-
-		if (node[exp]) {
-			id = node[exp];
-		} else {
-			node[exp] = ++Y.DOM.UUID;
-			id = node[exp];
+		_data: function (elem, name, data) {
+			return Y.DOM.dataPrivative.access(elem, name, data);
+		},
+		
+		_removeData: function (elem, name) {
+			Y.DOM.dataPrivative.remove(elem, name);
 		}
+	});
+	
+	//---
 
-		if (data[id]) {
-			store = data[id];
-		} else {
-			data[id] = attributeData(node);
-			store = data[id];
-		}
-
-		if (name !== undefined) {
-			store[Y.camelise(name)] = value;
-		}
-
-		return store;
-	}
-
-	// Get value from node:
-	// 1. first try key as given,
-	// 2. then try Camelised key,
-	// 3. fall back to reading 'data-*' attribute.
-	function getData(node, name) {
-		var id = node[exp],
-			store = id && data[id],
-			camelName;
-
-		if (name === undefined) {
-			return store || setData(node);
-		}
-
-		if (store) {
-			if (store.hasOwnProperty(name)) {
-				return store[name];
-			}
-
-			camelName = Y.camelise(name);
-
-			if (store.hasOwnProperty(camelName)) {
-				return store[camelName];
-			}
-		}
-
-		return dataAttr.call(Y.DOM(node), name);
-	}
-
-	Y.extend(Y.DOM.Function, {
+	Y.DOM.Function.extend({
 		data: function (key, value) {
 			var attrs, name,
 				elem = this[0],
@@ -413,7 +342,7 @@
 
 					// Attempt to 'discover' the data in
 					// HTML5 custom data-* attrs
-					_data = dataAttr(elem, camelKey, undefined);
+					_data = dataAttribute(elem, camelKey, undefined);
 					if (_data !== undefined) {
 						return _data;
 					}
@@ -449,68 +378,6 @@
 			});
 		}
 	});
-
-	Y.DOM.Function.data = function (name, value) {
-		var result;
-
-		// Set multiple values via object
-		if (Y.isUndefined(value)) {
-			if (Y.isPlainObject(name)) {
-				result = this.each(function (i, node) {
-					Y.each(name, function (key, value) {
-						setData(node, key, value);
-					});
-				});
-			} else {
-				// Get value from first element
-				if (this.length === 0) {
-					result = undefined;
-				} else {
-					result = getData(this[0], name);
-				}
-			}
-		} else {
-			// Set value on all elements
-			result = this.each(function () {
-				setData(this, name, value);
-			});
-		}
-
-		return result;
-	};
-
-	Y.DOM.Function.removeData = function (names) {
-		if (typeof names === 'string') {
-			names = names.split(/\s+/);
-		}
-		return this.each(function () {
-			var id = this[exp],
-				store = id && data[id];
-
-			if (store) {
-				Y.each(names || store, function (key) {
-					delete store[names ? Y.camelise(this) : key];
-				});
-			}
-		});
-	};
-
-	// Generate extended `remove` and `empty` functions
-	/*['remove', 'empty'].forEach(function (methodName) {
-		var origFn = Y.DOM.Function[methodName];
-
-		Y.DOM.Function[methodName] = function () {
-			var elements = this.find('*');
-
-			if (methodName === 'remove') {
-				elements = elements.add(this);
-			}
-
-			elements.removeData();
-
-			return origFn.call(this);
-		};
-	});*/
 
 	//---
 
