@@ -8,7 +8,7 @@
 /*jshint -W084 */
 /*jshint -W040 */
 /*jslint node: false */
-/*global YAX, Y, $ */
+/*global YAX, Y */
 
 (function () {
 
@@ -30,7 +30,7 @@
 		
 		/*switch (typeof selector) {
 			case 'string':
-				obj = $(selector);
+				obj = Y.DOM(selector);
 				break;
 			case 'object':
 				obj = selector;
@@ -39,7 +39,7 @@
 
 		switch (Y.typeOf(selector)) {
 			case 'string':
-				obj = $(selector);
+				obj = Y.DOM(selector);
 				break;
 
 			case 'object':
@@ -50,7 +50,7 @@
 		return obj;
 	}
 
-	$.fn.eventLoggerStart = function (event, color) {
+	Y.DOM.Function.eventLoggerStart = function (event, color) {
 		var fontColor = Y.isString(color) ? color : Y.empty;
 
 		this.on(event, {
@@ -60,7 +60,7 @@
 		return this;
 	};
 
-	$.fn.eventLoggerEnd = function (event) {
+	Y.DOM.Function.eventLoggerEnd = function (event) {
 		this.off(event, consoleOutput);
 
 		return this;
