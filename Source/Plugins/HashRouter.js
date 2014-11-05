@@ -15,12 +15,12 @@
 
 	'use strict';
 
-	Y.config.set('yax.plugins.hashrouter.defaultPath', '/');
-	Y.config.set('yax.plugins.hashrouter.before', Y.noop);
-	Y.config.set('yax.plugins.hashrouter.on', Y.noop);
-	Y.config.set('yax.plugins.hashrouter.notFound', Y.noop);
+	Y.config.set('HashRouter.defaultPath', '/');
+	Y.config.set('HashRouter.before', Y.noop);
+	Y.config.set('HashRouter.on', Y.noop);
+	Y.config.set('HashRouter.notFound', Y.noop);
 
-	var pluginOptions = Y.config.getAll('yax.plugins.hashrouter', false, true);
+	var pluginOptions = Y.config.getAll('HashRouter', false, true);
 
 	var location = window.location;
 	var router;
