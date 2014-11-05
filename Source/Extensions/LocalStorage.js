@@ -8,7 +8,7 @@
 /*jshint strict: false */
 /*global Y, YAX */
 
-(function () {
+(function (global) {
 
 	//---
 
@@ -54,17 +54,19 @@
 				} else {
 					var name;
 
-					window.localStorage = {};
+					if (!Y.isSet(global.localStorage)) {
+						global.localStorage = {};
+					}
 
 					if (Y.isString(key) && Y.isString(value)) {
-						window.localStorage[key] = value;
+						global.localStorage[key] = value;
 						return true;
 					}
 
 					if (Y.isObject(key) && Y.isUndefined(value)) {
 						for (name in key) {
 							if (key.hasOwnProperty(name)) {
-								window.localStorage[name] = key[name];
+								global.localStorage[name] = key[name];
 							}
 						}
 
@@ -80,14 +82,14 @@
 					return localStorage.getItem(key);
 				}
 
-				return window.localStorage[key];
+				return global.localStorage[key];
 			},
 
-			delete: function (key) {
+			'delete': function (key) {
 				if (this.available()) {
 					localStorage.removeItem(key);
 				} else {
-					delete window.localStorage[key];
+					delete global.localStorage[key];
 				}
 			},
 
@@ -95,7 +97,7 @@
 				if (this.available()) {
 					localStorage.clear();
 				} else {
-					window.localStorage = {};
+					global.localStorage = {};
 				}
 			}
 		}
@@ -105,6 +107,6 @@
 
 }());
 
-// FILE: ./Source/Plugins/LocalStorage.js
+// FILE: ./Source/Extensions/LocalStorage.js
 
 //---
