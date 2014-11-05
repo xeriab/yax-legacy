@@ -1,12 +1,14 @@
 {
 	"browser": true,
-	"node": false,
+	"node": true,
 	"globals": {
 		"YAX": true,
 		"define": true,
-		"Y": true
+		"Y": true,
+		"global": true,
+		"undef": true
 	},
-	"strict": false,
+	"strict": true,
 	"es3": true,
 
 	// Code Style

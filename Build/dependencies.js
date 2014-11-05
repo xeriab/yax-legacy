@@ -25,8 +25,11 @@ var Dependencies = {
 			// 'Core/Contrib/Store.js',
 			// 'Core/Contrib/Parser.js'
 
-			'Core/Contrib/I18n.js'
-			// 'Core/Contrib/Console.js'
+			'Core/Contrib/I18n.js',
+
+			// 'Core/Contrib/Console.js',
+
+			'Modules/UserAgent.js'
 		],
 
 		desc: 'Core Library.',
@@ -34,7 +37,7 @@ var Dependencies = {
 		extended_desc: ''
 	},
 
-	'Extended Core': {
+	'Core Extra': {
 		src: [
 			'YAX.js',
 
@@ -54,11 +57,14 @@ var Dependencies = {
 			'Core/Contrib/Store.js',
 			'Core/Contrib/Parser.js',
 
-			'Core/Contrib/I18n.js'
+			'Core/Contrib/I18n.js',
+
 			// 'Core/Contrib/Console.js'
+
+			'Modules/UserAgent.js'
 		],
 
-		desc: 'Core Library.',
+		desc: 'Extended Core Library.',
 
 		extended_desc: ''
 	},
@@ -66,13 +72,17 @@ var Dependencies = {
 	'Node': {
 		src: [
 			'Modules/EnvDetector.js',
+
 			'Modules/Utility.js',
 
 			'Modules/Node/NeoNode.js',
+
 			'Modules/Node/SimpleSelector.js',
 
-			'Modules/Node/Data.js',
-			'Modules/Node/Events.js',
+			'Modules/Node/NeoData.js',
+
+			'Modules/Node/NeoEvents.js',
+
 			'Modules/Node/Ajax.js',
 			'Modules/Node/Fx.js',
 			'Modules/Node/FxMethods.js',
@@ -88,10 +98,11 @@ var Dependencies = {
 			// 'Modules/Node/Contrib/EventGesture.js',
 			// 'Modules/Node/Contrib/Assets.js',
 			// 'Modules/Node/Contrib/Stack.js',
+			'Modules/Node/Contrib/I18n.js',
 
 			'Modules/Node/Extra.js',
 
-			// 'Modules/Node/Contrib/EventLogger.js',
+			'Modules/Node/Contrib/EventLogger.js',
 
 			'Support/Compatibility.js',
 
@@ -103,17 +114,22 @@ var Dependencies = {
 		extended_desc: ''
 	},
 
-	'Extended Node': {
+	'Node Extra': {
 		src: [
 			'Modules/EnvDetector.js',
+
 			'Modules/Utility.js',
 
-			'Modules/Node/Node.js',
+			'Modules/Node/NeoNode.js',
+
 			'Modules/Node/SimpleSelector.js',
-			'Modules/Node/SizzleSupport.js',
 
 			'Modules/Node/Data.js',
-			'Modules/Node/Events.js',
+
+			'Modules/Node/ExtendedEvents.js',
+
+			'Modules/Node/SizzleSupport.js',
+
 			'Modules/Node/Ajax.js',
 			'Modules/Node/Fx.js',
 			'Modules/Node/FxMethods.js',
@@ -128,47 +144,74 @@ var Dependencies = {
 			// 'Modules/Node/Contrib/EventGesture.js',
 			// 'Modules/Node/Contrib/Assets.js',
 			// 'Modules/Node/Contrib/Stack.js',
+			'Modules/Node/Contrib/I18n.js',
 
 			'Modules/Node/Extra.js',
 
-			// 'Modules/Node/Contrib/EventLogger.js',
+			'Modules/Node/Contrib/EventLogger.js',
 
 			'Support/Compatibility.js',
 
 			'Support/IE.js'
 		],
 
-		desc: 'Node/DOM module.',
+		desc: 'Extended Node/DOM module.',
+
+		extended_desc: ''
+	},
+
+	'Simple DOM': {
+		src: [
+			'Modules/EnvDetector.js',
+
+			'Modules/Utility.js',
+
+			'Modules/Node/SimpleDOM.js',
+
+			'Modules/Node/SimpleEvents.js'
+		],
+
+		desc: 'Simple Node/DOM module.',
 
 		extended_desc: ''
 	},
 
 	'LocalStorage': {
 		src: [
-			'Plugins/LocalStorage.js'
+			'Extensions/LocalStorage.js'
 		],
 
-		desc: 'LocalStorage store plugin.',
+		desc: 'LocalStorage store extension.',
 
 		extended_desc: ''
 	},
 
 	'Cookies': {
 		src: [
-			'Plugins/Cookies.js'
+			'Extensions/Cookies.js'
 		],
 
-		desc: 'Cookies store plugin.',
+		desc: 'Cookies store extension.',
 
 		extended_desc: ''
 	},
 
 	'CSV Parser': {
 		src: [
-			'Plugins/CSV.js'
+			'Extensions/CSV.js'
 		],
 
-		desc: 'CSV Parser plugin.',
+		desc: 'CSV Parser extension.',
+
+		extended_desc: ''
+	},
+
+	'JSON Parser': {
+		src: [
+			'Extensions/NeoJSON.js'
+		],
+
+		desc: 'JSON Parser extension.',
 
 		extended_desc: ''
 	},
