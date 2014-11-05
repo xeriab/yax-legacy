@@ -81,24 +81,24 @@
 	}
 
 	Y.extend({
-		lcfirst: function (string) {
-			string += this.empty();
+		lcFirst: function (string) {
+			string += this.empty;
 
 			var t = string.charAt(0).toLowerCase();
 
 			return t + string.substr(1);
 		},
 
-		ucfirst: function (string) {
-			string += this.empty();
+		ucFirst: function (string) {
+			string += this.empty;
 
 			var t = string.charAt(0).toUpperCase();
 
 			return t + string.substr(1);
 		},
 
-		ucwords: function (string) {
-			return (string + this.empty()).replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function ($1) {
+		ucWords: function (string) {
+			return (string + this.empty).replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function ($1) {
 				return $1.toUpperCase();
 			});
 		}
