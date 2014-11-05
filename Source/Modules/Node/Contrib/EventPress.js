@@ -7,7 +7,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global YAX, Y, $ */
+/*global YAX, Y */
 
 (function () {
 
@@ -44,7 +44,7 @@
 		ghosts = [];
 		callbacks = [];
 		handlers = [];
-		doc = $(document);
+		doc = Y.DOM(document);
 
 		removeGhosts = function () {
 			ghosts.splice(0, 2);
@@ -61,7 +61,7 @@
 
 		doc.on('click', handleGhosts);
 
-		$.fn.onPress = function () {
+		Y.DOM.Function.onPress = function () {
 			// Passing empty selectors, empty arguments list or a document node cause bugs on android/iOS
 			// Just to be on the safe side allowing only element and document fragment nodes to be used
 			if (!arguments.length || !this.length || !this[0].nodeType || (this[0].nodeType !== 1 && this[0].nodeType !== 11)) {
@@ -143,7 +143,7 @@
 			}
 		};
 
-		$.fn.offPress = function () {
+		Y.DOM.Function.offPress = function () {
 			var args = normalizeArgs(arguments),
 				x;
 
@@ -178,7 +178,7 @@
 			}
 		};
 	} else {
-		$.fn.onPress = function () {
+		Y.DOM.Function.onPress = function () {
 			var args = normalizeArgs(arguments);
 
 			if (args[0]) {
@@ -190,7 +190,7 @@
 			}
 		};
 
-		$.fn.offPress = function () {
+		Y.DOM.Function.offPress = function () {
 			var args = normalizeArgs(arguments);
 
 			if (args[0]) {
