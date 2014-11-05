@@ -89,8 +89,8 @@
 				return null;
 			},
 
-			delete: function (name) {
-				this.set(name, '', -1);
+			'delete': function (name) {
+				this.set(name, Y.empty, -1);
 			}
 		}
 	});
@@ -99,6 +99,6 @@
 
 }());
 
-// FILE: ./Source/Plugins/Cookies.js
+// FILE: ./Source/Extensions/Cookies.js
 
 //---
