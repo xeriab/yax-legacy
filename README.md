@@ -1,1 +1,7 @@
-![yax_js_logo_01-c.png](Media/yax_js_logo_01-c.png)
+![YAX.js](Media/yax_js_logo_01-c.png)
+
+YET ANOTHER EXTENSIBLE JAVASCRIPT APPLICATIONS DEVELOPMENT LIBRARY AND FRAMEWORK
+
+#### Develop Branch
+
+...
