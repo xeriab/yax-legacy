@@ -15,10 +15,8 @@
 
 	'use strict';
 
-	// var tmpYaxDom = Y.DOM;
-
-	var oldQSA = Y.DOM.qsa;
-	var oldMatches = Y.DOM.matches;
+	var oldQSA = Y.DOM.yDOM.qsa;
+	var oldMatches = Y.DOM.yDOM.matches;
 	var classTag = Y.DOM.classTag;
 	var Filters;
 
@@ -47,50 +45,61 @@
 				return this;
 			}
 		},
+
 		hidden: function () {
 			if (visible(this)) {
 				return this;
 			}
 		},
+
 		selected: function () {
 			if (visible(this)) {
 				return this;
 			}
 		},
+
 		checked: function () {
 			if (visible(this)) {
 				return this;
 			}
 		},
+
 		parent: function () {
 			return this.parentNode;
 		},
+
 		first: function (index) {
 			if (index === 0) {
 				return this;
 			}
 		},
+
 		last: function (index, nodes) {
 			if (index === nodes.length - 1) {
 				return this;
 			}
 		},
+
 		eq: function (index, _, value) {
 			if (index === value) {
 				return this;
 			}
 		},
+
 		contains: function (index, _, text) {
 			if (Y.DOM(this).text().indexOf(text) > -1) {
 				return this;
 			}
 		},
+
 		has: function (index, _, selector) {
 			if (Y.DOM.qsa(this, selector).length) {
 				return this;
 			}
 		}
 	};
+
+	//---
 
 	function process(selector, callback) {
 		// Quote the hash in `a[href^=#]` expression
@@ -117,7 +126,9 @@
 		return callback(selector, filter, argument);
 	}
 
-	Y.DOM.qsa = function (node, selector) {
+	//---
+
+	Y.DOM.yDOM.qsa = function (node, selector) {
 		var taggedParent, nodes;
 
 		return process(selector, function (_selector, filter, argument) {
@@ -148,7 +159,9 @@
 		});
 	};
 
-	Y.DOM.matches = function (node, selector) {
+	//---
+
+	Y.DOM.yDOM.matches = function (node, selector) {
 		return process(selector, function (_selector, filter, argument) {
 			return (!_selector || oldMatches(node, _selector)) && (!filter || filter.call(node, null, argument) === node);
 		});
