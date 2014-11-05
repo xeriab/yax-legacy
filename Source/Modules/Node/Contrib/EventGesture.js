@@ -7,7 +7,7 @@
 /*jslint white: true */
 /*jshint -W084 */
 /*jslint node: false */
-/*global YAX, Y, $ */
+/*global YAX, Y */
 
 (function () {
 
@@ -21,8 +21,8 @@
 		return node.hasOwnProperty('tagName') ? node : node.parentNode;
 	}
 
-	if (Y.UA.features.OS.osx) {
-		$(document).bind('gesturestart', function (event) {
+	if (Y.OS.osx) {
+		Y.DOM(document).bind('gesturestart', function (event) {
 			var now = Y.now();
 			// var delta = now - (gesture.last || now);
 			gesture.target = parentIfText(event.target);
@@ -39,8 +39,8 @@
 		}).bind('gestureend', function () {
 			if (gesture.e2 > 0) {
 				if (Math.abs(gesture.e1 - gesture.e2) !== 0 &&
-				$(gesture.target).trigger('pinch') &&
-				$(gesture.target).trigger('pinch' + (gesture.e1 - gesture.e2 > 0 ? 'In' : 'Out'))) {
+				Y.DOM(gesture.target).trigger('pinch') &&
+				Y.DOM(gesture.target).trigger('pinch' + (gesture.e1 - gesture.e2 > 0 ? 'In' : 'Out'))) {
 					gesture.e1 = gesture.e2 = gesture.last = 0;
 				}
 			} else if (gesture.hasOwnProperty('last')) {
@@ -55,7 +55,7 @@
 			'pinchIn',
 			'pinchOut'
 		].forEach(function (event) {
-			$.fn[event] = function (callback) {
+			Y.DOM.Function[event] = function (callback) {
 				return this.bind(event, callback);
 			};
 		});
