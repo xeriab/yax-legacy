@@ -32,6 +32,10 @@
 
 	//---
 
+	Y.CLASSES = [];
+
+	//---
+
 	Y.Class.extend = function (properties) {
 		var parent = this;
 		var newClass;
@@ -110,6 +114,8 @@
 			Y.extend(newClass, {
 				_class_name: properties._class_name.toString()
 			});
+
+			Y.CLASSES.push(properties._class_name.toString());
 
 			delete properties._class_name;
 		}
@@ -282,7 +288,9 @@
 	//---
 
 	Y.Class.toString = function () {
-		return '[YAX] ' + (this._class_name ? '::' + this._class_name + Y.empty : '');
+		return '[YAX] Class:' +
+			(this._class_name ? Y.empty + this._class_name + Y.empty : Y.empty) +
+			' [C]';
 	};
 
 	//---
