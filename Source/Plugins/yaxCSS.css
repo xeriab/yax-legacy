@@ -1,3 +1,18 @@
+/* AutoFix Element */
+.yax-autofix.yax-fixed {
+	position: fixed !important;
+	top: auto;
+	right: auto;
+	bottom: auto;
+	left: auto;
+	overflow: auto;
+	height: 100%;
+}
+.yax-autofix.yax-fixed.yax-bottom {
+	position: absolute !important;
+	bottom: 0;
+}
+
 /* Unselectable Element */
 .yax-unselectable {
 	-moz-user-select: -moz-none;
@@ -416,19 +431,4 @@
 	-ms-animation-fill-mode: both;
 	-o-animation-fill-mode: both;
 	animation-fill-mode: both;
-}
-
-/* AutoFix Element */
-.yax-autofix._fixed {
-	position: fixed !important;
-	top: auto;
-	right: auto;
-	bottom: auto;
-	left: auto;
-	overflow: auto;
-	height: 100%;
-}
-.yax-autofix._fixed._bottom {
-	position: absolute !important;
-	bottom: 0;
 }

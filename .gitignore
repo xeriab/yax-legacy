@@ -1,3 +1,5 @@
 .idea
+.brackets.json
 node_modules
+projectFilesBackup
 Distribution

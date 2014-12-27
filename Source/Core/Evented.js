@@ -19,7 +19,7 @@
 		 * Y.Events is a base class that YAEX classes inherit from to
 		 * handle custom events.
 		 */
-		var YAX_Evented = Y.Class.extend({
+		module.exports = Y.Class.extend({
 			_class_name: 'Evented',
 
 			eventsArray: [],
@@ -271,8 +271,6 @@
 				}
 			}
 		}); // END OF YAX_Evented CLASS
-
-		module.exports = YAX_Evented;
 	});
 
 	//---

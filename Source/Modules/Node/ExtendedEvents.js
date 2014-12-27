@@ -9,7 +9,7 @@
 /*global Y, YAX */
 
 if (typeof Sizzle === 'undefined') {
-	throw new Error('YAX.JS DOM [Extended Events] requires YAX.DOM and Sizzle');
+	throw new Error('YAX.js DOM [Extended Events] requires YAX.DOM and Sizzle');
 }
 
 (function () {

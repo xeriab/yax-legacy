@@ -14,7 +14,7 @@
 
 	'use strict';
 
-	function Config() {
+	function Config () {
 		var args = Y.G.slice.call(arguments);
 
 		Object.defineProperty(this.STORAGE = {}, 0, {
@@ -167,6 +167,7 @@
 			var extension = args[0];
 			var details = args[1];
 			var keyVals = args[2];
+			var extendedResult = args[3];
 
 			var key = '';
 			var cfg = {};
@@ -211,12 +212,25 @@
 				}
 			}*/
 
+
 			if (keyVals && Y.isSet(keyVals) && Y.isTrue(keyVals)) {
 				for (key in cfg) {
 					if (cfg.hasOwnProperty(key)) {
 						tmp = key.split('.');
 						// Y.LOG(tmp);
 						noDetails[tmp[tmp.length - 1]] = cfg[key].LOCAL_VALUE;
+					}
+				}
+
+				return noDetails;
+			}
+
+			if (extendedResult && Y.isSet(extendedResult) && Y.isTrue(extendedResult)) {
+				for (key in cfg) {
+					if (cfg.hasOwnProperty(key)) {
+						tmp = key.split('.');
+						// Y.LOG(tmp);
+						// noDetails[tmp[tmp.length - 1]] = cfg[key].LOCAL_VALUE;
 					}
 				}
 
@@ -272,21 +286,6 @@
 	//---
 
 	Y.config = new Config();
-
-	//---
-
-	/*var _CoreConsole = {
-		'Console.Log.Extended': true,
-		'Console.Level': null,
-		'Console.Colored': false,
-		'Console.Colored.Message': false,
-		'Console.Print.Level': true,
-		'Console.Timed': false,
-		'Console.On.Output': null
-	};
-
-	Y.config.set('yax.core.console', _CoreConsole);
-	Y.config.set('extension', 'yax.core.console');*/
 
 	//---
 

@@ -1,22 +1,20 @@
-/**
- *
- */
-
-//---
-
 /*global Y, YAX */
 
+// Y.DOM(document).ready(function () {
 
-//---
-
-Y.DOM(document).ready(function () {
-
-    'use strict';
-
+Y.DOM(function () {
 	var Wrapper = Y.DOM('body');
 	var ButtonOne = Y.DOM('#ButtonOne');
 	var TestOneImage = Y.DOM('#TestOneImage');
 	var Jumbotron = Y.DOM('.jumbotron');
+
+	// Wrapper.AutoFix();
+	// Wrapper.ManualFix();
+
+	Wrapper.AutoFix();
+	// Wrapper.ManualFix();
+	// Y.DOM('.container').AutoFix();
+	Y.DOM('.container').ManualFix();
 
 	ButtonOne.Tooltip({
 		dynamic: true
@@ -45,8 +43,6 @@ Y.DOM(document).ready(function () {
 		animation: 'flipIn',
 		// animation: 'fadeIn',
 		size: 'small'
-		// size: 'medium'
-		// size: 'large'
 	});
 
 	TestOneImage.addClass('yax-unselectable');
@@ -61,7 +57,7 @@ Y.DOM(document).ready(function () {
 	// Wrapper.WaitForMe();
 
 	// Wrapper.WaitForMe({effect: 'bounce'});
-	// Wrapper.WaitForMe({effect: 'rotateplane'});
+	Wrapper.WaitForMe({effect: 'rotateplane'});
 	// Wrapper.WaitForMe({effect: 'stretch'});
 	// Wrapper.WaitForMe({effect: 'orbit'});
 	// Wrapper.WaitForMe({effect: 'roundBounce'});
@@ -76,11 +72,11 @@ Y.DOM(document).ready(function () {
 	// Y.DOM('#ani1').WaitForMe({effect: 'bounce', color: 'red'});
 	// Y.DOM('#ani2').WaitForMe({effect: 'rotateplane', color: 'green'});
 
-	/*var closeWaitForMe = function closeWaitForMe () {
+	var closeWaitForMe = function closeWaitForMe () {
 		Wrapper.WaitForMe('close');
-	};*/
+	};
 
-	// Wrapper.oneTime(3000, 'closeWaitForMe', closeWaitForMe);
+	Wrapper.oneTime(3000, 'closeWaitForMe', closeWaitForMe);
 
 	// Y.LOG(Wrapper);
 
@@ -245,24 +241,24 @@ Y.DOM(document).ready(function () {
 
 	// Y.LOG(ButtonOne);
 
-	/*Jumbotron.append('<div class="a">A</div>' + 
-		'<div class="b">B<div class="c">C</div></div>' + 
-		'<div class="d">D</div><div class="e">E</div>' + 
+	/*Jumbotron.append('<div class="a">A</div>' +
+		'<div class="b">B<div class="c">C</div></div>' +
+		'<div class="d">D</div><div class="e">E</div>' +
 		'<div class="f">F</div>'
 	);
 
-	Jumbotron.append('<button onclick="javascript: Y.DOM(\'.a\')' + 
-		'.eventLoggerStart(\'click\');">Y.DOM(\'.a\')' + 
+	Jumbotron.append('<button onclick="javascript: Y.DOM(\'.a\')' +
+		'.eventLoggerStart(\'click\');">Y.DOM(\'.a\')' +
 		'.eventLoggerStart(\'click\');</button>'
 	);
 
-	Jumbotron.append('<button onclick="javascript: Y.DOM(\'.b\')' + 
-		'.eventLoggerStart(\'mouseover\', \'green\');">Y.DOM(\'.b\')' + 
+	Jumbotron.append('<button onclick="javascript: Y.DOM(\'.b\')' +
+		'.eventLoggerStart(\'mouseover\', \'green\');">Y.DOM(\'.b\')' +
 		'.eventLoggerStart(\'mouseover\', \'green\');</button>'
 	);
 
-	Jumbotron.append('<button onclick="javascript: Y.DOM(\'.a\')' + 
-		'.eventLoggerStart(\'click\');">Y.DOM(\'.a\')' + 
+	Jumbotron.append('<button onclick="javascript: Y.DOM(\'.a\')' +
+		'.eventLoggerStart(\'click\');">Y.DOM(\'.a\')' +
 		'.eventLoggerStart(\'click\');</button>'
 	);
 
@@ -273,20 +269,20 @@ Y.DOM(document).ready(function () {
 	var $e = Y.DOM('.e');
 	var $f = Y.DOM('.f');*/
 
-	var LocalStorageCache = new Y.Store('localStorageCache');
+	// var LocalStorageCache = new Y.Store('localStorageCache');
+
+	var lsStore = new Y.Store('localStorage');
+
+	Y.LOG(lsStore);
+
+
 
 	// Y.DOM('.tooltip1').jBox('Tooltip');
 
 	// Y.LOG(ButtonOne.YaBox());
 
-	Y.LOG(LocalStorageCache.t());
+	// Y.LOG(LocalStorageCache.t());
 
 	//---
 
 });
-
-//---
-
-
-
-//---

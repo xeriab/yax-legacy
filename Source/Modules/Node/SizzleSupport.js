@@ -10,7 +10,7 @@
 /*global Y, Y, Sizzle */
 
 if (typeof Sizzle === 'undefined') {
-	throw new Error('YAX.JS DOM [Sizzle Support] requires YAX.DOM and Sizzle');
+	throw new Error('YAX.js DOM [Sizzle Support] requires YAX.DOM and Sizzle');
 }
 
 (function (window, document) {

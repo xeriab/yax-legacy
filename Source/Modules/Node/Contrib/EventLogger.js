@@ -16,17 +16,17 @@
 
 	'use strict';
 
-	function consoleOutput(e) {
-		if (e.data.color) {
-			var style = 'color:' + e.data.color;
-			Y.LOG('%c' + e.type + ' on ' + this.tagName, style);
+	function consoleOutput (event) {
+		if (event.data.color) {
+			var style = 'color:' + event.data.color;
+			Y.LOG('%c' + event.type + ' on ' + this.tagName, style);
 		} else {
-			Y.LOG(e.type + ' on ' + this.tagName);
+			Y.LOG(event.type + ' on ' + this.tagName);
 		}
 	}
 
-	function getCollectionObj(selector) {
-		var obj = {};
+	function getCollectionObj (selector) {
+		var object = {};
 		
 		/*switch (typeof selector) {
 			case 'string':
@@ -39,15 +39,15 @@
 
 		switch (Y.typeOf(selector)) {
 			case 'string':
-				obj = Y.DOM(selector);
+				object = Y.DOM(selector);
 				break;
 
 			case 'object':
-				obj = selector;
+				object = selector;
 				break;
 		}
 		
-		return obj;
+		return object;
 	}
 
 	Y.DOM.Function.eventLoggerStart = function (event, color) {
@@ -70,21 +70,21 @@
 		start: function (selector, event, color) {
 			var fontColor = Y.isString(color) ? color : Y.empty;
 
-			var obj = getCollectionObj(selector);
+			var object = getCollectionObj(selector);
 
-			obj.on(event, {
+			object.on(event, {
 				color: fontColor
 			}, consoleOutput);
 
-			return obj;
+			return object;
 		},
 
 		end: function (selector, event) {
-			var obj = getCollectionObj(selector);
+			var object = getCollectionObj(selector);
 
-			obj.off(event, consoleOutput);
+			object.off(event, consoleOutput);
 
-			return obj;
+			return object;
 		}
 	};
 

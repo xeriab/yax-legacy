@@ -8,7 +8,7 @@
 /*jshint undef: true */
 /*jshint unused: true */
 /*jshint strict: false */
-/*global exports, module */
+/*global exports, module, console */
 
 (function () {
 
@@ -143,21 +143,24 @@
 	//---
 
 	// Create a safe reference to the `Y` object for use below.
-	var Y = function (obj) {
-		if (obj instanceof Y) {
-			return obj;
+	var Y = function Y (object) {
+		if (object instanceof Y) {
+			return object;
 		}
 
 		if (!(this instanceof Y)) {
-			return new Y(obj);
+			return new Y(object);
 		}
 
-		this._wrapped = obj;
+		this._wrapped = object;
+
+		this.__name__ = 'YAX';
+		this.__desc__ = 'YAX Main Library';
 	};
 
 	//---
 
-	function expose() {
+	var expose = function expose () {
 		// Save the previous value of the `Y` variable.
 		Y.noConflict = function () {
 			root.Y = previousYax;
@@ -167,7 +170,7 @@
 		root.Y = root.YAX = Y;
 
 		isNode = false;
-	}
+	};
 
 	//---
 
@@ -201,7 +204,7 @@
 	};
 
 	String.prototype.toCamel = function () {
-		return this.replace(/(\-[a-z])|(\_[a-z])|(\s[a-z])/g, function ($1) {
+		return this.replace(/(\-[a-z])|(_[a-z])|(\s[a-z])/g, function ($1) {
 			return $1.toUpperCase()
 				.replace('-', '')
 				.replace('_', '')
@@ -255,7 +258,7 @@
 	/**
 	 * YAX._GLOBALS
 	 */
-	Y._GLOBALS = Y.G = {};
+	Y._GLOBALS = Y.G = Y.Global = {};
 
 	/**
 	 * YAX.Mixin
@@ -290,12 +293,12 @@
 
 	if (isNode) {
 		isNode = true;
-		console.info('[INFO] Running YAX.JS in "Node" Environment!');
+		console.info('[INFO] Running YAX.js in "Node" Environment!');
 	} else {
 		isNode = false;
 		Y.WIN = this;
 		Y.DOC = Y.WIN.document;
-		console.info('[INFO] Running YAX.JS in "Browser" Environment!');
+		console.info('[INFO] Running YAX.js in "Browser" Environment!');
 	}
 
 	/** @namespace define.amd */

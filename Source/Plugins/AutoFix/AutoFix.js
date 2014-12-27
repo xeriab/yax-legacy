@@ -22,23 +22,23 @@
 	var pluginOptions = Y.config.getAll('AutoFix', false, true);
 
 	Y.DOM.Function.AutoFix = function (options) {
-		var settings = Y.extend(pluginOptions, options, {}),
-			el = Y.DOM(this),
-			curpos = el.position(),
-			offset = settings.customOffset,
-			pos = el.offset(),
-			fixAll;
+		var options = Y.extend(pluginOptions, options, {});
+		var elem = Y.DOM(this);
+		var curpos = elem.position();
+		var offset = options.customOffset;
+		var pos = elem.offset();
+		var fixAll;
 
-		el.addClass('yax-autofix');
+		elem.addClass('yax-autofix');
 
 		Y.DOM.Function.ManualFix = function () {
-			el = Y.DOM(this);
-			pos = el.offset();
+			elem = Y.DOM(this);
+			pos = elem.offset();
 
-			if (el.hasClass('_fixed')) {
-				el.removeClass('_fixed');
+			if (elem.hasClass('yax-fixed')) {
+				elem.removeClass('yax-fixed');
 			} else {
-				el.addClass('_fixed').css({
+				elem.addClass('yax-fixed').css({
 					top: 0,
 					left: pos.left,
 					right: 'auto',
@@ -47,15 +47,15 @@
 			}
 		};
 
-		fixAll = function (el, settings, curpos, pos) {
-			if (settings.customOffset === false) {
-				offset = el.parent().offset().top;
+		fixAll = function (elem, options, curpos, pos) {
+			if (options.customOffset === false) {
+				offset = elem.parent().offset().top;
 			}
 
 			if (Y.DOM(document).scrollTop() > offset &&
-				Y.DOM(document).scrollTop() <= (el.parent().height() +
+				Y.DOM(document).scrollTop() <= (elem.parent().height() +
 				(offset - Y.DOM(window).height()))) {
-				el.removeClass('_bottom').addClass('_fixed').css({
+				elem.removeClass('yax-bottom').addClass('yax-fixed').css({
 					top: 0,
 					left: pos.left,
 					right: 'auto',
@@ -63,25 +63,28 @@
 				});
 			} else {
 				if (Y.DOM(document).scrollTop() > offset) {
-					if (settings.onlyInContainer === true) {
-						if (Y.DOM(document).scrollTop() > (el.parent().height() - Y.DOM(window).height())) {
-							el.addClass('_bottom _fixed').removeAttr('style').css({
-								left: curpos.left
-							});
+					if (options.onlyInContainer === true) {
+						if (Y.DOM(document).scrollTop() > 
+							(elem.parent().height() - 
+								Y.DOM(window).height())) {
+							elem.addClass('yax-bottom yax-fixed')
+								.removeAttr('style').css({
+									left: curpos.left
+								});
 						} else {
-							el.removeClass('_bottom _fixed').removeAttr('style');
+							elem.removeClass('yax-bottom yax-fixed').removeAttr('style');
 
 						}
 					}
 				} else {
-					el.removeClass('_bottom _fixed').removeAttr('style');
+					elem.removeClass('yax-bottom yax-fixed').removeAttr('style');
 				}
 			}
 		};
 
-		if (settings.manual === false) {
+		if (options.manual === false) {
 			Y.DOM(window).scroll(function () {
-				fixAll(el, settings, curpos, pos);
+				fixAll(elem, options, curpos, pos);
 			});
 		}
 	};

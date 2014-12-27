@@ -149,8 +149,8 @@
 		_init: function () {
 			Y.config.set('Console.Log.Extended', true);
 			Y.config.set('Console.Level', this.LEVELS.DEBUG);
-			Y.config.set('Console.Colored', false);
-			Y.config.set('Console.Message.Colored', false);
+			Y.config.set('Console.Colored', true);
+			Y.config.set('Console.Message.Colored', true);
 			Y.config.set('Console.Print.Level', true);
 			Y.config.set('Console.Timed', false);
 			Y.config.set('Console.On.Output', null);

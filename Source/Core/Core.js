@@ -35,9 +35,9 @@
 	 * Get the type of
 	 */
 	Y.typeOf = function getType(variable) {
-		var str = typeof variable;
+		var string = typeof variable;
 		var name;
-		var getFuncName = function(func) {
+		var getFuncName = function getFuncName(func) {
 			name = (/\W*function\s+([\w\$]+)\s*\(/).exec(func);
 
 			if (!name) {
@@ -47,35 +47,35 @@
 			return name[1];
 		};
 
-		if (str === 'object') {
+		if (string === 'object') {
 			if (variable !== null) {
 				// From: http://javascript.crockford.com/remedial.html
 				if (typeof variable.length === 'number' &&
 					!(variable.propertyIsEnumerable('length')) &&
 					typeof variable.splice === 'function') {
-					str = 'array';
+					string = 'array';
 				} else if (variable.constructor &&
 					getFuncName(variable.constructor)) {
 					name = getFuncName(variable.constructor);
 
 					if (name === 'Date') {
-						str = 'date';
+						string = 'date';
 					} else if (name === 'RegExp') {
-						str = 'regexp';
-					} else if (name === 'YAEX_Resource') {
+						string = 'regexp';
+					} else if (name === 'YaxResource') {
 						// Check against our own resource constructor
-						str = 'resource';
+						string = 'resource';
 					}
 				}
 			} else {
-				str = 'null';
+				string = 'null';
 			}
-		} else if (str === 'number') {
-			// str = this.is_float(variable) ? 'double' : 'integer';
-			str = Y.isFloat(variable) ? 'double' : 'integer';
+		} else if (string === 'number') {
+			// string = this.is_float(variable) ? 'double' : 'integer';
+			string = Y.isFloat(variable) ? 'double' : 'integer';
 		}
 
-		return str;
+		return string;
 	};
 
 	/**
@@ -436,9 +436,9 @@
 	};
 
 	Y.empty = (function empty() {
-		var str = ' ';
+		var string = ' ';
 
-		return str.trim();
+		return string.trim();
 	}());
 
 	/**
