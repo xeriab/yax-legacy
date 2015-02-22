@@ -11,10 +11,10 @@ Y.DOM(function () {
 	// Wrapper.AutoFix();
 	// Wrapper.ManualFix();
 
-	Wrapper.AutoFix();
+	//Wrapper.AutoFix();
 	// Wrapper.ManualFix();
 	// Y.DOM('.container').AutoFix();
-	Y.DOM('.container').ManualFix();
+	//Y.DOM('.container').ManualFix();
 
 	ButtonOne.Tooltip({
 		dynamic: true
@@ -271,9 +271,9 @@ Y.DOM(function () {
 
 	// var LocalStorageCache = new Y.Store('localStorageCache');
 
-	var lsStore = new Y.Store('localStorage');
+	//var lsStore = new Y.Store('localStorage');
 
-	Y.LOG(lsStore);
+	//Y.LOG(lsStore);
 
 
 
@@ -284,5 +284,17 @@ Y.DOM(function () {
 	// Y.LOG(LocalStorageCache.t());
 
 	//---
+
+
+	//Y.DOM('.navbar-header').VideoBackground({
+	//	position: 'fixed',
+	//	zIndex: 2,
+	//	mp4: 'assets/christmas_snow.mp4',
+	//	ogv: 'assets/christmas_snow.ogv',
+	//	webm: 'assets/christmas_snow.webm',
+	//	poster: 'assets/christmas_snow.jpg',
+	//	opacity: 1,
+	//	fullscreen: true
+	//});
 
 });

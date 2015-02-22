@@ -15,7 +15,7 @@
 	'use strict';
 
 	var classToType = {};
-	
+
 	//---
 
 	/**
@@ -37,6 +37,7 @@
 	Y.typeOf = function getType(variable) {
 		var string = typeof variable;
 		var name;
+
 		var getFuncName = function getFuncName(func) {
 			name = (/\W*function\s+([\w\$]+)\s*\(/).exec(func);
 
@@ -774,7 +775,7 @@
 	}
 
 	function compact(array) {
-		return Y.G.filter.call(array, function(item) {
+		return Y.G.filter.call(array, function (item) {
 			return item !== null;
 		});
 	}
@@ -800,7 +801,7 @@
 	};
 
 	function unique(array) {
-		return Y.G.filter.call(array, function(item, index) {
+		return Y.G.filter.call(array, function (item, index) {
 			return array.indexOf(item) === index;
 		});
 	}
@@ -834,28 +835,28 @@
 		var tmp = (argc === null ? 3 : argc);
 
 		switch (tmp) {
-			case 1:
-				return function(value) {
-					return func.call(context, value);
-				};
+		case 1:
+			return function (value) {
+				return func.call(context, value);
+			};
 
-			case 2:
-				return function(value, other) {
-					return func.call(context, value, other);
-				};
+		case 2:
+			return function (value, other) {
+				return func.call(context, value, other);
+			};
 
-			case 3:
-				return function(value, index, collection) {
-					return func.call(context, value, index, collection);
-				};
+		case 3:
+			return function (value, index, collection) {
+				return func.call(context, value, index, collection);
+			};
 
-			case 4:
-				return function(accumulator, value, index, collection) {
-					return func.call(context, accumulator, value, index, collection);
-				};
+		case 4:
+			return function (accumulator, value, index, collection) {
+				return func.call(context, accumulator, value, index, collection);
+			};
 		}
 
-		return function() {
+		return function () {
 			return func.apply(context, arguments);
 		};
 	};
@@ -887,7 +888,7 @@
 				}
 			}
 
-		// A special, fast, case for the most common use of each
+			// A special, fast, case for the most common use of each
 		} else {
 			if (_isArray) {
 				for (x; x < length; x++) {
@@ -916,7 +917,7 @@
 	// The cornerstone, an `each` implementation, aka `forEach`.
 	// Handles raw objects in addition to array-likes. Treats all
 	// sparse array-likes as if they were dense.
-	Y.forEach = function forEach (object, iteratee, context) {
+	Y.forEach = function forEach(object, iteratee, context) {
 		/*jshint -W041 */
 		if (object == null) {
 			return object;
@@ -961,7 +962,7 @@
 		return Y.property(value);
 	};
 
-	Y.extend = function extend (object) {
+	Y.extend = function extend(object) {
 		if (!Y.isObject(object) && !Y.isFunction(object)) {
 			return object;
 		}
@@ -1058,7 +1059,7 @@
 	};
 
 	// Is a given value a DOM element?
-	Y.isElement = function isElement (object) {
+	Y.isElement = function isElement(object) {
 		return !!(object && object.nodeType === 1);
 	};
 

@@ -43,60 +43,64 @@
 //		console.log(compsStr);
 
 		switch (compsStr) {
-			case '0000000000000':
+			case '00000000000000':
 				type = 'Core';
 				break;
 
-			case '0000000000001':
+			case '00000000000001':
 				type = 'Core';
 				break;
 
-			case '0000000000010':
+			case '00000000000010':
 				type = 'CoreExtra';
 				break;
 
-			case '0000000000100':
+			case '00000000000100':
 				type = 'Node';
 				break;
 
-			case '0000000001000':
+			case '00000000001000':
 				type = 'NodeExtra';
 				break;
 
-			case '0000000010000':
+			case '00000000010000':
 				type = 'SimpleDOM';
 				break;
 
-			case '0000000100000':
+			case '00000000100000':
 				type = 'LocalStorage';
 				break;
 
-			case '0000001000000':
+			case '00000001000000':
 				type = 'Cookies';
 				break;
 
-			case '0000010000000':
+			case '00000010000000':
 				type = 'CSV.Parser';
 				break;
 
-			case '0000100000000':
+			case '00000100000000':
 				type = 'JSON.Parser';
 				break;
 
-			case '0001000000000':
+			case '00001000000000':
 				type = 'HashRouter';
 				break;
 
-			case '0010000000000':
+			case '00010000000000':
 				type = 'AutoFix';
 				break;
 
-			case '0100000000000':
+			case '00100000000000':
 				type = 'Tooltip';
 				break;
 
-			case '1000000000000':
+			case '01000000000000':
 				type = 'WaitForMe';
+				break;
+
+			case '10000000000000':
+				type = 'VideoBackground';
 				break;
 		}
 

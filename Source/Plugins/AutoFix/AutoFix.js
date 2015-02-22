@@ -93,6 +93,6 @@
 
 }());
 
-// FILE: ./Source/Plugins/autoFix/autoFix.js
+// FILE: ./Source/Plugins/AutoFix/AutoFix.js
 
 //---

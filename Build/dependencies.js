@@ -254,6 +254,16 @@ var Dependencies = {
 		desc: 'WaitForMe plugin.',
 
 		extended_desc: ''
+	},
+
+	'VideoBackground': {
+		src: [
+			'Plugins/VideoBackground/VideoBackground.js'
+		],
+
+		desc: 'VideoBackground plugin.',
+
+		extended_desc: ''
 	}
 };
 

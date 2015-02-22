@@ -281,7 +281,7 @@ ul#toolbar-list a:active {
 }
 #dependencies-list label {
 	float: left;
-	width: 160px;
+	width: 180px;
 	height: auto;
 	font-family: 'OpenSans', Tahoma, Verdana, sans, serif;
 	/*background: radial-gradient(200px 500px, rgba(255, 255, 255, .2) -150px, transparent 50%);*/
