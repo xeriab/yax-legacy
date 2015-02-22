@@ -3,7 +3,7 @@
 node_modules
 projectFilesBackup
 Distribution
-Tests/christmas_snow.jpg
-Tests/christmas_snow.mp4
-Tests/christmas_snow.ogv
-Tests/christmas_snow.webm
+Tests/assets/christmas_snow.jpg
+Tests/assets/christmas_snow.mp4
+Tests/assets/christmas_snow.ogv
+Tests/assets/christmas_snow.webm
